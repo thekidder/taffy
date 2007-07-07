@@ -1,0 +1,65 @@
+SORE Data Package File Format 0.2 DRAFT
+
+A simple file archive format supporting nested directories, DEFLATE compression (via zlib), and up to 65,534 files
+
+3 bytes: ASCII characters SDP
+Any other characters indicate a non-SDP formatted file
+0x53 0x44 0x50
+
+2 bytes: format version
+Major version (1 byte) Minor version (1 byte)
+ex 0x00 0x01 represents version 0.1 (this specification)
+
+2 bytes: number of files and directory entries (little endian)
+ex 0xff 0x00 represents 256 files/directories in the archive
+
+--------
+File Info Table
+For each file/directory:
+2 bytes: file/directory ID as a short integer (ranges from 1 to 65,534)
+IDs start at 1 and must proceed consecutively in the file table
+
+1 byte: flags:
+	1st bit: file/directory: 0 (file), 1 (directory)
+	2nd bit: compression (only if a file): 0 (none), 1 (DEFLATE)
+	3rd bit: reserved
+	4th bit: reserved
+	5th bit: reserved
+	6th bit: reserved
+	7th bit: reserved
+	8th bit: reserved
+	
+2 bytes: parent of file
+Used to build nested directory tree
+Value 65,535 is used to indicate no parent (top level)
+
+n bytes: file/directory name as a null-terminated string
+
+--------
+The following 8 bytes are only present if the entry describes a file
+
+4 bytes: absolute position of the beginning file
+
+4 bytes: absolute size of file in bytes
+
+-------
+The following 4 bytes are only present if compression is enabled for this file
+
+4 bytes: compressed size of file in bytes
+
+------------------------
+file structure:
+maintain: out buffer
+          out buffer filled
+CHUNK is between 16K - 256K (or whatever)
+
+allocate out buffer to be size CHUNK * 4
+and an input buffer to be CHUNK
+
+while (total data read) < (data requested)
+	make sure there is CHUNK input data in the in buffer
+	while avail_out == 0
+		inflate in buffer and place results into out buffer
+	if out buffer filled > data requested
+		put first (data requested) bytes into temp. buffer
+		move the rest into beginning of buffer

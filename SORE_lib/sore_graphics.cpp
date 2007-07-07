@@ -1,0 +1,95 @@
+
+#include "sore_graphics.h"
+#include "allgl.h"
+
+namespace SORE_2DOverlay
+{
+	void WindowToReal(int* window, int* real);
+	
+	GLint viewport[4];
+}
+
+void SORE_2DOverlay::WindowToReal(int* window, int* real)
+{
+	if(window[0]>viewport[2] || window[1]>viewport[3] || window[0]<0 || window[1]<0)
+		return;
+	real[0] = window[0];
+	real[1] = viewport[3]-window[1];
+}
+
+void SORE_2DOverlay::Init()
+{
+	UpdateViewport();
+}
+
+void SORE_2DOverlay::UpdateViewport()
+{
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	//std::cout << viewport[0] << ":" << viewport[1] << ":" << viewport[2] << ":" << viewport[3] << std::endl;
+}
+
+void SORE_2DOverlay::Init_2DCanvas()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(viewport[0],viewport[2],viewport[3],viewport[1], -1.0f, -1.0f);
+	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
+	glPopAttrib();
+	glLoadIdentity();
+}
+
+void SORE_2DOverlay::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
+{
+	int window[2];
+	window[0] = x;
+	window[1] = y;
+	int real[2];
+	
+	WindowToReal(window, real);
+	
+	int h = SORE_Font::FontHeight(font);
+	
+	//std::cout << "height: " << h << " " << real[1] << std::endl;
+	
+	real[1] -= h;
+	char text[256];
+		
+	if(fmt!=NULL)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		vsprintf(text, fmt, ap);
+		va_end(ap);
+		SORE_Font::Print(font, real[0], real[1], text);
+	}
+}
+
+void SORE_2DOverlay::Destroy_2DCanvas()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}
+
+/*inline void SORE_Font::PushScreenCoordMatrix()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
+	glPopAttrib();
+}
+
+inline void SORE_Font::PopProjectionMatrix()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}*/
