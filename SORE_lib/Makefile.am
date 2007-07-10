@@ -1,4 +1,4 @@
-INCLUDES = -I/usr/src/freetype
+INCLUDES = -I/usr/include/freetype2/
 METASOURCES = AUTO
 lib_LIBRARIES = libsore.a
 libsore_a_LDFLAGS = -lGL -lGLU -lSDL -lfontconfig -lfreetype -lz

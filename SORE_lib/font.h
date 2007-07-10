@@ -5,26 +5,7 @@
 
 //freetype
 #include <ft2build.h>
-#include <freetype/freetype.h>
-#include <freetype/ftglyph.h>
-#include <freetype/ftoutln.h>
-#include <freetype/fttrigon.h>
-
-#include <vector>
-#include <string>
-#include <string.h>
-#include <cstdlib>
-
-using std::vector;
-using std::string;
-
-#ifdef WIN32
-#define PATH_SEP "\\"
-#else
-#define PATH_SEP "/"
-#endif
-
-
+#include FT_FREETYPE_H
 
 namespace SORE_Font
 {

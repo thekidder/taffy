@@ -2,6 +2,22 @@
 #include "fileio.h"
 #include "sore_graphics.h"
 
+
+
+#include <vector>
+#include <string>
+#include <string.h>
+#include <cstdlib>
+
+using std::vector;
+using std::string;
+
+#ifdef WIN32
+#define PATH_SEP "\\"
+#else
+#define PATH_SEP "/"
+#endif
+
 namespace SORE_Font
 {
 	static vector<string> fontPaths;
@@ -21,14 +37,16 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint 
 		return GLYPH_LOAD_FAILED;
 	
 	// Move The Face's Glyph Into A Glyph Object.
-	FT_Glyph glyph;
+	/*FT_Glyph glyph;
 	if(FT_Get_Glyph( face->glyph, &glyph ))
-		return GET_GLYPH_FAILED;
+		return GET_GLYPH_FAILED;*/
+
+	FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 	
-	FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
-	FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
+	//FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
+	//FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
 	
-	FT_Bitmap& bitmap=bitmap_glyph->bitmap;
+	FT_Bitmap& bitmap=face->glyph->bitmap;
 	
 	int width = next_p2( bitmap.width );
 	int height = next_p2( bitmap.rows );
@@ -55,9 +73,9 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint 
 	glNewList(list_base+ch, GL_COMPILE);
 	glBindTexture(GL_TEXTURE_2D, tex_base[ch]);
 	glPushMatrix();
-	glTranslatef(bitmap_glyph->left,0.0f,0.0f);
+	glTranslatef(face->glyph->bitmap_left,0.0f,0.0f);
 	
-	glTranslatef(0.0f,bitmap_glyph->top-bitmap.rows,0.0f);
+	glTranslatef(0.0f,face->glyph->bitmap_top,0.0f);
 	float x=(float)bitmap.width / (float)width, y=(float)bitmap.rows / (float)height;
 	
 	glBegin(GL_QUADS);
