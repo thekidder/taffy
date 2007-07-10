@@ -75,7 +75,7 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint 
 	glPushMatrix();
 	glTranslatef(face->glyph->bitmap_left,0.0f,0.0f);
 	
-	glTranslatef(0.0f,face->glyph->bitmap_top,0.0f);
+	//glTranslatef(0.0f,face->glyph->bitmap_top,0.0f);
 	float x=(float)bitmap.width / (float)width, y=(float)bitmap.rows / (float)height;
 	
 	glBegin(GL_QUADS);
@@ -135,8 +135,13 @@ inline void SORE_Font::PopProjectionMatrix()
 
 int SORE_Font::FontHeight(font_ref font)
 {
-	FontInfo* fontObj = &fontStack[font];
-	return fontObj->height;
+	if(font >= 0)
+	{
+		FontInfo* fontObj = &fontStack[font];
+		return fontObj->height;
+	}
+	else
+		return -1;
 }
 
 int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
@@ -333,6 +338,9 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		FT_Done_FreeType(library);
 		delete[] dirName;
 		std::cerr << "Font load failed: Freetype error code " << err << std::endl;
+#ifdef NDEBUG
+		std::cout << ft_errors[err] << std::endl;
+#endif
 		return FONT_LOAD_FAILED;
 	}
 	

@@ -202,6 +202,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			return 0;
 		}
 		cachedFiles[it->second].currPos = 0;
+		cachedFiles[it->second].currPosRaw  = 0;
 		std::cout << "Opening file " << file << " from package " << cachedFiles[it->second].package << "\n";
 		if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
 		{
@@ -221,7 +222,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			cachedFiles[it->second].out_buf.next = NULL;
 			cachedFiles[it->second].out_buf.size = CHUNK * RATIO;
 			cachedFiles[it->second].out_filled  = 0;
-			cachedFiles[it->second].currPosRaw  = 0;
+			
 			cachedFiles[it->second].out_size    = CHUNK * RATIO;
 			int ret;
 			cachedFiles[it->second].strm           = new z_stream;
@@ -410,7 +411,8 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		{
 			read = fread(ptr, size, bytesToRead, openPackages[cachedFiles[file].package]);
 		}
-		cachedFiles[file].currPos += read;
+		cachedFiles[file].currPosRaw += read;
+		return read;
 	}
 	else if(file>=FILESYSTEM_START && file<4294967295)
 	{
@@ -463,7 +465,7 @@ void SORE_FileIO::LinkedListCopy(void* dest, linked_list* src, unsigned int n)//
 		if(n - copied > curr->size)
 			toCopy = curr->size;
 		else
-			toCopy = n;
+			toCopy = n - copied;
 		memcpy((unsigned char*)dest+copied, curr->data, toCopy);
 		copied += toCopy;
 		curr = curr->next;

@@ -7,6 +7,21 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#ifdef NDEBUG
+
+#undef __FTERRORS_H__
+#define FT_ERRORDEF( e, v, s )  { e, s },                       
+#define FT_ERROR_START_LIST     {                               
+#define FT_ERROR_END_LIST       { 0, 0 } };                     
+const struct                                                    
+{                                                               
+	int          err_code;                                        
+	const char*  err_msg                                          
+} ft_errors[] =                                                 
+#include FT_ERRORS_H
+
+#endif
+
 namespace SORE_Font
 {
 	//let's define some nice error constants
