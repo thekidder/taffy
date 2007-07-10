@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	font = SORE_Font::LoadFont("data/Fonts/liberationsans.ttf", 24);	
 	console.InitFont(SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24));
 	
-	SORE_2DOverlay::Init();
+	SORE_Graphics::Init_2DOverlay();
 	
 	if(LoadGLTextures()!=0)
 	{
@@ -503,11 +503,11 @@ int Render()
 			frames = 0;
 		}
 	}
-	SORE_2DOverlay::Init_2DCanvas();
+	SORE_Graphics::Init_2DCanvas();
 	console.Render();
 	//SORE_Font::Print(font, 0, 0, "FPS: %5.2f", fps);
-	SORE_2DOverlay::DrawString(font, 0, 0, "FPS: %5.2f", fps);
-	SORE_2DOverlay::Destroy_2DCanvas();
+	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
+	SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();
 	return 0;
 }
