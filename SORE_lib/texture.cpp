@@ -2,6 +2,10 @@
 #include "texture.h"
 #include "fileio.h"
 
+#include <fstream>
+#include <cstring>
+#include <string>
+#include <cctype>
 /*GLuint SORE_Texture::LoadBMP(const char* imgName)
 {
 	SDL_Surface* imgBuffer;
@@ -157,4 +161,41 @@ GLuint SORE_Texture::LoadTGA(const char* imgName)
 
 int SORE_Texture::ImageFormat(const char* imgName, bool useNameMatching)
 {
+	if(useNameMatching)
+	{
+		char ext[10];
+		int len = strlen(imgName);
+		int i;
+		for(i=len-1;i>=0;i--)
+		{
+			if(imgName[i]=='.')
+				break;
+		}
+		if(i==0) 
+		{
+			std::cerr << "no ext\n";
+			return IMG_INVALID;
+		}
+		if(len-i>10)
+		{
+			std::cerr << "too long ext\n";
+			return IMG_INVALID;
+		}
+		strcpy(ext, imgName+i+1);
+		for(i=0;i<strlen(ext);i++)
+		{
+			ext[i] = tolower(ext[i]);
+		}
+		std::cout << "ext: " << ext << std::endl;
+		if(strcmp(ext, "tga")==0)
+			return IMG_TGA;
+		if(strcmp(ext, "bmp")==0)
+			return IMG_BMP;
+		return IMG_INVALID;
+	}
+	else
+	{
+		//not implemented
+		return IMG_INVALID;
+	}	
 }

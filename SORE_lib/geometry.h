@@ -3,11 +3,6 @@
 
 #include "allgl.h"
 
-#define TGA 1
-#define BMP 2
-#define JPG 3
-
-
 struct Vertex
 {
 	GLfloat x, y, z; //geometry coordinates
@@ -21,7 +16,7 @@ class Triangle
 		Triangle();
 		Triangle(Vertex* v);
 		Triangle(Vertex* v, const char* filename);
-		Triangle(Vertex* v, SDL_Surface* surface);
+		Triangle(Vertex* v, GLuint texture);
 		void Draw();
 		int SetTexture(const char* filename);
 		~Triangle();

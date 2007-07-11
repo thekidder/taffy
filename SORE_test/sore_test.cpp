@@ -41,6 +41,17 @@ double angle;
 
 int main(int argc, char *argv[])
 {
+	cout << "testing ImageFormat\n";
+	cout << "TGA: " << SORE_Texture::IMG_TGA << " BMP: " << SORE_Texture::IMG_BMP << " INV: " << SORE_Texture::IMG_INVALID << endl;
+	cout << "file.tga " << SORE_Texture::ImageFormat("file.tga") << endl;
+	cout << "file.tgaABASDF " << SORE_Texture::ImageFormat("file.tgaABASDF") << endl;
+	cout << "file.tgaASDFGHJKLP " << SORE_Texture::ImageFormat("file.tgaASDFGHJKLP") << endl;
+	cout << "filetga " << SORE_Texture::ImageFormat("filetga") << endl;
+	cout << "file.bmp " << SORE_Texture::ImageFormat("file.bmp") << endl;
+	cout << "file.TGA " << SORE_Texture::ImageFormat("file.TGA") << endl;
+	cout << "file.tGa " << SORE_Texture::ImageFormat("file.tGa") << endl;
+	
+	
 	if(InitSDL()!=0)
 		return -1;
 	
@@ -289,37 +300,49 @@ int Render()
 	glDisable(GL_TEXTURE_2D);
 	glDisable( GL_COLOR_MATERIAL ) ;
 	glTranslatef(-3.0f, 0.0f, 0.0f);
-	glBegin(GL_QUADS);
+	glBegin(GL_LINE_LOOP);
 		
-	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom
 	glVertex3f( 0.1f, -0.1f,  0.1f);
 	glVertex3f( 0.1f, -0.1f, -0.1f);
 	glVertex3f(-0.1f, -0.1f, -0.1f);
-		
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
 		
 	glVertex3f(-0.1f,  0.1f,  0.1f); //top
 	glVertex3f( 0.1f,  0.1f,  0.1f);
 	glVertex3f( 0.1f,  0.1f, -0.1f);
 	glVertex3f(-0.1f,  0.1f, -0.1f);
 		
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+	
 		//front
 	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom left
 	glVertex3f(-0.1f,  0.1f,  0.1f); //top left
 	glVertex3f( 0.1f,  0.1f,  0.1f); //top right
 	glVertex3f( 0.1f, -0.1f,  0.1f); //bottom right
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
 		
 	glVertex3f(-0.1f, -0.1f, -0.1f); //back
 	glVertex3f(-0.1f,  0.1f, -0.1f);
 	glVertex3f( 0.1f,  0.1f, -0.1f);
 	glVertex3f( 0.1f, -0.1f, -0.1f);
-		
-		
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+			
 	glVertex3f(-0.1f, -0.1f,  0.1f); //left
 	glVertex3f(-0.1f,  0.1f,  0.1f);
 	glVertex3f(-0.1f,  0.1f, -0.1f);
 	glVertex3f(-0.1f, -0.1f, -0.1f);
-		
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
 		
 	glVertex3f( 0.1f, -0.1f,  0.1f); //right
 	glVertex3f( 0.1f,  0.1f,  0.1f);

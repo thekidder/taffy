@@ -2,7 +2,6 @@
 
 #include "allgl.h"
 #include "fileio.h"
-#include <fstream>
 
 namespace SORE_Texture
 {
