@@ -35,17 +35,8 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint 
 {
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
 		return GLYPH_LOAD_FAILED;
-	
-	// Move The Face's Glyph Into A Glyph Object.
-	/*FT_Glyph glyph;
-	if(FT_Get_Glyph( face->glyph, &glyph ))
-		return GET_GLYPH_FAILED;*/
 
 	FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-	
-	//FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
-	//FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
-	
 	FT_Bitmap& bitmap=face->glyph->bitmap;
 	
 	int width = next_p2( bitmap.width );

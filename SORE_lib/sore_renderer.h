@@ -4,6 +4,10 @@
 
 namespace SORE_Graphics
 {
+	class Renderable
+	{
+	};
+	
 	class Renderer
 	{
 	};
