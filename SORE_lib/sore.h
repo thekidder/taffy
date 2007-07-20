@@ -12,5 +12,6 @@
 #include "fileio.h"
 #include "sore_util.h"
 #include "sore_graphics.h"
+#include "sore_resource.h"
 
 #endif /*__SORE_ALL__*/
