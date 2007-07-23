@@ -41,15 +41,9 @@ double angle;
 
 int main(int argc, char *argv[])
 {
-	cout << "testing ImageFormat\n";
-	cout << "TGA: " << SORE_Texture::IMG_TGA << " BMP: " << SORE_Texture::IMG_BMP << " INV: " << SORE_Texture::IMG_INVALID << endl;
-	cout << "file.tga " << SORE_Texture::ImageFormat("file.tga") << endl;
-	cout << "file.tgaABASDF " << SORE_Texture::ImageFormat("file.tgaABASDF") << endl;
-	cout << "file.tgaASDFGHJKLP " << SORE_Texture::ImageFormat("file.tgaASDFGHJKLP") << endl;
-	cout << "filetga " << SORE_Texture::ImageFormat("filetga") << endl;
-	cout << "file.bmp " << SORE_Texture::ImageFormat("file.bmp") << endl;
-	cout << "file.TGA " << SORE_Texture::ImageFormat("file.TGA") << endl;
-	cout << "file.tGa " << SORE_Texture::ImageFormat("file.tGa") << endl;
+#ifdef DEBUG
+	std::cout << "----DEBUG BUILD----\n";
+#endif
 	
 	
 	if(InitSDL()!=0)

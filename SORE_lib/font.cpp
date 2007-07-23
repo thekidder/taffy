@@ -329,7 +329,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		FT_Done_FreeType(library);
 		delete[] dirName;
 		std::cerr << "Font load failed: Freetype error code " << err << std::endl;
-#ifdef NDEBUG
+#ifdef DEBUG
 		std::cout << ft_errors[err] << std::endl;
 #endif
 		return FONT_LOAD_FAILED;

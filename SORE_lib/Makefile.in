@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -33,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = SORE_lib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -56,7 +58,8 @@ libsore_a_LIBADD =
 am_libsore_a_OBJECTS = camera.$(OBJEXT) fileio.$(OBJEXT) \
 	font.$(OBJEXT) geometry.$(OBJEXT) particle.$(OBJEXT) \
 	sore_console.$(OBJEXT) sore_graphics.$(OBJEXT) \
-	sore_renderer.$(OBJEXT) sore_util.$(OBJEXT) texture.$(OBJEXT)
+	sore_renderer.$(OBJEXT) sore_resource.$(OBJEXT) \
+	sore_util.$(OBJEXT) texture.$(OBJEXT)
 libsore_a_OBJECTS = $(am_libsore_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -81,6 +84,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libsore_a_SOURCES)
 DIST_SOURCES = $(libsore_a_SOURCES)
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -196,9 +200,10 @@ libsore_a_LDFLAGS = -lGL -lGLU -lSDL -lfontconfig -lfreetype -lz
 libsore_a_SOURCES = 2d_overlay_thoughts allgl.h camera.cpp camera.h fileio.cpp \
 	fileio.h font.cpp font.h geometry.cpp geometry.h particle.cpp particle.h \
 	renderer_thoughts sdp_info sore.h sore_console.cpp sore_console.h sore_graphics.cpp \
-	sore_graphics.h sore_renderer.cpp sore_renderer.h sore_util.cpp sore_util.h texture.cpp \
-	texture.h
+	sore_graphics.h sore_renderer.cpp sore_renderer.h sore_resource.cpp sore_util.cpp \
+	sore_util.h texture.cpp texture.h
 
+noinst_HEADERS = sore_resource.h
 all: all-am
 
 .SUFFIXES:
@@ -280,6 +285,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_console.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_graphics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_renderer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_resource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texture.Po@am__quote@
 
@@ -386,7 +392,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
