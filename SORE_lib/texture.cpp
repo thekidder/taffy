@@ -1,5 +1,6 @@
 
 #include "texture.h"
+#include "sore_util.h"
 #include "fileio.h"
 
 #include <fstream>
@@ -164,28 +165,7 @@ int SORE_Texture::ImageFormat(const char* imgName, bool useNameMatching)
 	if(useNameMatching)
 	{
 		char ext[10];
-		int len = strlen(imgName);
-		int i;
-		for(i=len-1;i>=0;i--)
-		{
-			if(imgName[i]=='.')
-				break;
-		}
-		if(i==0) 
-		{
-			std::cerr << "no ext\n";
-			return IMG_INVALID;
-		}
-		if(len-i>10)
-		{
-			std::cerr << "too long ext\n";
-			return IMG_INVALID;
-		}
-		strcpy(ext, imgName+i+1);
-		for(i=0;i<strlen(ext);i++)
-		{
-			ext[i] = tolower(ext[i]);
-		}
+		SORE_Utility::GetFileExt(imgName, ext);
 		std::cout << "ext: " << ext << std::endl;
 		if(strcmp(ext, "tga")==0)
 			return IMG_TGA;

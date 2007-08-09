@@ -5,14 +5,14 @@ PFNGLPOINTPARAMETERFARBPROC  glPointParameterf  = NULL;
 PFNGLPOINTPARAMETERFVARBPROC  glPointParameterfv  = NULL;
 
 //Constants
-const int   WIDTH       = 1200;
-const int   HEIGHT      = 800;
-const bool  FULLSCREEN  = false;
-const bool  RESIZEABLE  = true;
-const char* TITLE       = "SDL OpenGL App";
-const GLfloat MOUSE_SENS = 5.0f;
+static const int   WIDTH       = 1200;
+static const int   HEIGHT      = 800;
+static const bool  FULLSCREEN  = false;
+static const bool  RESIZEABLE  = true;
+static const char* TITLE       = "SDL OpenGL App";
+static const GLfloat MOUSE_SENS = 5.0f;
 
-const int RUN_GAME_LOOP = 1;
+static const int RUN_GAME_LOOP = 1;
 
 //Globals
 bool keys[512];
