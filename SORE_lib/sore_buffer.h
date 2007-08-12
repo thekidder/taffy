@@ -13,7 +13,7 @@
 #include "sore_resource.h"
 #include <iostream>
 
-namespace SORE_Kernel
+namespace SORE_Resource
 {
 	class Buffer : public Resource
 	{

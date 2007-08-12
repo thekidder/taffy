@@ -4,7 +4,7 @@
 
 #include <map>
 
-namespace SORE_Kernel
+namespace SORE_Resource
 {
 	//flags
 	//caching - bits 1 and 2

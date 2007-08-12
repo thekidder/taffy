@@ -3,21 +3,21 @@
 #include "sore_util.h"
 #include <cstring>
 
-SORE_Kernel::Resource::Resource(int iflags)
+SORE_Resource::Resource::Resource(int iflags)
 {
 	data = new char[1];
 	len = 1;
 	flags = iflags;
 }
 
-SORE_Kernel::Resource::Resource(const Resource& r)
+SORE_Resource::Resource::Resource(const Resource& r)
 {
 	data = new char[r.len];
 	len = r.len;
 	memcpy(data, r.data, r.len);
 }
 
-SORE_Kernel::Resource& SORE_Kernel::Resource::operator=(const Resource& r)
+SORE_Resource::Resource& SORE_Resource::Resource::operator=(const Resource& r)
 {
 	delete[] data;
 	if(&r!=this)
@@ -29,39 +29,39 @@ SORE_Kernel::Resource& SORE_Kernel::Resource::operator=(const Resource& r)
 	return *this;
 }
 
-SORE_Kernel::Resource::~Resource()
+SORE_Resource::Resource::~Resource()
 {
 	delete[] data;
 }
 
-char* SORE_Kernel::Resource::GetDataPtr() const 
+char* SORE_Resource::Resource::GetDataPtr() const 
 {
 	return data;
 }
 
-const char* SORE_Kernel::Resource::GetFilename() const 
+const char* SORE_Resource::Resource::GetFilename() const 
 {
 	return filename;
 }
 
-int SORE_Kernel::Resource::GetLength() const 
+int SORE_Resource::Resource::GetLength() const 
 {
 	return len;
 }
 
-int SORE_Kernel::Resource::GetFlags() const 
+int SORE_Resource::Resource::GetFlags() const 
 {
 	return flags;
 }
 
-SORE_Kernel::ResourceManager* SORE_Kernel::ResourceManager::rm = NULL;
+SORE_Resource::ResourceManager* SORE_Resource::ResourceManager::rm = NULL;
 
-SORE_Kernel::ResourceManager::ResourceManager()
+SORE_Resource::ResourceManager::ResourceManager()
 {
 	std::cout << "Resource manager created.\n";
 }
 
-void SORE_Kernel::ResourceManager::Cleanup()
+void SORE_Resource::ResourceManager::Cleanup()
 {
 	for(std::map<res_handle, Resource*>::iterator it=resources.begin();it!=resources.end();it++)
 	{
@@ -70,7 +70,7 @@ void SORE_Kernel::ResourceManager::Cleanup()
 	resources.clear();
 }
 
-/*static SORE_Kernel::ResourceManager* SORE_Kernel::ResourceManager::GetManager()
+/*static SORE_Resource::ResourceManager* SORE_Resource::ResourceManager::GetManager()
 {
 	if(rm == NULL)
 	{
@@ -79,7 +79,7 @@ void SORE_Kernel::ResourceManager::Cleanup()
 	return rm;
 }*/
 
-SORE_Kernel::res_handle SORE_Kernel::ResourceManager::Register(char* filename, int flags)
+SORE_Resource::res_handle SORE_Resource::ResourceManager::Register(char* filename, int flags)
 {
 	char ext[10];
 	if(SORE_Utility::GetFileExt(filename, ext)!=0)
@@ -97,7 +97,7 @@ SORE_Kernel::res_handle SORE_Kernel::ResourceManager::Register(char* filename, i
 	return resources.size() - 1;
 }
 
-SORE_Kernel::res_handle SORE_Kernel::ResourceManager::Register(char* bytes, int len, char* ext, int flags)
+SORE_Resource::res_handle SORE_Resource::ResourceManager::Register(char* bytes, int len, char* ext, int flags)
 {
 	std::map<char*, RES_LOAD_DATA>::iterator it = load_data_funcs.find(ext);
 	if(it==load_data_funcs.end())
@@ -109,7 +109,7 @@ SORE_Kernel::res_handle SORE_Kernel::ResourceManager::Register(char* bytes, int 
 	return resources.size() - 1;
 }
 		
-void SORE_Kernel::ResourceManager::Unregister(res_handle resource)
+void SORE_Resource::ResourceManager::Unregister(res_handle resource)
 {
 	int flags = resources[resource]->GetFlags();
 	if(!(flags & CACHE_ALWAYS))
@@ -119,7 +119,7 @@ void SORE_Kernel::ResourceManager::Unregister(res_handle resource)
 	}
 }
 
-void SORE_Kernel::ResourceManager::Unregister(char* filename)
+void SORE_Resource::ResourceManager::Unregister(char* filename)
 {
 	std::map<res_handle, Resource*>::iterator it;
 	for(it=resources.begin();it!=resources.end();it++)
@@ -136,14 +136,14 @@ void SORE_Kernel::ResourceManager::Unregister(char* filename)
 	}
 }
 		
-SORE_Kernel::Resource* SORE_Kernel::ResourceManager::GetPtr(res_handle res)
+SORE_Resource::Resource* SORE_Resource::ResourceManager::GetPtr(res_handle res)
 {
 	if(resources.find(res)==resources.end())
 		return NULL;
 	return resources[res];
 }
 		
-SORE_Kernel::Resource* SORE_Kernel::ResourceManager::GetPtr(char* filename)
+SORE_Resource::Resource* SORE_Resource::ResourceManager::GetPtr(char* filename)
 {
 	std::map<res_handle, Resource*>::iterator it;
 	for(it=resources.begin();it!=resources.end();it++)
@@ -154,17 +154,17 @@ SORE_Kernel::Resource* SORE_Kernel::ResourceManager::GetPtr(char* filename)
 	return NULL;
 }
 
-void SORE_Kernel::ResourceManager::RegisterLoader(RES_LOAD loader, char* fileext)
+void SORE_Resource::ResourceManager::RegisterLoader(RES_LOAD loader, char* fileext)
 {
 	load_funcs[fileext] = loader;
 }
 
-void SORE_Kernel::ResourceManager::RegisterDataLoader(RES_LOAD_DATA loader, char* fileext)
+void SORE_Resource::ResourceManager::RegisterDataLoader(RES_LOAD_DATA loader, char* fileext)
 {
 	load_data_funcs[fileext] = loader;
 }
 
-void SORE_Kernel::ResourceManager::Session()
+void SORE_Resource::ResourceManager::Session()
 {
 	int flags;
 	std::map<res_handle, Resource*>::iterator it,temp;

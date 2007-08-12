@@ -192,9 +192,9 @@ int InitGL()
 	
 	/*std::cout << "Testing ResourceManager...\n";
 	
-	SORE_Kernel::ResourceManager* rm = SORE_Kernel::ResourceManager::GetManager();
-	rm->RegisterDataLoader((SORE_Kernel::RES_LOAD_DATA)SORE_Kernel::LoadDataBuffer, "buf");
-	SORE_Kernel::res_handle buf = rm->Register("", 10, "buf");
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	rm->RegisterDataLoader((SORE_Kernel::RES_LOAD_DATA)SORE_Resource::LoadDataBuffer, "buf");
+	SORE_Resource::res_handle buf = rm->Register("", 10, "buf");
 	char* data = rm->GetPtr(buf)->GetDataPtr();
 	data[0] = 'a';
 	data = rm->GetPtr(buf)->GetDataPtr();
