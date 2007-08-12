@@ -189,7 +189,16 @@ int InitGL()
 	circlePos[2] = 1.0f;
 	
 	b = 0.7f;
-		
+	
+	/*std::cout << "Testing ResourceManager...\n";
+	
+	SORE_Kernel::ResourceManager* rm = SORE_Kernel::ResourceManager::GetManager();
+	rm->RegisterDataLoader((SORE_Kernel::RES_LOAD_DATA)SORE_Kernel::LoadDataBuffer, "buf");
+	SORE_Kernel::res_handle buf = rm->Register("", 10, "buf");
+	char* data = rm->GetPtr(buf)->GetDataPtr();
+	data[0] = 'a';
+	data = rm->GetPtr(buf)->GetDataPtr();
+	std::cout << "Testing....(result should be 'a'): " << data[0] << "\n";*/
 	return 0;
 }
 

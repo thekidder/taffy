@@ -13,5 +13,6 @@
 #include "sore_util.h"
 #include "sore_graphics.h"
 #include "sore_resource.h"
+#include "sore_buffer.h"
 
 #endif /*__SORE_ALL__*/

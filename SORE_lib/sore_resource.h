@@ -8,39 +8,41 @@ namespace SORE_Kernel
 {
 	//flags
 	//caching - bits 1 and 2
-	int CACHE_ONDEMAND = 0x00;
-	int CACHE_SESSION  = 0x01;
-	int CACHE_ALWAYS   = 0x02;
+	const int CACHE_ONDEMAND = 0x00;
+	const int CACHE_SESSION  = 0x01;
+	const int CACHE_ALWAYS   = 0x02;
 		
 	//load time - bit 3
 
-	int LOAD_LAZY      = 0x00;
-	int LOAD_IMMEDIATE = 0x04;
+	const int LOAD_LAZY      = 0x00;
+	const int LOAD_IMMEDIATE = 0x04;
 	
 	class Resource
 	{
 		public:
-			Resource();
+			Resource(int iflags);
 			~Resource();
 			Resource& operator=(const Resource& r);
 			Resource(const Resource& r);
 			
-			virtual void Load(char* filename);
-			virtual void Load(char* bytes, int len);
-			virtual void Unload();
+			virtual void Load(char* file)=0;
+			virtual void Load(char* bytes, int len)=0;
+			virtual void Unload()=0;
 			
-			virtual char* GetDataPtr()  const {return data;}
-			  const char* GetFilename() const {return filename;}
-			virtual int   GetLength()   const {return len;}
+			char* GetDataPtr() const;
+			const char* GetFilename() const;
+			int   GetLength() const;
+			int   GetFlags() const;
 		protected:
 			char* data;
 			int len;
 			char filename[255];
+			int flags;
 	};
 	
 	typedef int res_handle;
-	typedef Resource*(*RES_LOAD)(char*);
-	typedef Resource*(*RES_LOAD_DATA)(char*,int);
+	typedef Resource*(*RES_LOAD)(char*, int);
+	typedef Resource*(*RES_LOAD_DATA)(char*,int, int);
 	
 	class ResourceManager
 	{
@@ -58,7 +60,8 @@ namespace SORE_Kernel
 			res_handle Register(char* filename, int flags = 0);
 			res_handle Register(char* bytes, int len, char* ext, int flags = 0);
 			void Unregister(res_handle resource);
-			
+			void Unregister(char* filename);
+
 			//Fetch actual resource
 			Resource* GetPtr(res_handle res);
 			Resource* GetPtr(char* filename);
