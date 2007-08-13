@@ -44,7 +44,9 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 	std::cout << "----DEBUG BUILD----\n";
 #endif
-	
+	SORE_FileIO::Init();
+	SORE_FileIO::CachePackageInfo("data_compressed.sdp");
+	//SORE_FileIO::CachePackageInfo("data.sdp");
 	
 	if(InitSDL()!=0)
 		return -1;
@@ -52,9 +54,7 @@ int main(int argc, char *argv[])
 	if(InitGL()!=0)
 		return -1;
 	
-	SORE_FileIO::Init();
-	SORE_FileIO::CachePackageInfo("data_compressed.sdp");
-	//SORE_FileIO::CachePackageInfo("data.sdp");
+	
 	
 	SORE_Font::Init();
 	font = SORE_Font::LoadFont("data/Fonts/liberationsans.ttf", 24);	
@@ -190,15 +190,19 @@ int InitGL()
 	
 	b = 0.7f;
 	
-	/*std::cout << "Testing ResourceManager...\n";
+	std::cout << "Testing ResourceManager...\n";
 	
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
-	rm->RegisterDataLoader((SORE_Kernel::RES_LOAD_DATA)SORE_Resource::LoadDataBuffer, "buf");
-	SORE_Resource::res_handle buf = rm->Register("", 10, "buf");
-	char* data = rm->GetPtr(buf)->GetDataPtr();
+	rm->RegisterDataLoader((SORE_Resource::RES_LOAD_DATA)SORE_Resource::LoadDataBuffer, "buf");
+	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
+	SORE_Resource::res_handle buf = rm->Register("\0", 10, "buf");
+	rm->Register("data/Textures/ring.tga");
+	SORE_Resource::Resource* buffer = rm->GetPtr(buf);
+	char* data = dynamic_cast<SORE_Resource::ResourceData*>(buffer)->GetDataPtr();
 	data[0] = 'a';
-	data = rm->GetPtr(buf)->GetDataPtr();
-	std::cout << "Testing....(result should be 'a'): " << data[0] << "\n";*/
+	data = dynamic_cast<SORE_Resource::ResourceData*>(rm->GetPtr(buf))->GetDataPtr();
+	std::cout << "Testing....(result should be 'a'): " << data[0] << "\n";
+	rm->Unregister(buf);
 	return 0;
 }
 
@@ -285,6 +289,9 @@ void Resize(int width, int height)
 
 int Render()
 {
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	SORE_Resource::Resource* re;
+	SORE_Resource::ResourceHandle* rd;
 	/* These are to calculate our fps */
 	static GLint T0     = 0;
 	static GLint frames = 0;
@@ -433,7 +440,9 @@ int Render()
 	//glRotatef( zrot, 0.0f, 0.0f, 1.0f); 
 	glEnable(GL_TEXTURE_2D);
 	//glEnable(GL_LIGHTING);
-	glBindTexture( GL_TEXTURE_2D, texture[0] );
+	re = rm->GetPtr("data/Textures/crate.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glColor4f(1.0f,1.0f,1.0, 1.0f);
 	glBegin(GL_QUADS);
 		
@@ -477,7 +486,9 @@ int Render()
 	
 	const static float one_50 = 1.0f*50.0f;
 	
-	glBindTexture(GL_TEXTURE_2D, texture[3]);
+	re = rm->GetPtr("data/Textures/grass.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glBegin(GL_QUADS);
 		
 	glTexCoord2f(0.0f, one_50); glVertex3f(-50.0f, -2.0f, -50.0f); //right
@@ -494,7 +505,9 @@ int Render()
 	glEnable(GL_BLEND);
 	glDepthMask (GL_FALSE);
 	
-	glBindTexture(GL_TEXTURE_2D, texture[2]);
+	re = rm->GetPtr("data/Textures/ring.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glColor4f(r, g, 1.0f, b);
 	//glColor3f(1.0f, 1.0f, 1.0f);
 	glTranslatef(circlePos[0], circlePos[1], circlePos[2]);
@@ -688,10 +701,16 @@ int LoadGLTextures( )
 {
 	int status = -1;
 	
-	texture[0] = SORE_Texture::LoadTGA("data/Textures/crate.tga");
-	texture[1] = SORE_Texture::LoadTGA("data/Textures/sprite.tga");
-	texture[2] = SORE_Texture::LoadTGA("data/Textures/ring.tga");
-	texture[3] = SORE_Texture::LoadTGA("data/Textures/grass.tga");
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	rm->Register("data/Textures/crate.tga");
+	rm->Register("data/Textures/sprite.tga");
+	rm->Register("data/Textures/ring.tga");
+	rm->Register("data/Textures/grass.tga");
+	
+	//texture[0] = SORE_Texture::LoadTGA("data/Textures/crate.tga");
+	//texture[1] = SORE_Texture::LoadTGA("data/Textures/sprite.tga");
+	//texture[2] = SORE_Texture::LoadTGA("data/Textures/ring.tga");
+	//texture[3] = SORE_Texture::LoadTGA("data/Textures/grass.tga");
 		
 	if(texture[0]!=-1 && texture[1]!=-1 && texture[2]!=-1 && texture[3]!=-1)
 		status = 0;

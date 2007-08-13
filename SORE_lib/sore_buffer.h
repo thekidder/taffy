@@ -15,17 +15,18 @@
 
 namespace SORE_Resource
 {
-	class Buffer : public Resource
+	class Buffer : public ResourceData
 	{
 		public:
-			Buffer(int iflags) : Resource(iflags) {std::cout <<"Buffer instantiated\n";}
+			Buffer(int iflags) : ResourceData(iflags) {std::cout <<"Buffer instantiated\n";}
+			Buffer(int iflags, const char* file) : ResourceData(iflags, file) {std::cout <<"Buffer instantiated\n";}
 			~Buffer() {std::cout <<"Buffer killed\n";}
-			void Load(char* filename);
-			void Load(char* bytes, int len);
+			void Load(const char* filename);
+			void Load(const char* bytes, int len);
 			void Unload();
 			//int  GetLength() {return len;}
 	};
 
-	Buffer* LoadBuffer(char* filename, int flags);
-	Buffer* LoadDataBuffer(char* bytes, int len, int flags);
+	Buffer* LoadBuffer(const char* filename, int flags);
+	Buffer* LoadDataBuffer(const char* bytes, int len, int flags);
 }

@@ -1,5 +1,6 @@
 
 #include "particle.h"
+#include "sore_texture.h"
 
 ParticleEngine::ParticleEngine(GLuint tex)
 {
@@ -101,12 +102,17 @@ void ParticleEngine::SetPosition(GLfloat xPos, GLfloat yPos, GLfloat zPos)
 
 void ParticleEngine::Display()
 {
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	SORE_Resource::Resource* r;
+	SORE_Resource::ResourceHandle* rd;
 	sort(particles, particles + (num/sizeof(Particle)));
 	GLfloat maxSize;
 	GLfloat atten[3] = {1.0f, 1.0f, 1.0f};
 	glGetFloatv( GL_POINT_SIZE_MAX_ARB, &maxSize );
 	glPointSize( 64.0f );
-	glBindTexture( GL_TEXTURE_2D, texture );
+	r = rm->GetPtr("data/Textures/sprite.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(r);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	
 	glEnable ( GL_POINT_SPRITE_ARB );
 	
