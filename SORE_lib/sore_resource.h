@@ -73,7 +73,7 @@ namespace SORE_Resource
 	
 	typedef unsigned int res_handle; //resource name
 	typedef Resource*(*RES_LOAD)(const char*, int);
-	typedef Resource*(*RES_LOAD_DATA)(const char*,int, int);
+	typedef ResourceData*(*RES_LOAD_DATA)(const char*,int, int);
 	
 	class ResourceManager
 	{
@@ -94,6 +94,7 @@ namespace SORE_Resource
 			void Unregister(const char* filename);
 
 			//Fetch actual resource
+			ResourceData* GetDataPtr(res_handle res);
 			Resource* GetPtr(res_handle res);
 			Resource* GetPtr(const char* filename);
 			
@@ -107,7 +108,8 @@ namespace SORE_Resource
 			//cleanup
 			void Cleanup();
 		protected:
-			std::map<res_handle, Resource*> resources;
+			std::map<res_handle, Resource*> hresources;
+			std::map<res_handle, ResourceData*> dresources;
 			std::map<const char*, RES_LOAD, equalstr> load_funcs;
 			std::map<const char*, RES_LOAD_DATA, equalstr> load_data_funcs;
 		private:

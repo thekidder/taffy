@@ -16,11 +16,12 @@ void SORE_Resource::Buffer::Load(const char* filename)
 {
 }
 
-void SORE_Resource::Buffer::Load(const char* bytes, int len)
+void SORE_Resource::Buffer::Load(const char* bytes, int _len)
 {
 	
 	delete[] data;
 	data = new char[len];
+	len = _len;
 	if(bytes[0]=='\0')
 		std::cout << "creating empty buffer of " << len << " bytes.\n";
 	else

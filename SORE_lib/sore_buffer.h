@@ -22,7 +22,7 @@ namespace SORE_Resource
 			Buffer(int iflags, const char* file) : ResourceData(iflags, file) {std::cout <<"Buffer instantiated\n";}
 			~Buffer() {std::cout <<"Buffer killed\n";}
 			void Load(const char* filename);
-			void Load(const char* bytes, int len);
+			void Load(const char* bytes, int _len);
 			void Unload();
 			//int  GetLength() {return len;}
 	};

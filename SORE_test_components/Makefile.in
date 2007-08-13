@@ -32,8 +32,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = create_sdp$(EXEEXT)
-subdir = SORE_create_package
+bin_PROGRAMS = sore_resource_testing$(EXEEXT)
+subdir = SORE_test_components
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -45,12 +45,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_create_sdp_OBJECTS = main.$(OBJEXT) walker_unix.$(OBJEXT)
-create_sdp_OBJECTS = $(am_create_sdp_OBJECTS)
-create_sdp_LDADD = $(LDADD)
-create_sdp_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+am_sore_resource_testing_OBJECTS = sore_resource_testing.$(OBJEXT)
+sore_resource_testing_OBJECTS = $(am_sore_resource_testing_OBJECTS)
+sore_resource_testing_DEPENDENCIES =  \
+	$(top_builddir)/SORE_lib/libsore.a
+sore_resource_testing_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(create_sdp_LDFLAGS) $(LDFLAGS) -o $@
+	$(CXXFLAGS) $(sore_resource_testing_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -63,17 +64,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-SOURCES = $(create_sdp_SOURCES)
-DIST_SOURCES = $(create_sdp_SOURCES)
+SOURCES = $(sore_resource_testing_SOURCES)
+DIST_SOURCES = $(sore_resource_testing_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -183,9 +175,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+INCLUDES = -I$(top_srcdir)/SORE_lib -I/usr/include/freetype2/
 METASOURCES = AUTO
-create_sdp_LDFLAGS = -lz
-create_sdp_SOURCES = main.cpp walker.h walker_unix.cpp
+sore_resource_testing_LDADD = $(top_builddir)/SORE_lib/libsore.a
+sore_resource_testing_LDFLAGS = -lfontconfig -lfreetype -lz -lGL -lGLU -lSDL
+sore_resource_testing_SOURCES = sore_resource_testing.cpp
 all: all-am
 
 .SUFFIXES:
@@ -199,9 +193,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  SORE_create_package/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  SORE_test_components/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  SORE_create_package/Makefile
+	  $(AUTOMAKE) --gnu  SORE_test_components/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -247,9 +241,9 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-create_sdp$(EXEEXT): $(create_sdp_OBJECTS) $(create_sdp_DEPENDENCIES) 
-	@rm -f create_sdp$(EXEEXT)
-	$(create_sdp_LINK) $(create_sdp_OBJECTS) $(create_sdp_LDADD) $(LIBS)
+sore_resource_testing$(EXEEXT): $(sore_resource_testing_OBJECTS) $(sore_resource_testing_DEPENDENCIES) 
+	@rm -f sore_resource_testing$(EXEEXT)
+	$(sore_resource_testing_LINK) $(sore_resource_testing_OBJECTS) $(sore_resource_testing_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -257,8 +251,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walker_unix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_resource_testing.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

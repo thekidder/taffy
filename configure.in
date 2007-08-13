@@ -8,4 +8,4 @@ AC_PROG_CXX
 AM_PROG_LIBTOOL
 
 AC_OUTPUT(Makefile SORE_create_package/Makefile SORE_lib/Makefile \
-	SORE_test/Makefile)
+	SORE_test/Makefile SORE_test_components/Makefile)

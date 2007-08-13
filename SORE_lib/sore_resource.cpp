@@ -60,6 +60,7 @@ SORE_Resource::ResourceData& SORE_Resource::ResourceData::operator=(const Resour
 
 SORE_Resource::ResourceData::~ResourceData()
 {
+	std::cout << "Freeing " << len << " bytes of data\n";
 	delete[] data;
 }
 
@@ -88,10 +89,18 @@ SORE_Resource::ResourceManager::ResourceManager()
 
 void SORE_Resource::ResourceManager::Cleanup()
 {
-	std::map<res_handle, Resource*>::iterator it=resources.begin();
-	for(it++;it!=resources.end();it++)
+	std::map<res_handle, ResourceData*>::iterator temp, it=dresources.begin();
+	ResourceData* rd;
+	for(it++;it!=dresources.end();)
 	{
-		delete it->second;
+		temp = it;
+		it++;
+		rd = dynamic_cast<ResourceData*>(temp->second);
+		if(rd) 
+			delete rd;
+		else
+			delete temp->second;
+		dresources.erase(temp);
 	}
 	resources.clear();
 }
@@ -149,7 +158,7 @@ SORE_Resource::res_handle SORE_Resource::ResourceManager::Register(const char* b
 		return 0;
 	}
 	res_handle name = GetNextName();
-	resources[name] = load_data_funcs[ext](bytes,len,flags);
+	dresources[name] = load_data_funcs[ext](bytes,len,flags);
 	return name;
 }
 		
@@ -182,13 +191,20 @@ void SORE_Resource::ResourceManager::Unregister(const char* filename)
 	}
 }
 		
-SORE_Resource::Resource* SORE_Resource::ResourceManager::GetPtr(res_handle res)
+SORE_Resource::Resource* SORE_Resource::ResourceManager::GetHandlePtr(res_handle res)
 {
-	if(resources.find(res)==resources.end())
+	if(hresources.find(res)==hresources.end())
 		return NULL;
-	return resources[res];
+	return hresources[res];
 }
-		
+
+SORE_Resource::ResourceData* SORE_Resource::ResourceManager::GetDataPtr(res_handle res)
+{
+	if(dresources.find(res)==dresources.end())
+		return NULL;
+	return dresources[res];
+}
+
 SORE_Resource::Resource* SORE_Resource::ResourceManager::GetPtr(const char* filename)
 {
 	std::map<res_handle, Resource*>::iterator it;
@@ -204,13 +220,11 @@ SORE_Resource::Resource* SORE_Resource::ResourceManager::GetPtr(const char* file
 void SORE_Resource::ResourceManager::RegisterLoader(RES_LOAD loader, const char* fileext)
 {
 	load_funcs[fileext] = loader;
-	std::cout << load_funcs.size() << "\n";
 }
 
 void SORE_Resource::ResourceManager::RegisterDataLoader(RES_LOAD_DATA loader, const char* fileext)
 {
 	load_data_funcs[fileext] = loader;
-	std::cout << load_data_funcs.size() << "\n";
 }
 
 void SORE_Resource::ResourceManager::Session()
