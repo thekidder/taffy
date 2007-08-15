@@ -44,7 +44,7 @@ int main()
 		begin = clock();
 		for(int i=0;i<1000000;i++)
 		{
-			/*r = rm->GetPtr(buf1);
+			r = rm->GetPtr(buf1);
 			data = dynamic_cast<SORE_Resource::ResourceData*>(r)->GetDataPtr();
 			
 			r = rm->GetPtr(buf2);
@@ -57,9 +57,9 @@ int main()
 			data = dynamic_cast<SORE_Resource::ResourceData*>(r)->GetDataPtr();
 			
 			r = rm->GetPtr(buf5);
-			data = dynamic_cast<SORE_Resource::ResourceData*>(r)->GetDataPtr();*/
+			data = dynamic_cast<SORE_Resource::ResourceData*>(r)->GetDataPtr();
 			
-			rd = rm->GetDataPtr(buf1);
+			/*rd = rm->GetDataPtr(buf1);
 			data = rd->GetDataPtr();
 			
 			rd = rm->GetDataPtr(buf2);
@@ -72,7 +72,7 @@ int main()
 			data = rd->GetDataPtr();
 			
 			rd = rm->GetDataPtr(buf5);
-			data = rd->GetDataPtr();
+			data = rd->GetDataPtr();*/
 		}
 		end = clock();
 		

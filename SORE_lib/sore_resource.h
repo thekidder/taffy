@@ -28,7 +28,8 @@ namespace SORE_Resource
 	{
 		public:
 			Resource(int iflags) {flags = iflags;filename[0]='\0';fromFile=false;}
-			Resource(int iflags, const char* file); 
+			Resource(int iflags, const char* file);
+			virtual ~Resource() {}
 			
 			virtual void Load(const char* file)=0;
 			virtual void Load(const char* bytes, int len)=0;
@@ -94,7 +95,6 @@ namespace SORE_Resource
 			void Unregister(const char* filename);
 
 			//Fetch actual resource
-			ResourceData* GetDataPtr(res_handle res);
 			Resource* GetPtr(res_handle res);
 			Resource* GetPtr(const char* filename);
 			
@@ -108,8 +108,7 @@ namespace SORE_Resource
 			//cleanup
 			void Cleanup();
 		protected:
-			std::map<res_handle, Resource*> hresources;
-			std::map<res_handle, ResourceData*> dresources;
+			std::map<res_handle, Resource*> resources;
 			std::map<const char*, RES_LOAD, equalstr> load_funcs;
 			std::map<const char*, RES_LOAD_DATA, equalstr> load_data_funcs;
 		private:
