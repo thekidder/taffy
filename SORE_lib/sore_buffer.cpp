@@ -12,22 +12,19 @@
 
 #include "sore_buffer.h"
 
-void SORE_Resource::Buffer::Load(const char* filename)
+void SORE_Resource::Buffer::Load()
 {
 }
 
-void SORE_Resource::Buffer::Load(const char* bytes, int _len)
+SORE_Resource::Buffer::Buffer(int iflags, const char* bytes, int len) : ResourceData(iflags, bytes, len)
 {
-	
-	delete[] data;
-	data = new char[len];
-	len = _len;
+	data = new char[length];
 	if(bytes[0]=='\0')
-		std::cout << "creating empty buffer of " << len << " bytes.\n";
+		std::cout << "creating empty buffer of " << length << " bytes.\n";
 	else
 	{
-		std::cout << "creating (non-empty) buffer of " << len << " bytes.\n";
-		memcpy(data, bytes, len);
+		std::cout << "creating (non-empty) buffer of " << length << " bytes.\n";
+		memcpy(data, bytes, length);
 	}
 }
 
@@ -39,13 +36,13 @@ void SORE_Resource::Buffer::Unload()
 SORE_Resource::Buffer* SORE_Resource::LoadBuffer(const char* filename, int flags)
 {
 	Buffer* b = new Buffer(flags, filename);
-	b->Load(filename);
+	//b->Load(filename);
 	return b;
 }
 
 SORE_Resource::Buffer* SORE_Resource::LoadDataBuffer(const char* bytes, int len, int flags)
 {
-	Buffer* b = new Buffer(flags);
-	b->Load(bytes, len);
+	Buffer* b = new Buffer(flags, bytes, len);
+	//b->Load(bytes, len);
 	return b;
 }

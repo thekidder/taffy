@@ -195,7 +195,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	float modelview_matrix[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 	
-	for(int i=0;i<lines.size();i++) 
+	for(int i=0;i<lines.size();i++)
 	{
 		glPushMatrix();
 		glLoadIdentity();

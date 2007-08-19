@@ -6,13 +6,36 @@
 SORE_Resource::Resource::Resource(int iflags, const char* file)
 {
 	fromFile = true;
+	flags = iflags;
 	if(strlen(file)<255)
 		strcpy(filename, file);
 	else 
 	{
 		filename[0]='\0';
 		std::cerr<<"filename too long\n";
+		return;
 	}
+	if(flags & LOAD_IMMEDIATE)
+	{
+		//Load();
+		loaded = true;
+	}
+	else
+	{
+		loaded = false;
+	}
+}
+
+SORE_Resource::Resource::Resource(int iflags, const char* bytes, int len)
+{
+	fromFile = false;
+	flags = iflags;
+	if(!(flags & LOAD_IMMEDIATE))
+	{
+		std::cerr <<"[ERROR] this structure is in an inconsistent state\n";
+		return;
+	}
+	loaded = true;
 }
 
 const char* SORE_Resource::Resource::GetFilename() const 
@@ -30,20 +53,24 @@ bool SORE_Resource::Resource::FromFile() const
 	return fromFile;
 }
 
-SORE_Resource::ResourceData::ResourceData(int iflags) : Resource(iflags)
-{}
-
 SORE_Resource::ResourceData::ResourceData(int iflags, const char* file) : Resource(iflags, file)
 {
 	data = new char[1];
-	len = 1;
+	length = 1;
+}
+
+SORE_Resource::ResourceData::ResourceData(int iflags, const char* bytes, int len) : Resource(iflags, bytes, len)
+{
+	data = new char[len];
+	memcpy(data, bytes, len);
+	length = len;
 }
 
 SORE_Resource::ResourceData::ResourceData(const ResourceData& r) : Resource(r.flags, r.filename)
 {
-	data = new char[r.len];
-	len = r.len;
-	memcpy(data, r.data, r.len);
+	data = new char[r.length];
+	length = r.length;
+	memcpy(data, r.data, r.length);
 }
 
 SORE_Resource::ResourceData& SORE_Resource::ResourceData::operator=(const ResourceData& r)
@@ -51,22 +78,22 @@ SORE_Resource::ResourceData& SORE_Resource::ResourceData::operator=(const Resour
 	delete[] data;
 	if(&r!=this)
 	{
-		data = new char[r.len];
-		len = r.len;
-		memcpy(data, r.data, r.len);
+		data = new char[r.length];
+		length = r.length;
+		memcpy(data, r.data, r.length);
 	}
 	return *this;
 }
 
 SORE_Resource::ResourceData::~ResourceData()
 {
-	std::cout << "Freeing " << len << " bytes of data\n";
+	std::cout << "Freeing " << length << " bytes of data\n";
 	delete[] data;
 }
 
 int SORE_Resource::ResourceData::GetLength() const 
 {
-	return len;
+	return length;
 }
 
 char* SORE_Resource::ResourceData::GetDataPtr() const 
@@ -94,7 +121,6 @@ void SORE_Resource::ResourceManager::Cleanup()
 	{
 		temp = it;
 		it++;
-		temp->second->Unload();
 		delete temp->second;
 		resources.erase(temp);
 	}
@@ -163,7 +189,6 @@ void SORE_Resource::ResourceManager::Unregister(res_handle resource)
 	int flags = resources[resource]->GetFlags();
 	if(!(flags & CACHE_ALWAYS))
 	{
-		resources[resource]->Unload();
 		resources.erase(resource);
 		names.push_front(resource);
 	}
@@ -180,8 +205,8 @@ void SORE_Resource::ResourceManager::Unregister(const char* filename)
 			int flags = it->second->GetFlags();
 			if(!(flags & CACHE_ALWAYS))
 			{
-				it->second->Unload();
-				resources.erase(it->first);
+				delete it->second;
+				resources.erase(it);
 			}
 		}
 	}
@@ -228,7 +253,7 @@ void SORE_Resource::ResourceManager::Session()
 		flags = it->second->GetFlags();
 		if(flags & CACHE_SESSION)
 		{
-			it->second->Unload();
+			delete temp->second;
 			resources.erase(temp);
 		}
 	}

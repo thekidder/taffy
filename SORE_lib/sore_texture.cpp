@@ -4,7 +4,7 @@
 #include "fileio.h"
 #include "allgl.h"
 
-void SORE_Resource::Texture::Load(const char* filename)
+void SORE_Resource::Texture::Load()
 {
 	char ext[10];
 	SORE_Utility::GetFileExt(filename, ext);
@@ -135,7 +135,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 SORE_Resource::Texture* SORE_Resource::LoadTexture(const char* filename, int flags)
 {
 	Texture* t = new Texture(flags, filename);
-	t->Load(filename);
+	t->Load();
 	return t;
 }
 

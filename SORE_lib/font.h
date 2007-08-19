@@ -10,14 +10,14 @@
 #ifdef DEBUG
 
 #undef __FTERRORS_H__
-#define FT_ERRORDEF( e, v, s )  { e, s },                       
-#define FT_ERROR_START_LIST     {                               
-#define FT_ERROR_END_LIST       { 0, 0 } };                     
-const struct                                                    
-{                                                               
-	int          err_code;                                        
-	const char*  err_msg                                          
-} ft_errors[] =                                                 
+#define FT_ERRORDEF( e, v, s )  { e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       { 0, 0 } };
+const struct
+{
+	int          err_code;
+	const char*  err_msg
+} ft_errors[] =
 #include FT_ERRORS_H
 
 #endif
@@ -34,18 +34,20 @@ namespace SORE_Font
 	const int INVALID_FONT_OBJ       = 7;
 	const int INVALID_FONT_HEIGHT    = 8;
 	
-	struct FontInfo
+	class FontInfo
 	{
-		int      height;
-		GLuint*  textures;
-		GLuint   listBase;
-		FT_Byte* fontInfo;
-		
-		int     Init(const char* fontName, unsigned int h);
-		int     Init();
-		int     LoadFont(const char* fontName);
-		int     SetHeight(unsigned int h);
-		void    Cleanup();
+		public:
+			//Font(int iflags) : ResourceHandle(iflags) {}
+			//Font(int iflags, const char* filename) : ResourceHandle(iflags, filename) {}
+			int     Init(const char* fontName, unsigned int h);
+			int     Init();
+			int     LoadFont(const char* fontName);
+			int     SetHeight(unsigned int h);
+			void    Cleanup();
+			int      height;
+			GLuint*  textures;
+			GLuint   listBase;
+			FT_Byte* fontInfo;
 	};
 	
 	typedef int font_ref;
@@ -56,8 +58,8 @@ namespace SORE_Font
 	int         FontHeight(font_ref font);
 	
 	int         MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint * tex_base );
-	inline void PushScreenCoordMatrix();
-	inline void PopProjectionMatrix();
+	//inline void PushScreenCoordMatrix();
+	//inline void PopProjectionMatrix();
 	
 	int         Print(font_ref fontIndex, int x, int y, const char* fmt, ...);
 	float       Print(font_ref fontIndex, int x, int y, char c);

@@ -20,27 +20,25 @@ namespace SORE_Resource
 	const int CACHE_ALWAYS   = 0x02;
 		
 	//load time - bit 3
-
 	const int LOAD_LAZY      = 0x00;
 	const int LOAD_IMMEDIATE = 0x04;
 	
 	class Resource
 	{
 		public:
-			Resource(int iflags) {flags = iflags;filename[0]='\0';fromFile=false;}
 			Resource(int iflags, const char* file);
+			Resource(int iflags, const char* bytes, int len);
 			virtual ~Resource() {}
 			
-			virtual void Load(const char* file)=0;
-			virtual void Load(const char* bytes, int len)=0;
-			virtual void Unload()=0;
+			virtual void Load()=0; //load from file (called from constructor or by ResourceHandler)
 			
 			const char* GetFilename() const;
 			int   GetFlags() const;
 			bool  FromFile() const;
+			bool  IsLoaded() const {return loaded;}
 		protected:
 			
-			bool fromFile;
+			bool fromFile, loaded;
 			char filename[255];
 			int flags;
 	};
@@ -48,7 +46,7 @@ namespace SORE_Resource
 	class ResourceData : public Resource
 	{
 		public:
-			ResourceData(int iflags);
+			ResourceData(int iflags, const char* bytes, int len);
 			ResourceData(int iflags, const char* file);
 			ResourceData& operator=(const ResourceData& r);
 			ResourceData(const ResourceData& r);
@@ -58,13 +56,13 @@ namespace SORE_Resource
 			int   GetLength() const;
 		protected:
 			char* data;
-			int len;
+			int length;
 	};
 	
 	class ResourceHandle : public Resource
 	{
 		public:
-			ResourceHandle(int iflags) : Resource(iflags) {handle = 0;}
+			ResourceHandle(int iflags, const char* bytes, int len) : Resource(iflags, bytes, len) {handle = 0;}
 			ResourceHandle(int iflags, const char* file) : Resource(iflags, file) {handle = 0;}
 			unsigned int GetHandle() const;
 			

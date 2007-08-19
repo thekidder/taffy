@@ -7,7 +7,7 @@ namespace SORE_Resource
 	{
 		public:
 			Texture(int iflags, const char* file) : ResourceHandle(iflags, file) {}
-			void Load(const char* filename);
+			void Load();
 			void Load(const char* bytes, int len) {}
 			void Unload() {}
 			
