@@ -1,3 +1,11 @@
+/*
+  At the time, consider the resource management in all files currently BROKEN.
+  It compiles, but there is no guarantee it works or doesn't crash or leak memory or behave badly in any other way.
+  It will be fixed eventually, but needs an entire redesign. The 'design' it currently has is ugly, hard to maintain,
+  hard to extend, and generally not froody.
+*/
+
+
 
 #ifndef  __SORE_RESOURCE_H__
 #define  __SORE_RESOURCE_H__
