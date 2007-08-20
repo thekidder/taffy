@@ -29,6 +29,17 @@ void SORE_Logging::AddLogLevel(int lvl, const char* name)
 	}
 }
 
+void SORE_Logging::LoggerBackend::SetLevel(int lvl)
+{
+	level = lvl;
+}
+
+void SORE_Logging::LoggerBackend::Log(int lvl, const char* string)
+{
+	if(level & lvl)
+		Write(string);
+}
+
 SORE_Logging::FileLogger::FileLogger(int lvl, const char* filename)
 {
 	level = lvl;
@@ -41,20 +52,31 @@ SORE_Logging::FileLogger::~FileLogger()
 	fclose(filePtr);
 }
 
-void SORE_Logging::FileLogger::SetLevel(int lvl)
+void SORE_Logging::FileLogger::Write(const char* string)
 {
-	level = lvl;
-}
-
-void SORE_Logging::FileLogger::Write(int lvl, const char* string)
-{
-	if(level & lvl)
-		fputs(string, filePtr);
+	fwrite(string, sizeof(char), strlen(string), filePtr);
 }
 
 void SORE_Logging::FileLogger::Flush()
 {
 	fflush(filePtr);
+}
+
+SORE_Logging::ConsoleLogger::ConsoleLogger(int lvl)
+{
+	level = lvl;
+}
+
+SORE_Logging::ConsoleLogger::~ConsoleLogger() {}
+
+void SORE_Logging::ConsoleLogger::Flush()
+{
+	fflush(stdout);
+}
+
+void SORE_Logging::ConsoleLogger::Write(const char* string)
+{
+	fwrite(string, sizeof(char), strlen(string), stdout);
 }
 
 SORE_Logging::Logger::Logger()
@@ -94,7 +116,7 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 	for(it=logs.begin();it<logs.end();it++)
 	{
 		for(int i=0;i<buffers.size();i++)
-			(*it)->Write(buffers[i].level, buffers[i].buffer);
+			(*it)->Log(buffers[i].level, buffers[i].buffer);
 	}
 	if(logs.size()>0) buffers.clear();
 }
@@ -104,7 +126,7 @@ void SORE_Logging::Logger::Flush()
 	for(it=logs.begin();it<logs.end();it++)
 	{
 		for(int i=0;i<buffers.size();i++)
-			(*it)->Write(buffers[i].level, buffers[i].buffer);
+			(*it)->Log(buffers[i].level, buffers[i].buffer);
 		(*it)->Flush();
 	}
 	if(logs.size()>0) buffers.clear();

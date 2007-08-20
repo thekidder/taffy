@@ -33,8 +33,12 @@ namespace SORE_Logging
 	{
 		public:
 			virtual ~LoggerBackend() {}
-			virtual void Write(int lvl, const char* string) = 0;
 			virtual void Flush() = 0;
+			void Log(int lvl, const char* string);
+			void SetLevel(int lvl);
+		protected:
+			virtual void Write(const char* string) = 0;
+			int level;
 	};
 	
 	class FileLogger : public LoggerBackend
@@ -42,13 +46,23 @@ namespace SORE_Logging
 		public:
 			FileLogger(int lvl, const char* filename);
 			~FileLogger();
-			void SetLevel(int lvl);
-			void Write(int lvl, const char* string);
+			
 			void Flush();
 		protected:
+			void Write(const char* string);
 			char file[256];
-			int level;
 			FILE* filePtr;
+	};
+	
+	class ConsoleLogger : public LoggerBackend
+	{
+		public:
+			ConsoleLogger(int lvl);
+			~ConsoleLogger();
+			
+			void Flush();
+		protected:
+			void Write(const char* string);
 	};
 	
 	class Logger
