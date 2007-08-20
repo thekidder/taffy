@@ -1,0 +1,5 @@
+
+namespace SORE_Kernel
+{
+	
+}
