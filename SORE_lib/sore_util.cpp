@@ -1,5 +1,6 @@
 
 #include "sore_util.h"
+#include "sore_logger.h"
 
 bool CheckExtension(const char* extensionName)
 {
@@ -40,12 +41,12 @@ int SORE_Utility::GetFileExt(const char* filename, char* ext)
 	}
 	if(i==0) 
 	{
-		std::cerr << "no ext\n";
+		LOG_S(SORE_Logging::LVL_ERROR, "No file extension");
 		return -1;
 	}
 	if(len-i>10)
 	{
-		std::cerr << "too long ext\n";
+		LOG_S(SORE_Logging::LVL_ERROR, "Extension is too long");
 		return -1;
 	}
 	strcpy(ext, filename+i+1);

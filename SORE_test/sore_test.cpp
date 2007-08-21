@@ -36,21 +36,20 @@ GLfloat fps;
 SORE_Util::Console console;
 float r, g, b;
 GLfloat circlePos[3];
-SORE_Logging::Logger* mainLog;
-SORE_Logging::FileLogger* fileLog;
-SORE_Logging::ConsoleLogger* consoleLog;
+//SORE_Logging::Logger* mainLog;
+//SORE_Logging::FileLogger* fileLog;
+//SORE_Logging::ConsoleLogger* consoleLog;
 
 double angle;
 
 int main(int argc, char *argv[])
 {
-	SORE_Logging::InitLogging();
-	mainLog = new SORE_Logging::Logger;
-	fileLog = new SORE_Logging::FileLogger(SORE_Logging::INFO, "program.log");
-	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
-	mainLog->AddBackend(fileLog);
-	mainLog->AddBackend(consoleLog);
-	mainLog->Flush();
+	//mainLog = new SORE_Logging::Logger;
+	//fileLog = new SORE_Logging::FileLogger(SORE_Logging::INFO, "program.log");
+	//consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
+	//mainLog->AddBackend(fileLog);
+	//mainLog->AddBackend(consoleLog);
+	//mainLog->Flush();
 #ifdef DEBUG
 	std::cout << "----DEBUG BUILD----\n";
 #endif
@@ -739,9 +738,9 @@ void Cleanup()
 	} 
 	glDeleteLists(fontList, 96);
 	SORE_Font::Cleanup();
-	delete fileLog;
-	delete mainLog;
-	delete consoleLog;
+	//delete fileLog;
+	//delete mainLog;
+	//delete consoleLog;
 }
 
 void ToggleGrab()

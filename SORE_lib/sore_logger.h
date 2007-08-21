@@ -4,6 +4,9 @@
 #include <map>
 #include <cstdio>
 
+#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
+#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
+
 namespace SORE_Logging
 {
 	const int LVL_CRITICAL = 0x01;
@@ -26,7 +29,6 @@ namespace SORE_Logging
 		char buffer[BUFFER_LEN];
 	};
 	
-	void InitLogging();
 	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
 	
 	class LoggerBackend
@@ -69,7 +71,7 @@ namespace SORE_Logging
 	{
 		public:
 			Logger();
-			~Logger() {}
+			~Logger();
 		
 			void AddBackend(LoggerBackend* newLog);
 			void Log(int lvl, const char* format, ...);
@@ -79,6 +81,6 @@ namespace SORE_Logging
 			std::vector<LoggerBackend*>::iterator it;
 			std::vector<log_buffer> buffers;
 	};
-	
-	
+	extern Logger sore_log;
+	extern FileLogger sore_file_log;
 }

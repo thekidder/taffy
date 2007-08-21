@@ -7,6 +7,10 @@
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
+	FileLogger sore_file_logger(INFO | LVL_DEBUG1 | LVL_DEBUG2, "sore.log");
+	Logger sore_log;
+	
+	void InitLogging();
 }
 
 void SORE_Logging::InitLogging()
@@ -18,7 +22,7 @@ void SORE_Logging::InitLogging()
 	lvlNames[LVL_INFO    ] = "Info    ";
 	lvlNames[LVL_DEBUG1  ] = "Debug 1 ";
 	lvlNames[LVL_DEBUG2  ] = "Debug 2 ";
-	
+	sore_log.AddBackend(&sore_file_logger);
 }
 
 void SORE_Logging::AddLogLevel(int lvl, const char* name)
@@ -88,6 +92,11 @@ SORE_Logging::Logger::Logger()
 	Log(LVL_INFO, "Program log started at %s", asctime(curr_local));
 }
 
+SORE_Logging::Logger::~Logger()
+{
+	Flush();
+}
+
 void SORE_Logging::Logger::AddBackend(LoggerBackend* newLog)
 {
 	logs.push_back(newLog);
@@ -98,7 +107,9 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 	log_buffer temp;
 	temp.level = lvl;
 	strcpy(temp.buffer,  "[");
-	if(SORE_Logging::lvlNames.find(lvl)==lvlNames.end())
+	if(lvlNames.size()==0)
+		InitLogging();
+	if(lvlNames.find(lvl)==lvlNames.end())
 	{
 		sprintf(temp.buffer+strlen(temp.buffer), "%8d", lvl);
 	}

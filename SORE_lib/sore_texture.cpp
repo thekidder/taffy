@@ -3,6 +3,7 @@
 #include "sore_util.h"
 #include "fileio.h"
 #include "allgl.h"
+#include "sore_logger.h"
 
 void SORE_Resource::Texture::Load()
 {
@@ -28,15 +29,20 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
 	if(SORE_FileIO::Read(header, 1, 18, file)<18)
 	{
-		std::cerr << "Could not read header...corrupted file?\n";
+		LOG_S(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
 	
-	std::cout << "Loaded header\nImage information:\n";
-	std::cout << "Name: " << filename << "\n";
-	std::cout << "Width: " << int(header[12]+header[13]*256) << " Height: " << int(header[14]+header[15]*256) << "\n";
-	std::cout << "BPP: " << (int)header[16] << " Image type: " << (int)header[2] << "\n";
+	LOG_S(SORE_Logging::LVL_DEBUG2, "Loaded header");
+	LOG(SORE_Logging::LVL_DEBUG2, "Name: %s", filename);
+	LOG(SORE_Logging::LVL_DEBUG2, "Width: %d Height: %d", int(header[12]+header[13]*256), int(header[14]+header[15]*256));
+	LOG(SORE_Logging::LVL_DEBUG2, "BPP: %d Image type: %d", (int)header[16], (int)header[2]);
+	//SORE_Logging::sore_log.Flush();
+	//std::cout << "Loaded header\nImage information:\n";
+	//std::cout << "Name: " << filename << "\n";
+	//std::cout << "Width: " << int(header[12]+header[13]*256) << " Height: " << int(header[14]+header[15]*256) << "\n";
+	//std::cout << "BPP: " << (int)header[16] << " Image type: " << (int)header[2] << "\n";
 	
 	//do some basic checks to make sure we can handle the file
 	
@@ -68,7 +74,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	//inFile.read(filler, int(header[0]));
 	if(SORE_FileIO::Read(filler, sizeof(char), int(header[0]), file)!=int(header[0]))
 	{
-		std::cerr << "Could not read filler...corrupted file?\n";
+		LOG_S(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
@@ -84,7 +90,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	if(SORE_FileIO::Read(imgData, 1, dataSize, file)!=dataSize)
 	{
 		delete[] imgData;
-		std::cerr << "Could not read image data...corrupted file?\n";
+		LOG_S(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}

@@ -1,5 +1,6 @@
 
 #include "fileio.h"
+#include "sore_logger.h"
 
 #include <vector>
 #include <map>
@@ -86,25 +87,26 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 	in = fopen(package, "rb");
 	if(!in || ferror(in)!=0)
 	{
-		std::cerr << "Could not open package file " << package << ", aborting.\n";
+		//SORE_Logging::sore_log.Log(SORE_Logging::LVL_ERROR, "Could not open package file %s, aborting.", package);
+		LOG(SORE_Logging::LVL_ERROR, "Could not open package file %s, aborting.", package);
 		return -1;
 	}
 	fread(header, sizeof(char), 7, in);
 	
 	if(header[0]!='S' || header[1]!='D' || header[2]!='P')
 	{
-		std::cerr << "Not a SORE Data Package file\n";
+		LOG(SORE_Logging::LVL_ERROR, "Not a SORE Data Package file", 0);
 		return -1;
 	}
 	
 	if(int(header[3])>MAX_MAJOR || int(header[4])>MAX_MINOR)
 	{
-		std::cerr << "Can't decode SDP files greater than version " << MAX_MAJOR << "." << MAX_MINOR << "\n";
+		LOG(SORE_Logging::LVL_ERROR, "Can't decode SDP files greater than version %d.%d", MAX_MAJOR, MAX_MINOR);
 	}
 	
 	unsigned short int numPackageFiles = (header[5]) + (header[6]<<8);
 	
-	std::cout << "Now processing " << package << " containing " << numPackageFiles << " files and directories...\n";
+	LOG(SORE_Logging::LVL_INFO, "Now processing %s containing %d files and directories...", package, numPackageFiles);
 		
 	char flags, c;
 	int pos;
@@ -144,20 +146,18 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 		strcpy(tempInfo.package, package);
 		if(cachedFiles.size()>=FILESYSTEM_START-1)
 		{
-			std::cerr << "Too many cached files...aborting\n";
+			LOG(SORE_Logging::LVL_CRITICAL, "Too many cached files...aborting", 0); //marked as critical because this should never happen...unless you load LOTS of resources
 			fclose(in);
 			return -2;
 		}
 		cachedFiles.push_back(tempInfo);
 		BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1], cachedFiles[cachedFiles.size()-1]);
-		std::cout << "Adding " << cachedFiles[cachedFiles.size()-1].fullname << " to cache\n";
+		LOG(SORE_Logging::LVL_DEBUG1, "Adding %s to cache", cachedFiles[cachedFiles.size()-1].fullname);
 		fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
 	}
 	
 	fclose(in);
-	
-	std::cout << "Done.\n";
-	
+
 	return errCode;
 }
 
@@ -174,10 +174,10 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	if(temp && ferror(temp)==0)
 	{
 		//fclose(temp);
-		std::cout << "Opening file " << file << " from disk\n";
+		LOG(SORE_Logging::LVL_INFO, "Opening file %s from disk", file);
 		if(nOpenFilesystemFiles>=4294967295-FILESYSTEM_START)
 		{
-			std::cerr << "Too many files open, aborting.\n";
+			LOG_S(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
 			fclose(temp);
 			return 0;
 		}
@@ -198,16 +198,16 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		if(cachedFiles[it->second].isOpen)
 		{
-			std::cerr << "This file is already open, aborting.\n";
+			LOG_S(SORE_Logging::LVL_WARNING,"This file is already open, aborting.");
 			return 0;
 		}
 		cachedFiles[it->second].currPos = 0;
 		cachedFiles[it->second].currPosRaw  = 0;
-		std::cout << "Opening file " << file << " from package " << cachedFiles[it->second].package << "\n";
+		LOG(SORE_Logging::LVL_DEBUG1, "Opening file %s from package %s", file, cachedFiles[it->second].package);
 		if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
 		{
 			FILE* temp;
-			std::cout << "Opening package " << cachedFiles[it->second].package << "\n";
+			LOG(SORE_Logging::LVL_INFO, "Opening package %s", cachedFiles[it->second].package);
 			temp = fopen(cachedFiles[it->second].package, "rb");
 			openPackages[cachedFiles[it->second].package] = temp;
 			if(openPackageCount.find(cachedFiles[it->second].package)==openPackageCount.end())
@@ -247,7 +247,7 @@ void SORE_FileIO::Close(file_ref file)
 {
 	if(file<FILESYSTEM_START && file>=PACKAGE_START)
 	{
-		std::cout << "Closing file " << cachedFiles[file].filename << " from package cache\n";
+		LOG(SORE_Logging::LVL_DEBUG1, "Closing file %s from package cache", cachedFiles[file].filename);
 		cachedFiles[file].isOpen = false;
 		if(cachedFiles[file].compressed)
 		{
@@ -259,14 +259,14 @@ void SORE_FileIO::Close(file_ref file)
 		}
 		if(--openPackageCount[cachedFiles[file].package]==0)
 		{
-			std::cout << "Closing package " << cachedFiles[file].package << "\n";
+			LOG(SORE_Logging::LVL_INFO, "Closing package %s", cachedFiles[file].package);
 			fclose(openPackages[cachedFiles[file].package]);
 			openPackages.erase(cachedFiles[file].package);
 		}
 	}
 	else if(file>=FILESYSTEM_START && file<4294967295)
 	{
-		std::cout << "Closing file reference " << file << " from disk\n";
+		LOG(SORE_Logging::LVL_DEBUG1, "Closing file reference %s from disk",file);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);
@@ -281,7 +281,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 	{
 		if(cachedFiles[file].isOpen==false)
 		{
-			std::cerr << "File is not open\n";
+			LOG_S(SORE_Logging::LVL_ERROR, "File is not open");
 			return 0;
 		}
 		unsigned int bytesToRead = cachedFiles[file].size - cachedFiles[file].currPos; //how many bytes we need to read -adjusted from size*nmemb to make sure we don't go past the end of the file in our stream
@@ -327,10 +327,10 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 				if((ret=fread(in_buf, 1, size, openPackages[cachedFiles[file].package]))!=size)
 				{
 					cachedFiles[file].currPos += ret;
-					std::cerr << "WARNING: Reading from file failed:\n";
-					std::cerr << "\tNeeded to read " << size << " bytes but only got " << ret << " bytes.\n";
-					std::cerr << "\t" << cachedFiles[file].filename << " resides at poisition " << cachedFiles[file].pos << " and is " << cachedFiles[file].size << " bytes of size\n";
-					std::cerr << "\tCurrent package position is " << ftell(openPackages[cachedFiles[file].package]) << ". Current file position is " << cachedFiles[file].currPos << " bytes.\n";
+					LOG_S(SORE_Logging::LVL_WARNING, "Reading from file failed:");
+					LOG(SORE_Logging::LVL_WARNING, "\tNeeded to read %d bytes but only got %d bytes.", size, ret);
+					LOG(SORE_Logging::LVL_WARNING, "\t %s resides at poisition %d and is %d bytes of size", cachedFiles[file].filename, cachedFiles[file].pos, cachedFiles[file].size);
+					LOG(SORE_Logging::LVL_WARNING, "\tCurrent package position is %d. Current file position is %d bytes.", ftell(openPackages[cachedFiles[file].package]), cachedFiles[file].currPos);
 					return read;
 				}
 				cachedFiles[file].currPosRaw += ret;
@@ -419,9 +419,8 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
 		if(read != size*nmemb)
 		{
-			std::cerr << "Could not read all " << size*nmemb << " bytes: ";
-			perror("");
-			std::cerr << "ferror: " << ferror(openFilesystemFiles[file]) << ", feof: " << feof(openFilesystemFiles[file]) << std::endl;
+			LOG(SORE_Logging::LVL_ERROR, "Could not read all %d bytes: ", size*nmemb);
+			LOG(SORE_Logging::LVL_ERROR, "ferror: %s, feof: %s", ferror(openFilesystemFiles[file]),  feof(openFilesystemFiles[file]));
 		}
 		return read;
 	}
