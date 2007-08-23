@@ -3,11 +3,12 @@
 #include <string.h>
 #include <ctime>
 #include <cstdarg>
+#include <cstdlib>
 
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
-	FileLogger sore_file_logger(INFO | LVL_DEBUG1 | LVL_DEBUG2, "sore.log");
+	XMLLogger sore_file_logger(ALL, "logs/sore_log.xml");
 	Logger sore_log;
 	
 	void InitLogging();
@@ -38,10 +39,10 @@ void SORE_Logging::LoggerBackend::SetLevel(int lvl)
 	level = lvl;
 }
 
-void SORE_Logging::LoggerBackend::Log(int lvl, const char* string)
+void SORE_Logging::LoggerBackend::Log(log_message* log)
 {
-	if(level & lvl)
-		Write(string);
+	if(level & log->level)
+		Write(log);
 }
 
 SORE_Logging::FileLogger::FileLogger(int lvl, const char* filename)
@@ -56,9 +57,9 @@ SORE_Logging::FileLogger::~FileLogger()
 	fclose(filePtr);
 }
 
-void SORE_Logging::FileLogger::Write(const char* string)
+void SORE_Logging::FileLogger::Write(log_message* log)
 {
-	fwrite(string, sizeof(char), strlen(string), filePtr);
+	fwrite(log->buffer, sizeof(char), strlen(log->buffer), filePtr);
 }
 
 void SORE_Logging::FileLogger::Flush()
@@ -78,18 +79,105 @@ void SORE_Logging::ConsoleLogger::Flush()
 	fflush(stdout);
 }
 
-void SORE_Logging::ConsoleLogger::Write(const char* string)
+void SORE_Logging::ConsoleLogger::Write(log_message* log)
 {
-	fwrite(string, sizeof(char), strlen(string), stdout);
+	fwrite(log->buffer, sizeof(char), strlen(log->buffer), stdout);
+}
+
+SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
+{
+	const char begin[] = "<?xml version=\"1.0\"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?>\n<log filename=\"";
+	const char end[] = "\">\n";
+	level = lvl;
+	strncpy(file, filename, 255);
+	filePtr = fopen(file, "w");
+	fwrite(begin, sizeof(char), strlen(begin), filePtr);
+	fwrite(filename, sizeof(char), strlen(filename), filePtr);
+	fwrite(end, sizeof(char), strlen(end), filePtr);
+	prevFunc[0] = '\0';
+	first = true;
+}
+
+SORE_Logging::XMLLogger::~XMLLogger()
+{
+	if(!first)
+		fwrite("</function>\n", sizeof(char), 12, filePtr);
+
+	const char end[] = "</log>\n";
+	fwrite(end, sizeof(char), strlen(end), filePtr);
+	fclose(filePtr);
+}
+
+void SORE_Logging::XMLLogger::Write(log_message* log)
+{
+	char buffer[2048];
+	char levelstr[9];
+	char levelint[9];
+	
+	if(!first && ((log->func==NULL && strlen(prevFunc)>0) || strcmp(prevFunc, log->func)!=0))
+	{
+		sprintf(buffer, "</function>\n");
+		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	}
+	if(log->func!=NULL && strcmp(prevFunc, log->func)!=0)
+	{
+		sprintf(buffer, "<function>\n\t<name>%s</name>\n", log->func);
+		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	}
+	else if(log->func==NULL && (strlen(prevFunc)>0 || first))
+	{
+		sprintf(buffer, "<function>\n\t<name></name>\n");
+		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	}
+	first = false;
+	if(log->func==NULL)
+		prevFunc[0] = '\0';
+	else
+		strncpy(prevFunc, log->func, 255);
+	
+	if(lvlNames.find(log->level)!=lvlNames.end())
+	{
+		strncpy(levelstr, lvlNames[log->level], 9);
+	}
+	else
+	{
+		levelstr[0]='\0';
+	}
+	sprintf(levelint, "%d", log->level);
+	const char begin[] = "\t<message>\n";
+	const char end[]   = "\t</message>\n";
+	fwrite(begin, sizeof(char), strlen(begin), filePtr);
+	tm* currtime;
+	currtime = localtime(&(log->time));
+	strftime(buffer, 127, "%X", currtime);
+	fwrite("\t\t<time>", sizeof(char), 8, filePtr);
+	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	fwrite("</time>\n", sizeof(char), 8, filePtr);
+	fwrite("\t\t<level>", sizeof(char), 9, filePtr);
+	fwrite(levelint, sizeof(char), strlen(levelint), filePtr);
+	fwrite("</level>\n", sizeof(char), 9, filePtr);
+	fwrite("\t\t<levelstr>", sizeof(char), 12, filePtr);
+	fwrite(levelstr, sizeof(char), strlen(levelstr), filePtr);
+	fwrite("</levelstr>\n", sizeof(char), 12, filePtr);
+	sprintf(buffer, "\t\t<line>%d</line>\n", log->line);
+	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	sprintf(buffer, "\t\t<file>%s</file>\n", log->file);
+	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
+	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	
+	fwrite(end, sizeof(char), strlen(end), filePtr);
+}
+
+void SORE_Logging::XMLLogger::Flush()
+{
+	fflush(filePtr);
 }
 
 SORE_Logging::Logger::Logger()
 {
 	buffers.clear();
-	time_t curr = time(NULL);
-	tm* curr_local;
-	curr_local = localtime(&curr);
-	Log(LVL_INFO, "Program log started at %s", asctime(curr_local));
+	Log(LVL_INFO, "Program log started");
 }
 
 SORE_Logging::Logger::~Logger()
@@ -104,30 +192,46 @@ void SORE_Logging::Logger::AddBackend(LoggerBackend* newLog)
 
 void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 {
-	log_buffer temp;
+	log_message temp;
 	temp.level = lvl;
-	strcpy(temp.buffer,  "[");
+	temp.line = 0;
+	temp.func = 0;
+	temp.file = 0;
+	temp.time = time(NULL);
 	if(lvlNames.size()==0)
 		InitLogging();
-	if(lvlNames.find(lvl)==lvlNames.end())
-	{
-		sprintf(temp.buffer+strlen(temp.buffer), "%8d", lvl);
-	}
-	else
-	{
-		strncat(temp.buffer, lvlNames[lvl], BUFFER_LEN-strlen(temp.buffer)-1);
-	}
-	strncat(temp.buffer, "] ", BUFFER_LEN-strlen(temp.buffer)-1);
 	va_list args;
 	va_start (args, format);
-	vsprintf (temp.buffer+strlen(temp.buffer),format, args);
+	vsprintf (temp.buffer,format, args);
 	va_end (args);
-	strncat(temp.buffer, "\n", BUFFER_LEN-strlen(temp.buffer)-1);
 	buffers.push_back(temp);
 	for(it=logs.begin();it<logs.end();it++)
 	{
 		for(int i=0;i<buffers.size();i++)
-			(*it)->Log(buffers[i].level, buffers[i].buffer);
+			(*it)->Log(&buffers[i]);
+	}
+	if(logs.size()>0) buffers.clear();
+}
+
+void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, const char* format, ...)
+{
+	log_message temp;
+	temp.level = lvl;
+	temp.line = line;
+	temp.func = func;
+	temp.file = file;
+	temp.time = time(NULL);
+	if(lvlNames.size()==0)
+		InitLogging();
+	va_list args;
+	va_start (args, format);
+	vsprintf (temp.buffer,format, args);
+	va_end (args);
+	buffers.push_back(temp);
+	for(it=logs.begin();it<logs.end();it++)
+	{
+		for(int i=0;i<buffers.size();i++)
+			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
 }
@@ -137,7 +241,7 @@ void SORE_Logging::Logger::Flush()
 	for(it=logs.begin();it<logs.end();it++)
 	{
 		for(int i=0;i<buffers.size();i++)
-			(*it)->Log(buffers[i].level, buffers[i].buffer);
+			(*it)->Log(&buffers[i]);
 		(*it)->Flush();
 	}
 	if(logs.size()>0) buffers.clear();

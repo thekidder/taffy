@@ -87,8 +87,8 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 	in = fopen(package, "rb");
 	if(!in || ferror(in)!=0)
 	{
-		//SORE_Logging::sore_log.Log(SORE_Logging::LVL_ERROR, "Could not open package file %s, aborting.", package);
 		LOG(SORE_Logging::LVL_ERROR, "Could not open package file %s, aborting.", package);
+		//SORE_Logging::sore_log.Log(SORE_Logging::LVL_ERROR, __LINE__, __PRETTY_FUNCTION__, __FILE__, "Could not open package file %s, aborting.", package);
 		return -1;
 	}
 	fread(header, sizeof(char), 7, in);

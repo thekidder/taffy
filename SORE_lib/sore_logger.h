@@ -4,8 +4,11 @@
 #include <map>
 #include <cstdio>
 
-#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
-#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
+//#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
+//#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
+
+#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
+#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
 
 namespace SORE_Logging
 {
@@ -20,14 +23,25 @@ namespace SORE_Logging
 	const int ERROR        = CRITICAL | LVL_ERROR;
 	const int WARNING      = ERROR    | LVL_WARNING;
 	const int INFO         = WARNING  | LVL_INFO;
+	const int ALL          = INFO     | LVL_DEBUG1 | LVL_DEBUG2;
 	
 	const int BUFFER_LEN = 2048;
 	
-	struct log_buffer
+	struct log_message
+	{
+		int level;
+		int line;
+		const char* func;
+		const char* file;
+		char buffer[BUFFER_LEN];
+		time_t time;
+	};
+	
+	/*struct log_buffer
 	{
 		int level;
 		char buffer[BUFFER_LEN];
-	};
+	};*/
 	
 	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
 	
@@ -36,10 +50,10 @@ namespace SORE_Logging
 		public:
 			virtual ~LoggerBackend() {}
 			virtual void Flush() = 0;
-			void Log(int lvl, const char* string);
+			void Log(log_message* log);
 			void SetLevel(int lvl);
 		protected:
-			virtual void Write(const char* string) = 0;
+			virtual void Write(log_message* log) = 0;
 			int level;
 	};
 	
@@ -51,7 +65,7 @@ namespace SORE_Logging
 			
 			void Flush();
 		protected:
-			void Write(const char* string);
+			void Write(log_message* log);
 			char file[256];
 			FILE* filePtr;
 	};
@@ -64,7 +78,22 @@ namespace SORE_Logging
 			
 			void Flush();
 		protected:
-			void Write(const char* string);
+			void Write(log_message* log);
+	};
+	
+	class XMLLogger : public LoggerBackend
+	{
+		public:
+			XMLLogger(int lvl, const char* filename);
+			~XMLLogger();
+			
+			void Flush();
+		protected:
+			void Write(log_message* log);
+			char file[256];
+			FILE* filePtr;
+			char prevFunc[256];
+			bool first;
 	};
 	
 	class Logger
@@ -75,11 +104,12 @@ namespace SORE_Logging
 		
 			void AddBackend(LoggerBackend* newLog);
 			void Log(int lvl, const char* format, ...);
+			void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);
 			void Flush();
 		protected:
 			std::vector<LoggerBackend*> logs;
 			std::vector<LoggerBackend*>::iterator it;
-			std::vector<log_buffer> buffers;
+			std::vector<log_message> buffers;
 	};
 	extern Logger sore_log;
 	extern FileLogger sore_file_log;

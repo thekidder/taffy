@@ -36,20 +36,19 @@ GLfloat fps;
 SORE_Util::Console console;
 float r, g, b;
 GLfloat circlePos[3];
-//SORE_Logging::Logger* mainLog;
-//SORE_Logging::FileLogger* fileLog;
-//SORE_Logging::ConsoleLogger* consoleLog;
+SORE_Logging::Logger* mainLog;
+SORE_Logging::XMLLogger* fileLog;
+SORE_Logging::ConsoleLogger* consoleLog;
 
 double angle;
 
 int main(int argc, char *argv[])
 {
-	//mainLog = new SORE_Logging::Logger;
-	//fileLog = new SORE_Logging::FileLogger(SORE_Logging::INFO, "program.log");
-	//consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
-	//mainLog->AddBackend(fileLog);
-	//mainLog->AddBackend(consoleLog);
-	//mainLog->Flush();
+	mainLog = new SORE_Logging::Logger;
+	fileLog = new SORE_Logging::XMLLogger(SORE_Logging::INFO, "logs/program_log.xml");
+	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
+	mainLog->AddBackend(fileLog);
+	mainLog->AddBackend(consoleLog);
 #ifdef DEBUG
 	std::cout << "----DEBUG BUILD----\n";
 #endif

@@ -1,6 +1,7 @@
 #include "font.h"
 #include "fileio.h"
 #include "sore_graphics.h"
+#include "sore_logger.h"
 
 
 
@@ -216,7 +217,7 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 {
 	FontInfo* font = &fontStack[fontIndex];
 	glEnd();
-	std::cout << "c: " << c << " x: " << x << " y: " << y << "\n";
+	//std::cout << "c: " << c << " x: " << x << " y: " << y << "\n";
 	if(font->height == 0) return -1.0f;
 	
 	GLuint fontList=font->listBase;
@@ -318,7 +319,8 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	
 	if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
 	{
-		std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
+		//std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
+		LOG(SORE_Logging::ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", read, err);
 		SORE_FileIO::Close(fontObj);
 		return FONT_LOAD_FAILED;
 	}
@@ -328,9 +330,11 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		delete[] fontPath;
 		FT_Done_FreeType(library);
 		delete[] dirName;
-		std::cerr << "Font load failed: Freetype error code " << err << std::endl;
+		//std::cerr << "Font load failed: Freetype error code " << err << std::endl;
+		LOG(SORE_Logging::ERROR, "Font load failed: Freetype error code %d", err);
 #ifdef DEBUG
-		std::cout << ft_errors[err] << std::endl;
+		//std::cout << ft_errors[err] << std::endl;
+		LOG(SORE_Logging::ERROR, "Freetype error: %s", ft_errors[err]);
 #endif
 		return FONT_LOAD_FAILED;
 	}
@@ -341,7 +345,8 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	GLenum error;
 	while((error=glGetError())!=GL_NO_ERROR)
 	{
-		std::cout << "error detected: " << error << "\n";
+		//std::cout << "error detected: " << error << "\n";
+		LOG(SORE_Logging::ERROR, "GL Error: %d", error);
 		delete[] fontPath;
 	
 		FT_Done_Face(face);
@@ -415,7 +420,8 @@ SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
 	newFont.SetHeight(h);
 	if((err=newFont.LoadFont(font))!=0)
 	{
-		std::cerr << "Failed to load font; error code " << err << std::endl;
+		//std::cerr << "Failed to load font; error code " << err << std::endl;
+		LOG(SORE_Logging::ERROR, "Failed to load font: error code %d", err);
 		return 0;
 	}
 	font_ref index = fontStack.size();
