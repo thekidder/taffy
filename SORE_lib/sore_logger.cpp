@@ -41,7 +41,7 @@ void SORE_Logging::LoggerBackend::SetLevel(int lvl)
 
 void SORE_Logging::LoggerBackend::Log(log_message* log)
 {
-	if(level & log->level)
+	if(level & (log->level))
 		Write(log);
 }
 
