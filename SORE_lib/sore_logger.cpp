@@ -59,7 +59,18 @@ SORE_Logging::FileLogger::~FileLogger()
 
 void SORE_Logging::FileLogger::Write(log_message* log)
 {
-	fwrite(log->buffer, sizeof(char), strlen(log->buffer), filePtr);
+	static char buffer[2048];
+	char levelstr[9];
+	if(lvlNames.find(log->level)!=lvlNames.end())
+	{
+		strncpy(levelstr, lvlNames[log->level], 9);
+	}
+	else
+	{
+		sprintf(levelstr, "%-8d", log->level);
+	}
+	sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
+	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 }
 
 void SORE_Logging::FileLogger::Flush()
@@ -81,7 +92,18 @@ void SORE_Logging::ConsoleLogger::Flush()
 
 void SORE_Logging::ConsoleLogger::Write(log_message* log)
 {
-	fwrite(log->buffer, sizeof(char), strlen(log->buffer), stdout);
+	static char buffer[2048];
+	char levelstr[9];
+	if(lvlNames.find(log->level)!=lvlNames.end())
+	{
+		strncpy(levelstr, lvlNames[log->level], 9);
+	}
+	else
+	{
+		sprintf(levelstr, "%-8d", log->level);
+	}
+	sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
+	fwrite(buffer, sizeof(char), strlen(buffer), stdout);
 }
 
 SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
@@ -110,7 +132,7 @@ SORE_Logging::XMLLogger::~XMLLogger()
 
 void SORE_Logging::XMLLogger::Write(log_message* log)
 {
-	char buffer[2048];
+	static char buffer[2048];
 	char levelstr[9];
 	char levelint[9];
 	

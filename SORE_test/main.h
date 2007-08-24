@@ -4,24 +4,14 @@
 
 #include <sore.h>
 
-using namespace std;
+#define APP_LOG(lvl, format, ...) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
+#define APP_LOG_S(lvl, format) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
 
 //Functions
 void Cleanup();
-void Resize(int width, int height);
-int  Render();
-bool EventLoop();
-void GameLogic(float timeElapsed, float timestep);
-int  GameLoop();
-int  InitGL();
-int  InitSDL();
-int  LoadGLTextures();
-void ToggleGrab();
 
-
-int HandleUserEvents(SDL_Event* event);
-int HandleKeydown   (SDL_Event* event);
-int HandleKeyup     (SDL_Event* event);
-int HandleMouse     (SDL_Event* event);
+extern SORE_Logging::Logger* mainLog;
+extern SORE_Logging::XMLLogger* fileLog;
+extern SORE_Logging::ConsoleLogger* consoleLog;
 
 #endif //__MAIN_H__

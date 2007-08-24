@@ -4,11 +4,11 @@
 #include <map>
 #include <cstdio>
 
-//#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
-//#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
+//#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
+//#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
 
-#define LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
-#define LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
+#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
 
 namespace SORE_Logging
 {

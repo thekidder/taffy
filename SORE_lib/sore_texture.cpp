@@ -29,15 +29,15 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
 	if(SORE_FileIO::Read(header, 1, 18, file)<18)
 	{
-		LOG_S(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
 	
-	LOG_S(SORE_Logging::LVL_DEBUG2, "Loaded header");
-	LOG(SORE_Logging::LVL_DEBUG2, "Name: %s", filename);
-	LOG(SORE_Logging::LVL_DEBUG2, "Width: %d Height: %d", int(header[12]+header[13]*256), int(header[14]+header[15]*256));
-	LOG(SORE_Logging::LVL_DEBUG2, "BPP: %d Image type: %d", (int)header[16], (int)header[2]);
+	ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Loaded header");
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Name: %s", filename);
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Width: %d Height: %d", int(header[12]+header[13]*256), int(header[14]+header[15]*256));
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "BPP: %d Image type: %d", (int)header[16], (int)header[2]);
 	//SORE_Logging::sore_log.Flush();
 	//std::cout << "Loaded header\nImage information:\n";
 	//std::cout << "Name: " << filename << "\n";
@@ -74,7 +74,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	//inFile.read(filler, int(header[0]));
 	if(SORE_FileIO::Read(filler, sizeof(char), int(header[0]), file)!=int(header[0]))
 	{
-		LOG_S(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
@@ -90,7 +90,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	if(SORE_FileIO::Read(imgData, 1, dataSize, file)!=dataSize)
 	{
 		delete[] imgData;
-		LOG_S(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}

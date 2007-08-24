@@ -10,11 +10,29 @@
 //
 //
 
-namespace SORE_Input
+#include "sore_kernel.h"
+
+namespace SORE_Kernel
 {
+	struct Event
+	{
+	};
 	
 	typedef unsigned int event_listener;
 	typedef int(*EVENT_LISTENER)(Event*);
 	event_listener AddListener(EVENT_LISTENER listener);
 	void RemoveListener(event_listener listener);
+	
+	class InputTask : public Task
+	{
+		public:
+			InputTask();
+			~InputTask();
+			
+			void Frame();
+			void Pause();
+			void Resume();
+			
+			const char* GetName() const {return "Input task";}
+	};
 }

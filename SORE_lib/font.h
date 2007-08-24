@@ -8,7 +8,7 @@
 #include FT_FREETYPE_H
 
 #ifdef DEBUG
-
+/*
 #undef __FTERRORS_H__
 #define FT_ERRORDEF( e, v, s )  { e, s },
 #define FT_ERROR_START_LIST     {
@@ -19,7 +19,7 @@ const struct
 	const char*  err_msg
 } ft_errors[] =
 #include FT_ERRORS_H
-
+*/
 #endif
 
 namespace SORE_Font
