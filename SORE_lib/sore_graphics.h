@@ -6,7 +6,7 @@
 
 namespace SORE_Graphics
 {
-	void Init_2DOverlay();
+	void Init2DOverlay();
 	void UpdateViewport();
 
 	void Init_2DCanvas();

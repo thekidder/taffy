@@ -1,4 +1,7 @@
 
+#ifndef  __SORE_LOGGER_H__
+#define  __SORE_LOGGER_H__
+
 //#include "fileio.h"
 #include <vector>
 #include <map>
@@ -9,6 +12,8 @@
 
 #define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
 #define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+
+#define SORE_CONSOLE_LOG
 
 namespace SORE_Logging
 {
@@ -112,5 +117,6 @@ namespace SORE_Logging
 			std::vector<log_message> buffers;
 	};
 	extern Logger sore_log;
-	extern FileLogger sore_file_log;
 }
+
+#endif /*__SORE_LOGGER_H__*/

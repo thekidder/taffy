@@ -1,6 +1,7 @@
 
 #include "sore_kernel.h"
 #include "sore_logger.h"
+#include "allgl.h"
 
 SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::gk = NULL;
 
@@ -20,11 +21,23 @@ SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::GetKernel()
 SORE_Kernel::GameKernel::GameKernel()
 {
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
+	lastTicks = SDL_GetTicks();
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
 {
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel destroyed");
+}
+
+void SORE_Kernel::GameKernel::Frame()
+{
+	int ticks = SDL_GetTicks();
+	task_ref it;
+	for(it=tasks.begin();it!=tasks.end();it++)
+	{
+		it->second->Frame(ticks - lastTicks);
+	}
+	lastTicks = ticks;
 }
 
 void SORE_Kernel::GameKernel::Pause()

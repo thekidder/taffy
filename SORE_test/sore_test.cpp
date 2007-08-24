@@ -17,14 +17,42 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 	APP_LOG_S(SORE_Logging::LVL_INFO, "DEBUG BUILD");
 #endif
-	SORE_FileIO::Init();
+	SORE_FileIO::InitFileIO();
 	SORE_FileIO::CachePackageInfo("data_compressed.sdp");
+	
+	SORE_Font::InitFontSystem();
 	
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
 	gk->AddTask(10, renderer);
 	gk->AddTask(20, input);
+	
+	const double maxFPS = 100.0;
+	
+	int ticks, lastTicks;
+	
+	lastTicks = SDL_GetTicks();
+	
+	atexit(Cleanup);
+	
+	bool done = false;
+	
+	while(!done)
+	{
+		ticks = SDL_GetTicks();
+		
+		int ms = ticks - lastTicks;
+		
+		if(1000.0/double(ms)>maxFPS)
+		{
+			SDL_Delay(1);
+			continue;
+		}
+		gk->Frame();
+		lastTicks = ticks;
+	}
+	
 	Cleanup();
 	return 0;
 }

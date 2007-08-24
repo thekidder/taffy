@@ -29,7 +29,7 @@ namespace SORE_Kernel
 			InputTask();
 			~InputTask();
 			
-			void Frame();
+			void Frame(int elapsedTime);
 			void Pause();
 			void Resume();
 			

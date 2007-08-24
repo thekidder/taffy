@@ -20,7 +20,7 @@ SORE_Kernel::InputTask::~InputTask()
 {
 }
 
-void SORE_Kernel::InputTask::Frame()
+void SORE_Kernel::InputTask::Frame(int elapsedTime)
 {
 }
 

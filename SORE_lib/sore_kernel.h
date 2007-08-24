@@ -1,6 +1,6 @@
 
-#ifndef __SORE_KERNEL_H__
-#define __SORE_KERNEL_H__
+#ifndef  __SORE_KERNEL_H__
+#define  __SORE_KERNEL_H__
 
 #include <vector>
 #include <map>
@@ -13,7 +13,7 @@ namespace SORE_Kernel
 			Task();
 			virtual ~Task() {}
 			
-			virtual void Frame()  = 0;
+			virtual void Frame(int elapsedTime)  = 0;
 			virtual void Pause()  = 0;
 			virtual void Resume() = 0;
 			
@@ -40,7 +40,8 @@ namespace SORE_Kernel
 			std::multimap<unsigned int, Task*> tasks;
 			GameKernel();
 			static GameKernel* gk;
+			int lastTicks;
 	};
 }
 
-#endif
+#endif /*__SORE_KERNEL_H__*/

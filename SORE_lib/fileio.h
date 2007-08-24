@@ -11,7 +11,7 @@ namespace SORE_FileIO
 	
 	typedef unsigned int file_ref;
 	
-	int          Init(); //return 0 on success
+	int          InitFileIO(); //return 0 on success
 	
 	/*
 	  Call this to include a package and make its contents available to the application

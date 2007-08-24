@@ -1,6 +1,8 @@
 
 #include "sore_graphics.h"
+#include "sore_logger.h"
 #include "allgl.h"
+#include <cassert>
 
 namespace SORE_Graphics
 {
@@ -17,7 +19,7 @@ void SORE_Graphics::WindowToReal(int* window, int* real)
 	real[1] = viewport[3]-window[1];
 }
 
-void SORE_Graphics::Init_2DOverlay()
+void SORE_Graphics::Init2DOverlay()
 {
 	UpdateViewport();
 }
@@ -26,6 +28,7 @@ void SORE_Graphics::UpdateViewport()
 {
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	//std::cout << viewport[0] << ":" << viewport[1] << ":" << viewport[2] << ":" << viewport[3] << std::endl;
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "OpenGL viewport: (%d, %d, %d, %d)", viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 void SORE_Graphics::Init_2DCanvas()
@@ -49,11 +52,13 @@ void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const cha
 	
 	WindowToReal(window, real);
 	
+	
 	int h = SORE_Font::FontHeight(font);
 	
 	//std::cout << "height: " << h << " " << real[1] << std::endl;
 	
 	real[1] -= h;
+	assert(real[1]>=0);
 	char text[256];
 		
 	if(fmt!=NULL)

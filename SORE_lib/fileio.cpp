@@ -65,7 +65,7 @@ namespace SORE_FileIO
 	
 }
 
-int SORE_FileIO::Init()
+int SORE_FileIO::InitFileIO()
 {
 	file_info temp;
 	cachedFiles.clear();

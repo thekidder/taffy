@@ -378,7 +378,7 @@ int SORE_Font::FontInfo::SetHeight(unsigned int h)
 	return 0;
 }
 
-int SORE_Font::Init()
+int SORE_Font::InitFontSystem()
 {
 	SORE_Font::fontPaths.clear();
 #ifndef WIN32

@@ -53,7 +53,7 @@ namespace SORE_Font
 	typedef int font_ref;
 	
 	
-	int         Init();
+	int         InitFontSystem();
 	font_ref    LoadFont(const char* font, unsigned int h);
 	int         FontHeight(font_ref font);
 	

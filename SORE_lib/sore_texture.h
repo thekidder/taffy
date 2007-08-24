@@ -1,4 +1,7 @@
 
+#ifndef  __SORE_TEXTURE_H__
+#define  __SORE_TEXTURE_H__
+
 #include "sore_resource.h"
 
 namespace SORE_Resource
@@ -19,3 +22,5 @@ namespace SORE_Resource
 	Texture* LoadTexture(const char* filename, int flags);
 	//Texture* LoadDataTexture(const char* bytes, int len, int flags);
 }
+
+#endif /*__SORE_TEXTURE_H__*/

@@ -9,6 +9,9 @@ namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
 	XMLLogger sore_file_logger(ALL, "logs/sore_log.xml");
+#ifdef SORE_CONSOLE_LOG
+	ConsoleLogger sore_console_logger(ALL);
+#endif
 	Logger sore_log;
 	
 	void InitLogging();
@@ -24,6 +27,7 @@ void SORE_Logging::InitLogging()
 	lvlNames[LVL_DEBUG1  ] = "Debug 1 ";
 	lvlNames[LVL_DEBUG2  ] = "Debug 2 ";
 	sore_log.AddBackend(&sore_file_logger);
+	sore_log.AddBackend(&sore_console_logger);
 }
 
 void SORE_Logging::AddLogLevel(int lvl, const char* name)
