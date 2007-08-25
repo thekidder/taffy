@@ -8,11 +8,11 @@
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
-	XMLLogger sore_file_logger(ALL, "logs/sore_log.xml");
+	XMLLogger sore_file_logger(INFO | LVL_DEBUG1, "logs/sore_log.xml");
 #ifdef SORE_CONSOLE_LOG
-	ConsoleLogger sore_console_logger(ALL);
+	ConsoleLogger sore_console_logger(INFO | LVL_DEBUG1);
 #endif
-	Logger sore_log;
+	Logger sore_log("SORE Engine");
 	
 	void InitLogging();
 }
@@ -53,6 +53,7 @@ SORE_Logging::FileLogger::FileLogger(int lvl, const char* filename)
 {
 	level = lvl;
 	strncpy(file, filename, 255);
+	file[255] = '\0';
 	filePtr = fopen(file, "w");
 }
 
@@ -67,7 +68,8 @@ void SORE_Logging::FileLogger::Write(log_message* log)
 	char levelstr[9];
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 9);
+		strncpy(levelstr, lvlNames[log->level], 8);
+		levelstr[8] = '\0';
 	}
 	else
 	{
@@ -98,15 +100,26 @@ void SORE_Logging::ConsoleLogger::Write(log_message* log)
 {
 	static char buffer[2048];
 	char levelstr[9];
+	char name[13];
+	if(strlen(log->logName)==0)
+	{
+		strcpy(name, "Unnamed");
+	}
+	else
+	{
+		strncpy(name, log->logName, 12);
+		name[12] = '\0';
+	}
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 9);
+		strncpy(levelstr, lvlNames[log->level], 8);
+		levelstr[8] = '\0';
 	}
 	else
 	{
 		sprintf(levelstr, "%-8d", log->level);
 	}
-	sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
+	sprintf(buffer, "[%-12s] [%s] %s\n", name, levelstr, log->buffer);
 	fwrite(buffer, sizeof(char), strlen(buffer), stdout);
 }
 
@@ -116,6 +129,7 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
 	const char end[] = "\">\n";
 	level = lvl;
 	strncpy(file, filename, 255);
+	file[255] = '\0';
 	filePtr = fopen(file, "w");
 	fwrite(begin, sizeof(char), strlen(begin), filePtr);
 	fwrite(filename, sizeof(char), strlen(filename), filePtr);
@@ -159,11 +173,15 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	if(log->func==NULL)
 		prevFunc[0] = '\0';
 	else
+	{
 		strncpy(prevFunc, log->func, 255);
-	
+		prevFunc[255] = '\0';
+	}
+		
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 9);
+		strncpy(levelstr, lvlNames[log->level], 8);
+		levelstr[8] = '\0';
 	}
 	else
 	{
@@ -203,11 +221,24 @@ void SORE_Logging::XMLLogger::Flush()
 SORE_Logging::Logger::Logger()
 {
 	buffers.clear();
-	Log(LVL_INFO, "Program log started");
+	Log(LVL_INFO, "Unnamed log started");
+	logName[0] = '\0';
+}
+
+SORE_Logging::Logger::Logger(const char* name)
+{
+	buffers.clear();
+	strncpy(logName, name, 31);
+	logName[31] = '\0';
+	Log(LVL_INFO, "%s log started", logName);
 }
 
 SORE_Logging::Logger::~Logger()
 {
+	if(strlen(logName)==0)
+		Log(LVL_INFO, "Unnamed log terminated");
+	else
+		Log(LVL_INFO, "%s log terminated", logName);
 	Flush();
 }
 
@@ -224,6 +255,7 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 	temp.func = 0;
 	temp.file = 0;
 	temp.time = time(NULL);
+	temp.logName = logName;
 	if(lvlNames.size()==0)
 		InitLogging();
 	va_list args;
@@ -247,6 +279,7 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 	temp.func = func;
 	temp.file = file;
 	temp.time = time(NULL);
+	temp.logName = logName;
 	if(lvlNames.size()==0)
 		InitLogging();
 	va_list args;
@@ -271,4 +304,9 @@ void SORE_Logging::Logger::Flush()
 		(*it)->Flush();
 	}
 	if(logs.size()>0) buffers.clear();
+}
+
+const char* SORE_Logging::Logger::GetName() const
+{
+	return logName;
 }

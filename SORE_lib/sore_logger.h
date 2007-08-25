@@ -40,6 +40,7 @@ namespace SORE_Logging
 		const char* file;
 		char buffer[BUFFER_LEN];
 		time_t time;
+		char* logName;
 	};
 	
 	/*struct log_buffer
@@ -105,16 +106,20 @@ namespace SORE_Logging
 	{
 		public:
 			Logger();
+			Logger(const char* name); //create a named logger
 			~Logger();
 		
 			void AddBackend(LoggerBackend* newLog);
 			void Log(int lvl, const char* format, ...);
 			void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);
 			void Flush();
+			
+			const char* GetName() const;
 		protected:
 			std::vector<LoggerBackend*> logs;
 			std::vector<LoggerBackend*>::iterator it;
 			std::vector<log_message> buffers;
+			char logName[32];
 	};
 	extern Logger sore_log;
 }

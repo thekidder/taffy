@@ -9,7 +9,7 @@ SORE_Kernel::Task* input;
 
 int main(int argc, char *argv[])
 {
-	mainLog = new SORE_Logging::Logger;
+	mainLog = new SORE_Logging::Logger("SORE_test");
 	fileLog = new SORE_Logging::XMLLogger(SORE_Logging::INFO, "logs/program_log.xml");
 	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
 	mainLog->AddBackend(fileLog);
