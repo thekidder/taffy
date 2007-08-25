@@ -18,10 +18,16 @@ SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::GetKernel()
 	return gk;
 }
 
+void SORE_Kernel::GameKernel::Cleanup()
+{
+	delete gk;
+}
+
 SORE_Kernel::GameKernel::GameKernel()
 {
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
 	lastTicks = SDL_GetTicks();
+	quitFlag = false;
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
@@ -78,4 +84,9 @@ SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(const char* taskName)
 			tasks.erase(it);
 		}
 	}
+}
+
+void SORE_Kernel::GameKernel::RemoveAllTasks()
+{
+	tasks.clear();
 }

@@ -11,6 +11,7 @@
 //
 
 #include "sore_kernel.h"
+#include "allgl.h"
 
 namespace SORE_Kernel
 {
@@ -18,10 +19,8 @@ namespace SORE_Kernel
 	{
 	};
 	
-	typedef unsigned int event_listener;
+	typedef unsigned int event_listener_ref;
 	typedef int(*EVENT_LISTENER)(Event*);
-	event_listener AddListener(EVENT_LISTENER listener);
-	void RemoveListener(event_listener listener);
 	
 	class InputTask : public Task
 	{
@@ -34,5 +33,10 @@ namespace SORE_Kernel
 			void Resume();
 			
 			const char* GetName() const {return "Input task";}
+			
+			event_listener_ref AddListener   (EVENT_LISTENER listener);
+			void RemoveListener(event_listener_ref listener);
+		protected:
+			SDL_Event event;
 	};
 }

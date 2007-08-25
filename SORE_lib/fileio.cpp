@@ -152,7 +152,7 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 		}
 		cachedFiles.push_back(tempInfo);
 		BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1], cachedFiles[cachedFiles.size()-1]);
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Adding %s to cache", cachedFiles[cachedFiles.size()-1].fullname);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Adding %s to cache", cachedFiles[cachedFiles.size()-1].fullname);
 		fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
 	}
 	
@@ -203,7 +203,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 		}
 		cachedFiles[it->second].currPos = 0;
 		cachedFiles[it->second].currPosRaw  = 0;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Opening file %s from package %s", file, cachedFiles[it->second].package);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from package %s", file, cachedFiles[it->second].package);
 		if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
 		{
 			FILE* temp;

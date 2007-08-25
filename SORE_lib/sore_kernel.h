@@ -27,18 +27,21 @@ namespace SORE_Kernel
 	{
 		public:
 			static GameKernel* GetKernel();
-			~GameKernel();
+			static void        Cleanup();
 			
-			void Pause();
-			void Frame();
-			void Resume();
+			void     Pause();
+			void     Frame();
+			void     Resume();
 			
 			task_ref AddTask(unsigned int priority, Task* task);
 			Task*    RemoveTask(task_ref task);
 			Task*    RemoveTask(const char* taskName);
+			void     RemoveAllTasks();
+			bool     quitFlag;
 		protected:
 			std::multimap<unsigned int, Task*> tasks;
 			GameKernel();
+			~GameKernel();
 			static GameKernel* gk;
 			int lastTicks;
 	};

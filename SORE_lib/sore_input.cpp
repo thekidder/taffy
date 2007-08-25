@@ -22,6 +22,17 @@ SORE_Kernel::InputTask::~InputTask()
 
 void SORE_Kernel::InputTask::Frame(int elapsedTime)
 {
+	while(SDL_PollEvent(&event))
+	{
+		switch(event.type)
+		{
+			case SDL_QUIT:
+			{
+				GameKernel* gk = GameKernel::GetKernel();
+				gk->quitFlag = true;
+			}
+		}
+	}
 }
 
 void SORE_Kernel::InputTask::Pause()

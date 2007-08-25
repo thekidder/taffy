@@ -34,11 +34,10 @@ int main(int argc, char *argv[])
 	
 	lastTicks = SDL_GetTicks();
 	
-	atexit(Cleanup);
 	
 	bool done = false;
 	
-	while(!done)
+	while(!gk->quitFlag)
 	{
 		ticks = SDL_GetTicks();
 		
@@ -59,8 +58,13 @@ int main(int argc, char *argv[])
 
 void Cleanup()
 {
+	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
+	gk->RemoveAllTasks();
+	
 	delete renderer;
 	delete input;
+	
+	gk->Cleanup();
 	
 	delete mainLog;
 	delete fileLog;
