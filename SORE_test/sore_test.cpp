@@ -5,7 +5,9 @@ SORE_Logging::Logger* mainLog;
 SORE_Logging::XMLLogger* fileLog;
 SORE_Logging::ConsoleLogger* consoleLog;
 SORE_Kernel::Task* renderer;
-SORE_Kernel::Task* input;
+SORE_Kernel::InputTask* input;
+
+bool testlisten(SORE_Kernel::Event* event);
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +27,7 @@ int main(int argc, char *argv[])
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
+	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten);
 	gk->AddTask(10, renderer);
 	gk->AddTask(20, input);
 	
@@ -69,4 +72,14 @@ void Cleanup()
 	delete mainLog;
 	delete fileLog;
 	delete consoleLog;
+}
+
+bool testlisten(SORE_Kernel::Event* event)
+{
+	if(event->mouse.x < 100 && event->mouse.y < 100)
+	{
+		APP_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse clicked in bottom right");
+		return true;
+	}
+	return false;
 }
