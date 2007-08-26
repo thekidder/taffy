@@ -1,0 +1,15 @@
+the construction of the resource manager is slightly complex, but after initialization is very easy to use.
+
+after initialization:
+ResourceManager* rm = ResourceManager::GetManager();
+res_handle some_tex = rm->Register("data/Textures/some_texture.tga");
+
+...
+
+Texture some_texture = rm->GetPtr(some_tex); or
+Texture some_texture = rm->GetPtr("data/Textures/some_texture.tga");
+
+Each type of resource is a class derived from class Resource. It must have Load( char* filename), Load(char* bytes, int len), and Unload() functions defined. Its internal data representation is simply a pointer to some bytes.
+		
+For ResourceManager to know how to instantiate different types of resources, this method is used:
+ResourceManager keeps two structures mapping file extensions to function pointers. Thus, when a new resource type is needed, a class is derived from Resource, and RES_LOAD and RES_LOAD_DATA functions are defined then registered in ResourceManager.
