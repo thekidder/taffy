@@ -2,22 +2,29 @@
 #include "sore_renderer.h"
 #include "sore_logger.h"
 #include "sore_graphics.h"
+#include <cassert>
 
 SORE_Kernel::Renderer::Renderer()
 {
 	if(InitializeSDL()!=0)
 	{
-		ENGINE_LOG(SORE_Logging::CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
+		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
 	}
 	if(InitializeGL()!=0)
 	{
-		ENGINE_LOG_S(SORE_Logging::CRITICAL, "Could not initialize GL");
+		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
 	}
 	if(InitializeSOREGraphics()!=0)
 	{
-		ENGINE_LOG_S(SORE_Logging::CRITICAL, "Could not initialize SORE Graphics subsystems");
+		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize SORE Graphics subsystems");
 	}
-	font = SORE_Font::LoadFont("data/Fonts/liberationsans.ttf", 24);	
+	font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
+	if(font == 0)
+	{
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
+		GameKernel* gk = GameKernel::GetKernel();
+		gk->quitFlag = true;
+	}
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -74,7 +81,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	/* This checks if hardware blits can be done */
 	if ( videoInfo->blit_hw )
 		videoFlags |= SDL_HWACCEL;
-	drawContext = SDL_SetVideoMode(640, 480, 0, videoFlags);
+	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
 	return 0;
 }
 

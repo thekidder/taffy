@@ -138,6 +138,7 @@ int SORE_Font::FontHeight(font_ref font)
 
 int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 {
+	if(fontIndex == 0) return 0;
 	//std::cout << "test\n";
 	FontInfo* font = &fontStack[fontIndex];
 	//std::cout << "font.h: " << font.height << std::endl;
@@ -215,6 +216,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 
 float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 {
+	if(fontIndex == 0) return 0.0;
 	FontInfo* font = &fontStack[fontIndex];
 	glEnd();
 	//std::cout << "c: " << c << " x: " << x << " y: " << y << "\n";
@@ -320,7 +322,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
 	{
 		//std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
-		ENGINE_LOG(SORE_Logging::ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", read, err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", read, err);
 		SORE_FileIO::Close(fontObj);
 		return FONT_LOAD_FAILED;
 	}
@@ -331,10 +333,10 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		FT_Done_FreeType(library);
 		delete[] dirName;
 		//std::cerr << "Font load failed: Freetype error code " << err << std::endl;
-		ENGINE_LOG(SORE_Logging::ERROR, "Font load failed: Freetype error code %d", err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Freetype error code %d", err);
 #ifdef DEBUG
 		//std::cout << ft_errors[err] << std::endl;
-		ENGINE_LOG(SORE_Logging::ERROR, "Freetype error: %s", ft_errors[err]);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Freetype error: %s", ft_errors[err]);
 #endif
 		return FONT_LOAD_FAILED;
 	}
@@ -346,7 +348,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	while((error=glGetError())!=GL_NO_ERROR)
 	{
 		//std::cout << "error detected: " << error << "\n";
-		ENGINE_LOG(SORE_Logging::ERROR, "GL Error: %d", error);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "GL Error: %d", error);
 		delete[] fontPath;
 	
 		FT_Done_Face(face);
@@ -411,6 +413,9 @@ int SORE_Font::InitFontSystem()
 	FcStrListDone(fontDirs);
 #endif
 	delete[] dirName;
+	
+	FontInfo null;
+	fontStack.push_back(null);
 }
 
 SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
@@ -421,7 +426,7 @@ SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
 	if((err=newFont.LoadFont(font))!=0)
 	{
 		//std::cerr << "Failed to load font; error code " << err << std::endl;
-		ENGINE_LOG(SORE_Logging::ERROR, "Failed to load font: error code %d", err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to load font: error code %d", err);
 		return 0;
 	}
 	font_ref index = fontStack.size();

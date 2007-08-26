@@ -8,12 +8,13 @@ SORE_Kernel::Task* renderer;
 SORE_Kernel::InputTask* input;
 
 bool testlisten(SORE_Kernel::Event* event);
+bool testlisten2(SORE_Kernel::Event* event);
 
 int main(int argc, char *argv[])
 {
 	mainLog = new SORE_Logging::Logger("SORE_test");
 	fileLog = new SORE_Logging::XMLLogger(SORE_Logging::INFO, "logs/program_log.xml");
-	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::INFO);
+	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::ALL);
 	mainLog->AddBackend(fileLog);
 	mainLog->AddBackend(consoleLog);
 #ifdef DEBUG
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
 	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten);
+	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten2);
 	gk->AddTask(10, renderer);
 	gk->AddTask(20, input);
 	
@@ -78,7 +80,17 @@ bool testlisten(SORE_Kernel::Event* event)
 {
 	if(event->mouse.x < 100 && event->mouse.y < 100)
 	{
-		APP_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse clicked in bottom right");
+		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Mouse clicked in top left");
+		return true;
+	}
+	return false;
+}
+
+bool testlisten2(SORE_Kernel::Event* event)
+{
+	if(event->mouse.x < 50 && event->mouse.y < 50)
+	{
+		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Mouse clicked in (very) top left");
 		return true;
 	}
 	return false;

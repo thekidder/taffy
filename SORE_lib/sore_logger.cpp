@@ -10,7 +10,7 @@ namespace SORE_Logging
 	static std::map<int, const char*> lvlNames;
 	XMLLogger sore_file_logger(INFO | LVL_DEBUG1, "logs/sore_log.xml");
 #ifdef SORE_CONSOLE_LOG
-	ConsoleLogger sore_console_logger(INFO | LVL_DEBUG1);
+	ConsoleLogger sore_console_logger(ALL);
 #endif
 	Logger sore_log("SORE Engine");
 	

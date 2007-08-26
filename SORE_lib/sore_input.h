@@ -49,7 +49,7 @@ namespace SORE_Kernel
 	};
 	
 	typedef unsigned int event_listener_ref;
-	typedef bool(*EVENT_LISTENER)(Event*);
+	typedef bool (*EVENT_LISTENER)(Event*);
 	
 	class InputTask : public Task
 	{
@@ -63,7 +63,7 @@ namespace SORE_Kernel
 			
 			const char* GetName() const {return "Input task";}
 			
-			event_listener_ref AddListener   (unsigned int eventType, EVENT_LISTENER listener);
+			event_listener_ref AddListener(unsigned int eventType, EVENT_LISTENER listener);
 			void RemoveListener(event_listener_ref listener);
 		protected:
 			Event event;

@@ -25,7 +25,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 	SDL_Event sdl_event;
 	while(SDL_PollEvent(&sdl_event))
 	{
-		switch(event.type)
+		switch(sdl_event.type)
 		{
 			case SDL_QUIT:
 			{
@@ -63,10 +63,16 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 		{
 			if(it->first & event.type)
 			{
-				it->second(&event);
+				if(it->second(&event))
+					break;
 			}
 		}
 	}
+}
+
+SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, EVENT_LISTENER listener)
+{
+	allListeners.insert(std::pair<unsigned int, EVENT_LISTENER>(eventType, listener));
 }
 
 void SORE_Kernel::InputTask::Pause()

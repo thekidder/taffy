@@ -50,7 +50,7 @@ namespace SORE_Font
 			FT_Byte* fontInfo;
 	};
 	
-	typedef int font_ref;
+	typedef unsigned int font_ref;
 	
 	
 	int         InitFontSystem();
