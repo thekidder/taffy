@@ -6,6 +6,7 @@
 #include "sore_font.h"
 #include "sore_allgl.h"
 #include "sore_graphics.h"
+#include "sore_camera.h"
 
 namespace SORE_Kernel
 {

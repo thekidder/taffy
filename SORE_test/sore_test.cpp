@@ -4,9 +4,12 @@
 SORE_Logging::Logger* mainLog;
 SORE_Logging::XMLLogger* fileLog;
 SORE_Logging::ConsoleLogger* consoleLog;
+SORE_Graphics::Camera cam;
+SORE_Graphics::CameraTask camTask(&cam);
 
 bool testlisten(SORE_Kernel::Event* event);
 bool testlisten2(SORE_Kernel::Event* event);
+bool camCallback(SORE_Kernel::Event* event);
 
 int main(int argc, char *argv[])
 {
@@ -25,16 +28,24 @@ int main(int argc, char *argv[])
 	
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
+	
 	SORE_Graphics::TerrainGraph tg(10,10);
+	
+	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
+	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
+	
 	
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
 	renderer->SetSceneGraph(&tg);
+	renderer->SetCamera(&cam);
+	input->AddListener(SORE_Kernel::MOUSEMOVE | SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, camCallback);
 	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten);
 	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten2);
-	gk->AddTask(10, renderer);
-	gk->AddTask(20, input);
+	gk->AddTask(20, renderer);
+	gk->AddTask(10, input);
+	gk->AddTask(30, &camTask);
 	
 	const double maxFPS = 100.0;
 	
@@ -94,4 +105,9 @@ bool testlisten2(SORE_Kernel::Event* event)
 		return true;
 	}
 	return false;
+}
+
+bool camCallback(SORE_Kernel::Event* event)
+{
+	camTask.CameraCallback(event);
 }

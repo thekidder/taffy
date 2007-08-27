@@ -26,6 +26,7 @@ SORE_Kernel::Renderer::Renderer()
 		gk->quitFlag = true;
 	}
 	sg = NULL;
+	cam = NULL;
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -35,7 +36,11 @@ SORE_Kernel::Renderer::~Renderer()
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	cam->TransformView();
+	assert(sg!=NULL && "No scene graph");
+	if(cam)
+		cam->TransformView();
+	else
+		ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "No camera set, no view transformations possible");
 	sg->Render();
 	SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

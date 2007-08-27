@@ -52,7 +52,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</div>
 				</xsl:if> 
 				<xsl:if test="level = 4">
-					<div class = "warn">
+					<div class = "warning">
 						<small><b>Time: </b><xsl:value-of select="time"/></small>
 						<small><b>Severity: </b><xsl:value-of select="levelstr"/></small>
 						<xsl:if test="line != 0">

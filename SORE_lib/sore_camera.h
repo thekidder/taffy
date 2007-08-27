@@ -1,7 +1,9 @@
-#ifndef  __CAMERA_H__
-#define  __CAMERA_H__
+#ifndef  __SORE_CAMERA_H__
+#define  __SORE_CAMERA_H__
 
-#include "allgl.h"
+#include "sore_allgl.h"
+#include "sore_kernel.h"
+#include "sore_input.h"
 
 const int AXIS_X = 1;
 const int AXIS_Y = 2;
@@ -35,6 +37,27 @@ namespace SORE_Graphics
 			GLfloat xr, yr, zr;
 			RotationLimit xl,yl,zl;
 	};
+	
+	class CameraTask : public SORE_Kernel::Task
+	{
+		public:
+			CameraTask();
+			CameraTask(Camera* camera);
+			~CameraTask() {}
+			
+			void Pause();
+			void Resume();
+			void Frame(int elapsedTime);
+			
+			const char* GetName() const {return "Camera Task";}
+			
+			void SetCamera(Camera* camera);
+			bool CameraCallback(SORE_Kernel::Event* event);
+		protected:
+			Camera* cam;
+			bool forward,back,left,right;
+			bool grabbed;
+	};
 }
 
-#endif //__CAMERA_H__
+#endif //__SORE_CAMERA_H__

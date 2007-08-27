@@ -30,11 +30,13 @@ void SORE_Graphics::TerrainGraph::Render()
 	float z;
 	for(int i=0;i<xres;i++)
 	{
-		glBegin(GL_TRIANGLE_STRIP);
+		glBegin(GL_LINE_STRIP);
 		for(int j=0;j<yres;j++)
 		{
-			glVertex3f(i,j,pn->GetValue(i,j));
-			glVertex3f(i+1,j,pn->GetValue(i,j));
+			//glVertex3f(i,pn->GetValue(i,j), j);
+			//glVertex3f(i+1,pn->GetValue(i,j),j);
+			glVertex3f(0.1f*i,0.1f*pn->GetValue(i,j), 0.1f*j);
+			glVertex3f(0.1f*i+0.1f,0.1f*pn->GetValue(i+1,j),0.1f*j);
 		}
 		glEnd();
 	}

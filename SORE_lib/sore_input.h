@@ -10,6 +10,9 @@
 //
 //
 
+#ifndef  __SORE_INPUT_H__
+#define  __SORE_INPUT_H__
+
 #include "sore_kernel.h"
 #include "sore_allgl.h"
 #include <map>
@@ -70,3 +73,5 @@ namespace SORE_Kernel
 			std::multimap<unsigned int, EVENT_LISTENER> allListeners;
 	};
 }
+
+#endif /*__SORE_INPUT_H__*/

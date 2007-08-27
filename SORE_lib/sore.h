@@ -7,6 +7,7 @@
 #endif
 
 #include "sore_allgl.h"
+#include "sore_camera.h"
 #include "sore_util.h"
 #include "sore_texture.h"
 #include "sore_font.h"
