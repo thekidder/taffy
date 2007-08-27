@@ -25,6 +25,7 @@ SORE_Kernel::Renderer::Renderer()
 		GameKernel* gk = GameKernel::GetKernel();
 		gk->quitFlag = true;
 	}
+	sg = NULL;
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -34,10 +35,10 @@ SORE_Kernel::Renderer::~Renderer()
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	sg->Render();
 	SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
-	SORE_Logging::sore_log.Flush();
 	SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();
 }
@@ -48,6 +49,11 @@ void SORE_Kernel::Renderer::Pause()
 
 void SORE_Kernel::Renderer::Resume()
 {
+}
+
+void SORE_Kernel::Renderer::SetSceneGraph(SORE_Graphics::SceneGraph* scene)
+{
+	sg = scene;
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()

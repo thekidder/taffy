@@ -4,8 +4,6 @@
 SORE_Logging::Logger* mainLog;
 SORE_Logging::XMLLogger* fileLog;
 SORE_Logging::ConsoleLogger* consoleLog;
-SORE_Kernel::Task* renderer;
-SORE_Kernel::InputTask* input;
 
 bool testlisten(SORE_Kernel::Event* event);
 bool testlisten2(SORE_Kernel::Event* event);
@@ -25,9 +23,14 @@ int main(int argc, char *argv[])
 	
 	SORE_Font::InitFontSystem();
 	
+	SORE_Kernel::Renderer* renderer;
+	SORE_Kernel::InputTask* input;
+	SORE_Graphics::TerrainGraph tg(10,10);
+	
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
+	renderer->SetSceneGraph(&tg);
 	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten);
 	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten2);
 	gk->AddTask(10, renderer);
@@ -56,7 +59,8 @@ int main(int argc, char *argv[])
 		gk->Frame();
 		lastTicks = ticks;
 	}
-	
+	delete renderer;
+	delete input;
 	Cleanup();
 	return 0;
 }
@@ -65,10 +69,6 @@ void Cleanup()
 {
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	gk->RemoveAllTasks();
-	
-	delete renderer;
-	delete input;
-	
 	gk->Cleanup();
 	
 	delete mainLog;

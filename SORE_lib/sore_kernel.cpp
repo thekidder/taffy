@@ -43,6 +43,9 @@ void SORE_Kernel::GameKernel::Frame()
 	{
 		it->second->Frame(ticks - lastTicks);
 	}
+#ifdef DEBUG
+	SORE_Logging::sore_log.Flush();
+#endif
 	lastTicks = ticks;
 }
 

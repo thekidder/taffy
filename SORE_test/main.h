@@ -3,6 +3,7 @@
 #define  __MAIN_H__
 
 #include <sore.h>
+#include "terrain_graph.h"
 
 #define APP_LOG(lvl, format, ...) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
 #define APP_LOG_S(lvl, format) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)

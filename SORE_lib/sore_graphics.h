@@ -13,6 +13,15 @@ namespace SORE_Graphics
 	void Destroy_2DCanvas();
 	
 	void DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...);
+	
+	class SceneGraph
+	{
+		public:
+			SceneGraph() {}
+			virtual ~SceneGraph() {}
+			
+			virtual void Render() = 0;
+	};
 }
 
 #endif /*__SORE_H__*/
