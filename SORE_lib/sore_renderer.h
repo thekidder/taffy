@@ -22,6 +22,7 @@ namespace SORE_Kernel
 			const char* GetName() const {return "Renderer";}
 			
 			void SetSceneGraph(SORE_Graphics::SceneGraph* scene);
+			void SetCamera    (SORE_Graphics::Camera*     camera);
 		protected:
 			int  InitializeSDL();
 			int  InitializeGL();
@@ -30,6 +31,7 @@ namespace SORE_Kernel
 			SORE_Font::font_ref font;
 			
 			SORE_Graphics::SceneGraph* sg;
+			SORE_Graphics::Camera*     cam;
 	};
 }
 

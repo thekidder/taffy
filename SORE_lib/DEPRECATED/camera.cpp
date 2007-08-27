@@ -1,12 +1,12 @@
 #include "camera.h"
 
-Camera::Camera()
+SORE_Graphics::Camera::Camera()
 {
 	x = xr = y = yr = z = zr = 0.0f;
 	z = 5.0f;
 }
 
-void Camera::Rotate(GLfloat i, GLfloat j, GLfloat k)
+void SORE_Graphics::Camera::Rotate(GLfloat i, GLfloat j, GLfloat k)
 {
 	xr += i;
 	yr += j;
@@ -33,7 +33,7 @@ void Camera::Rotate(GLfloat i, GLfloat j, GLfloat k)
 	if(zr < -180.0f) zr =  180.0f;
 }
 
-void Camera::SetRotationUpperLimit(int axis, GLfloat limit)
+void SORE_Graphics::Camera::SetRotationUpperLimit(int axis, GLfloat limit)
 {
 	if(axis<1 || axis>3) return;
 	
@@ -54,7 +54,7 @@ void Camera::SetRotationUpperLimit(int axis, GLfloat limit)
 	}
 }
 
-void Camera::SetRotationLowerLimit(int axis, GLfloat limit)
+void SORE_Graphics::Camera::SetRotationLowerLimit(int axis, GLfloat limit)
 {
 	if(axis<1 || axis>3) return;
 	
@@ -75,7 +75,7 @@ void Camera::SetRotationLowerLimit(int axis, GLfloat limit)
 	}
 }
 
-void Camera::Translate(GLfloat i, GLfloat j, GLfloat k)
+void SORE_Graphics::Camera::Translate(GLfloat i, GLfloat j, GLfloat k)
 {
 	//std::cout << "k: " << k << std::endl;
 	x += i;
@@ -83,37 +83,29 @@ void Camera::Translate(GLfloat i, GLfloat j, GLfloat k)
 	z += k;
 }
 
-GLfloat* Camera::GetRotation()
+GLfloat* SORE_Graphics::Camera::GetRotation()
 {
-	GLfloat* vector = new GLfloat[3];
+	static GLfloat vector[3]
 	vector[0] = xr;
 	vector[1] = yr;
 	vector[2] = zr;
 	return vector;
 }
 
-GLfloat* Camera::GetPosition()
+GLfloat* SORE_Graphics::Camera::GetPosition()
 {
-	GLfloat* vector = new GLfloat[3];
+	static GLfloat vector[3]
 	vector[0] = x;
 	vector[1] = y;
 	vector[2] = z;
 	return vector;
 }
 
-void Camera::TransformView()
+void SORE_Graphics::Camera::TransformView()
 {
 	::glLoadIdentity();
 	::glRotatef(-xr, 1.0f, 0.0f, 0.0f);
 	::glRotatef(-yr, 0.0f, 1.0f, 0.0f);
 	::glRotatef(-zr, 0.0f, 0.0f, 1.0f);
 	::glTranslatef(-x, -y, -z);
-}
-
-void Camera::Print()
-{
-	std::cout << "Camera position: " << std::endl;
-	std::cout << "\tx: " << x << " y: " << y << " z: " << z << std::endl;
-	std::cout << "Camera rotation: " << std::endl;
-	std::cout << "\txr: " << xr << " yr: " << yr << " zr: " << zr << std::endl;
 }

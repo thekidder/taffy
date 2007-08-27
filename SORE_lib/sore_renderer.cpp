@@ -35,6 +35,7 @@ SORE_Kernel::Renderer::~Renderer()
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	cam->TransformView();
 	sg->Render();
 	SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -54,6 +55,11 @@ void SORE_Kernel::Renderer::Resume()
 void SORE_Kernel::Renderer::SetSceneGraph(SORE_Graphics::SceneGraph* scene)
 {
 	sg = scene;
+}
+
+void SORE_Kernel::Renderer::SetCamera(SORE_Graphics::Camera* camera)
+{
+	cam = camera;
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()

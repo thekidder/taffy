@@ -18,11 +18,12 @@ namespace SORE_Graphics
 	class TerrainGraph : public SceneGraph
 	{
 		public:
-			TerrainGraph(int x, int y) {xres=x;yres=y;}
-			~TerrainGraph() {}
+			TerrainGraph(int x, int y);
+			~TerrainGraph();
 		
 			void Render();
 		protected:
 			int xres,yres;
+			Noise::PerlinNoise* pn;
 	};
 }
