@@ -24,6 +24,8 @@ namespace SORE_Kernel
 			
 			void SetSceneGraph(SORE_Graphics::SceneGraph* scene);
 			void SetCamera    (SORE_Graphics::Camera*     camera);
+			
+			void OnResize();
 		protected:
 			int  InitializeSDL();
 			int  InitializeGL();

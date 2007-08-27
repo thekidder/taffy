@@ -115,6 +115,11 @@ void SORE_Graphics::Camera::TransformView()
 	::glTranslatef(-x, -y, -z);
 }
 
+void SORE_Graphics::Camera::LogPosition()
+{
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "position: (%f, %f, %f) rotation: (%f, %f, %f)",x,y,z,xr,yr,zr);
+}
+
 SORE_Graphics::CameraTask::CameraTask()
 {
 	forward = back = left = right = false;
@@ -223,6 +228,9 @@ bool SORE_Graphics::CameraTask::CameraCallback(SORE_Kernel::Event* event)
 						grabbed = !grabbed;
 					}
 					return true;
+					break;
+				case SDLK_l:
+					cam->LogPosition();
 					break;
 			}
 			break;

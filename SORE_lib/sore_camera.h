@@ -31,6 +31,7 @@ namespace SORE_Graphics
 			void SetRotationLowerLimit(int axis, GLfloat value);
 			GLfloat* GetRotation();
 			GLfloat* GetPosition();
+			void LogPosition();
 		private:
 		protected:
 			GLfloat x, y, z;

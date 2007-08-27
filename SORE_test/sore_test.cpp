@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	SORE_Graphics::TerrainGraph tg(10,10);
+	SORE_Graphics::TerrainGraph tg(10000,10000);
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);

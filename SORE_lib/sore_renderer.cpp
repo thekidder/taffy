@@ -37,6 +37,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	assert(sg!=NULL && "No scene graph");
+	//glLoadIdentity();
 	if(cam)
 		cam->TransformView();
 	else
@@ -65,6 +66,28 @@ void SORE_Kernel::Renderer::SetSceneGraph(SORE_Graphics::SceneGraph* scene)
 void SORE_Kernel::Renderer::SetCamera(SORE_Graphics::Camera* camera)
 {
 	cam = camera;
+}
+
+void SORE_Kernel::Renderer::OnResize()
+{
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	GLint width = viewport[2];
+	GLint height = viewport[3];
+	/* Height / width ration */
+	GLfloat ratio;
+	ratio = ( GLfloat )width / ( GLfloat )height;
+	/* Setup our viewport. */
+	glViewport( 0, 0, ( GLsizei )width, ( GLsizei )height );
+	/* change to the projection matrix and set our viewing volume. */
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity( );
+	/* Set our perspective */
+	gluPerspective( 45.0f, ratio, 0.1f, 100.0f );
+	/* Make sure we're chaning the model view and not the projection */
+	glMatrixMode( GL_MODELVIEW );
+	/* Reset The View */
+	glLoadIdentity( );
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()
@@ -120,6 +143,7 @@ int SORE_Kernel::Renderer::InitializeGL()
 	/* Really Nice Perspective Calculations */
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	OnResize();
 	return 0;
 }
 

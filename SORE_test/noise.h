@@ -10,6 +10,9 @@
 //
 //
 
+#ifndef  __NOISE_H__
+#define  __NOISE_H__
+
 namespace Noise
 {
 	typedef double(*NOISE_FUNC1D)(double, int); //the int is used for a possible seed
@@ -20,3 +23,5 @@ namespace Noise
 	
 	double Noise12D(int x, int y, int seed);
 }
+
+#endif /*__NOISE_H__*/

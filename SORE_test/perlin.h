@@ -10,6 +10,9 @@
 //
 //
 
+#ifndef  __PERLIN_H__
+#define  __PERLIN_H__
+
 #include "noise.h"
 
 namespace Noise
@@ -23,6 +26,8 @@ namespace Noise
 			double GetValue(double x, double y);
 		protected:
 			double SmoothedNoise(double x, double y);
+			double InterpolatedNoise(double x, double y);
+			double CosineInterpolate(double a, double b, double x);
 			
 			NOISE_FUNC2D noiseGenerator;
 			int seed;
@@ -30,3 +35,5 @@ namespace Noise
 			double persistance;
 	};
 }
+
+#endif /*__PERLIN_H__*/

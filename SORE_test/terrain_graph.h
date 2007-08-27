@@ -10,6 +10,9 @@
 //
 //
 
+#ifndef  __TERRAIN_GRAPH_H__
+#define  __TERRAIN_GRAPH_H__
+
 #include <sore.h>
 #include "perlin.h"
 
@@ -25,5 +28,8 @@ namespace SORE_Graphics
 		protected:
 			int xres,yres;
 			Noise::PerlinNoise* pn;
+			double* cachedValues;
 	};
 }
+
+#endif /*__TERRAIN_GRAPH_H__*/
