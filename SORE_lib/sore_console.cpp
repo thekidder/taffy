@@ -1,5 +1,5 @@
 #include "sore_console.h"
-#include "allgl.h"
+#include "sore_allgl.h"
 #include "sore_graphics.h"
 
 SORE_Util::Console::Console(font_ref fontID, int x, int y, int width, unsigned int height)

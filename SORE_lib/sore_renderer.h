@@ -3,8 +3,8 @@
 #define  __SORE_RENDERER__
 
 #include "sore_kernel.h"
-#include "font.h"
-#include "allgl.h"
+#include "sore_font.h"
+#include "sore_allgl.h"
 
 namespace SORE_Kernel
 {

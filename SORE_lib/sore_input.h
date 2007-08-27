@@ -11,7 +11,7 @@
 //
 
 #include "sore_kernel.h"
-#include "allgl.h"
+#include "sore_allgl.h"
 #include <map>
 
 namespace SORE_Kernel

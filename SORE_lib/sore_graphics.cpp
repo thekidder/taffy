@@ -1,7 +1,7 @@
 
 #include "sore_graphics.h"
 #include "sore_logger.h"
-#include "allgl.h"
+#include "sore_allgl.h"
 #include <cassert>
 
 namespace SORE_Graphics

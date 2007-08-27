@@ -2,7 +2,7 @@
 #ifndef  __SORE_H__
 #define  __SORE_H__
 
-#include "font.h"
+#include "sore_font.h"
 
 namespace SORE_Graphics
 {

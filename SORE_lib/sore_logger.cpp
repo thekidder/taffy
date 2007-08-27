@@ -1,6 +1,6 @@
 
 #include "sore_logger.h"
-#include <string.h>
+#include <cstring>
 #include <ctime>
 #include <cstdarg>
 #include <cstdlib>

@@ -1,8 +1,8 @@
 
 #include "sore_texture.h"
 #include "sore_util.h"
-#include "fileio.h"
-#include "allgl.h"
+#include "sore_fileio.h"
+#include "sore_allgl.h"
 #include "sore_logger.h"
 
 void SORE_Resource::Texture::Load()

@@ -1,6 +1,5 @@
-#include "allgl.h"
-//#include "main.h"
-#include "font.h"
+#include "sore_allgl.h"
+#include "sore_font.h"
 
 #include <string>
 

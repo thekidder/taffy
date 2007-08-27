@@ -1,5 +1,5 @@
-#include "font.h"
-#include "fileio.h"
+#include "sore_font.h"
+#include "sore_fileio.h"
 #include "sore_graphics.h"
 #include "sore_logger.h"
 

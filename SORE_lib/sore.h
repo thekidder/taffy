@@ -6,15 +6,12 @@
 #define DEBUG 1
 #endif
 
-#include "allgl.h"
+#include "sore_allgl.h"
 #include "sore_util.h"
-#include "camera.h"
-//#include "texture.h"
 #include "sore_texture.h"
-#include "font.h"
+#include "sore_font.h"
 #include "sore_console.h"
-#include "particle.h"
-#include "fileio.h"
+#include "sore_fileio.h"
 #include "sore_util.h"
 #include "sore_graphics.h"
 #include "sore_resource.h"

@@ -2,8 +2,7 @@
 #ifndef  __SORE_UTIL_H__
 #define  __SORE_UTIL_H__
 
-//#include "allgl.h"
-#include <camera.h>
+#include "sore_allgl.h"
 
 using namespace std;
 
@@ -23,8 +22,7 @@ const float PI_180 = (float)M_PI/180.0f;
 
 extern PFNGLPOINTPARAMETERFARBPROC  glPointParameterf;
 extern PFNGLPOINTPARAMETERFVARBPROC  glPointParameterfv;
-extern Camera camera;
-extern GLuint fontList;
+//extern GLuint fontList;
 
 
 #endif //__SORE_UTIL_H__

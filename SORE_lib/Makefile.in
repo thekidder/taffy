@@ -55,13 +55,12 @@ LIBRARIES = $(lib_LIBRARIES)
 ARFLAGS = cru
 libsore_a_AR = $(AR) $(ARFLAGS)
 libsore_a_LIBADD =
-am_libsore_a_OBJECTS = camera.$(OBJEXT) fileio.$(OBJEXT) \
-	font.$(OBJEXT) geometry.$(OBJEXT) particle.$(OBJEXT) \
-	sore_buffer.$(OBJEXT) sore_console.$(OBJEXT) \
+am_libsore_a_OBJECTS = sore_buffer.$(OBJEXT) sore_console.$(OBJEXT) \
+	sore_fileio.$(OBJEXT) sore_font.$(OBJEXT) \
 	sore_graphics.$(OBJEXT) sore_input.$(OBJEXT) \
 	sore_kernel.$(OBJEXT) sore_logger.$(OBJEXT) \
 	sore_renderer.$(OBJEXT) sore_resource.$(OBJEXT) \
-	sore_texture.$(OBJEXT) sore_util.$(OBJEXT) texture.$(OBJEXT)
+	sore_texture.$(OBJEXT) sore_util.$(OBJEXT)
 libsore_a_OBJECTS = $(am_libsore_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -74,15 +73,6 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libsore_a_SOURCES)
 DIST_SOURCES = $(libsore_a_SOURCES)
@@ -200,15 +190,13 @@ INCLUDES = -I/usr/include/freetype2/
 METASOURCES = AUTO
 lib_LIBRARIES = libsore.a
 libsore_a_LDFLAGS = -lGL -lGLU -lSDL -lfontconfig -lfreetype -lz
-libsore_a_SOURCES = allgl.h camera.cpp camera.h fileio.cpp fileio.h font.cpp \
-	font.h geometry.cpp geometry.h manager particle.cpp particle.h resource \
-	sdp_info sore.h sore_buffer.cpp sore_console.cpp sore_console.h \
-	sore_graphics.cpp sore_graphics.h sore_input.cpp sore_kernel.cpp sore_logger.cpp \
-	sore_renderer.cpp sore_renderer.h sore_resource.cpp sore_texture.cpp sore_util.cpp \
-	sore_util.h texture.cpp texture.h
+libsore_a_SOURCES = sore_buffer.cpp sore_console.cpp sore_fileio.cpp \
+	sore_font.cpp sore_graphics.cpp sore_input.cpp sore_kernel.cpp sore_logger.cpp \
+	sore_renderer.cpp sore_resource.cpp sore_texture.cpp sore_util.cpp
 
-noinst_HEADERS = sore_buffer.h sore_input.h sore_kernel.h sore_logger.h \
-	sore_resource.h sore_texture.h
+noinst_HEADERS = sore.h sore_allgl.h sore_buffer.h sore_console.h sore_fileio.h \
+	sore_font.h sore_graphics.h sore_input.h sore_kernel.h sore_logger.h \
+	sore_renderer.h sore_resource.h sore_texture.h sore_util.h
 
 all: all-am
 
@@ -283,13 +271,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/camera.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fileio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/particle.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_buffer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_console.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_fileio.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_graphics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_kernel.Po@am__quote@
@@ -298,7 +283,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_resource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_texture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texture.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

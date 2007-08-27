@@ -1,7 +1,7 @@
 #ifndef  __FONT_H__
 #define  __FONT_H__
 
-#include "allgl.h"
+#include "sore_allgl.h"
 
 //freetype
 #include <ft2build.h>

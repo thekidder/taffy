@@ -1,7 +1,7 @@
 
 #include "sore_kernel.h"
 #include "sore_logger.h"
-#include "allgl.h"
+#include "sore_allgl.h"
 
 SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::gk = NULL;
 
