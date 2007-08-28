@@ -155,7 +155,7 @@ void SORE_Graphics::CameraTask::Frame(int elapsedTime)
 	x_rad = xr*PI_180;
 	y_rad = yr*PI_180;
 	
-	float rot_const = 0.001f*elapsedTime;
+	float rot_const = 0.0004f*elapsedTime;
 	
 	if(forward)
 	{
@@ -214,24 +214,23 @@ bool SORE_Graphics::CameraTask::CameraCallback(SORE_Kernel::Event* event)
 					{
 						SDL_WM_GrabInput(SDL_GRAB_ON);
 						SDL_ShowCursor(SDL_DISABLE);
-						ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Mouse grabbed");
+						ENGINE_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse grabbed");
 						grabbed = !grabbed; 
+						return true;
 					}
-					return true;
+					break;
+				case SDLK_l:
+					cam->LogPosition();
 					break;
 				case SDLK_u:
 					if(grabbed)
 					{
 						SDL_WM_GrabInput(SDL_GRAB_OFF);
 						SDL_ShowCursor(SDL_ENABLE);
-						ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Mouse ungrabbed");
+						ENGINE_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse ungrabbed");
 						grabbed = !grabbed;
+						return true;
 					}
-					return true;
-					break;
-				case SDLK_l:
-					cam->LogPosition();
-					break;
 			}
 			break;
 		case SORE_Kernel::KEYUP:

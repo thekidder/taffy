@@ -29,10 +29,12 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	SORE_Graphics::TerrainGraph tg(10000,10000);
+	SORE_Graphics::TerrainGraph tg(100,100);
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
+	
+	cam.Rotate(0.0f, 180.0f, 0.0f);
 	
 	
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();

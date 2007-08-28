@@ -17,7 +17,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 {
 	xres = x;
 	yres = y;
-	pn = new Noise::PerlinNoise(Noise::Noise12D,0,5,0.25);
+	pn = new Noise::PerlinNoise(Noise::Noise12D,0,10,0.002);
 	APP_LOG_S(SORE_Logging::LVL_DEBUG1,"Generating terrain...");
 	cachedValues = new double[x*y];
 	for(int i=0;i<xres;i++)
@@ -26,8 +26,12 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 		{
 			cachedValues[j + j*i] = pn->GetValue(i,j);
 		}
-		APP_LOG(SORE_Logging::LVL_DEBUG1,"%f percent done", float(i)/float(xres)*100.0);
+		APP_LOG(SORE_Logging::LVL_DEBUG2,"%5.1f percent done", float(i)/float(xres)*100.0);
 	}
+	
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
+	rm->Register("data/Textures/crate.tga");
 }
 
 SORE_Graphics::TerrainGraph::~TerrainGraph()
@@ -38,9 +42,13 @@ SORE_Graphics::TerrainGraph::~TerrainGraph()
 	
 void SORE_Graphics::TerrainGraph::Render()
 {
-	const float scale = 0.01f;
-	const float vscale = 0.02f;
-	/*const GLfloat LightPosition[]= {(xres/2.0f)*scale, 3.0f, (yres/2.0f)*scale+0.5f, 1.0f };
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	SORE_Resource::Resource* re;
+	SORE_Resource::ResourceHandle* rd;
+	const float scale = 0.1f;
+	const float vscale = 0.2f;
+	const GLfloat LightPosition[]= {(xres/2.0f)*scale, 3.0f, (yres/2.0f)*scale+0.5f};
+	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	const GLfloat LightAmbient[]=  {  0.01f, 0.01f, 0.01f, 1.0f };
 	const GLfloat LightDiffuse[]=  {  0.6f, 0.6f, 0.6f, 1.0f };
 	
@@ -48,24 +56,106 @@ void SORE_Graphics::TerrainGraph::Render()
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHTING);
+	//glEnable(GL_TEXTURE_2D);
 	glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT ) ;
 	glEnable ( GL_COLOR_MATERIAL ) ;
 	glPushMatrix();
-	glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);
-	glPopMatrix();*/
-	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-	float z;
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable( GL_COLOR_MATERIAL ) ;
+	glBegin(GL_LINE_LOOP);
+		
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom
+	glVertex3f( 0.1f, -0.1f,  0.1f);
+	glVertex3f( 0.1f, -0.1f, -0.1f);
+	glVertex3f(-0.1f, -0.1f, -0.1f);
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+		
+	glVertex3f(-0.1f,  0.1f,  0.1f); //top
+	glVertex3f( 0.1f,  0.1f,  0.1f);
+	glVertex3f( 0.1f,  0.1f, -0.1f);
+	glVertex3f(-0.1f,  0.1f, -0.1f);
+		
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+	
+		//front
+	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom left
+	glVertex3f(-0.1f,  0.1f,  0.1f); //top left
+	glVertex3f( 0.1f,  0.1f,  0.1f); //top right
+	glVertex3f( 0.1f, -0.1f,  0.1f); //bottom right
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+		
+	glVertex3f(-0.1f, -0.1f, -0.1f); //back
+	glVertex3f(-0.1f,  0.1f, -0.1f);
+	glVertex3f( 0.1f,  0.1f, -0.1f);
+	glVertex3f( 0.1f, -0.1f, -0.1f);
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+			
+	glVertex3f(-0.1f, -0.1f,  0.1f); //left
+	glVertex3f(-0.1f,  0.1f,  0.1f);
+	glVertex3f(-0.1f,  0.1f, -0.1f);
+	glVertex3f(-0.1f, -0.1f, -0.1f);
+	
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+		
+	glVertex3f( 0.1f, -0.1f,  0.1f); //right
+	glVertex3f( 0.1f,  0.1f,  0.1f);
+	glVertex3f( 0.1f,  0.1f, -0.1f);
+	glVertex3f( 0.1f, -0.1f, -0.1f);
+		
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable ( GL_COLOR_MATERIAL ) ;
+	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
+	glPopMatrix();
+	//float z;
+	re = rm->GetPtr("data/Textures/crate.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	for(int i=0;i<xres-1;i++)
 	{
-		glBegin(GL_LINE_STRIP);
+		glBegin(GL_TRIANGLE_STRIP);
 		for(int j=0;j<yres;j++)
 		{
-			glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+			//glColor4f(cachedValues[j + j*i], cachedValues[j + j*i], cachedValues[j + j*i], 1.0f);
+			/*if(j%2==0)
+				glTexCoord2f(1.0f, 0.0f);
+			else
+				glTexCoord2f(1.0f, 1.0f);*/
 			glVertex3f(scale*i,vscale*cachedValues[j + j*i], scale*j);
-			//glColor4f(0.0f, 0.8f, 0.0f, 1.0f);
+			//glColor4f(cachedValues[j + j*i], cachedValues[j + j*i], cachedValues[j + j*i], 1.0f);
+			/*if(j%2==0)
+				glTexCoord2f(0.0f, 0.0f);
+			else
+				glTexCoord2f(0.0f, 1.0f);*/
 			glVertex3f(scale*i+scale,vscale*cachedValues[j + j*(i+1)],scale*j);
-			//APP_LOG(SORE_Logging::LVL_DEBUG2, "(%f, %f, %f)",scale*i,vscale*cachedValues[j + j*i], scale*j);
 		}
 		glEnd();
 	}
+	/*for(int i=0;i<xres-1;i++)
+	{
+		for(int j=0;j<yres-1;j++)
+		{
+			glBegin(GL_TRIANGLES);
+			//glTexCoord2f(0.0f, 1.0f);
+			glVertex3f(scale*i,vscale*cachedValues[j + j*i], scale*j);
+			//glTexCoord2f(0.0f, 0.0f);
+			glVertex3f(scale*i+scale,vscale*cachedValues[j + j*(i+1)],scale*j);
+			//glTexCoord2f(1.0f, 0.0f);
+			glVertex3f(scale*i,vscale*cachedValues[j + j*i + 1],scale*j+scale);
+			
+			glEnd();
+		}
+	}*/
 }
