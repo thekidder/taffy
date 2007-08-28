@@ -60,6 +60,7 @@ void SORE_Graphics::TerrainGraph::Render()
 	glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT ) ;
 	glEnable ( GL_COLOR_MATERIAL ) ;
 	glPushMatrix();
+	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 	glDisable( GL_COLOR_MATERIAL ) ;
@@ -115,7 +116,7 @@ void SORE_Graphics::TerrainGraph::Render()
 	glEnd();
 	glEnable(GL_LIGHTING);
 	glEnable ( GL_COLOR_MATERIAL ) ;
-	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
+	
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
 	glPopMatrix();
 	//float z;
