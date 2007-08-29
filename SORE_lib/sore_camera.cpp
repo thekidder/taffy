@@ -155,7 +155,7 @@ void SORE_Graphics::CameraTask::Frame(int elapsedTime)
 	x_rad = xr*PI_180;
 	y_rad = yr*PI_180;
 	
-	float rot_const = 0.004f*elapsedTime;
+	float rot_const = 0.04f*elapsedTime;
 	
 	if(forward)
 	{

@@ -25,10 +25,15 @@ namespace SORE_Graphics
 			~TerrainGraph();
 		
 			void Render();
+			void WritePGM(const char* name);
+			void ToggleWireframe() {wireframe = !wireframe;}
 		protected:
 			int xres,yres;
 			Noise::PerlinNoise* pn;
 			double* cachedValues;
+			float* normalValues;
+			const static float scale = 1.0f;
+			bool wireframe;
 	};
 }
 

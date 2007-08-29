@@ -11,6 +11,7 @@
 //
 
 #include "perlin.h"
+#include "main.h"
 #include <cmath>
 
 Noise::PerlinNoise::PerlinNoise(NOISE_FUNC2D noiseGen, int s, int num, double p)
@@ -38,7 +39,8 @@ double Noise::PerlinNoise::SmoothedNoise(double x, double y)
 	double corners = (noiseGenerator(x-1,y-1,seed)+noiseGenerator(x+1,y-1,seed)+noiseGenerator(x+1,y+1,seed)+noiseGenerator(x-1,y+1,seed))/16.0;
 	double sides = (noiseGenerator(x+1,y,seed)+noiseGenerator(x-1,y,seed)+noiseGenerator(x,y+1,seed)+noiseGenerator(x,y-1,seed))/8.0;
 	double center = noiseGenerator(x,y,seed)/4.0;
-	return sides + center + corners;
+	double final = sides + center + corners;
+	return final;
 }
 
 double Noise::PerlinNoise::InterpolatedNoise(double x, double y)

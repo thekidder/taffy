@@ -6,9 +6,9 @@ SORE_Logging::XMLLogger* fileLog;
 SORE_Logging::ConsoleLogger* consoleLog;
 SORE_Graphics::Camera cam;
 SORE_Graphics::CameraTask camTask(&cam);
+SORE_Graphics::TerrainGraph* tg;
 
 bool testlisten(SORE_Kernel::Event* event);
-bool testlisten2(SORE_Kernel::Event* event);
 bool camCallback(SORE_Kernel::Event* event);
 
 int main(int argc, char *argv[])
@@ -29,22 +29,24 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	SORE_Graphics::TerrainGraph tg(100,100);
+	tg = new SORE_Graphics::TerrainGraph(70, 70);
+	
+	tg->WritePGM("map.pgm");
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
 	
-	cam.Rotate(0.0f, 180.0f, 0.0f);
+	cam.Rotate(0.0f, -120.0f, 0.0f);
+	cam.Translate(0.0f, 2.0f, 0.0f);
 	
 	
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
-	renderer->SetSceneGraph(&tg);
+	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
 	input->AddListener(SORE_Kernel::MOUSEMOVE | SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, camCallback);
-	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten);
-	input->AddListener(SORE_Kernel::MOUSEBUTTONDOWN, testlisten2);
+	input->AddListener(SORE_Kernel::KEYDOWN, testlisten);
 	gk->AddTask(20, renderer);
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
@@ -87,23 +89,15 @@ void Cleanup()
 	delete mainLog;
 	delete fileLog;
 	delete consoleLog;
+	delete tg;
 }
 
 bool testlisten(SORE_Kernel::Event* event)
 {
-	if(event->mouse.x < 100 && event->mouse.y < 100)
+	if(event->key.keySym==SDLK_x)
 	{
-		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Mouse clicked in top left");
-		return true;
-	}
-	return false;
-}
-
-bool testlisten2(SORE_Kernel::Event* event)
-{
-	if(event->mouse.x < 50 && event->mouse.y < 50)
-	{
-		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Mouse clicked in (very) top left");
+		tg->ToggleWireframe();
+		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
 		return true;
 	}
 	return false;
