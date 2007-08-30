@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	tg = new SORE_Graphics::TerrainGraph(70, 70);
+	tg = new SORE_Graphics::TerrainGraph(180, 180);
 	
 	tg->WritePGM("map.pgm");
 	
@@ -97,6 +97,12 @@ bool testlisten(SORE_Kernel::Event* event)
 	if(event->key.keySym==SDLK_x)
 	{
 		tg->ToggleWireframe();
+		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
+		return true;
+	}
+	else if(event->key.keySym==SDLK_n)
+	{
+		tg->ToggleNormals();
 		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
 		return true;
 	}

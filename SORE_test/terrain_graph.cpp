@@ -68,6 +68,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
 	rm->Register("data/Textures/crate.tga");
 	wireframe = false;
+	normals = true;
 }
 
 SORE_Graphics::TerrainGraph::~TerrainGraph()
@@ -236,17 +237,20 @@ void SORE_Graphics::TerrainGraph::Render()
 	}
 	*/
 	
-	glDisable(GL_LIGHTING);
-	for(int i=0;i<xres;i++)
+	if(normals)
 	{
-		for(int j=0;j<yres;j++)
+		glDisable(GL_LIGHTING);
+		for(int i=0;i<xres;i++)
 		{
-			
-			glBegin(GL_LINES);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-			glVertex3f(scale*i+normalValues[(j + yres*i)*3],vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1], scale*j+normalValues[(j + yres*i)*3+2]);
-			glEnd();
+			for(int j=0;j<yres;j++)
+			{
+				
+				glBegin(GL_LINES);
+				glColor3f(1.0f, 0.0f, 0.0f);
+				glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
+				glVertex3f(scale*i+normalValues[(j + yres*i)*3],vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1], scale*j+normalValues[(j + yres*i)*3+2]);
+				glEnd();
+			}
 		}
 	}
 }

@@ -27,13 +27,14 @@ namespace SORE_Graphics
 			void Render();
 			void WritePGM(const char* name);
 			void ToggleWireframe() {wireframe = !wireframe;}
+			void ToggleNormals() {normals = !normals;}
 		protected:
 			int xres,yres;
 			Noise::PerlinNoise* pn;
 			double* cachedValues;
 			float* normalValues;
 			const static float scale = 1.0f;
-			bool wireframe;
+			bool wireframe,normals;
 	};
 }
 
