@@ -31,12 +31,20 @@ namespace SORE_Math
 			z = T(0);
 		}
 		
-		Point3D<T>& operator+(Point3D<T>& t)
+		Point3D<T> operator+(Point3D<T>& t)
 		{
 			Point3D<T> temp;
 			temp.x = x + t.x;
-			temp.y = x + t.y;
-			temp.z = x + t.z;
+			temp.y = y + t.y;
+			temp.z = z + t.z;
+			return temp;
+		}
+		Point3D<T> operator-(Point3D<T>& t)
+		{
+			Point3D<T> temp;
+			temp.x = x - t.x;
+			temp.y = y - t.y;
+			temp.z = z - t.z;
 			return temp;
 		}
 		T x,y,z;
@@ -83,7 +91,7 @@ namespace SORE_Math
 				return *this;
 			}
 			
-			Vector3D<T>& operator-()
+			Vector3D<T> operator-()
 			{
 				Vector3D<T> temp(-value[0],-value[1],-value[2]);
 				return temp;
@@ -120,6 +128,11 @@ namespace SORE_Math
 				double mag = Magnitude();
 				Vector3D<T> temp(value[0]/mag,value[1]/mag,value[2]/mag);
 				return temp;
+			}
+			
+			void Log(unsigned int severity)
+			{
+				ENGINE_LOG(severity, "(%fi, %fj,%fk)",value[0],value[1],value[2]);
 			}
 				
 		protected:

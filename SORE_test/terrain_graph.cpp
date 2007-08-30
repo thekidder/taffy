@@ -38,18 +38,65 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 			APP_LOG(SORE_Logging::LVL_DEBUG2,"%5.1f percent done", float(i)/float(xres)*100.0);
 	}
 	APP_LOG_S(SORE_Logging::LVL_DEBUG1,"Generating normals...");
-	for(int i=0;i<xres-1;i++)
+	for(int i=0;i<xres;i++)
 	{
-		for(int j=0;j<yres-1;j++)
+		for(int j=0;j<yres;j++)
 		{
 			int num = 0;
-			Vector3D<float> total;
-			Vector3D<float> v1 = Vector3D<float>(Point3D<float>(i,j,cachedValues[j + yres*i]));
+			Vector3D<float> total,v2,v3;
+			Point3D<float> p1(i,vscale*cachedValues[j + yres*i],j);
 			if(i<(xres-1) && j<(yres-1))
 			{
-				Vector3D<float> v2 = Vector3D<float>(Point3D<float>(i+1,j+1,cachedValues[j + yres*(i+1)+1]));
-				v2 = v1.CrossProduct(v2).Normalize();
-				if(v2.GetValue()[2]<cachedValues[j + yres*i])
+				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)],j)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i+1],j+1)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
+					v2 = -v2;
+				total += v2;
+				num++;
+			}
+			if(i>0 && j<(yres-1))
+			{
+				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[1 + j + yres*(i-1)],j+1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i+1],j+1)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
+					v2 = -v2;
+				total += v2;
+				num++;
+				
+				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[1 + j + yres*(i-1)],j+1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i-2,vscale*cachedValues[j + yres*(i-1)],j)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
+					v2 = -v2;
+				total += v2;
+				num++;
+			}
+			if(i>0 && j>0)
+			{
+				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[j + yres*(i-1)],j)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i-1],j-1)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
+					v2 = -v2;
+				total += v2;
+				num++;
+			}
+			if(i<(xres-1) && j>0)
+			{
+				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)-1],j-1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i-1],j-1)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
+					v2 = -v2;
+				total += v2;
+				num++;
+
+				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)-1],j-1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)],j)-p1);
+				v2 = v2.CrossProduct(v3).Normalize();
+				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
@@ -57,18 +104,80 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 			total /= num;
 			float* value = total.GetValue();
 			normalValues[  (j + yres*i)*3] = value[0];
-			normalValues[1+(j + yres*i)*3] = value[2];
-			normalValues[2+(j + yres*i)*3] = value[1];
+			normalValues[1+(j + yres*i)*3] = value[1];
+			normalValues[2+(j + yres*i)*3] = value[2];
 		}
 		if(int(float(i)/float(xres)*100.0)%5==0)
 			APP_LOG(SORE_Logging::LVL_DEBUG2,"%5.1f percent done", float(i)/float(xres)*100.0);
 	}
-	
+	APP_LOG(SORE_Logging::LVL_DEBUG2,"normal: (%f,%f,%f)",normalValues[0],normalValues[1],normalValues[2]);
+	APP_LOG(SORE_Logging::LVL_DEBUG2,"points: %f %f %f",cachedValues[0], cachedValues[yres*1], cachedValues[1]);
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
 	rm->Register("data/Textures/crate.tga");
 	wireframe = false;
-	normals = true;
+	normals = false;
+	heightColor = false;
+	LightPosition[0] = (xres/2.0f)*scale;
+	LightPosition[1] =  3.0f;
+	LightPosition[2] = (yres/2.0f)*scale;
+	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
+}
+
+bool SORE_Graphics::TerrainGraph::LightMoveCallback(SORE_Kernel::Event* event)
+{
+	switch(event->key.keySym)
+	{
+		case SDLK_LEFT:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveX = -1.0f;
+			else
+				lightMoveX = 0.0f;
+			return true;
+			break;
+		case SDLK_RIGHT:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveX = 1.0f;
+			else
+				lightMoveX = 0.0f;
+			return true;
+			break;
+		case SDLK_UP:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveY = 1.0f;
+			else
+				lightMoveY = 0.0f;
+			return true;
+			break;
+		case SDLK_DOWN:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveY = -1.0f;
+			else
+				lightMoveY = 0.0f;
+			return true;
+		case SDLK_EQUALS:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveZ = 1.0f;
+			else
+				lightMoveZ = 0.0f;
+			return true;
+		case SDLK_MINUS:
+			if(event->type == SORE_Kernel::KEYDOWN)
+				lightMoveZ = -1.0f;
+			else
+				lightMoveZ = 0.0f;
+			return true;
+			break;
+	}
+	return false;
+}
+
+void SORE_Graphics::TerrainGraph::Frame(int elapsedTime)
+{
+	const float speed = 0.005;
+	LightPosition[2] += lightMoveX*elapsedTime*speed;
+	LightPosition[1] += lightMoveZ*elapsedTime*speed;
+	LightPosition[0] += lightMoveY*elapsedTime*speed;
 }
 
 SORE_Graphics::TerrainGraph::~TerrainGraph()
@@ -84,17 +193,15 @@ void SORE_Graphics::TerrainGraph::Render()
 	SORE_Resource::Resource* re;
 	SORE_Resource::ResourceHandle* rd;
 	
-	const float vscale = 6.0*scale;
-	const GLfloat LightPosition[]= {(xres/2.0f)*scale, 3.0f, (yres/2.0f)*scale+0.5f};
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	const GLfloat LightAmbient[]=  {  0.01f, 0.01f, 0.01f, 1.0f };
 	const GLfloat LightDiffuse[]=  {  0.6f, 0.6f, 0.6f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
 	
-	//glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1.0);
-	//glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.5);
-	//glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.3);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
 	glDisable(GL_TEXTURE_2D);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
@@ -105,9 +212,9 @@ void SORE_Graphics::TerrainGraph::Render()
 	glColorMaterial ( GL_FRONT, GL_AMBIENT ) ;
 	glEnable ( GL_COLOR_MATERIAL ) ;
 	glPushMatrix();
-	//glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
-	//glDisable(GL_LIGHTING);
-	//glDisable( GL_COLOR_MATERIAL ) ;
+	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
+	glDisable(GL_LIGHTING);
+	glDisable( GL_COLOR_MATERIAL ) ;
 	glBegin(GL_LINE_LOOP);
 		
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -158,8 +265,8 @@ void SORE_Graphics::TerrainGraph::Render()
 	glVertex3f( 0.1f, -0.1f, -0.1f);
 		
 	glEnd();
-	//glEnable(GL_LIGHTING);
-	//glEnable ( GL_COLOR_MATERIAL ) ;
+	glEnable(GL_LIGHTING);
+	glEnable ( GL_COLOR_MATERIAL ) ;
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glPopMatrix();
@@ -167,31 +274,31 @@ void SORE_Graphics::TerrainGraph::Render()
 	//rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	//glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
+	glColor4f(0.2f, 0.6f, 0.2f, 1.0f);
 	for(int i=0;i<xres-1;i++)
 	{
-		GLfloat normal[3];
-		normal[0] = 0.0f;
-		normal[1] = 1.0f;
-		normal[2] = 0.0f;
 		if(wireframe)
 			glBegin(GL_LINE_STRIP);
 		else
 			glBegin(GL_TRIANGLE_STRIP);
 		for(int j=0;j<yres;j++)
 		{
+			
 			//if(j%2==0)
 			//	glTexCoord2f(1.0f, 0.0f);
 			//else
 			//	glTexCoord2f(1.0f, 1.0f);
-			glNormal3fv(normal);
-			glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
+			glNormal3fv(&normalValues[(j + yres*i)*3]);
+			if(heightColor)
+				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
 			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
 			//if(j%2==0)
 			//	glTexCoord2f(0.0f, 0.0f);
 			//else
 			//	glTexCoord2f(0.0f, 1.0f);
-			glNormal3fv(normal);
-			glColor4f(cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], 1.0f);
+			glNormal3fv(&normalValues[(j + yres*(i+1))*3]);
+			if(heightColor)
+				glColor4f(cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], 1.0f);
 			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)],scale*j);
 		}
 		glEnd();
@@ -248,7 +355,7 @@ void SORE_Graphics::TerrainGraph::Render()
 				glBegin(GL_LINES);
 				glColor3f(1.0f, 0.0f, 0.0f);
 				glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-				glVertex3f(scale*i+normalValues[(j + yres*i)*3],vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1], scale*j+normalValues[(j + yres*i)*3+2]);
+				glVertex3f(scale*(i+normalValues[(j + yres*i)*3]),(vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1]), scale*(j+normalValues[(j + yres*i)*3+2]));
 				glEnd();
 			}
 		}

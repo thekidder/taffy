@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	tg = new SORE_Graphics::TerrainGraph(180, 180);
+	tg = new SORE_Graphics::TerrainGraph(70, 70);
 	
 	tg->WritePGM("map.pgm");
 	
@@ -46,12 +46,13 @@ int main(int argc, char *argv[])
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
 	input->AddListener(SORE_Kernel::MOUSEMOVE | SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, camCallback);
-	input->AddListener(SORE_Kernel::KEYDOWN, testlisten);
+	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, testlisten);
 	gk->AddTask(20, renderer);
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
+	gk->AddTask(40, tg);
 	
-	const double maxFPS = 100.0;
+	const double maxFPS = 500.0;
 	
 	int ticks, lastTicks;
 	
@@ -94,18 +95,28 @@ void Cleanup()
 
 bool testlisten(SORE_Kernel::Event* event)
 {
-	if(event->key.keySym==SDLK_x)
+	if(event->type == SORE_Kernel::KEYDOWN)
 	{
-		tg->ToggleWireframe();
-		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
-		return true;
+		if(event->key.keySym==SDLK_x)
+		{
+			tg->ToggleWireframe();
+			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
+			return true;
+		}
+		else if(event->key.keySym==SDLK_n)
+		{
+			tg->ToggleNormals();
+			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
+			return true;
+		}
+		else if(event->key.keySym==SDLK_c)
+		{
+			tg->ToggleHeightmapColoring();
+			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled coloring");
+			return true;
+		}
 	}
-	else if(event->key.keySym==SDLK_n)
-	{
-		tg->ToggleNormals();
-		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
-		return true;
-	}
+	tg->LightMoveCallback(event);
 	return false;
 }
 
