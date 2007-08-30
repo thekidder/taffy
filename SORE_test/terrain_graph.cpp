@@ -195,21 +195,18 @@ void SORE_Graphics::TerrainGraph::Render()
 	
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	const GLfloat LightAmbient[]=  {  0.01f, 0.01f, 0.01f, 1.0f };
-	const GLfloat LightDiffuse[]=  {  0.6f, 0.6f, 0.6f, 1.0f };
+	const GLfloat LightDiffuse[]=  {  1.0f, 0.2f, 0.2f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
 	
 	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.3);
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
 	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
-	glDisable(GL_TEXTURE_2D);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glEnable(GL_LIGHT0);
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_AUTO_NORMAL);
 	//glEnable(GL_TEXTURE_2D);
-	glColorMaterial ( GL_FRONT, GL_AMBIENT ) ;
+	glColorMaterial ( GL_FRONT, GL_AMBIENT );
 	glEnable ( GL_COLOR_MATERIAL ) ;
 	glPushMatrix();
 	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);

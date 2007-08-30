@@ -1,3 +1,14 @@
+//
+// sore_test generic header file
+//
+// Description: 
+//
+//
+// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #ifndef  __MAIN_H__
 #define  __MAIN_H__

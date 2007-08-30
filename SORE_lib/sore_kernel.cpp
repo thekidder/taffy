@@ -1,3 +1,14 @@
+//
+// C++ Implementation: sore_kernel
+//
+// Description: 
+//
+//
+// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #include "sore_kernel.h"
 #include "sore_logger.h"
