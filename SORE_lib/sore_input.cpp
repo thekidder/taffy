@@ -72,7 +72,9 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 
 SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, EVENT_LISTENER listener)
 {
+	event_listener_ref size = allListeners.size();
 	allListeners.insert(std::pair<unsigned int, EVENT_LISTENER>(eventType, listener));
+	return size;
 }
 
 void SORE_Kernel::InputTask::Pause()

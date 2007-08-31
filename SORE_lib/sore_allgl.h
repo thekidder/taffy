@@ -8,11 +8,10 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glext.h>
 
 #ifdef WIN32
 	#include <SDL.h>
-	#include <SDL_image.h>
+	//#include <SDL_image.h>
 	
 	//wglGetProcAddress
 	#include <GL/wglext.h>
@@ -21,6 +20,7 @@
 	//We need M_PI
 	#define _USE_MATH_DEFINES
 #else /* GLX */
+	#include <GL/glext.h>
 	#include <SDL/SDL.h>
 	#include <SDL/SDL_image.h>
 	#include <SDL/SDL_opengl.h>

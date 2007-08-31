@@ -114,7 +114,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 
 	if ( !videoInfo )
 	{
-		ENGINE_LOG(SORE_Logging::CRITICAL, "Video query failed: %s", SDL_GetError());
+		ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, "Video query failed: %s", SDL_GetError());
 		return 1;
 	}
 

@@ -16,8 +16,13 @@
 #include <sore.h>
 #include "terrain_graph.h"
 
+#ifndef WIN32
 #define APP_LOG(lvl, format, ...) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
 #define APP_LOG_S(lvl, format) mainLog->Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+#else
+#define APP_LOG(lvl, format, ...) mainLog->Log(lvl, __LINE__, __FUNCTION__, __FILE__, format, __VA_ARGS__) 
+#define APP_LOG_S(lvl, format) mainLog->Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
+#endif
 
 //Functions
 void Cleanup();

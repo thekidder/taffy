@@ -80,12 +80,15 @@ void SORE_Kernel::GameKernel::Resume()
 
 SORE_Kernel::task_ref SORE_Kernel::GameKernel::AddTask(unsigned int priority, SORE_Kernel::Task* task)
 {
-	tasks.insert(std::pair<unsigned int, Task*>(priority, task));
+	task_ref size = tasks.insert(std::pair<unsigned int, Task*>(priority, task));
+	return size;
 }
 
 SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(SORE_Kernel::task_ref task)
 {
+	Task* temp = task->second;
 	tasks.erase(task);
+	return temp;
 }
 
 SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(const char* taskName)
@@ -95,9 +98,12 @@ SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(const char* taskName)
 	{
 		if(strcmp(it->second->GetName(), taskName)==0)
 		{
+			Task* temp = it->second;
 			tasks.erase(it);
+			return temp;
 		}
 	}
+	return NULL;
 }
 
 void SORE_Kernel::GameKernel::RemoveAllTasks()

@@ -9,9 +9,13 @@
 
 //#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
 //#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
-
+#ifndef WIN32
 #define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
 #define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+#else
+#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format, __VA_ARGS__) 
+#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
+#endif
 
 #define SORE_CONSOLE_LOG
 
@@ -24,11 +28,11 @@ namespace SORE_Logging
 	const int LVL_DEBUG1   = 0x10;
 	const int LVL_DEBUG2   = 0x20;
 	
-	const int CRITICAL     = LVL_CRITICAL;
-	const int ERROR        = CRITICAL | LVL_ERROR;
-	const int WARNING      = ERROR    | LVL_WARNING;
-	const int INFO         = WARNING  | LVL_INFO;
-	const int ALL          = INFO     | LVL_DEBUG1 | LVL_DEBUG2;
+	const int SHOW_CRITICAL     = LVL_CRITICAL;
+	const int SHOW_ERROR        = SHOW_CRITICAL | LVL_ERROR;
+	const int SHOW_WARNING      = SHOW_ERROR    | LVL_WARNING;
+	const int SHOW_INFO         = SHOW_WARNING  | LVL_INFO;
+	const int SHOW_ALL          = SHOW_INFO     | LVL_DEBUG1 | LVL_DEBUG2;
 	
 	const int BUFFER_LEN = 2048;
 	

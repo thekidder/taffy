@@ -212,6 +212,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 		glPopMatrix();
 	}
 	glPopAttrib();
+	return 0;
 }
 
 float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
@@ -322,7 +323,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
 	{
 		//std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", read, err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", size, err);
 		SORE_FileIO::Close(fontObj);
 		return FONT_LOAD_FAILED;
 	}
@@ -416,6 +417,7 @@ int SORE_Font::InitFontSystem()
 	
 	FontInfo null;
 	fontStack.push_back(null);
+	return 0;
 }
 
 SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
