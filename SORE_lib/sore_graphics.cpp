@@ -22,6 +22,14 @@ namespace SORE_Graphics
 	GLint viewport[4];
 }
 
+void SORE_Graphics::InitExtensions()
+{
+	// Initialize OpenGL extension function pointers
+#define GLEXT_PROC(proc, name) glextInitProc(name, #name);
+#include "glextproc.h"
+#undef GLEXT_PROC
+} 
+
 void SORE_Graphics::WindowToReal(int* window, int* real)
 {
 	if(window[0]>viewport[2] || window[1]>viewport[3] || window[0]<0 || window[1]<0)

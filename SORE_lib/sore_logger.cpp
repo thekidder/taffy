@@ -10,8 +10,10 @@
 //
 //
 
+#include "sore_allgl.h"
 #include "sore_logger.h"
 #include <cstring>
+#include <string>
 #include <ctime>
 #include <cstdarg>
 #include <cstdlib>
@@ -203,6 +205,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	const char end[]   = "\t</message>\n";
 	fwrite(begin, sizeof(char), strlen(begin), filePtr);
 	tm* currtime;
+	int pos;
 	currtime = localtime(&(log->time));
 	strftime(buffer, 127, "%X", currtime);
 	fwrite("\t\t<time>", sizeof(char), 8, filePtr);
@@ -218,6 +221,12 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	sprintf(buffer, "\t\t<file>%s</file>\n", log->file);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	/*std::string message = log->buffer;
+	while((pos=message.find("\n"))!=std::string::npos)
+	{
+		message.replace(pos, 1, "<br />");
+	}
+	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());*/
 	sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	

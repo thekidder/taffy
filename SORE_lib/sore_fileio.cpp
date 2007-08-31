@@ -174,7 +174,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	if(temp && ferror(temp)==0)
 	{
 		//fclose(temp);
-		ENGINE_LOG(SORE_Logging::LVL_INFO, "Opening file %s from disk", file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from disk", file);
 		if(nOpenFilesystemFiles>=4294967295-FILESYSTEM_START)
 		{
 			ENGINE_LOG_S(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
@@ -247,7 +247,7 @@ void SORE_FileIO::Close(file_ref file)
 {
 	if(file<FILESYSTEM_START && file>=PACKAGE_START)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Closing file %s from package cache", cachedFiles[file].filename);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file %s from package cache", cachedFiles[file].filename);
 		cachedFiles[file].isOpen = false;
 		if(cachedFiles[file].compressed)
 		{
@@ -266,7 +266,7 @@ void SORE_FileIO::Close(file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<4294967295)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Closing file reference %s from disk",file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %s from disk",file);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);

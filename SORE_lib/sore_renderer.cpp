@@ -46,6 +46,9 @@ SORE_Kernel::Renderer::~Renderer()
 
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
+	static int frames = 0;
+	static int T0 = SDL_GetTicks();
+	static float fps;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	assert(sg!=NULL && "No scene graph");
 	//glLoadIdentity();
@@ -56,7 +59,22 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	sg->Render();
 	SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
+	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
+	
+	frames++;
+	{
+		GLint t = SDL_GetTicks();
+		if (t - T0 >= 100) //display FPS every 100 milliseconds
+		{
+			GLfloat seconds = (GLfloat)((t - T0) / 1000.0);
+			fps = frames / seconds;
+			T0 = t;
+			frames = 0;
+		}
+	}
+	
+	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
+	
 	SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();
 }
@@ -155,6 +173,8 @@ int SORE_Kernel::Renderer::InitializeGL()
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	OnResize();
+	SORE_Graphics::InitExtensions();
+	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
 	return 0;
 }
 

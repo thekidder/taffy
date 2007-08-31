@@ -30,6 +30,7 @@ namespace SORE_Graphics
 			void WritePGM(const char* name);
 			void ToggleWireframe() {wireframe = !wireframe;}
 			void ToggleNormals() {normals = !normals;}
+			void ToggleLighting() {perpixel = !perpixel;}
 			void ToggleHeightmapColoring() {heightColor = !heightColor;}
 			bool LightMoveCallback(SORE_Kernel::Event* event);
 			
@@ -41,13 +42,18 @@ namespace SORE_Graphics
 			const char* GetName() const {return "TerrainGraph input task";}
 			
 		protected:
+			
+			void InitShaders();
+			void DestroyShaders();
+			
 			int xres,yres;
 			Noise::PerlinNoise* pn;
 			double* cachedValues;
 			float* normalValues;
 			GLfloat LightPosition[3];
-			bool wireframe,normals, heightColor;
+			bool wireframe,normals, heightColor, perpixel;
 			float lightMoveX, lightMoveY, lightMoveZ;
+			GLuint vertex, fragment, program;
 	};
 }
 

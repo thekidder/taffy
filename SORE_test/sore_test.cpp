@@ -40,10 +40,6 @@ int main(int argc, char *argv[])
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
 	
-	tg = new SORE_Graphics::TerrainGraph(70, 70);
-	
-	tg->WritePGM("map.pgm");
-	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
 	
@@ -54,6 +50,10 @@ int main(int argc, char *argv[])
 	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
+	
+	tg = new SORE_Graphics::TerrainGraph(70, 70);
+	tg->WritePGM("map.pgm");
+	
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
 	input->AddListener(SORE_Kernel::MOUSEMOVE | SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, camCallback);
@@ -124,6 +124,12 @@ bool testlisten(SORE_Kernel::Event* event)
 		{
 			tg->ToggleHeightmapColoring();
 			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled coloring");
+			return true;
+		}
+		else if(event->key.keySym==SDLK_l)
+		{
+			tg->ToggleLighting();
+			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled lighting modes");
 			return true;
 		}
 	}

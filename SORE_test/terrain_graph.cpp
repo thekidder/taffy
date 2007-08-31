@@ -110,18 +110,33 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 		if(int(float(i)/float(xres)*100.0)%5==0)
 			APP_LOG(SORE_Logging::LVL_DEBUG2,"%5.1f percent done", float(i)/float(xres)*100.0);
 	}
-	APP_LOG(SORE_Logging::LVL_DEBUG2,"normal: (%f,%f,%f)",normalValues[0],normalValues[1],normalValues[2]);
-	APP_LOG(SORE_Logging::LVL_DEBUG2,"points: %f %f %f",cachedValues[0], cachedValues[yres*1], cachedValues[1]);
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
-	rm->Register("data/Textures/crate.tga");
+	//rm->Register("data/Textures/crate.tga");
 	wireframe = false;
 	normals = false;
 	heightColor = false;
+	perpixel = true;
 	LightPosition[0] = (xres/2.0f)*scale;
 	LightPosition[1] =  3.0f;
 	LightPosition[2] = (yres/2.0f)*scale;
 	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
+	
+	const GLfloat LightAmbient[]=  {  0.2f, 0.2f, 0.2f, 1.0f };
+	const GLfloat LightDiffuse[]=  {  0.2f, 0.2f, 0.2f, 1.0f };
+	
+	glEnable(GL_DEPTH_TEST); 
+	
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.3);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
+	glEnable(GL_LIGHT0);
+	//glEnable(GL_TEXTURE_2D);
+	glColorMaterial ( GL_FRONT, GL_AMBIENT );
+	glEnable(GL_COLOR_MATERIAL);
+	InitShaders();
 }
 
 bool SORE_Graphics::TerrainGraph::LightMoveCallback(SORE_Kernel::Event* event)
@@ -182,6 +197,7 @@ void SORE_Graphics::TerrainGraph::Frame(int elapsedTime)
 
 SORE_Graphics::TerrainGraph::~TerrainGraph()
 {
+	DestroyShaders();
 	delete pn;
 	delete cachedValues;
 	delete normalValues;
@@ -194,24 +210,14 @@ void SORE_Graphics::TerrainGraph::Render()
 	SORE_Resource::ResourceHandle* rd;
 	
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	const GLfloat LightAmbient[]=  {  0.01f, 0.01f, 0.01f, 1.0f };
-	const GLfloat LightDiffuse[]=  {  1.0f, 0.2f, 0.2f, 1.0f };
 	
-	glEnable(GL_DEPTH_TEST); 
-	
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.3);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
-	glEnable(GL_LIGHT0);
-	//glEnable(GL_TEXTURE_2D);
-	glColorMaterial ( GL_FRONT, GL_AMBIENT );
-	glEnable ( GL_COLOR_MATERIAL ) ;
 	glPushMatrix();
 	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
-	glDisable(GL_LIGHTING);
-	glDisable( GL_COLOR_MATERIAL ) ;
+	if(!perpixel)
+	{
+		glDisable(GL_LIGHTING);
+		glDisable( GL_COLOR_MATERIAL ) ;
+	}
 	glBegin(GL_LINE_LOOP);
 		
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -262,11 +268,20 @@ void SORE_Graphics::TerrainGraph::Render()
 	glVertex3f( 0.1f, -0.1f, -0.1f);
 		
 	glEnd();
-	glEnable(GL_LIGHTING);
-	glEnable ( GL_COLOR_MATERIAL ) ;
-	
+	if(!perpixel)
+	{
+		glEnable(GL_LIGHTING);
+		glEnable ( GL_COLOR_MATERIAL ) ;
+	}
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glPopMatrix();
+	if(perpixel)
+	{
+		glAttachShader(program, vertex);
+		glAttachShader(program, fragment);
+		glLinkProgram(program);
+		glUseProgram(program);
+	}
 	//re = rm->GetPtr("data/Textures/crate.tga");
 	//rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -341,14 +356,21 @@ void SORE_Graphics::TerrainGraph::Render()
 	}
 	*/
 	
+	if(perpixel)
+	{
+		glDetachShader(program, vertex);
+		glDetachShader(program, fragment);
+		glLinkProgram(program);
+		glUseProgram(program);
+	}
+	else
+		glDisable(GL_LIGHTING);
 	if(normals)
 	{
-		glDisable(GL_LIGHTING);
 		for(int i=0;i<xres;i++)
 		{
 			for(int j=0;j<yres;j++)
 			{
-				
 				glBegin(GL_LINES);
 				glColor3f(1.0f, 0.0f, 0.0f);
 				glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
@@ -379,4 +401,122 @@ void SORE_Graphics::TerrainGraph::WritePGM(const char* name)
 		fputs(buffer, file);
 	}
 	fclose(file);
+}
+
+void SORE_Graphics::TerrainGraph::InitShaders()
+{
+	char* frag, * vert;
+	unsigned int fsize, vsize;
+	SORE_FileIO::file_ref fptr, vptr;
+	fptr = SORE_FileIO::Open("data/Shaders/fragment.shad");
+	vptr = SORE_FileIO::Open("data/Shaders/vertex.shad");
+	fsize = SORE_FileIO::Size(fptr);
+	vsize = SORE_FileIO::Size(vptr);
+	frag = new char[fsize];
+	vert = new char[vsize];
+	
+	SORE_FileIO::Read(frag, sizeof(char), fsize, fptr);
+	SORE_FileIO::Read(vert, sizeof(char), vsize, vptr);
+	
+	const char* frag_t = frag;
+	const char* vert_t = vert;
+	
+	vertex   = glCreateShader(GL_VERTEX_SHADER);
+	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	
+	glShaderSource(vertex, 1, &vert_t, NULL);
+	glShaderSource(fragment, 1, &frag_t, NULL);
+	
+	glCompileShader(vertex);
+	glCompileShader(fragment);
+	
+	program = glCreateProgram();
+	
+	glAttachShader(program, vertex);
+	glAttachShader(program, fragment);
+	
+	
+	glLinkProgram(program);
+	glUseProgram(program);
+	
+	int success;
+	int fras, vras;
+	glGetShaderiv(vertex, GL_COMPILE_STATUS, &vras);
+	glGetShaderiv(fragment, GL_COMPILE_STATUS, &fras);
+	
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	
+	if(fras!=GL_TRUE || vras!=GL_TRUE)
+	{
+		APP_LOG_S(SORE_Logging::LVL_ERROR, "Failed to compile one or more shaders");
+		
+		int infologLength = 0;
+		int charsWritten  = 0;
+		char *infoLog;
+
+		glGetShaderiv(fragment, GL_INFO_LOG_LENGTH,&infologLength);
+		
+		if (infologLength > 0)
+		{
+			infoLog = new char[infologLength];
+			glGetShaderInfoLog(fragment, infologLength, &charsWritten, infoLog);
+			APP_LOG(SORE_Logging::LVL_ERROR, "Failed to compile fragment program. Log follows.\n%s", infoLog);
+			delete[] infoLog;
+		}
+		else
+			APP_LOG_S(SORE_Logging::LVL_INFO, "No info log for fragment shader");
+		
+		glGetShaderiv(vertex, GL_INFO_LOG_LENGTH,&infologLength);
+		
+		if (infologLength > 0)
+		{
+			infoLog = new char[infologLength];
+			glGetShaderInfoLog(vertex, infologLength, &charsWritten, infoLog);
+			APP_LOG(SORE_Logging::LVL_ERROR, "Failed to compile vertex program. Log follows.\n%s", infoLog);
+			delete[] infoLog;
+		}
+		else
+			APP_LOG_S(SORE_Logging::LVL_INFO, "No info log for vertex shader");
+	}
+	else
+	{
+		APP_LOG_S(SORE_Logging::LVL_INFO, "Shaders compiled OK");
+	}
+	
+	if(success!=GL_TRUE)
+	{
+		int infologLength = 0;
+		int charsWritten  = 0;
+		char *infoLog;
+
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH,&infologLength);
+		
+		if (infologLength > 0)
+		{
+			infoLog = new char[infologLength];
+			glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
+			APP_LOG(SORE_Logging::LVL_ERROR, "Failed to link shader program. Log follows.\n%s", infoLog);
+			delete[] infoLog;
+		}
+		else
+			APP_LOG_S(SORE_Logging::LVL_ERROR, "Failed to link shader program. No info log.");
+	}
+	else
+	{
+		APP_LOG_S(SORE_Logging::LVL_INFO, "Shaders linked OK");
+	}
+	
+	delete[] frag;
+	delete[] vert;
+	
+}
+
+void SORE_Graphics::TerrainGraph::DestroyShaders()
+{
+	glDetachShader(program, fragment);
+	glDetachShader(program, vertex);
+	
+	glDeleteShader(fragment);
+	glDeleteShader(vertex);
+	glDeleteProgram(program);
 }
