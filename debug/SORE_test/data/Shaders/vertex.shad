@@ -2,8 +2,8 @@ varying vec4 diffuse,ambientGlobal,ambient;
 varying vec3 normal,lightDir,halfVector;
 varying float dist;
 
-void main()
-{	
+void main() 
+{
 	vec4 ecPos;
 	vec3 aux;
 	
@@ -24,7 +24,7 @@ void main()
 	/* suffers attenuation */
 	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 	ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient * gl_Color;
-	
-		
+
+	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	gl_Position = ftransform();
-} 
+}

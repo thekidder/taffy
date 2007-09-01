@@ -50,13 +50,15 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	static int T0 = SDL_GetTicks();
 	static float fps;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	assert(sg!=NULL && "No scene graph");
-	//glLoadIdentity();
-	if(cam)
-		cam->TransformView();
-	else
-		ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "No camera set, no view transformations possible");
-	sg->Render();
+	//assert(sg!=NULL && "No scene graph");
+	if(sg)
+	{
+		if(cam)
+			cam->TransformView();
+		else
+			ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "No camera set, no view transformations possible");
+		sg->Render();
+	}
 	SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
@@ -64,7 +66,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	frames++;
 	{
 		GLint t = SDL_GetTicks();
-		if (t - T0 >= 100) //display FPS every 100 milliseconds
+		if (t - T0 >= 400) //display FPS every 400 milliseconds
 		{
 			GLfloat seconds = (GLfloat)((t - T0) / 1000.0);
 			fps = frames / seconds;

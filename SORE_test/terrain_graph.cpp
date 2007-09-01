@@ -112,7 +112,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	}
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
-	//rm->Register("data/Textures/crate.tga");
+	rm->Register("data/Textures/grass.tga");
 	wireframe = false;
 	normals = false;
 	heightColor = false;
@@ -136,6 +136,9 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	//glEnable(GL_TEXTURE_2D);
 	glColorMaterial ( GL_FRONT, GL_AMBIENT );
 	glEnable(GL_COLOR_MATERIAL);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	InitShaders();
 }
 
@@ -276,18 +279,12 @@ void SORE_Graphics::TerrainGraph::Render()
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glPopMatrix();
 	if(perpixel)
-	{
-		glAttachShader(program, vertex);
-		glAttachShader(program, fragment);
-		glLinkProgram(program);
 		glUseProgram(program);
-	}
-	//re = rm->GetPtr("data/Textures/crate.tga");
-	//rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	//glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
+	re = rm->GetPtr("data/Textures/grass.tga");
+	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glColor4f(0.2f, 0.6f, 0.2f, 1.0f);
-	for(int i=0;i<xres-1;i++)
+	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)
 			glBegin(GL_LINE_STRIP);
@@ -295,74 +292,27 @@ void SORE_Graphics::TerrainGraph::Render()
 			glBegin(GL_TRIANGLE_STRIP);
 		for(int j=0;j<yres;j++)
 		{
-			
-			//if(j%2==0)
-			//	glTexCoord2f(1.0f, 0.0f);
-			//else
-			//	glTexCoord2f(1.0f, 1.0f);
-			glNormal3fv(&normalValues[(j + yres*i)*3]);
-			if(heightColor)
-				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
-			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-			//if(j%2==0)
-			//	glTexCoord2f(0.0f, 0.0f);
-			//else
-			//	glTexCoord2f(0.0f, 1.0f);
+			float texX, texY;
+			texX = j%2==0 ? 0.0 : 0.1;
+			texY = i%2==0 ? 0.0 : 0.1;
+			glTexCoord2f(texX, texY);
 			glNormal3fv(&normalValues[(j + yres*(i+1))*3]);
 			if(heightColor)
 				glColor4f(cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], 1.0f);
 			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)],scale*j);
+
+			glTexCoord2f(texX, texY-0.1);
+			
+			glNormal3fv(&normalValues[(j + yres*i)*3]);
+			if(heightColor)
+				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
+			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
 		}
 		glEnd();
 	}
-	/*for(int i=0;i<xres-1;i++)
-	{
-		for(int j=0;j<yres-1;j++)
-		{
-			if(wireframe)
-				glBegin(GL_LINES);
-			else
-				glBegin(GL_TRIANGLES);
-			glNormal3fv(&normalValues[(j + yres*i)*3]);
-			glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
-			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-			
-			glNormal3fv(&normalValues[(j + yres*(i+1))*3]);
-			glColor4f(cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], 1.0f);
-			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)],scale*j);
-					
-			glNormal3fv(&normalValues[(j + yres*(i+1)+1)*3]);
-			glColor4f(cachedValues[j + yres*(i+1)+1], cachedValues[j + yres*(i+1)+1], cachedValues[j + yres*(i+1)+1], 1.0f);
-			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)+1],scale*j+scale);
-			glEnd();
-			
-			if(wireframe)
-				glBegin(GL_LINES);
-			else
-				glBegin(GL_TRIANGLES);
-			glNormal3fv(&normalValues[(j + yres*i)*3]);
-			glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
-			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-		
-			glNormal3fv(&normalValues[(j + yres*i+1)*3]);
-			glColor4f(cachedValues[j + yres*i+1], cachedValues[j + yres*i+1], cachedValues[j + yres*i+1], 1.0f);
-			glVertex3f(scale*i,vscale*cachedValues[j + yres*i+1],scale*j+scale);
-					
-			glNormal3fv(&normalValues[(j + yres*(i+1)+1)*3]);
-			glColor4f(cachedValues[j + yres*(i+1)+1], cachedValues[j + yres*(i+1)+1], cachedValues[j + yres*(i+1)+1], 1.0f);
-			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)+1],scale*j+scale);
-			glEnd();
-		}
-	}
-	*/
-	
+
 	if(perpixel)
-	{
-		glDetachShader(program, vertex);
-		glDetachShader(program, fragment);
-		glLinkProgram(program);
-		glUseProgram(program);
-	}
+		glUseProgram(0);
 	else
 		glDisable(GL_LIGHTING);
 	if(normals)
