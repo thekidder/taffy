@@ -18,6 +18,8 @@ using namespace SORE_Math;
 
 SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 {
+	APP_LOG_S(SORE_Logging::LVL_DEBUG2, "In TerrainGraph constructor");
+	mainLog->Flush();
 	xres = x;
 	yres = y;
 	pn = new Noise::PerlinNoise(Noise::Noise12D,0, 5,1);
@@ -355,26 +357,33 @@ void SORE_Graphics::TerrainGraph::WritePGM(const char* name)
 
 void SORE_Graphics::TerrainGraph::InitShaders()
 {
-	char* frag, * vert;
+	//char frag[] = "void main(){gl_Color=vec4(1.0,1.0,1.0,1.0);}";
+	//char vert[] = "void main(){gl_Position=ftransform();}";
+	char *frag, *vert;
 	unsigned int fsize, vsize;
 	SORE_FileIO::file_ref fptr, vptr;
 	fptr = SORE_FileIO::Open("data/Shaders/fragment.shad");
 	vptr = SORE_FileIO::Open("data/Shaders/vertex.shad");
 	fsize = SORE_FileIO::Size(fptr);
 	vsize = SORE_FileIO::Size(vptr);
-	frag = new char[fsize];
-	vert = new char[vsize];
+	frag = new char[fsize+1];
+	vert = new char[vsize+1];
 	
+	APP_LOG(SORE_Logging::LVL_INFO, "Size: %d", fsize);
+
 	SORE_FileIO::Read(frag, sizeof(char), fsize, fptr);
 	SORE_FileIO::Read(vert, sizeof(char), vsize, vptr);
 	
+	frag[fsize] = '\0';
+	vert[vsize] = '\0';
+
 	const char* frag_t = frag;
 	const char* vert_t = vert;
 	
 	vertex   = glCreateShader(GL_VERTEX_SHADER);
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	
-	glShaderSource(vertex, 1, &vert_t, NULL);
+
+	glShaderSource(vertex, 1, &vert_t,NULL);
 	glShaderSource(fragment, 1, &frag_t, NULL);
 	
 	glCompileShader(vertex);
@@ -411,6 +420,7 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 			infoLog = new char[infologLength];
 			glGetShaderInfoLog(fragment, infologLength, &charsWritten, infoLog);
 			APP_LOG(SORE_Logging::LVL_ERROR, "Failed to compile fragment program. Log follows.\n%s", infoLog);
+			APP_LOG(SORE_Logging::LVL_ERROR, "Shader: \"%s\"", frag);
 			delete[] infoLog;
 		}
 		else
@@ -423,6 +433,7 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 			infoLog = new char[infologLength];
 			glGetShaderInfoLog(vertex, infologLength, &charsWritten, infoLog);
 			APP_LOG(SORE_Logging::LVL_ERROR, "Failed to compile vertex program. Log follows.\n%s", infoLog);
+			APP_LOG(SORE_Logging::LVL_ERROR, "Shader: \"%s\"", vert);
 			delete[] infoLog;
 		}
 		else

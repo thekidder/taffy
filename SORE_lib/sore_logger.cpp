@@ -221,13 +221,17 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	sprintf(buffer, "\t\t<file>%s</file>\n", log->file);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
-	/*std::string message = log->buffer;
-	while((pos=message.find("\n"))!=std::string::npos)
+	std::string message = log->buffer;
+	while((pos=message.find("<"))!=std::string::npos)
 	{
-		message.replace(pos, 1, "<br />");
+		message.replace(pos, 1, "&lt;");
 	}
-	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());*/
-	sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
+	while((pos=message.find(">"))!=std::string::npos)
+	{
+		message.replace(pos, 1, "&gt;");
+	}
+	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());
+	//sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	
 	fwrite(end, sizeof(char), strlen(end), filePtr);

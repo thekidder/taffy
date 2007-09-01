@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glu32.lib zdll.lib libfreetype.dll.a sore_lib.lib SDL.lib SDLmain.lib"
+				AdditionalDependencies="opengl32.lib glu32.lib zdll.lib freetype.lib sore_lib.lib SDL.lib SDLmain.lib"
 				AdditionalLibraryDirectories="C:\DEVEL\lib;..\debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"

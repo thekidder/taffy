@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SORE_lib", "SORE_lib\SORE_lib.vcproj", "{4B67CBDD-FF67-44F1-A6D9-8BAEC2790367}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SORE_test", "SORE_test\SORE_test.vcproj", "{85D806E2-A04A-4E60-A571-AD4D4691BBAA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4B67CBDD-FF67-44F1-A6D9-8BAEC2790367} = {4B67CBDD-FF67-44F1-A6D9-8BAEC2790367}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

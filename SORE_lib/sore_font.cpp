@@ -265,10 +265,11 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if(height<=0) return INVALID_FONT_HEIGHT;
 	//if(textures) delete[] textures;
 	textures = new GLuint[128];
+
 	FT_Library library;
 	if (FT_Init_FreeType( &library )) 
 		return LIBRARY_LOAD_FAILED;
-	
+
 	FT_Face face;
 	
 	int length = strlen(fontName);
