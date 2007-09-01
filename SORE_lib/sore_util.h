@@ -3,6 +3,7 @@
 #define  __SORE_UTIL_H__
 
 #include "sore_allgl.h"
+#include <cmath>
 
 using namespace std;
 

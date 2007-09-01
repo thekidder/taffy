@@ -10,7 +10,16 @@
 //
 //
 
+#ifndef  __SORE_GLEXT_H__
+#define  __SORE_GLEXT_H__
+
 // OpenGL extension function pointers
 #define GLEXT_PROC(proc, name) extern proc name
 #include "glextproc.h"
 #undef GLEXT_PROC 
+
+typedef void(*TESTPTR)();
+
+extern TESTPTR tard;
+
+#endif /*__SORE_GLEXT_H__*/

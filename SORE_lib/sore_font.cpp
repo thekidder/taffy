@@ -236,7 +236,6 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 	glListBase(fontList);
 	int* listBase;
 	glGetIntegerv(GL_LIST_BASE, listBase);
-	std::cout << "base: " << *listBase << std::endl;
 	
 	float modelview_matrix[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);

@@ -15,7 +15,7 @@ void SORE_Resource::Texture::Load()
 	}
 	else
 	{
-		std::cerr <<"Unrecognized file format\n";
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unknown file format %s", ext);
 	}
 }
 

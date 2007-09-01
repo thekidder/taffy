@@ -2,6 +2,7 @@
 #include "sore_resource.h"
 #include "sore_util.h"
 #include <cstring>
+#include <iostream>
 
 SORE_Resource::Resource::Resource(int iflags, const char* file)
 {

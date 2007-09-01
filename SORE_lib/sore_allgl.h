@@ -8,6 +8,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glext.h>
 
 #ifdef WIN32
 	#include <SDL.h>
@@ -20,7 +21,6 @@
 	//We need M_PI
 	#define _USE_MATH_DEFINES
 #else /* GLX */
-	#include <GL/glext.h>
 	#include <SDL/SDL.h>
 	#include <SDL/SDL_image.h>
 	#include <SDL/SDL_opengl.h>
@@ -32,9 +32,4 @@
 	//glXGetProcAddress
 	#define uglGetProcAddress(x) (*glXGetProcAddress)((const GLubyte*)(x))
 #endif
-
-#include <iostream>
-#include <cstdlib>
-#include <cmath>
-
 #endif //__ALLGL_H__

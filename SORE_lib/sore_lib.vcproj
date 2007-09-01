@@ -44,10 +44,12 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
+				CallingConvention="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -146,6 +148,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\glextproc.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sore.h"
 				>
 			</File>
@@ -171,6 +177,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_font.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_glext.h"
 				>
 			</File>
 			<File
@@ -239,6 +249,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_font.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_glext.cpp"
 				>
 			</File>
 			<File

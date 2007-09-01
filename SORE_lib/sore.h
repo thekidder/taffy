@@ -12,6 +12,7 @@
 #include "sore_console.h"
 #include "sore_fileio.h"
 #include "sore_font.h"
+#include "sore_glext.h"
 #include "sore_graphics.h"
 #include "sore_input.h"
 #include "sore_kernel.h"
