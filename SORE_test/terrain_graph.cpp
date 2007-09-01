@@ -124,8 +124,8 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	LightPosition[2] = (yres/2.0f)*scale;
 	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
 	
-	const GLfloat LightAmbient[]=  {  0.2f, 0.2f, 0.2f, 1.0f };
-	const GLfloat LightDiffuse[]=  {  0.2f, 0.2f, 0.2f, 1.0f };
+	const GLfloat LightAmbient[]=  {  0.4f, 0.4f, 0.4f, 1.0f };
+	const GLfloat LightDiffuse[]=  {  0.8f, 0.8f, 0.8f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
 	
@@ -357,8 +357,6 @@ void SORE_Graphics::TerrainGraph::WritePGM(const char* name)
 
 void SORE_Graphics::TerrainGraph::InitShaders()
 {
-	//char frag[] = "void main(){gl_Color=vec4(1.0,1.0,1.0,1.0);}";
-	//char vert[] = "void main(){gl_Position=ftransform();}";
 	char *frag, *vert;
 	unsigned int fsize, vsize;
 	SORE_FileIO::file_ref fptr, vptr;
@@ -368,8 +366,6 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 	vsize = SORE_FileIO::Size(vptr);
 	frag = new char[fsize+1];
 	vert = new char[vsize+1];
-	
-	APP_LOG(SORE_Logging::LVL_INFO, "Size: %d", fsize);
 
 	SORE_FileIO::Read(frag, sizeof(char), fsize, fptr);
 	SORE_FileIO::Read(vert, sizeof(char), vsize, vptr);
