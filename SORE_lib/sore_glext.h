@@ -18,8 +18,4 @@
 #include "glextproc.h"
 #undef GLEXT_PROC 
 
-typedef void(*TESTPTR)();
-
-extern TESTPTR tard;
-
 #endif /*__SORE_GLEXT_H__*/

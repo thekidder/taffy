@@ -355,7 +355,6 @@ void SORE_Graphics::TerrainGraph::WritePGM(const char* name)
 
 void SORE_Graphics::TerrainGraph::InitShaders()
 {
-	tard();
 	char* frag, * vert;
 	unsigned int fsize, vsize;
 	SORE_FileIO::file_ref fptr, vptr;

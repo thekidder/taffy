@@ -16,9 +16,3 @@
 #define GLEXT_PROC(proc, name) proc name = NULL
 #include "glextproc.h"
 #undef GLEXT_PROC
-
-
-void nothing()
-{}
-
-TESTPTR tard = &nothing;

@@ -28,7 +28,6 @@ void SORE_Graphics::InitExtensions()
 #define GLEXT_PROC(proc, name) glextInitProc(name, #name);
 #include "glextproc.h"
 #undef GLEXT_PROC
-glCreateProgram = (PFNGLCREATEPROGRAMPROC)uglGetProcAddress("glCreateProgram");
 } 
 
 void SORE_Graphics::WindowToReal(int* window, int* real)
