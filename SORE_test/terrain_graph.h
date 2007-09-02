@@ -54,6 +54,7 @@ namespace SORE_Graphics
 			bool wireframe,normals, heightColor, perpixel;
 			float lightMoveX, lightMoveY, lightMoveZ;
 			GLuint vertex, fragment, program;
+			GLuint wireBox;
 	};
 }
 

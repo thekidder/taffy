@@ -38,11 +38,6 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Name: %s", filename);
 	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Width: %d Height: %d", int(header[12]+header[13]*256), int(header[14]+header[15]*256));
 	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "BPP: %d Image type: %d", (int)header[16], (int)header[2]);
-	//SORE_Logging::sore_log.Flush();
-	//std::cout << "Loaded header\nImage information:\n";
-	//std::cout << "Name: " << filename << "\n";
-	//std::cout << "Width: " << int(header[12]+header[13]*256) << " Height: " << int(header[14]+header[15]*256) << "\n";
-	//std::cout << "BPP: " << (int)header[16] << " Image type: " << (int)header[2] << "\n";
 	
 	//do some basic checks to make sure we can handle the file
 	
@@ -71,7 +66,6 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	
 	char* filler = new char[int(header[0])];
 	
-	//inFile.read(filler, int(header[0]));
 	if(SORE_FileIO::Read(filler, sizeof(char), int(header[0]), file)!=int(header[0]))
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
@@ -86,7 +80,6 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	GLubyte* imgData = new GLubyte[dataSize];
 	GLubyte temp;
 	
-	//inFile.read((char*)imgData, dataSize);
 	if(SORE_FileIO::Read(imgData, 1, dataSize, file)!=dataSize)
 	{
 		delete[] imgData;
@@ -101,10 +94,6 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 		imgData[i] = imgData[i+2];
 		imgData[i+2] = temp;
 	}
-	
-	//if(inFile.gcount()!=dataSize) return 0;
-	
-	//now for the actual opengl texture generation
 	
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);

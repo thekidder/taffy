@@ -266,7 +266,7 @@ void SORE_FileIO::Close(file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<4294967295)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %s from disk",file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %d from disk",file);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);

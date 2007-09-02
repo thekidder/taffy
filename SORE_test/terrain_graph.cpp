@@ -114,7 +114,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	}
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
-	rm->Register("data/Textures/grass.tga");
+	rm->Register("data/Textures/texture.tga");
 	wireframe = false;
 	normals = false;
 	heightColor = false;
@@ -135,13 +135,68 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glEnable(GL_LIGHT0);
-	//glEnable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
 	glColorMaterial ( GL_FRONT, GL_AMBIENT );
 	glEnable(GL_COLOR_MATERIAL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 	InitShaders();
+	
+	wireBox = glGenLists(1);
+	glNewList(wireBox, GL_COMPILE);
+	{
+		glBegin(GL_LINE_LOOP);
+				
+		glVertex3f(-0.1f, -0.1f,  0.1f); //bottom
+		glVertex3f( 0.1f, -0.1f,  0.1f);
+		glVertex3f( 0.1f, -0.1f, -0.1f);
+		glVertex3f(-0.1f, -0.1f, -0.1f);
+		
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+			
+		glVertex3f(-0.1f,  0.1f,  0.1f); //top
+		glVertex3f( 0.1f,  0.1f,  0.1f);
+		glVertex3f( 0.1f,  0.1f, -0.1f);
+		glVertex3f(-0.1f,  0.1f, -0.1f);
+			
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+		
+			//front
+		glVertex3f(-0.1f, -0.1f,  0.1f); //bottom left
+		glVertex3f(-0.1f,  0.1f,  0.1f); //top left
+		glVertex3f( 0.1f,  0.1f,  0.1f); //top right
+		glVertex3f( 0.1f, -0.1f,  0.1f); //bottom right
+		
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+			
+		glVertex3f(-0.1f, -0.1f, -0.1f); //back
+		glVertex3f(-0.1f,  0.1f, -0.1f);
+		glVertex3f( 0.1f,  0.1f, -0.1f);
+		glVertex3f( 0.1f, -0.1f, -0.1f);
+		
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+				
+		glVertex3f(-0.1f, -0.1f,  0.1f); //left
+		glVertex3f(-0.1f,  0.1f,  0.1f);
+		glVertex3f(-0.1f,  0.1f, -0.1f);
+		glVertex3f(-0.1f, -0.1f, -0.1f);
+		
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+			
+		glVertex3f( 0.1f, -0.1f,  0.1f); //right
+		glVertex3f( 0.1f,  0.1f,  0.1f);
+		glVertex3f( 0.1f,  0.1f, -0.1f);
+		glVertex3f( 0.1f, -0.1f, -0.1f);
+			
+		glEnd();
+	}
+	glEndList();
 }
 
 bool SORE_Graphics::TerrainGraph::LightMoveCallback(SORE_Kernel::Event* event)
@@ -215,7 +270,13 @@ void SORE_Graphics::TerrainGraph::Render()
 	SORE_Resource::ResourceHandle* rd;
 	
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glDisable(GL_TEXTURE_2D);
+	glCallList(wireBox);
+	glPushMatrix();
+	glTranslatef(0.0,0.0,scale);
+	glCallList(wireBox);
+	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
 	if(!perpixel)
@@ -223,56 +284,8 @@ void SORE_Graphics::TerrainGraph::Render()
 		glDisable(GL_LIGHTING);
 		glDisable( GL_COLOR_MATERIAL ) ;
 	}
-	glBegin(GL_LINE_LOOP);
-		
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom
-	glVertex3f( 0.1f, -0.1f,  0.1f);
-	glVertex3f( 0.1f, -0.1f, -0.1f);
-	glVertex3f(-0.1f, -0.1f, -0.1f);
-	
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-		
-	glVertex3f(-0.1f,  0.1f,  0.1f); //top
-	glVertex3f( 0.1f,  0.1f,  0.1f);
-	glVertex3f( 0.1f,  0.1f, -0.1f);
-	glVertex3f(-0.1f,  0.1f, -0.1f);
-		
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-	
-		//front
-	glVertex3f(-0.1f, -0.1f,  0.1f); //bottom left
-	glVertex3f(-0.1f,  0.1f,  0.1f); //top left
-	glVertex3f( 0.1f,  0.1f,  0.1f); //top right
-	glVertex3f( 0.1f, -0.1f,  0.1f); //bottom right
-	
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-		
-	glVertex3f(-0.1f, -0.1f, -0.1f); //back
-	glVertex3f(-0.1f,  0.1f, -0.1f);
-	glVertex3f( 0.1f,  0.1f, -0.1f);
-	glVertex3f( 0.1f, -0.1f, -0.1f);
-	
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-			
-	glVertex3f(-0.1f, -0.1f,  0.1f); //left
-	glVertex3f(-0.1f,  0.1f,  0.1f);
-	glVertex3f(-0.1f,  0.1f, -0.1f);
-	glVertex3f(-0.1f, -0.1f, -0.1f);
-	
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-		
-	glVertex3f( 0.1f, -0.1f,  0.1f); //right
-	glVertex3f( 0.1f,  0.1f,  0.1f);
-	glVertex3f( 0.1f,  0.1f, -0.1f);
-	glVertex3f( 0.1f, -0.1f, -0.1f);
-		
-	glEnd();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glCallList(wireBox);
 	if(!perpixel)
 	{
 		glEnable(GL_LIGHTING);
@@ -282,33 +295,33 @@ void SORE_Graphics::TerrainGraph::Render()
 	glPopMatrix();
 	if(perpixel)
 		glUseProgram(program);
-	re = rm->GetPtr("data/Textures/grass.tga");
+	re = rm->GetPtr("data/Textures/texture.tga");
 	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
-	glColor4f(0.2f, 0.6f, 0.2f, 1.0f);
 	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)
 			glBegin(GL_LINE_STRIP);
 		else
 			glBegin(GL_TRIANGLE_STRIP);
+		float texY = i%2==1 ? 0.0 : 1.0;
 		for(int j=0;j<yres;j++)
 		{
-			float texX, texY;
-			texX = j%2==0 ? 0.0 : 0.1;
-			texY = i%2==0 ? 0.0 : 0.1;
-			glTexCoord2f(texX, texY);
-			glNormal3fv(&normalValues[(j + yres*(i+1))*3]);
-			if(heightColor)
-				glColor4f(cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], cachedValues[j + yres*(i+1)], 1.0f);
-			glVertex3f(scale*i+scale,vscale*cachedValues[j + yres*(i+1)],scale*j);
+			float texX;
+			texX = j%2==0 ? 0.0 : 1.0;
 
-			glTexCoord2f(texX, texY-0.1);
-			
+			glTexCoord2f(texX, texY);
 			glNormal3fv(&normalValues[(j + yres*i)*3]);
 			if(heightColor)
 				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
 			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
+			
+			glTexCoord2f(texX, texY-1.0);
+			glNormal3fv(&normalValues[(j + yres*(i-1))*3]);
+			if(heightColor)
+				glColor4f(cachedValues[j + yres*(i-1)], cachedValues[j + yres*(i-1)], cachedValues[j + yres*(i-1)], 1.0f);
+			glVertex3f(scale*i-scale,vscale*cachedValues[j + yres*(i-1)],scale*j);
 		}
 		glEnd();
 	}
@@ -466,6 +479,9 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 	delete[] frag;
 	delete[] vert;
 	
+	
+	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
+	//rm->Register("data/Textures/texture.tga");
 }
 
 void SORE_Graphics::TerrainGraph::DestroyShaders()

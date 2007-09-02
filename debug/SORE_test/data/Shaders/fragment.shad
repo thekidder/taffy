@@ -29,7 +29,7 @@ void main()
 	
 		halfV = normalize(halfVector);
 		NdotHV = max(dot(n,halfV),0.0);
-	}
-	
+	}	
+
 	gl_FragColor = color * texel;
 }

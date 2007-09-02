@@ -117,7 +117,7 @@ bool testlisten(SORE_Kernel::Event* event)
 		else if(event->key.keySym==SDLK_n)
 		{
 			tg->ToggleNormals();
-			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled wireframe");
+			APP_LOG_S(SORE_Logging::LVL_DEBUG2, "Toggled normals");
 			return true;
 		}
 		else if(event->key.keySym==SDLK_c)
