@@ -63,6 +63,7 @@
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
+				Profile="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -114,7 +115,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\DEVEL\include"
+				AdditionalIncludeDirectories="C:\DEVEL\include;..\SORE_lib\"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -131,7 +132,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib glu32.lib zdll.lib libfreetype.dll.a sore_lib.lib SDL.lib SDLmain.lib"
+				AdditionalDependencies="opengl32.lib glu32.lib zdll.lib freetype.lib sore_lib.lib SDL.lib SDLmain.lib"
 				AdditionalLibraryDirectories="C:\DEVEL\lib;..\release"
 				GenerateDebugInformation="true"
 				SubSystem="1"

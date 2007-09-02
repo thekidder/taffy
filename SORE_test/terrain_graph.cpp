@@ -115,6 +115,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	rm->RegisterLoader((SORE_Resource::RES_LOAD)SORE_Resource::LoadTexture, "tga");
 	rm->Register("data/Textures/texture.tga");
+	rm->Register("data/Textures/grass.tga");
 	wireframe = false;
 	normals = false;
 	heightColor = false;
@@ -295,7 +296,7 @@ void SORE_Graphics::TerrainGraph::Render()
 	glPopMatrix();
 	if(perpixel)
 		glUseProgram(program);
-	re = rm->GetPtr("data/Textures/texture.tga");
+	re = rm->GetPtr("data/Textures/grass.tga");
 	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
