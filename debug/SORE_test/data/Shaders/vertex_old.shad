@@ -23,7 +23,7 @@ void main()
 	/* The ambient terms have been separated since one of them */
 	/* suffers attenuation */
 	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
-	ambientGlobal = gl_LightSource[0].ambient * gl_FrontMaterial.ambient * gl_Color;
+	ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient * gl_Color;
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;

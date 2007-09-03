@@ -18,7 +18,7 @@
 
 namespace SORE_Graphics
 {
-	const float scale = 1.0f;
+	const float scale = 3.0f;
 	const float vscale = 6.0*scale;
 	class TerrainGraph : public SceneGraph, public SORE_Kernel::Task
 	{

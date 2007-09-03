@@ -121,18 +121,19 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	heightColor = false;
 	perpixel = true;
 	LightPosition[0] = (xres/2.0f)*scale;
-	LightPosition[1] =  3.0f;
+	LightPosition[1] =  9.0f;
 	LightPosition[2] = (yres/2.0f)*scale;
 	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
 	
-	const GLfloat LightAmbient[]=  {  0.4f, 0.4f, 0.4f, 1.0f };
+	//const GLfloat LightAmbient[]=  {  0.4f, 0.4f, 0.4f, 1.0f };
+	const GLfloat LightAmbient[]=  {  0.0f, 0.0f, 0.0f, 1.0f };
 	const GLfloat LightDiffuse[]=  {  0.8f, 0.8f, 0.8f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
 	
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.3);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.01);
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.06);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.03);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.001);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glEnable(GL_LIGHT0);

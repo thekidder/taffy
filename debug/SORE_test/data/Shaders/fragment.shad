@@ -8,8 +8,8 @@ void main()
 	vec4 texel;
 	texel = texture2D(tex,gl_TexCoord[0].st);
 
-	vec3 n,halfV,viewV,ldir;
-	float NdotL,NdotHV;
+	vec3 n;
+	float NdotL;
 	vec4 color = ambientGlobal;
 	float att;
 	
@@ -20,16 +20,11 @@ void main()
 	/* compute the dot product between normal and normalized lightdir */
 	NdotL = max(dot(n,normalize(lightDir)),0.0);
 
-	//if (NdotL > 0.0)
-	//{
-		att = 1.0 / (gl_LightSource[0].constantAttenuation +
-				gl_LightSource[0].linearAttenuation * dist +
-				gl_LightSource[0].quadraticAttenuation * dist * dist);
-		color += att * (diffuse * NdotL + ambient);
-	
-		halfV = normalize(halfVector);
-		NdotHV = max(dot(n,halfV),0.0);
-	//}	
+	att = 1.0 / (gl_LightSource[0].constantAttenuation +
+		gl_LightSource[0].linearAttenuation * dist +
+		gl_LightSource[0].quadraticAttenuation * dist * dist);
+	color += att * (diffuse * NdotL + ambient);
+
 
 	gl_FragColor = color * texel;
 }

@@ -70,10 +70,10 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 		{
 			if(it->first & event.type)
 			{
-				InputFunctor* temp = (it->second);
+				//InputFunctor* temp = (it->second);
 				//if((it->second)(&event))
 				//	break;
-				if((*temp)(&event))
+				if((*it->second)(&event))
 					break;
 			}
 		}
