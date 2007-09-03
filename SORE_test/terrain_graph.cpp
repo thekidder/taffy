@@ -198,6 +198,8 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 		glEnd();
 	}
 	glEndList();
+	//glClearColor(0.7f,0.8f,0.9f,1.0f);
+	glClearColor(0.0f,0.0f,0.0f,1.0f);
 }
 
 bool SORE_Graphics::TerrainGraph::LightMoveCallback(SORE_Kernel::Event* event)
@@ -273,11 +275,6 @@ void SORE_Graphics::TerrainGraph::Render()
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glDisable(GL_TEXTURE_2D);
-	glCallList(wireBox);
-	glPushMatrix();
-	glTranslatef(0.0,0.0,scale);
-	glCallList(wireBox);
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(LightPosition[0], LightPosition[1], LightPosition[2]);
 	if(!perpixel)
@@ -294,11 +291,17 @@ void SORE_Graphics::TerrainGraph::Render()
 	}
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glPopMatrix();
-	if(perpixel)
-		glUseProgram(program);
+		
 	re = rm->GetPtr("data/Textures/grass.tga");
 	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
-	glEnable(GL_TEXTURE_2D);
+	if(perpixel)
+	{
+		glUseProgram(program);
+	}
+	else if(!heightColor && !perpixel)
+	{
+		glEnable(GL_TEXTURE_2D);
+	}
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	for(int i=1;i<xres;i++)
 	{

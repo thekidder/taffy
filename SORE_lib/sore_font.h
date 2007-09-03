@@ -57,7 +57,7 @@ namespace SORE_Font
 	font_ref    LoadFont(const char* font, unsigned int h);
 	int         FontHeight(font_ref font);
 	
-	int         MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint * tex_base );
+	int         MakeDisplayList(FT_Face face, char ch, GLuint list_base, GLuint* tex_base);
 	//inline void PushScreenCoordMatrix();
 	//inline void PopProjectionMatrix();
 	

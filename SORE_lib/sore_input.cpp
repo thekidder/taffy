@@ -12,6 +12,13 @@
 
 #include "sore_input.h"
 
+SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
+{
+	static GlobalInputFunctor temp(func);
+	temp = GlobalInputFunctor(func);
+	return &temp;
+}
+
 SORE_Kernel::InputTask::InputTask()
 {
 }
@@ -58,22 +65,25 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.key.keySym = sdl_event.key.keysym.sym;
 				break;
 		}
-		std::multimap<unsigned int, EVENT_LISTENER>::iterator it;
+		std::multimap<unsigned int, InputFunctor*>::iterator it;
 		for(it=allListeners.begin();it!=allListeners.end();it++)
 		{
 			if(it->first & event.type)
 			{
-				if(it->second(&event))
+				InputFunctor* temp = (it->second);
+				//if((it->second)(&event))
+				//	break;
+				if((*temp)(&event))
 					break;
 			}
 		}
 	}
 }
 
-SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, EVENT_LISTENER listener)
+SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, InputFunctor* functor)
 {
 	event_listener_ref size = allListeners.size();
-	allListeners.insert(std::pair<unsigned int, EVENT_LISTENER>(eventType, listener));
+	allListeners.insert(std::pair<unsigned int, InputFunctor*>(eventType, functor));
 	return size;
 }
 

@@ -19,8 +19,7 @@ SORE_Graphics::Camera cam;
 SORE_Graphics::CameraTask camTask(&cam);
 SORE_Graphics::TerrainGraph* tg;
 
-bool testlisten(SORE_Kernel::Event* event);
-bool camCallback(SORE_Kernel::Event* event);
+bool OptionCallback(SORE_Kernel::Event* event);
 
 int main(int argc, char *argv[])
 {
@@ -56,8 +55,9 @@ int main(int argc, char *argv[])
 	
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
-	input->AddListener(SORE_Kernel::MOUSEMOVE | SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, camCallback);
-	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, testlisten);
+	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
+	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
+	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor<SORE_Graphics::TerrainGraph>(tg, &SORE_Graphics::TerrainGraph::LightMoveCallback));
 	gk->AddTask(20, renderer);
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
@@ -104,7 +104,7 @@ void Cleanup()
 	delete tg;
 }
 
-bool testlisten(SORE_Kernel::Event* event)
+bool OptionCallback(SORE_Kernel::Event* event)
 {
 	if(event->type == SORE_Kernel::KEYDOWN)
 	{
@@ -133,11 +133,5 @@ bool testlisten(SORE_Kernel::Event* event)
 			return true;
 		}
 	}
-	tg->LightMoveCallback(event);
 	return false;
-}
-
-bool camCallback(SORE_Kernel::Event* event)
-{
-	return camTask.CameraCallback(event);
 }

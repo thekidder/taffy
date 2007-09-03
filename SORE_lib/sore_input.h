@@ -52,7 +52,55 @@ namespace SORE_Kernel
 	};
 	
 	typedef unsigned int event_listener_ref;
-	typedef bool (*EVENT_LISTENER)(Event*);
+	
+	class InputFunctor
+	{
+		public:
+			virtual bool operator()(Event*){return false;}
+	};
+	
+	class GlobalInputFunctor : public InputFunctor
+	{
+		protected:
+			typedef bool (*EVENT_LISTENER)(Event*);
+			EVENT_LISTENER func;
+		public:
+			GlobalInputFunctor(EVENT_LISTENER _func)
+			{
+				func = _func;
+			}
+			bool operator()(Event* event)
+			{
+				return func(event);
+			}
+	};
+	
+	template<class T>
+	class ClassInputFunctor : public InputFunctor
+	{
+		protected:
+			typedef bool (T::*EVENT_LISTENER)(Event*);
+			EVENT_LISTENER func;
+			T* obj;
+		public:
+			ClassInputFunctor(T* _obj, EVENT_LISTENER _func)
+			{
+				obj = _obj;
+				func = _func;
+			}
+			bool operator()(Event* event)
+			{
+				return (obj->*func)(event);
+			}
+	};
+		
+	GlobalInputFunctor* MakeFunctor(bool(*func)(Event*));
+	
+	template<class T>
+	ClassInputFunctor<T>* MakeFunctor(T* obj, bool(T::*func)(Event*))
+	{
+		return new ClassInputFunctor<T>(obj, func);
+	}
 	
 	class InputTask : public Task
 	{
@@ -66,11 +114,11 @@ namespace SORE_Kernel
 			
 			const char* GetName() const {return "Input task";}
 			
-			event_listener_ref AddListener(unsigned int eventType, EVENT_LISTENER listener);
+			event_listener_ref AddListener(unsigned int eventType, InputFunctor* functor);
 			void RemoveListener(event_listener_ref listener);
 		protected:
 			Event event;
-			std::multimap<unsigned int, EVENT_LISTENER> allListeners;
+			std::multimap<unsigned int, InputFunctor*> allListeners;
 	};
 }
 

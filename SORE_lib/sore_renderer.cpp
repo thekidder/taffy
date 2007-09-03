@@ -77,10 +77,10 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	
 	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
 	
-	//SORE_Graphics::DrawString(font, 0, 36,  "Controls");
-	//SORE_Graphics::DrawString(font, 0, 64,  "Mouse:       m Grab              u Ungrab");
-	//SORE_Graphics::DrawString(font, 0, 92,  "l - toggle lighting, n - toggle normals");
-	//SORE_Graphics::DrawString(font, 0, 120, "x - toggle wireframe, c - toggle coloring");
+	SORE_Graphics::DrawString(font, 0, 36,  "Controls");
+	SORE_Graphics::DrawString(font, 0, 64,  "m - grab mouse         u - ungrab mouse");
+	SORE_Graphics::DrawString(font, 0, 92,  "l - toggle lighting    n - toggle normals");
+	SORE_Graphics::DrawString(font, 0, 120, "x - toggle wireframe   c - toggle coloring");
 	
 	SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();

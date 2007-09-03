@@ -32,7 +32,7 @@ inline int next_p2 (int a )
 	return rval;
 }
 
-int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
+int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint* tex_base)
 {
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
 		return GLYPH_LOAD_FAILED;
@@ -58,16 +58,18 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_INTENSITY, width, height, 0,
 				  GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, expanded_data );
 	delete [] expanded_data;
 	
 	glNewList(list_base+ch, GL_COMPILE);
 	glBindTexture(GL_TEXTURE_2D, tex_base[ch]);
 	glPushMatrix();
-	glTranslatef(face->glyph->bitmap_left,0.0f,0.0f);
 	
-	//glTranslatef(0.0f,face->glyph->bitmap_top,0.0f);
+	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Face character: %c, top: %d, rows: %d", ch, face->glyph->bitmap_top, bitmap.rows);
+	
+	glTranslatef(face->glyph->bitmap_left,0.0f,0.0f);
+	glTranslatef(0.0f,face->glyph->bitmap_top-bitmap.rows, 0.0f);
 	float x=(float)bitmap.width / (float)width, y=(float)bitmap.rows / (float)height;
 	
 	glBegin(GL_QUADS);
@@ -187,7 +189,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glListBase(fontList);
 	//int* listBase = new int[1];
@@ -203,7 +205,6 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 		glLoadIdentity();
 		glTranslatef(x,y-h*i,0);
 		glMultMatrixf(modelview_matrix);
-		//glScalef(0.01f, 0.01f, 0.01f);
 		glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
 		// float rpos[4];
 		// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
@@ -342,7 +343,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		return FONT_LOAD_FAILED;
 	}
 	
-	FT_Set_Char_Size( face, height << 6, height << 6, 96, 96);
+	FT_Set_Pixel_Sizes( face, 0, height);
 	
 	listBase=glGenLists(128);
 	GLenum error;
