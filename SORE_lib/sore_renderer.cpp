@@ -13,6 +13,7 @@
 #include "sore_renderer.h"
 #include "sore_logger.h"
 #include "sore_graphics.h"
+#include "sore_util.h"
 #include <cassert>
 
 SORE_Kernel::Renderer::Renderer()
@@ -182,6 +183,14 @@ int SORE_Kernel::Renderer::InitializeGL()
 	OnResize();
 	SORE_Graphics::InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
+	if(wglSwapIntervalEXT)
+	{
+		wglSwapIntervalEXT(0); //turn off vsync
+	}
+	else
+	{
+		ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "Vsync control not available");
+	}
 	return 0;
 }
 

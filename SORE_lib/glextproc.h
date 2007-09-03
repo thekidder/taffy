@@ -1,6 +1,181 @@
 
 #include "sore_allgl.h"
 
+typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+
+// ---------------------------------------------------------------------------
+// WGL extensions
+// ---------------------------------------------------------------------------
+GLEXT_PROC( PFNWGLSWAPINTERVALFARPROC,          wglSwapIntervalEXT          );
+
+// ---------------------------------------------------------------------------
+// OpenGL 1.2 extensions
+// ---------------------------------------------------------------------------
+
+GLEXT_PROC( PFNGLBLENDCOLORPROC,                glBlendColor                );
+GLEXT_PROC( PFNGLBLENDEQUATIONPROC,             glBlendEquation             );
+GLEXT_PROC( PFNGLDRAWRANGEELEMENTSPROC,         glDrawRangeElements         );
+GLEXT_PROC( PFNGLCOLORTABLEPROC,                glColorTable                );
+GLEXT_PROC( PFNGLCOLORTABLEPARAMETERFVPROC,     glColorTableParameterfv     );
+GLEXT_PROC( PFNGLCOLORTABLEPARAMETERIVPROC,     glColorTableParameteriv     );
+GLEXT_PROC( PFNGLCOPYCOLORTABLEPROC,            glCopyColorTable            );
+GLEXT_PROC( PFNGLGETCOLORTABLEPROC,             glGetColorTable             );
+GLEXT_PROC( PFNGLGETCOLORTABLEPARAMETERFVPROC,  glGetColorTableParameterfv  );
+GLEXT_PROC( PFNGLGETCOLORTABLEPARAMETERIVPROC,  glGetColorTableParameteriv  );
+GLEXT_PROC( PFNGLCOLORSUBTABLEPROC,             glColorSubTable             );
+GLEXT_PROC( PFNGLCOPYCOLORSUBTABLEPROC,         glCopyColorSubTable         );
+GLEXT_PROC( PFNGLCONVOLUTIONFILTER1DPROC,       glConvolutionFilter1D       );
+GLEXT_PROC( PFNGLCONVOLUTIONFILTER2DPROC,       glConvolutionFilter2D       );
+GLEXT_PROC( PFNGLCONVOLUTIONPARAMETERFPROC,     glConvolutionParameterf     );
+GLEXT_PROC( PFNGLCONVOLUTIONPARAMETERFVPROC,    glConvolutionParameterfv    );
+GLEXT_PROC( PFNGLCONVOLUTIONPARAMETERIPROC,     glConvolutionParameteri     );
+GLEXT_PROC( PFNGLCONVOLUTIONPARAMETERIVPROC,    glConvolutionParameteriv    );
+GLEXT_PROC( PFNGLCOPYCONVOLUTIONFILTER1DPROC,   glCopyConvolutionFilter1D   );
+GLEXT_PROC( PFNGLCOPYCONVOLUTIONFILTER2DPROC,   glCopyConvolutionFilter2D   );
+GLEXT_PROC( PFNGLGETCONVOLUTIONFILTERPROC,      glGetConvolutionFilter      );
+GLEXT_PROC( PFNGLGETCONVOLUTIONPARAMETERFVPROC, glGetConvolutionParameterfv );
+GLEXT_PROC( PFNGLGETCONVOLUTIONPARAMETERIVPROC, glGetConvolutionParameteriv );
+GLEXT_PROC( PFNGLGETSEPARABLEFILTERPROC,        glGetSeparableFilter        );
+GLEXT_PROC( PFNGLSEPARABLEFILTER2DPROC,         glSeparableFilter2D         );
+GLEXT_PROC( PFNGLGETHISTOGRAMPROC,              glGetHistogram              );
+GLEXT_PROC( PFNGLGETHISTOGRAMPARAMETERFVPROC,   glGetHistogramParameterfv   );
+GLEXT_PROC( PFNGLGETHISTOGRAMPARAMETERIVPROC,   glGetHistogramParameteriv   );
+GLEXT_PROC( PFNGLGETMINMAXPROC,                 glGetMinmax                 );
+GLEXT_PROC( PFNGLGETMINMAXPARAMETERFVPROC,      glGetMinmaxParameterfv      );
+GLEXT_PROC( PFNGLGETMINMAXPARAMETERIVPROC,      glGetMinmaxParameteriv      );
+GLEXT_PROC( PFNGLHISTOGRAMPROC,                 glHistogram                 );
+GLEXT_PROC( PFNGLMINMAXPROC,                    glMinmax                    );
+GLEXT_PROC( PFNGLRESETHISTOGRAMPROC,            glResetHistogram            );
+GLEXT_PROC( PFNGLRESETMINMAXPROC,               glResetMinmax               );
+GLEXT_PROC( PFNGLTEXIMAGE3DPROC,                glTexImage3D                );
+GLEXT_PROC( PFNGLTEXSUBIMAGE3DPROC,             glTexSubImage3D             );
+GLEXT_PROC( PFNGLCOPYTEXSUBIMAGE3DPROC,         glCopyTexSubImage3D         );
+
+// ---------------------------------------------------------------------------
+// OpenGL 1.3 extensions
+// ---------------------------------------------------------------------------
+
+GLEXT_PROC( PFNGLACTIVETEXTUREPROC,             glActiveTexture             );
+GLEXT_PROC( PFNGLCLIENTACTIVETEXTUREPROC,       glClientActiveTexture       );
+GLEXT_PROC( PFNGLMULTITEXCOORD1DPROC,           glMultiTexCoord1d           );
+GLEXT_PROC( PFNGLMULTITEXCOORD1DVPROC,          glMultiTexCoord1dv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD1FPROC,           glMultiTexCoord1f           );
+GLEXT_PROC( PFNGLMULTITEXCOORD1FVPROC,          glMultiTexCoord1fv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD1IPROC,           glMultiTexCoord1i           );
+GLEXT_PROC( PFNGLMULTITEXCOORD1IVPROC,          glMultiTexCoord1iv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD1SPROC,           glMultiTexCoord1s           );
+GLEXT_PROC( PFNGLMULTITEXCOORD1SVPROC,          glMultiTexCoord1sv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD2DPROC,           glMultiTexCoord2d           );
+GLEXT_PROC( PFNGLMULTITEXCOORD2DVPROC,          glMultiTexCoord2dv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD2FPROC,           glMultiTexCoord2f           );
+GLEXT_PROC( PFNGLMULTITEXCOORD2FVPROC,          glMultiTexCoord2fv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD2IPROC,           glMultiTexCoord2i           );
+GLEXT_PROC( PFNGLMULTITEXCOORD2IVPROC,          glMultiTexCoord2iv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD2SPROC,           glMultiTexCoord2s           );
+GLEXT_PROC( PFNGLMULTITEXCOORD2SVPROC,          glMultiTexCoord2sv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD3DPROC,           glMultiTexCoord3d           );
+GLEXT_PROC( PFNGLMULTITEXCOORD3DVPROC,          glMultiTexCoord3dv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD3FPROC,           glMultiTexCoord3f           );
+GLEXT_PROC( PFNGLMULTITEXCOORD3FVPROC,          glMultiTexCoord3fv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD3IPROC,           glMultiTexCoord3i           );
+GLEXT_PROC( PFNGLMULTITEXCOORD3IVPROC,          glMultiTexCoord3iv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD3SPROC,           glMultiTexCoord3s           );
+GLEXT_PROC( PFNGLMULTITEXCOORD3SVPROC,          glMultiTexCoord3sv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD4DPROC,           glMultiTexCoord4d           );
+GLEXT_PROC( PFNGLMULTITEXCOORD4DVPROC,          glMultiTexCoord4dv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD4FPROC,           glMultiTexCoord4f           );
+GLEXT_PROC( PFNGLMULTITEXCOORD4FVPROC,          glMultiTexCoord4fv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD4IPROC,           glMultiTexCoord4i           );
+GLEXT_PROC( PFNGLMULTITEXCOORD4IVPROC,          glMultiTexCoord4iv          );
+GLEXT_PROC( PFNGLMULTITEXCOORD4SPROC,           glMultiTexCoord4s           );
+GLEXT_PROC( PFNGLMULTITEXCOORD4SVPROC,          glMultiTexCoord4sv          );
+GLEXT_PROC( PFNGLLOADTRANSPOSEMATRIXFPROC,      glLoadTransposeMatrixf      );
+GLEXT_PROC( PFNGLLOADTRANSPOSEMATRIXDPROC,      glLoadTransposeMatrixd      );
+GLEXT_PROC( PFNGLMULTTRANSPOSEMATRIXFPROC,      glMultTransposeMatrixf      );
+GLEXT_PROC( PFNGLMULTTRANSPOSEMATRIXDPROC,      glMultTransposeMatrixd      );
+GLEXT_PROC( PFNGLSAMPLECOVERAGEPROC,            glSampleCoverage            );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXIMAGE3DPROC,      glCompressedTexImage3D      );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXIMAGE2DPROC,      glCompressedTexImage2D      );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXIMAGE1DPROC,      glCompressedTexImage1D      );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC,   glCompressedTexSubImage3D   );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC,   glCompressedTexSubImage2D   );
+GLEXT_PROC( PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC,   glCompressedTexSubImage1D   );
+GLEXT_PROC( PFNGLGETCOMPRESSEDTEXIMAGEPROC,     glGetCompressedTexImage     );
+
+// ---------------------------------------------------------------------------
+// OpenGL 1.4 extensions
+// ---------------------------------------------------------------------------
+
+GLEXT_PROC( PFNGLBLENDFUNCSEPARATEPROC,         glBlendFuncSeparate         );
+GLEXT_PROC( PFNGLFOGCOORDFPROC,                 glFogCoordf                 );
+GLEXT_PROC( PFNGLFOGCOORDFVPROC,                glFogCoordfv                );
+GLEXT_PROC( PFNGLFOGCOORDDPROC,                 glFogCoordd                 );
+GLEXT_PROC( PFNGLFOGCOORDDVPROC,                glFogCoorddv                );
+GLEXT_PROC( PFNGLFOGCOORDPOINTERPROC,           glFogCoordPointer           );
+GLEXT_PROC( PFNGLMULTIDRAWARRAYSPROC,           glMultiDrawArrays           );
+GLEXT_PROC( PFNGLMULTIDRAWELEMENTSPROC,         glMultiDrawElements         );
+GLEXT_PROC( PFNGLPOINTPARAMETERFPROC,           glPointParameterf           );
+GLEXT_PROC( PFNGLPOINTPARAMETERFVPROC,          glPointParameterfv          );
+GLEXT_PROC( PFNGLPOINTPARAMETERIPROC,           glPointParameteri           );
+GLEXT_PROC( PFNGLPOINTPARAMETERIVPROC,          glPointParameteriv          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3BPROC,          glSecondaryColor3b          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3BVPROC,         glSecondaryColor3bv         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3DPROC,          glSecondaryColor3d          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3DVPROC,         glSecondaryColor3dv         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3FPROC,          glSecondaryColor3f          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3FVPROC,         glSecondaryColor3fv         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3IPROC,          glSecondaryColor3i          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3IVPROC,         glSecondaryColor3iv         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3SPROC,          glSecondaryColor3s          );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3SVPROC,         glSecondaryColor3sv         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3UBPROC,         glSecondaryColor3ub         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3UBVPROC,        glSecondaryColor3ubv        );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3UIPROC,         glSecondaryColor3ui         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3UIVPROC,        glSecondaryColor3uiv        );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3USPROC,         glSecondaryColor3us         );
+GLEXT_PROC( PFNGLSECONDARYCOLOR3USVPROC,        glSecondaryColor3usv        );
+GLEXT_PROC( PFNGLSECONDARYCOLORPOINTERPROC,     glSecondaryColorPointer     );
+GLEXT_PROC( PFNGLWINDOWPOS2DPROC,               glWindowPos2d               );
+GLEXT_PROC( PFNGLWINDOWPOS2DVPROC,              glWindowPos2dv              );
+GLEXT_PROC( PFNGLWINDOWPOS2FPROC,               glWindowPos2f               );
+GLEXT_PROC( PFNGLWINDOWPOS2FVPROC,              glWindowPos2fv              );
+GLEXT_PROC( PFNGLWINDOWPOS2IPROC,               glWindowPos2i               );
+GLEXT_PROC( PFNGLWINDOWPOS2IVPROC,              glWindowPos2iv              );
+GLEXT_PROC( PFNGLWINDOWPOS2SPROC,               glWindowPos2s               );
+GLEXT_PROC( PFNGLWINDOWPOS2SVPROC,              glWindowPos2sv              );
+GLEXT_PROC( PFNGLWINDOWPOS3DPROC,               glWindowPos3d               );
+GLEXT_PROC( PFNGLWINDOWPOS3DVPROC,              glWindowPos3dv              );
+GLEXT_PROC( PFNGLWINDOWPOS3FPROC,               glWindowPos3f               );
+GLEXT_PROC( PFNGLWINDOWPOS3FVPROC,              glWindowPos3fv              );
+GLEXT_PROC( PFNGLWINDOWPOS3IPROC,               glWindowPos3i               );
+GLEXT_PROC( PFNGLWINDOWPOS3IVPROC,              glWindowPos3iv              );
+GLEXT_PROC( PFNGLWINDOWPOS3SPROC,               glWindowPos3s               );
+GLEXT_PROC( PFNGLWINDOWPOS3SVPROC,              glWindowPos3sv              );
+
+// ---------------------------------------------------------------------------
+// OpenGL 1.5 extensions
+// ---------------------------------------------------------------------------
+
+GLEXT_PROC( PFNGLGENQUERIESPROC,                glGenQueries                );
+GLEXT_PROC( PFNGLDELETEQUERIESPROC,             glDeleteQueries             );
+GLEXT_PROC( PFNGLISQUERYPROC,                   glIsQuery                   );
+GLEXT_PROC( PFNGLBEGINQUERYPROC,                glBeginQuery                );
+GLEXT_PROC( PFNGLENDQUERYPROC,                  glEndQuery                  );
+GLEXT_PROC( PFNGLGETQUERYIVPROC,                glGetQueryiv                );
+GLEXT_PROC( PFNGLGETQUERYOBJECTIVPROC,          glGetQueryObjectiv          );
+GLEXT_PROC( PFNGLGETQUERYOBJECTUIVPROC,         glGetQueryObjectuiv         );
+GLEXT_PROC( PFNGLBINDBUFFERPROC,                glBindBuffer                );
+GLEXT_PROC( PFNGLDELETEBUFFERSPROC,             glDeleteBuffers             );
+GLEXT_PROC( PFNGLGENBUFFERSPROC,                glGenBuffers                );
+GLEXT_PROC( PFNGLISBUFFERPROC,                  glIsBuffer                  );
+GLEXT_PROC( PFNGLBUFFERDATAPROC,                glBufferData                );
+GLEXT_PROC( PFNGLBUFFERSUBDATAPROC,             glBufferSubData             );
+GLEXT_PROC( PFNGLGETBUFFERSUBDATAPROC,          glGetBufferSubData          );
+GLEXT_PROC( PFNGLMAPBUFFERPROC,                 glMapBuffer                 );
+GLEXT_PROC( PFNGLUNMAPBUFFERPROC,               glUnmapBuffer               );
+GLEXT_PROC( PFNGLGETBUFFERPARAMETERIVPROC,      glGetBufferParameteriv      );
+GLEXT_PROC( PFNGLGETBUFFERPOINTERVPROC,         glGetBufferPointerv         );
+
 // ---------------------------------------------------------------------------
 // OpenGL 2.0 extensions
 // ---------------------------------------------------------------------------
@@ -98,3 +273,14 @@ GLEXT_PROC( PFNGLVERTEXATTRIB4UBVPROC,          glVertexAttrib4ubv          );
 GLEXT_PROC( PFNGLVERTEXATTRIB4UIVPROC,          glVertexAttrib4uiv          );
 GLEXT_PROC( PFNGLVERTEXATTRIB4USVPROC,          glVertexAttrib4usv          );
 GLEXT_PROC( PFNGLVERTEXATTRIBPOINTERPROC,       glVertexAttribPointer       );
+
+// ---------------------------------------------------------------------------
+// OpenGL 2.1 extensions
+// ---------------------------------------------------------------------------
+
+//GLEXT_PROC( PFNGLUNIFORMMATRIX2X3FVPROC,        glUniformMatrix2x3fv        );
+//GLEXT_PROC( PFNGLUNIFORMMATRIX3X2FVPROC,        glUniformMatrix3x2fv        );
+//GLEXT_PROC( PFNGLUNIFORMMATRIX2X4FVPROC,        glUniformMatrix2x4fv        );
+//GLEXT_PROC( PFNGLUNIFORMMATRIX4X2FVPROC,        glUniformMatrix4x2fv        );
+//GLEXT_PROC( PFNGLUNIFORMMATRIX3X4FVPROC,        glUniformMatrix3x4fv        );
+//GLEXT_PROC( PFNGLUNIFORMMATRIX4X3FVPROC,        glUniformMatrix4x3fv        );

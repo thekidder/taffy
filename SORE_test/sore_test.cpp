@@ -83,7 +83,9 @@ int main(int argc, char *argv[])
 			SDL_Delay(1);
 			continue;
 		}
+		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		gk->Frame();
+		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		lastTicks = ticks;
 	}
 	delete renderer;
