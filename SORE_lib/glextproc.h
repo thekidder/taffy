@@ -8,6 +8,7 @@ typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
 // ---------------------------------------------------------------------------
 GLEXT_PROC( PFNWGLSWAPINTERVALFARPROC,          wglSwapIntervalEXT          );
 
+#ifdef WIN32
 // ---------------------------------------------------------------------------
 // OpenGL 1.2 extensions
 // ---------------------------------------------------------------------------
@@ -151,6 +152,8 @@ GLEXT_PROC( PFNGLWINDOWPOS3IPROC,               glWindowPos3i               );
 GLEXT_PROC( PFNGLWINDOWPOS3IVPROC,              glWindowPos3iv              );
 GLEXT_PROC( PFNGLWINDOWPOS3SPROC,               glWindowPos3s               );
 GLEXT_PROC( PFNGLWINDOWPOS3SVPROC,              glWindowPos3sv              );
+
+#endif
 
 // ---------------------------------------------------------------------------
 // OpenGL 1.5 extensions

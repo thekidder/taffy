@@ -166,6 +166,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	static char buffer[2048];
 	char levelstr[9];
 	char levelint[9];
+	int pos = 0;
 	
 	if(!first && ((log->func==NULL && strlen(prevFunc)>0) || strcmp(prevFunc, log->func)!=0))
 	{
@@ -174,7 +175,13 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	}
 	if(log->func!=NULL && strcmp(prevFunc, log->func)!=0)
 	{
-		sprintf(buffer, "<function>\n\t<name>%s</name>\n", log->func);
+		std::string func = log->func;
+		while((pos=func.find("&", pos+1))!=std::string::npos)
+		{
+			func.replace(pos, 1, "&amp;");
+		}
+		
+		sprintf(buffer, "<function>\n\t<name>%s</name>\n", func.c_str());
 		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	}
 	else if(log->func==NULL && (strlen(prevFunc)>0 || first))
@@ -205,7 +212,6 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	const char end[]   = "\t</message>\n";
 	fwrite(begin, sizeof(char), strlen(begin), filePtr);
 	tm* currtime;
-	int pos;
 	currtime = localtime(&(log->time));
 	strftime(buffer, 127, "%X", currtime);
 	fwrite("\t\t<time>", sizeof(char), 8, filePtr);
@@ -229,6 +235,10 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	while((pos=message.find(">"))!=std::string::npos)
 	{
 		message.replace(pos, 1, "&gt;");
+	}
+	while((pos=message.find("&"))!=std::string::npos)
+	{
+		message.replace(pos, 1, "&amp;");
 	}
 	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());
 	//sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
