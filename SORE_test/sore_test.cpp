@@ -50,6 +50,14 @@ int main(int argc, char *argv[])
 	renderer = new SORE_Kernel::Renderer;
 	input    = new SORE_Kernel::InputTask;
 	
+	char version[80];
+	
+	strcpy(version, (char*)glGetString(GL_VERSION));
+	if(version[0]<'2')
+	{
+		APP_LOG_S(SORE_Logging::LVL_CRITICAL, "OpenGL Version is less than 2.0. Aborting.");
+	}
+		
 	tg = new SORE_Graphics::TerrainGraph(70, 70);
 	tg->WritePGM("map.pgm");
 	

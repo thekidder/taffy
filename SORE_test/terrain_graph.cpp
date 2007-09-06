@@ -271,7 +271,7 @@ void SORE_Graphics::TerrainGraph::Render()
 {
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	SORE_Resource::Resource* re;
-	SORE_Resource::ResourceHandle* rd;
+	SORE_Resource::ResourceHandle* rd,*rd2;
 	
 	const GLfloat lightPos[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -293,17 +293,25 @@ void SORE_Graphics::TerrainGraph::Render()
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glPopMatrix();
 		
-	re = rm->GetPtr("data/Textures/grass.tga");
-	rd = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	re  = rm->GetPtr("data/Textures/grass.tga");
+	rd  = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	re  = rm->GetPtr("data/Textures/texture.tga");
+	rd2 = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	if(perpixel)
 	{
 		glUseProgram(program);
 	}
 	else if(!heightColor && !perpixel)
 	{
+		glActiveTexture(GL_TEXTURE0);
+		glEnable(GL_TEXTURE_2D);
+		glActiveTexture(GL_TEXTURE1);
 		glEnable(GL_TEXTURE_2D);
 	}
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture( GL_TEXTURE_2D, rd2->GetHandle());
 	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)
@@ -317,12 +325,14 @@ void SORE_Graphics::TerrainGraph::Render()
 			texX = j%2==0 ? 0.0 : 1.0;
 
 			glTexCoord2f(texX, texY);
+			glMultiTexCoord2f(GL_TEXTURE1, texX, texY);
 			glNormal3fv(&normalValues[(j + yres*i)*3]);
 			if(heightColor)
 				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
 			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
 			
 			glTexCoord2f(texX, texY-1.0);
+			glMultiTexCoord2f(GL_TEXTURE1, texX, texY-1.0);
 			glNormal3fv(&normalValues[(j + yres*(i-1))*3]);
 			if(heightColor)
 				glColor4f(cachedValues[j + yres*(i-1)], cachedValues[j + yres*(i-1)], cachedValues[j + yres*(i-1)], 1.0f);
@@ -335,6 +345,10 @@ void SORE_Graphics::TerrainGraph::Render()
 		glUseProgram(0);
 	else
 		glDisable(GL_LIGHTING);
+	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE1);
+	glDisable(GL_TEXTURE_2D);
 	if(normals)
 	{
 		for(int i=0;i<xres;i++)

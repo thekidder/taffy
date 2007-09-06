@@ -47,12 +47,6 @@ namespace SORE_Logging
 		char* logName;
 	};
 	
-	/*struct log_buffer
-	{
-		int level;
-		char buffer[BUFFER_LEN];
-	};*/
-	
 	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
 	
 	class LoggerBackend

@@ -2,11 +2,12 @@ varying vec4 diffuse,ambientGlobal, ambient;
 varying vec3 normal,lightDir,halfVector;
 varying float dist;
 uniform sampler2D tex;
+uniform sampler2D tex2;
 
 void main()
 {
 	vec4 texel;
-	texel = texture2D(tex,gl_TexCoord[0].st);
+	texel = texture2D(tex2,gl_TexCoord[1].st);
 
 	vec3 n;
 	float NdotL;

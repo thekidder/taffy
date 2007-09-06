@@ -54,6 +54,7 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint*
 					0 : bitmap.buffer[i + bitmap.width*j];
 		}
 	}
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture( GL_TEXTURE_2D, tex_base[ch]);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -63,6 +64,7 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint*
 	delete [] expanded_data;
 	
 	glNewList(list_base+ch, GL_COMPILE);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_base[ch]);
 	glPushMatrix();
 	
@@ -186,6 +188,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT); 
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_LIGHTING);
+	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
