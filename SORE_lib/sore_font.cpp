@@ -188,10 +188,13 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT); 
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_LIGHTING);
+	glActiveTexture(GL_TEXTURE1);
+	glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glListBase(fontList);
@@ -232,6 +235,9 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT); 
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_LIGHTING);
+	//glActiveTexture(GL_TEXTURE1);
+	//glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

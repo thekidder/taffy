@@ -1,13 +1,14 @@
 varying vec4 diffuse,ambientGlobal, ambient;
 varying vec3 normal,lightDir,halfVector;
 varying float dist;
-uniform sampler2D tex;
-uniform sampler2D tex2;
+uniform sampler2D grass;
+uniform sampler2D texture;
 
 void main()
 {
 	vec4 texel;
-	texel = texture2D(tex2,gl_TexCoord[1].st);
+	texel = texture2D(grass,gl_TexCoord[0].st).rgba;
+	vec4 texel2 = texture2D(texture, gl_TexCoord[1].st);
 
 	vec3 n;
 	float NdotL;
@@ -27,5 +28,5 @@ void main()
 	color += att * (diffuse * NdotL + ambient);
 
 
-	gl_FragColor = color * texel;
+	gl_FragColor = color * texel * texel2;
 }

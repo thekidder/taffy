@@ -312,6 +312,7 @@ void SORE_Graphics::TerrainGraph::Render()
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture( GL_TEXTURE_2D, rd2->GetHandle());
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)
@@ -324,14 +325,14 @@ void SORE_Graphics::TerrainGraph::Render()
 			float texX;
 			texX = j%2==0 ? 0.0 : 1.0;
 
-			glTexCoord2f(texX, texY);
+			glMultiTexCoord2f(GL_TEXTURE0, texX, texY);
 			glMultiTexCoord2f(GL_TEXTURE1, texX, texY);
 			glNormal3fv(&normalValues[(j + yres*i)*3]);
 			if(heightColor)
 				glColor4f(cachedValues[j + yres*i], cachedValues[j + yres*i], cachedValues[j + yres*i], 1.0f);
 			glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
 			
-			glTexCoord2f(texX, texY-1.0);
+			glMultiTexCoord2f(GL_TEXTURE0, texX, texY-1.0);
 			glMultiTexCoord2f(GL_TEXTURE1, texX, texY-1.0);
 			glNormal3fv(&normalValues[(j + yres*(i-1))*3]);
 			if(heightColor)
@@ -349,6 +350,8 @@ void SORE_Graphics::TerrainGraph::Render()
 	glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE1);
 	glDisable(GL_TEXTURE_2D);
+	//glClientActiveTexture(GL_TEXTURE1);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	if(normals)
 	{
 		for(int i=0;i<xres;i++)
