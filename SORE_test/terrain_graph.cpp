@@ -312,7 +312,12 @@ void SORE_Graphics::TerrainGraph::Render()
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture( GL_TEXTURE_2D, rd2->GetHandle());
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	GLint grass, texture;
+	grass   = glGetUniformLocation(program, "grass");
+	texture = glGetUniformLocation(program, "texture");
+	glUniform1i(grass, 0);
+	glUniform1i(texture, 1);
 	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)
