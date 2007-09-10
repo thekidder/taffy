@@ -15,6 +15,7 @@
 
 #include <sore.h>
 #include "perlin.h"
+#include "physics.h"
 
 namespace SORE_Graphics
 {
@@ -40,7 +41,6 @@ namespace SORE_Graphics
 			void Frame(int elapsedTime);
 			
 			const char* GetName() const {return "TerrainGraph input task";}
-			
 		protected:
 			
 			void InitShaders();
@@ -55,6 +55,7 @@ namespace SORE_Graphics
 			float lightMoveX, lightMoveY, lightMoveZ;
 			GLuint vertex, fragment, program;
 			GLuint wireBox;
+			PhysicsBall ball;
 	};
 }
 

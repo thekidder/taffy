@@ -73,6 +73,13 @@ namespace SORE_Math
 				value[2] = p.z;
 			}
 			
+			void Set(T x, T y, T z)
+			{
+				value[0] = x;
+				value[1] = y;
+				value[2] = z;
+			}
+			
 			T* GetValue()
 			{
 				return value;

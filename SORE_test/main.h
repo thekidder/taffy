@@ -27,6 +27,8 @@
 //Functions
 void Cleanup();
 
+void RenderSphere(float r, int div);
+
 extern SORE_Logging::Logger* mainLog;
 extern SORE_Logging::XMLLogger* fileLog;
 extern SORE_Logging::ConsoleLogger* consoleLog;

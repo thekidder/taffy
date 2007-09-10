@@ -126,14 +126,14 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
 	
 	//const GLfloat LightAmbient[]=  {  0.4f, 0.4f, 0.4f, 1.0f };
-	const GLfloat LightAmbient[]=  {  0.0f, 0.0f, 0.0f, 1.0f };
+	const GLfloat LightAmbient[]=  {  0.1f, 0.1f, 0.1f, 1.0f };
 	const GLfloat LightDiffuse[]=  {  0.8f, 0.8f, 0.8f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
 	
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.06);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.03);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.001);
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.05);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.02);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glEnable(GL_LIGHT0);
@@ -142,8 +142,10 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glEnable(GL_COLOR_MATERIAL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	InitShaders();
+	
+	ball.MoveTo((xres/2.0)*scale, 7.5, (yres/2.0)*scale);
 	
 	wireBox = glGenLists(1);
 	glNewList(wireBox, GL_COMPILE);
@@ -269,6 +271,7 @@ SORE_Graphics::TerrainGraph::~TerrainGraph()
 	
 void SORE_Graphics::TerrainGraph::Render()
 {
+	GLUquadricObj* sphere;
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	SORE_Resource::Resource* re;
 	SORE_Resource::ResourceHandle* rd,*rd2;
@@ -285,6 +288,9 @@ void SORE_Graphics::TerrainGraph::Render()
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glCallList(wireBox);
+	sphere = gluNewQuadric();
+	gluQuadricNormals(sphere, GLU_SMOOTH);
+	gluQuadricTexture(sphere, GL_TRUE);
 	if(!perpixel)
 	{
 		glEnable(GL_LIGHTING);
@@ -308,16 +314,21 @@ void SORE_Graphics::TerrainGraph::Render()
 		glActiveTexture(GL_TEXTURE1);
 		glEnable(GL_TEXTURE_2D);
 	}
+	glPushMatrix();
+	glTranslatef(ball.GetPosition()[0],ball.GetPosition()[1],ball.GetPosition()[2]);
+	gluSphere(sphere, 0.2f, 32, 32);
+	glPopMatrix();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture( GL_TEXTURE_2D, rd2->GetHandle());
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	GLint grass, texture;
 	grass   = glGetUniformLocation(program, "grass");
 	texture = glGetUniformLocation(program, "texture");
 	glUniform1i(grass, 0);
 	glUniform1i(texture, 1);
+	
 	for(int i=1;i<xres;i++)
 	{
 		if(wireframe)

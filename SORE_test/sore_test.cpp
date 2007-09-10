@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 	
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
+	PhysicsTask physTask;
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
 	gk->AddTask(40, tg);
+	gk->AddTask(50, &physTask);
 	
 	const double maxFPS = 500.0;
 	
@@ -144,4 +146,38 @@ bool OptionCallback(SORE_Kernel::Event* event)
 		}
 	}
 	return false;
+}
+
+void RenderSphere(float r, int div)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glBegin(GL_TRIANGLES);
+	
+	for(int i=0;i<1;i++)
+	{
+		glLoadIdentity();
+		glVertex3f(0.0f,-r,0.0f);
+		//glPushMatrix();
+		glRotatef(360.0f/div*i, 0.0f,1.0f,0.0f);
+		glVertex3f(1.0f/div, 1.0f/div, 1.0f/div);
+		glRotatef(45.0f, 0.0f,0.0f,1.0f);
+		glVertex3f(1.0f/div, 1.0f/div, 1.0f/div);
+		//glPopMatrix();
+	}
+	
+	//glVertex3f(0.0f,-r,0.0f);
+	//glVertex3f(1.0f/div, 0.0f,0.0f);
+	//glVertex3f(1.0f/-div,0.0f,0.0f);
+	
+	for(int i=0;i<div-2;i++)
+	{
+		
+	}
+	
+	for(int i=0;i<div;i++)
+	{
+		
+	}
+	
+	glEnd();
 }
