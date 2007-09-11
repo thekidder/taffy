@@ -41,6 +41,7 @@ namespace SORE_Graphics
 			void Frame(int elapsedTime);
 			
 			const char* GetName() const {return "TerrainGraph input task";}
+			PhysicsBall ball;
 		protected:
 			
 			void InitShaders();
@@ -55,7 +56,6 @@ namespace SORE_Graphics
 			float lightMoveX, lightMoveY, lightMoveZ;
 			GLuint vertex, fragment, program;
 			GLuint wireBox;
-			PhysicsBall ball;
 	};
 }
 

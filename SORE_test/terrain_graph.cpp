@@ -411,8 +411,8 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 	char *frag, *vert;
 	unsigned int fsize, vsize;
 	SORE_FileIO::file_ref fptr, vptr;
-	fptr = SORE_FileIO::Open("data/Shaders/fragment.shad");
-	vptr = SORE_FileIO::Open("data/Shaders/vertex.shad");
+	fptr = SORE_FileIO::Open("data/Shaders/fragment.glsl");
+	vptr = SORE_FileIO::Open("data/Shaders/vertex.glsl");
 	fsize = SORE_FileIO::Size(fptr);
 	vsize = SORE_FileIO::Size(vptr);
 	frag = new char[fsize+1];

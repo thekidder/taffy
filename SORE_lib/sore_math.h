@@ -97,7 +97,13 @@ namespace SORE_Math
 				value[2] += v.value[2];
 				return *this;
 			}
-			
+			Vector3D<T>& operator+=(T v)
+			{
+				value[0] += v;
+				value[1] += v;
+				value[2] += v;
+				return *this;
+			}
 			Vector3D<T> operator-()
 			{
 				Vector3D<T> temp(-value[0],-value[1],-value[2]);
@@ -115,6 +121,12 @@ namespace SORE_Math
 				value[1] /= num;
 				value[2] /= num;
 				return *this;
+			}
+			template<class OP>
+			Vector3D<T> operator*(OP& num)
+			{
+				Vector3D<T> temp(value[0]/num, value[1]/num, value[2]/num);
+				return temp;
 			}
 			Vector3D<T> CrossProduct(Vector3D<T>& v)
 			{

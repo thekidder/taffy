@@ -64,6 +64,9 @@ int main(int argc, char *argv[])
 	
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
+	
+	physTask.AddObject(&(tg->ball));
+	
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor<SORE_Graphics::TerrainGraph>(tg, &SORE_Graphics::TerrainGraph::LightMoveCallback));
@@ -81,6 +84,8 @@ int main(int argc, char *argv[])
 	
 	
 	bool done = false;
+	
+	//tg->ball.Zero();
 	
 	while(!gk->quitFlag)
 	{
