@@ -109,8 +109,8 @@ namespace SORE_Math
 				Vector3D<T> temp(-value[0],-value[1],-value[2]);
 				return temp;
 			}
-			
-			Vector3D<T> operator/(T& num)
+			template<class OP>
+			Vector3D<T> operator/(OP& num)
 			{
 				Vector3D<T> temp(value[0]/num, value[1]/num, value[2]/num);
 				return temp;

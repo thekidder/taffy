@@ -10,6 +10,7 @@
 //
 //
 
+#include <cassert>
 #include "sore_kernel.h"
 #include "sore_logger.h"
 #include "sore_allgl.h"
@@ -39,6 +40,7 @@ SORE_Kernel::GameKernel::GameKernel()
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
 	lastTicks = SDL_GetTicks();
 	quitFlag = false;
+	lastTicks = 0;
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
@@ -48,11 +50,26 @@ SORE_Kernel::GameKernel::~GameKernel()
 
 void SORE_Kernel::GameKernel::Frame()
 {
-	int ticks = SDL_GetTicks();
+	
 	task_ref it;
+	int ticks = SDL_GetTicks();
+	int deltaT = ticks - lastTicks;
 	for(it=tasks.begin();it!=tasks.end();it++)
 	{
-		it->second->Frame(ticks - lastTicks);
+		if(deltaT<2000)
+		{
+			if(it->second.ms>0)
+			{
+				it->second.accum += deltaT;
+				while(it->second.accum>it->second.ms)
+				{
+					it->second.task->Frame(it->second.ms);
+					it->second.accum -= it->second.ms;
+				}
+			}
+			else
+				it->second.task->Frame(deltaT);
+		}
 	}
 #ifdef DEBUG
 	SORE_Logging::sore_log.Flush();
@@ -65,7 +82,7 @@ void SORE_Kernel::GameKernel::Pause()
 	task_ref it;
 	for(it=tasks.begin();it!=tasks.end();it++)
 	{
-		it->second->Pause();
+		it->second.task->Pause();
 	}
 }
 
@@ -74,19 +91,34 @@ void SORE_Kernel::GameKernel::Resume()
 	task_ref it;
 	for(it=tasks.begin();it!=tasks.end();it++)
 	{
-		it->second->Resume();
+		it->second.task->Resume();
 	}
+}
+
+SORE_Kernel::task_ref SORE_Kernel::GameKernel::AddConstTask(unsigned int priority, unsigned int ms, Task* task)
+{
+	assert(ms!=0 && "Milliseconds must be greater than 0");
+	const_task newTask;
+	newTask.task = task;
+	newTask.ms = ms;
+	newTask.accum = 0;
+	task_ref size = tasks.insert(std::pair<unsigned int, const_task>(priority, newTask));
+	return size;
 }
 
 SORE_Kernel::task_ref SORE_Kernel::GameKernel::AddTask(unsigned int priority, SORE_Kernel::Task* task)
 {
-	task_ref size = tasks.insert(std::pair<unsigned int, Task*>(priority, task));
+	const_task newTask;
+	newTask.task = task;
+	newTask.ms = 0;
+	newTask.accum = 0;
+	task_ref size = tasks.insert(std::pair<unsigned int, const_task>(priority, newTask));
 	return size;
 }
 
 SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(SORE_Kernel::task_ref task)
 {
-	Task* temp = task->second;
+	Task* temp = task->second.task;
 	tasks.erase(task);
 	return temp;
 }
@@ -96,9 +128,9 @@ SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(const char* taskName)
 	task_ref it;
 	for(it=tasks.begin();it!=tasks.end();it++)
 	{
-		if(strcmp(it->second->GetName(), taskName)==0)
+		if(strcmp(it->second.task->GetName(), taskName)==0)
 		{
-			Task* temp = it->second;
+			Task* temp = it->second.task;
 			tasks.erase(it);
 			return temp;
 		}

@@ -74,14 +74,13 @@ int main(int argc, char *argv[])
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
 	gk->AddTask(40, tg);
-	gk->AddTask(50, &physTask);
+	gk->AddConstTask(50, 1, &physTask);
 	
 	const double maxFPS = 500.0;
 	
 	int ticks, lastTicks;
 	
 	lastTicks = SDL_GetTicks();
-	
 	
 	bool done = false;
 	
