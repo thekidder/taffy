@@ -50,13 +50,13 @@ SORE_Kernel::GameKernel::~GameKernel()
 
 void SORE_Kernel::GameKernel::Frame()
 {
-	
+	const int maxDeltaT = 2000; //if frame time is over 2 seconds don't run frame
 	task_ref it;
 	int ticks = SDL_GetTicks();
 	int deltaT = ticks - lastTicks;
 	for(it=tasks.begin();it!=tasks.end();it++)
 	{
-		if(deltaT<2000)
+		if(deltaT<maxDeltaT)
 		{
 			if(it->second.ms>0)
 			{

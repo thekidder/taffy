@@ -19,15 +19,33 @@
 
 using namespace SORE_Math;
 
+struct ObjectState
+{
+	Vector3D<double> vel;
+	Vector3D<double> pos;
+};
+
+struct ObjectDerivative
+{
+	Vector3D<double> dVel;
+	Vector3D<double> dPos;
+};
+
+ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d);
+ObjectDerivative Evaluate(const ObjectState& initial);
+
+Vector3D<double> SumForces(ObjectState state, double dt);
+void             Integrate(ObjectState& state, int dt);
+
 class PhysicsObject
 {
 	public:
 		//virtual void Update(int elapsedTime) = 0;
-		double* GetPosition() {return position.GetValue();}
-		void MoveTo(double x, double y, double z) {position.Set(x,y,z);}
+		double* GetPosition() {return state.pos.GetValue();}
+		void MoveTo(double x, double y, double z) {state.pos.Set(x,y,z);}
 		
-		Vector3D<double> velocity;
-		Vector3D<double> position;
+		ObjectState      state;
+		ObjectDerivative derivative;
 };
 
 class PhysicsBall : public PhysicsObject

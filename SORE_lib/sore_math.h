@@ -85,11 +85,6 @@ namespace SORE_Math
 				return value;
 			}
 			
-			Vector3D<T> operator+(Vector3D<T>& v)
-			{
-				Vector3D<T> temp(value[0]+v.value[0], value[1]+v.value[1], value[2]+v.value[2]);
-				return temp;
-			}
 			Vector3D<T>& operator+=(Vector3D<T> v)
 			{
 				value[0] += v.value[0];
@@ -97,11 +92,21 @@ namespace SORE_Math
 				value[2] += v.value[2];
 				return *this;
 			}
-			Vector3D<T>& operator+=(T v)
+			
+			//template<class OP>
+					Vector3D<T>& operator+=(T v)
 			{
 				value[0] += v;
 				value[1] += v;
 				value[2] += v;
+				return *this;
+			}
+			//template<class OP>
+					Vector3D<T>& operator*=(T v)
+			{
+				value[0] *= v;
+				value[1] *= v;
+				value[2] *= v;
 				return *this;
 			}
 			Vector3D<T> operator-()
@@ -109,25 +114,24 @@ namespace SORE_Math
 				Vector3D<T> temp(-value[0],-value[1],-value[2]);
 				return temp;
 			}
-			template<class OP>
-			Vector3D<T> operator/(OP& num)
+			
+			Vector3D<T>& operator/=(Vector3D<T> v)
 			{
-				Vector3D<T> temp(value[0]/num, value[1]/num, value[2]/num);
-				return temp;
+				value[0] /= v.value[0];
+				value[1] /= v.value[1];
+				value[2] /= v.value[2];
+				return *this;
 			}
-			Vector3D<T>& operator/=(T num)
+			
+			template<class OP>
+					Vector3D<T>& operator/=(OP num)
 			{
 				value[0] /= num;
 				value[1] /= num;
 				value[2] /= num;
 				return *this;
 			}
-			template<class OP>
-			Vector3D<T> operator*(OP& num)
-			{
-				Vector3D<T> temp(value[0]/num, value[1]/num, value[2]/num);
-				return temp;
-			}
+			
 			Vector3D<T> CrossProduct(Vector3D<T>& v)
 			{
 				Point3D<T> p;
@@ -157,6 +161,37 @@ namespace SORE_Math
 		protected:
 			T value[3];
 	};
+	
+	template<class T>
+			Vector3D<T> operator+(Vector3D<T> v1, Vector3D<T> v2)
+	{
+		//Vector3D<T> r = v1;
+		return v1+=v2;
+	}
+	
+	template<class T, class OP>
+			Vector3D<T> operator/(Vector3D<T> v1, OP& num)
+	{
+		Vector3D<T> r;
+		r /= num;
+		return r;
+	}
+	
+	template<class T>
+			Vector3D<T> operator*(Vector3D<T> v1, T num)
+	{
+		Vector3D<T> r = v1;
+		r *= num;
+		return r;
+	}
+	
+	template<class T>
+			Vector3D<T> operator*(T num, Vector3D<T> v1)
+	{
+		Vector3D<T> r = v1;
+		r *= num;
+		return r;
+	}
 }
 
 #endif /*__SORE_MATH_H__*/
