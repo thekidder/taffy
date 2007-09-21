@@ -21,14 +21,34 @@ using namespace SORE_Math;
 
 struct ObjectState
 {
-	Vector3D<double> vel;
-	Vector3D<double> pos;
+	//primary
+	Vector3D<double> momentum;
+	Vector3D<double> position;
+	
+	//secondary
+	Vector3D<double> velocity;
+	
+	protected:
+	//constant
+	double mass;
+	double inverseMass;
+	
+	public:
+	void recalculate()
+	{
+		velocity = momentum * inverseMass;
+	}
+	void set_mass(double newMass)
+	{
+		mass = newMass;
+		inverseMass = 1.0/mass;
+	}
 };
 
 struct ObjectDerivative
 {
-	Vector3D<double> dVel;
-	Vector3D<double> dPos;
+	Vector3D<double> force;
+	Vector3D<double> velocity;
 };
 
 ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d);
@@ -41,8 +61,8 @@ class PhysicsObject
 {
 	public:
 		//virtual void Update(int elapsedTime) = 0;
-		double* GetPosition() {return state.pos.GetValue();}
-		void MoveTo(double x, double y, double z) {state.pos.Set(x,y,z);}
+		double* GetPosition() {return state.position.GetValue();}
+		void MoveTo(double x, double y, double z) {state.position.Set(x,y,z);}
 		
 		ObjectState      state;
 		ObjectDerivative derivative;

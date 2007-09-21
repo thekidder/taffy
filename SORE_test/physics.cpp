@@ -16,20 +16,22 @@
 ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d)
 {
 	ObjectState state;
-	state.pos = initial.pos + d.dPos*dt;
-	state.vel = initial.vel + d.dVel*dt;
+	state.position = initial.position + d.velocity*dt;
+	state.momentum = initial.momentum + d.force*dt;
 
+	state.recalculate();
+	
 	ObjectDerivative output;
-	output.dPos = state.vel;
-	output.dVel = SumForces(state, dt);
+	output.velocity = state.velocity;
+	output.force = SumForces(state, dt);
 	return output;
 }
 
 ObjectDerivative Evaluate(const ObjectState& initial)
 {
 	ObjectDerivative output;
-	output.dPos = initial.vel;
-	output.dVel = SumForces(initial, 0);
+	output.velocity = initial.velocity;
+	output.force = SumForces(initial, 0);
 	return output;
 }
 
@@ -40,47 +42,44 @@ void Integrate(ObjectState& state, int dt)
 	ObjectDerivative c = Evaluate(state, dt*0.5, b);
 	ObjectDerivative d = Evaluate(state, dt, c);
 
-	//const float dxdt = 1.0f/6.0f * (a.dx + 2.0f*(b.dx + c.dx) + d.dx);
-	//const float dvdt = 1.0f/6.0f * (a.dv + 2.0f*(b.dv + c.dv) + d.dv);
+	Vector3D<double> dxdt = 1.0/6.0 * (a.velocity + 2.0*(b.velocity + c.velocity) + d.velocity);
+	Vector3D<double> dvdt = 1.0/6.0 * (a.force + 2.0*(b.force + c.force) + d.force);
 	
-	Vector3D<double> dxdt = 1.0/6.0 * (a.dPos + 2.0*(b.dPos + c.dPos) + d.dPos);
-	Vector3D<double> dvdt = 1.0/6.0 * (a.dVel + 2.0*(b.dVel + c.dVel) + d.dVel);
-
-	double delta = double(dt);
-	
-	state.pos = state.pos + dxdt * delta;
-	state.vel = state.vel + dvdt * delta;
+	state.position = state.position + dxdt * double(dt);
+	state.momentum = state.momentum + dvdt * double(dt);
+	state.recalculate();
 }
 
 Vector3D<double> SumForces(ObjectState state, double dt)
 {
-	Vector3D<double> f (0.0, -0.00001, 0.0);
+	Vector3D<double> f (0.0, -0.001, 0.0);
 	
-	if(state.vel.GetValue()[1]<0.0 && state.pos.GetValue()[1]<5.0)
-		f += -(state.vel*10.0);
+	if(state.momentum.GetValue()[1]<0.0 && state.position.GetValue()[1]<5.0)
+		f += -(state.momentum*10.0);
 	
 	return f;
 }
 
 PhysicsBall::PhysicsBall()
 {
-	derivative.dPos.Set(0.0,0.0,0.0);
-	derivative.dVel.Set(0.0,0.0,0.0);
+	derivative.velocity.Set(0.0,0.0,0.0);
+	derivative.force.Set(0.0,0.0,0.0);
 }
 
 PhysicsBall::PhysicsBall(double x, double y, double z)
 {
-	state.pos.Set(x,y,z);
-	derivative.dPos.Set(0.0,0.0,0.0);
-	derivative.dVel.Set(0.0,0.0,0.0);
+	state.position.Set(x,y,z);
+	derivative.velocity.Set(0.0,0.0,0.0);
+	derivative.force.Set(0.0,0.0,0.0);
+	state.set_mass(1.0);
 }
 
 void PhysicsBall::Zero()
 {
-	state.pos.Set(0,0,0);
-	state.vel.Set(0,0,0);
-	derivative.dPos.Set(0.0,0.0,0.0);
-	derivative.dVel.Set(0.0,0.0,0.0);
+	state.position.Set(0,0,0);
+	state.momentum.Set(0,0,0);
+	derivative.velocity.Set(0.0,0.0,0.0);
+	derivative.force.Set(0.0,0.0,0.0);
 }
 
 /*void PhysicsBall::Update(int elapsedTime)

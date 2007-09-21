@@ -73,6 +73,13 @@ namespace SORE_Math
 				value[2] = p.z;
 			}
 			
+			Vector3D(const Vector3D<T>& v)
+			{
+				value[0] = v.value[0];
+				value[1] = v.value[1];
+				value[2] = v.value[2];
+			}
+			
 			void Set(T x, T y, T z)
 			{
 				value[0] = x;
@@ -90,6 +97,22 @@ namespace SORE_Math
 				value[0] += v.value[0];
 				value[1] += v.value[1];
 				value[2] += v.value[2];
+				return *this;
+			}
+			
+			Vector3D<T>& operator*=(Vector3D<T> v)
+			{
+				value[0] *= v.value[0];
+				value[1] *= v.value[1];
+				value[2] *= v.value[2];
+				return *this;
+			}
+			
+			Vector3D<T>& operator/=(Vector3D<T> v)
+			{
+				value[0] /= v.value[0];
+				value[1] /= v.value[1];
+				value[2] /= v.value[2];
 				return *this;
 			}
 			
@@ -115,16 +138,8 @@ namespace SORE_Math
 				return temp;
 			}
 			
-			Vector3D<T>& operator/=(Vector3D<T> v)
-			{
-				value[0] /= v.value[0];
-				value[1] /= v.value[1];
-				value[2] /= v.value[2];
-				return *this;
-			}
-			
-			template<class OP>
-					Vector3D<T>& operator/=(OP num)
+			//template<class OP>
+					Vector3D<T>& operator/=(T num)
 			{
 				value[0] /= num;
 				value[1] /= num;
@@ -169,8 +184,8 @@ namespace SORE_Math
 		return v1+=v2;
 	}
 	
-	template<class T, class OP>
-			Vector3D<T> operator/(Vector3D<T> v1, OP& num)
+	template<class T>
+			Vector3D<T> operator/(Vector3D<T> v1, T& num)
 	{
 		Vector3D<T> r;
 		r /= num;
