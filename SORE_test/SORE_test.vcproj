@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\physics.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_test.cpp"
 				>
 			</File>
@@ -206,6 +210,10 @@
 			</File>
 			<File
 				RelativePath=".\perlin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics.h"
 				>
 			</File>
 			<File
