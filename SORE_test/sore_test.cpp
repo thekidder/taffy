@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
-	PhysicsTask physTask;
+	//PhysicsTask physTask;
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
 	
-	physTask.AddObject(&(tg->ball));
+	//physTask.AddObject(&(tg->ball));
 	
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	gk->AddTask(10, input);
 	gk->AddTask(30, &camTask);
 	gk->AddTask(40, tg);
-	gk->AddConstTask(50, 1, &physTask);
+	//gk->AddConstTask(50, 1, &physTask);
 	
 	const double maxFPS = 500.0;
 	

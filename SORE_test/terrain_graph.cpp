@@ -119,7 +119,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	wireframe = false;
 	normals = false;
 	heightColor = false;
-	perpixel = true;
+	perpixel = false;
 	LightPosition[0] = (xres/2.0f)*scale;
 	LightPosition[1] =  9.0f;
 	LightPosition[2] = (yres/2.0f)*scale;
@@ -143,7 +143,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glCullFace(GL_BACK);
 	//glEnable(GL_CULL_FACE);
-	InitShaders();
+	//InitShaders();
 	
 	ball.MoveTo((xres/2.0)*scale, 7.5, (yres/2.0)*scale);
 	

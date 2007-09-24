@@ -424,6 +424,8 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		}
 		return read;
 	}
+	else
+		return 0;
 }
 
 void SORE_FileIO::BuildFullName(file_list& list, file_info& file, file_info& orig)
