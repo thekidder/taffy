@@ -19,7 +19,7 @@ using namespace SORE_Math;
 SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 {
 	APP_LOG_S(SORE_Logging::LVL_DEBUG2, "In TerrainGraph constructor");
-	mainLog->Flush();
+	mainLog->Flush();ng:
 	xres = x;
 	yres = y;
 	pn = new Noise::PerlinNoise(Noise::Noise12D,0, 5,1);
@@ -126,7 +126,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	lightMoveY = lightMoveX = lightMoveZ = 0.0f;
 	
 	//const GLfloat LightAmbient[]=  {  0.4f, 0.4f, 0.4f, 1.0f };
-	const GLfloat LightAmbient[]=  {  0.1f, 0.1f, 0.1f, 1.0f };
+	const GLfloat LightAmbient[]=  {  0.3f, 0.3f, 0.3f, 1.0f };
 	const GLfloat LightDiffuse[]=  {  0.8f, 0.8f, 0.8f, 1.0f };
 	
 	glEnable(GL_DEPTH_TEST); 
@@ -142,7 +142,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glEnable(GL_COLOR_MATERIAL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glCullFace(GL_BACK);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	//InitShaders();
 	
 	ball.MoveTo((xres/2.0)*scale, 7.5, (yres/2.0)*scale);
@@ -311,8 +311,8 @@ void SORE_Graphics::TerrainGraph::Render()
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
-		glActiveTexture(GL_TEXTURE1);
-		glEnable(GL_TEXTURE_2D);
+		//glActiveTexture(GL_TEXTURE1);
+		//glEnable(GL_TEXTURE_2D);
 	}
 	glPushMatrix();
 	glTranslatef(ball.GetPosition()[0],ball.GetPosition()[1],ball.GetPosition()[2]);

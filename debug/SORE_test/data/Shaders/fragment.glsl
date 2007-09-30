@@ -25,5 +25,5 @@ void main()
 	color += att * (diffuse * NdotL + ambient);
 
 
-	gl_FragColor = color;// * (texel + texel2);
+	gl_FragColor = color * (texel);
 }

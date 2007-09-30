@@ -48,14 +48,17 @@ void Integrate(ObjectState& state, int dt)
 	state.position = state.position + dxdt * double(dt);
 	state.momentum = state.momentum + dvdt * double(dt);
 	state.recalculate();
+	//APP_LOG(SORE_Logging::LVL_DEBUG2, "position: %f", state.position.GetValue()[1]);
 }
 
 Vector3D<double> SumForces(ObjectState state, double dt)
 {
-	Vector3D<double> f (0.0, -0.001, 0.0);
+	Vector3D<double> f (0.0, -0.000001, 0.0);
 	
 	if(state.momentum.GetValue()[1]<0.0 && state.position.GetValue()[1]<5.0)
-		f += -(state.momentum*10.0);
+	{
+		//f += -(state.momentum);
+	}
 	
 	return f;
 }
@@ -64,6 +67,7 @@ PhysicsBall::PhysicsBall()
 {
 	derivative.velocity.Set(0.0,0.0,0.0);
 	derivative.force.Set(0.0,0.0,0.0);
+	state.set_mass(1.0);
 }
 
 PhysicsBall::PhysicsBall(double x, double y, double z)

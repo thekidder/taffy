@@ -180,14 +180,15 @@ namespace SORE_Math
 	template<class T>
 			Vector3D<T> operator+(Vector3D<T> v1, Vector3D<T> v2)
 	{
-		//Vector3D<T> r = v1;
-		return v1+=v2;
+		Vector3D<T> r = v1;
+		r += v2;
+		return r;
 	}
 	
 	template<class T>
 			Vector3D<T> operator/(Vector3D<T> v1, T& num)
 	{
-		Vector3D<T> r;
+		Vector3D<T> r = v1;
 		r /= num;
 		return r;
 	}
