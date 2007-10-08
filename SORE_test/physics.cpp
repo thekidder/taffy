@@ -69,8 +69,8 @@ Vector3Dd PhysicsTask::collision(ObjectState state)
 	if(depth<0.0) return Vector3Dd(0.0,0.0,0.0);
 	Vector3Dd normal = tg->GetNormal(state.position[0], state.position[2]);
 	
-	double k = 0.1;
-	double b = 1.0;
+	double k = 0.5;
+	double b = 0.3;
 	double f = 0.001;
 	
 	Vector3Dd force = normal*k*depth;
