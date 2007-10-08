@@ -92,6 +92,18 @@ namespace SORE_Math
 				return value;
 			}
 			
+			T operator[] (int index) const
+			{
+				if(index<0 || index>2) return T(0.0);
+				return value[index];
+			}
+
+			T dot(Vector3D<T>& v)
+			{
+				T temp = v[0]*value[0] + v[1]*value[1] + v[2]*value[2];
+				return temp;
+			}
+			
 			Vector3D<T>& operator+=(Vector3D<T> v)
 			{
 				value[0] += v.value[0];
@@ -132,11 +144,7 @@ namespace SORE_Math
 				value[2] *= v;
 				return *this;
 			}
-			Vector3D<T> operator-()
-			{
-				Vector3D<T> temp(-value[0],-value[1],-value[2]);
-				return temp;
-			}
+			
 			
 			//template<class OP>
 					Vector3D<T>& operator/=(T num)
@@ -147,7 +155,7 @@ namespace SORE_Math
 				return *this;
 			}
 			
-			Vector3D<T> CrossProduct(Vector3D<T>& v)
+			Vector3D<T> cross(Vector3D<T>& v)
 			{
 				Point3D<T> p;
 				p.x = value[1]*v.value[2] - value[2]*v.value[1];
@@ -178,10 +186,25 @@ namespace SORE_Math
 	};
 	
 	template<class T>
+		Vector3D<T> operator-(Vector3D<T> v)
+	{
+		Vector3D<T> temp(-v[0],-v[1],-v[2]);
+		return temp;
+	}
+	
+	template<class T>
 			Vector3D<T> operator+(Vector3D<T> v1, Vector3D<T> v2)
 	{
 		Vector3D<T> r = v1;
 		r += v2;
+		return r;
+	}
+	
+	template<class T>
+			Vector3D<T> operator-(Vector3D<T> v1, Vector3D<T> v2)
+	{
+		Vector3D<T> r = v1;
+		r += -v2;
 		return r;
 	}
 	
@@ -204,10 +227,12 @@ namespace SORE_Math
 	template<class T>
 			Vector3D<T> operator*(T num, Vector3D<T> v1)
 	{
-		Vector3D<T> r = v1;
-		r *= num;
-		return r;
+		return v1*num;
 	}
+	
+	typedef Vector3D<double> Vector3Dd;
+	typedef Vector3D<float>  Vector3Df;
+	typedef Vector3D<int>    Vector3Di;
 }
 
 #endif /*__SORE_MATH_H__*/

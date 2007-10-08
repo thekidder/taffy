@@ -43,6 +43,7 @@ struct ObjectState
 		mass = newMass;
 		inverseMass = 1.0/mass;
 	}
+	double get_mass() const {return mass;}
 };
 
 struct ObjectDerivative
@@ -50,12 +51,6 @@ struct ObjectDerivative
 	Vector3D<double> force;
 	Vector3D<double> velocity;
 };
-
-ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d);
-ObjectDerivative Evaluate(const ObjectState& initial);
-
-Vector3D<double> SumForces(ObjectState state, double dt);
-void             Integrate(ObjectState& state, int dt);
 
 class PhysicsObject
 {
@@ -80,15 +75,27 @@ class PhysicsBall : public PhysicsObject
 class PhysicsTask : public SORE_Kernel::Task
 {
 	public:
+		PhysicsTask() {updating = false;}
 		void Frame(int elapsedTime);
 		void Resume();
 		void Pause();
 		void AddObject(PhysicsObject* obj);
 		
 		const char* GetName() const {return "Physics Task";}
+		
+		ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d);
+		ObjectDerivative Evaluate(const ObjectState& initial);
+
+		Vector3Dd SumForces(ObjectState state, double dt);
+		void       Integrate(ObjectState& state, int dt);
+		Vector3Dd collision(ObjectState state);
+		
+		bool PhysicsCallback(SORE_Kernel::Event* event);
+
 	protected:
 		std::vector<PhysicsObject*> objs;
 		void Update(PhysicsObject* obj, int elapsedTime);
+		bool updating;
 };
 
 #endif /*__PHYSICS_H__*/

@@ -44,60 +44,62 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	{
 		for(int j=0;j<yres;j++)
 		{
+			double iScaled = i*scale;
+			double jScaled = j*scale;
 			int num = 0;
 			Vector3D<float> total,v2,v3;
-			Point3D<float> p1(i,vscale*cachedValues[j + yres*i],j);
-			if(i<(xres-1) && j<(yres-1))
+			Point3D<float> p1(iScaled,vscale*cachedValues[j + yres*i],jScaled);
+			if(iScaled<(xres-1) && jScaled<(yres-1))
 			{
-				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)],j)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i+1],j+1)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled+1,vscale*cachedValues[j + yres*(i+1)],jScaled)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled,vscale*cachedValues[j + yres*i+1],jScaled+1)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
 			}
-			if(i>0 && j<(yres-1))
+			if(iScaled>0 && jScaled<(yres-1))
 			{
-				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[1 + j + yres*(i-1)],j+1)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i+1],j+1)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled-1,vscale*cachedValues[1 + j + yres*(i-1)],jScaled+1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled,vscale*cachedValues[j + yres*i+1],jScaled+1)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
 				
-				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[1 + j + yres*(i-1)],j+1)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i-2,vscale*cachedValues[j + yres*(i-1)],j)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled-1,vscale*cachedValues[1 + j + yres*(i-1)],jScaled+1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled-2,vscale*cachedValues[j + yres*(i-1)],jScaled)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
 			}
-			if(i>0 && j>0)
+			if(iScaled>0 && jScaled>0)
 			{
-				v2 = Vector3D<float>(Point3D<float>(i-1,vscale*cachedValues[j + yres*(i-1)],j)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i-1],j-1)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled-1,vscale*cachedValues[j + yres*(i-1)],jScaled)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled,vscale*cachedValues[j + yres*i-1],jScaled-1)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
 			}
-			if(i<(xres-1) && j>0)
+			if(iScaled<(xres-1) && jScaled>0)
 			{
-				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)-1],j-1)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i,vscale*cachedValues[j + yres*i-1],j-1)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled+1,vscale*cachedValues[j + yres*(i+1)-1],jScaled-1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled,vscale*cachedValues[j + yres*i-1],jScaled-1)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
 				num++;
 
-				v2 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)-1],j-1)-p1);
-				v3 = Vector3D<float>(Point3D<float>(i+1,vscale*cachedValues[j + yres*(i+1)],j)-p1);
-				v2 = v2.CrossProduct(v3).Normalize();
+				v2 = Vector3D<float>(Point3D<float>(iScaled+1,vscale*cachedValues[j + yres*(i+1)-1],jScaled-1)-p1);
+				v3 = Vector3D<float>(Point3D<float>(iScaled+1,vscale*cachedValues[j + yres*(i+1)],jScaled)-p1);
+				v2 = v2.cross(v3).Normalize();
 				if(v2.GetValue()[1]<cachedValues[j + yres*i])
 					v2 = -v2;
 				total += v2;
@@ -205,6 +207,29 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 }
 
+Vector3Dd SORE_Graphics::TerrainGraph::GetNormal(double x, double y)
+{
+	if(x>0 && y>0 && y<yres*scale && x<xres*scale)
+	{
+		int i = int(y/scale) + int(x/scale)*yres;
+		return Vector3Dd(normalValues[3*i],normalValues[3*i+1],normalValues[3*i+2]);
+		//return Vector3Dd(0.0,1.0,0.0);
+	}
+	return Vector3Dd(0.0,1.0,0.0);
+}
+
+double SORE_Graphics::TerrainGraph::GetHeight(double x, double y)
+{
+	if(x>0 && y>0 && y<yres*scale && x<xres*scale)
+	{
+		//return cachedValues[int(y/scale) + int(x/scale)*yres]*vscale;
+		double i = x/scale;
+		double j = y/scale;
+		return vscale*(pn->GetValue(i/100.0,j/100.0)+1.0)/2.0;
+	}
+	return 0.0;
+}
+
 bool SORE_Graphics::TerrainGraph::LightMoveCallback(SORE_Kernel::Event* event)
 {
 	switch(event->key.keySym)
@@ -303,6 +328,10 @@ void SORE_Graphics::TerrainGraph::Render()
 	rd  = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	re  = rm->GetPtr("data/Textures/texture.tga");
 	rd2 = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
+	glPushMatrix();
+	glTranslatef(ball.GetPosition()[0],ball.GetPosition()[1],ball.GetPosition()[2]);
+	gluSphere(sphere, 0.2f, 32, 32);
+	glPopMatrix();
 	if(perpixel)
 	{
 		glUseProgram(program);
@@ -314,10 +343,7 @@ void SORE_Graphics::TerrainGraph::Render()
 		//glActiveTexture(GL_TEXTURE1);
 		//glEnable(GL_TEXTURE_2D);
 	}
-	glPushMatrix();
-	glTranslatef(ball.GetPosition()[0],ball.GetPosition()[1],ball.GetPosition()[2]);
-	gluSphere(sphere, 0.2f, 32, 32);
-	glPopMatrix();
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture( GL_TEXTURE_2D, rd->GetHandle());
 	glActiveTexture(GL_TEXTURE1);
@@ -377,7 +403,7 @@ void SORE_Graphics::TerrainGraph::Render()
 				glBegin(GL_LINES);
 				glColor3f(1.0f, 0.0f, 0.0f);
 				glVertex3f(scale*i,vscale*cachedValues[j + yres*i], scale*j);
-				glVertex3f(scale*(i+normalValues[(j + yres*i)*3]),(vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1]), scale*(j+normalValues[(j + yres*i)*3+2]));
+				glVertex3f(scale*i+normalValues[(j + yres*i)*3],(vscale*cachedValues[j + yres*i]+normalValues[(j + yres*i)*3+1]), scale*j+normalValues[(j + yres*i)*3+2]);
 				glEnd();
 			}
 		}

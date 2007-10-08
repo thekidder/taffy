@@ -13,9 +13,12 @@
 #include "physics.h"
 #include "main.h"
 
-ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d)
+//SORE_Graphics::TerrainGraph* tg;
+
+ObjectDerivative PhysicsTask::Evaluate(const ObjectState& initial, double dt, const ObjectDerivative& d)
 {
 	ObjectState state;
+	state.set_mass(initial.get_mass());
 	state.position = initial.position + d.velocity*dt;
 	state.momentum = initial.momentum + d.force*dt;
 
@@ -27,7 +30,7 @@ ObjectDerivative Evaluate(const ObjectState& initial, double dt, const ObjectDer
 	return output;
 }
 
-ObjectDerivative Evaluate(const ObjectState& initial)
+ObjectDerivative PhysicsTask::Evaluate(const ObjectState& initial)
 {
 	ObjectDerivative output;
 	output.velocity = initial.velocity;
@@ -35,7 +38,7 @@ ObjectDerivative Evaluate(const ObjectState& initial)
 	return output;
 }
 
-void Integrate(ObjectState& state, int dt)
+void PhysicsTask::Integrate(ObjectState& state, int dt)
 {
 	ObjectDerivative a = Evaluate(state);                    // note: overloaded 'evaluate' just returns derivative at current time 't'
 	ObjectDerivative b = Evaluate(state, dt*0.5, a);
@@ -51,16 +54,31 @@ void Integrate(ObjectState& state, int dt)
 	//APP_LOG(SORE_Logging::LVL_DEBUG2, "position: %f", state.position.GetValue()[1]);
 }
 
-Vector3D<double> SumForces(ObjectState state, double dt)
+Vector3D<double> PhysicsTask::SumForces(ObjectState state, double dt)
 {
-	Vector3D<double> f (0.0, -0.000001, 0.0);
+	Vector3D<double> f (0.0, -0.00001, 0.0);
 	
-	if(state.momentum.GetValue()[1]<0.0 && state.position.GetValue()[1]<5.0)
-	{
-		//f += -(state.momentum);
-	}
+	f += collision(state);
 	
 	return f;
+}
+
+Vector3Dd PhysicsTask::collision(ObjectState state)
+{
+	double depth = tg->GetHeight(state.position[0], state.position[2])-state.position[1]+0.2;
+	if(depth<0.0) return Vector3Dd(0.0,0.0,0.0);
+	Vector3Dd normal = tg->GetNormal(state.position[0], state.position[2]);
+	
+	double k = 0.1;
+	double b = 1.0;
+	double f = 0.001;
+	
+	Vector3Dd force = normal*k*depth;
+	Vector3Dd damping = normal*b*(normal.dot(state.velocity));
+	
+	Vector3Dd friction = -((normal*state.velocity.Magnitude()) + state.velocity)*f;
+	
+	return force - damping + friction;
 }
 
 PhysicsBall::PhysicsBall()
@@ -101,7 +119,8 @@ void PhysicsTask::Frame(int elapsedTime)
 
 void PhysicsTask::Update(PhysicsObject* obj, int elapsedTime)
 {
-	Integrate(obj->state, elapsedTime);
+	if(updating)
+		Integrate(obj->state, elapsedTime);
 }
 
 void PhysicsTask::Resume()
@@ -115,4 +134,15 @@ void PhysicsTask::Pause()
 void PhysicsTask::AddObject(PhysicsObject* obj)
 {
 	objs.push_back(obj);
+}
+
+bool PhysicsTask::PhysicsCallback(SORE_Kernel::Event* event)
+{
+	switch(event->key.keySym)
+	{
+		case SDLK_b:
+			updating = !updating;
+			break;
+	}
+	return false;
 }

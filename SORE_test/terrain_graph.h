@@ -36,6 +36,10 @@ namespace SORE_Graphics
 			bool LightMoveCallback(SORE_Kernel::Event* event);
 			
 			
+			double    GetHeight(double x, double y);
+			SORE_Math::Vector3Dd GetNormal(double x, double y);
+			
+			
 			void Pause() {}
 			void Resume() {}
 			void Frame(int elapsedTime);
@@ -58,5 +62,7 @@ namespace SORE_Graphics
 			GLuint wireBox;
 	};
 }
+
+extern SORE_Graphics::TerrainGraph* tg;
 
 #endif /*__TERRAIN_GRAPH_H__*/
