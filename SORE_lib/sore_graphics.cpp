@@ -62,6 +62,12 @@ void SORE_Graphics::Init_2DCanvas()
 	glLoadIdentity();
 }
 
+bool SORE_Graphics::OnResize(SORE_Kernel::Event* event=NULL)
+{
+	UpdateViewport();
+	return true;
+}
+
 void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
 {
 	int window[2];

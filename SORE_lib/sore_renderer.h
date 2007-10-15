@@ -25,12 +25,13 @@ namespace SORE_Kernel
 			void SetSceneGraph(SORE_Graphics::SceneGraph* scene);
 			void SetCamera    (SORE_Graphics::Camera*     camera);
 			
-			void OnResize();
+			bool OnResize(Event* event);
 		protected:
 			int  InitializeSDL();
 			int  InitializeGL();
 			int InitializeSOREGraphics();
 			SDL_Surface* drawContext;
+			Uint32 videoFlags;
 			SORE_Font::font_ref font;
 			
 			SORE_Graphics::SceneGraph* sg;

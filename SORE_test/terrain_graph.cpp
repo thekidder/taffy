@@ -146,9 +146,7 @@ SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 	//InitShaders();
-	
-	ball.MoveTo((xres/2.0)*scale, 7.5, (yres/2.0)*scale);
-	
+		
 	wireBox = glGenLists(1);
 	glNewList(wireBox, GL_COMPILE);
 	{
@@ -328,10 +326,14 @@ void SORE_Graphics::TerrainGraph::Render()
 	rd  = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
 	re  = rm->GetPtr("data/Textures/texture.tga");
 	rd2 = dynamic_cast<SORE_Resource::ResourceHandle*>(re);
-	glPushMatrix();
-	glTranslatef(ball.GetPosition()[0],ball.GetPosition()[1],ball.GetPosition()[2]);
-	gluSphere(sphere, 0.2f, 32, 32);
-	glPopMatrix();
+	int num = phys->GetNumObjs();
+	for(int i=0;i<num;i++)
+	{
+		glPushMatrix();
+		glTranslatef(phys->GetState(i).position[0], phys->GetState(i).position[1], phys->GetState(i).position[2]);
+		gluSphere(sphere, 0.2f, 32, 32);
+		glPopMatrix();
+	}
 	if(perpixel)
 	{
 		glUseProgram(program);
@@ -408,6 +410,11 @@ void SORE_Graphics::TerrainGraph::Render()
 			}
 		}
 	}
+}
+
+void SORE_Graphics::TerrainGraph::AddPhysicsEngine(PhysicsTask* task)
+{
+	phys = task;
 }
 
 void SORE_Graphics::TerrainGraph::WritePGM(const char* name)
@@ -542,7 +549,6 @@ void SORE_Graphics::TerrainGraph::InitShaders()
 	
 	delete[] frag;
 	delete[] vert;
-	
 	
 	SORE_Resource::ResourceManager* rm = SORE_Resource::ResourceManager::GetManager();
 	//rm->Register("data/Textures/texture.tga");

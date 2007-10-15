@@ -18,8 +18,12 @@ SORE_Logging::ConsoleLogger* consoleLog;
 SORE_Graphics::Camera cam;
 SORE_Graphics::CameraTask camTask(&cam);
 SORE_Graphics::TerrainGraph* tg;
+PhysicsTask physTask;
 
 bool OptionCallback(SORE_Kernel::Event* event);
+bool BallListen(SORE_Kernel::Event* event);
+
+//std::vector<PhysicsBall> balls;
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +42,6 @@ int main(int argc, char *argv[])
 	
 	SORE_Kernel::Renderer* renderer;
 	SORE_Kernel::InputTask* input;
-	PhysicsTask physTask;
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
@@ -65,10 +68,19 @@ int main(int argc, char *argv[])
 	renderer->SetSceneGraph(tg);
 	renderer->SetCamera(&cam);
 	
-	physTask.AddObject(&(tg->ball));
+	tg->AddPhysicsEngine(&physTask);
+		
+	PhysicsBall newBall(100.0, 12.0, 100.0);
+	physTask.AddObject(newBall);
+	
+	PhysicsBall newBall2(100.0, 14.0, 100.0);
+	physTask.AddObject(newBall2);
 	
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
 	input->AddListener(SORE_Kernel::KEYDOWN, SORE_Kernel::MakeFunctor<PhysicsTask>(&physTask, &PhysicsTask::PhysicsCallback));
+	input->AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor<SORE_Kernel::Renderer>(renderer, &SORE_Kernel::Renderer::OnResize));
+	input->AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor(SORE_Graphics::OnResize));
+	input->AddListener(SORE_Kernel::KEYDOWN , SORE_Kernel::MakeFunctor(BallListen));
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
 	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor<SORE_Graphics::TerrainGraph>(tg, &SORE_Graphics::TerrainGraph::LightMoveCallback));
 	gk->AddTask(20, renderer);
@@ -100,6 +112,7 @@ int main(int argc, char *argv[])
 		}
 		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		gk->Frame();
+
 		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		lastTicks = ticks;
 	}
@@ -185,4 +198,23 @@ void RenderSphere(float r, int div)
 	}
 	
 	glEnd();
+}
+
+void AddBall()
+{
+	PhysicsBall newBall(100.0, 14.0, 100.0);
+	physTask.AddObject(newBall);
+}
+
+bool BallListen(SORE_Kernel::Event* event)
+{
+	if(event->type==SORE_Kernel::KEYDOWN)
+	{
+		if(event->key.keySym==SDLK_k)
+		{
+			AddBall();
+			return true;
+		}
+		return false;
+	}
 }

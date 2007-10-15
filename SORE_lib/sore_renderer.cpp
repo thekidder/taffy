@@ -105,12 +105,22 @@ void SORE_Kernel::Renderer::SetCamera(SORE_Graphics::Camera* camera)
 	cam = camera;
 }
 
-void SORE_Kernel::Renderer::OnResize()
+bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 {
-	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	GLint width = viewport[2];
-	GLint height = viewport[3];
+	GLint width, height;
+	if(event==NULL)
+	{
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		width = viewport[2];
+		height = viewport[3];
+	}
+	else
+	{
+		width  = event->resize.w;
+		height = event->resize.h;
+		drawContext = SDL_SetVideoMode(width, height, 0, videoFlags);
+	}
 	/* Height / width ration */
 	GLfloat ratio;
 	ratio = ( GLfloat )width / ( GLfloat )height;
@@ -125,6 +135,7 @@ void SORE_Kernel::Renderer::OnResize()
 	glMatrixMode( GL_MODELVIEW );
 	/* Reset The View */
 	glLoadIdentity( );
+	return true;
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()
@@ -144,9 +155,10 @@ int SORE_Kernel::Renderer::InitializeSDL()
 		return 1;
 	}
 
-	Uint32 videoFlags = SDL_OPENGL;
+	videoFlags = SDL_OPENGL;
 	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
 	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
+	videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
 	videoFlags |= SDL_HWPALETTE; 
 	/* This checks to see if surfaces can be stored in memory */

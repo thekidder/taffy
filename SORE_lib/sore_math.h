@@ -186,7 +186,13 @@ namespace SORE_Math
 	};
 	
 	template<class T>
-		Vector3D<T> operator-(Vector3D<T> v)
+			double distance(Vector3D<T> one, Vector3D<T> two)
+	{
+		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1])+(one[2]-two[2])*(one[2]-two[2]));
+	}
+	
+	template<class T>
+			Vector3D<T> operator-(Vector3D<T> v)
 	{
 		Vector3D<T> temp(-v[0],-v[1],-v[2]);
 		return temp;

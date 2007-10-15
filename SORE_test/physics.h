@@ -79,7 +79,7 @@ class PhysicsTask : public SORE_Kernel::Task
 		void Frame(int elapsedTime);
 		void Resume();
 		void Pause();
-		void AddObject(PhysicsObject* obj);
+		void AddObject(PhysicsObject obj);
 		
 		const char* GetName() const {return "Physics Task";}
 		
@@ -88,12 +88,16 @@ class PhysicsTask : public SORE_Kernel::Task
 
 		Vector3Dd SumForces(ObjectState state, double dt);
 		void       Integrate(ObjectState& state, int dt);
-		Vector3Dd collision(ObjectState state);
+		Vector3Dd collisionGround(ObjectState state);
+		Vector3Dd collisionBalls(ObjectState state, std::vector<PhysicsObject> balls);
 		
 		bool PhysicsCallback(SORE_Kernel::Event* event);
+		
+		int GetNumObjs();
+		ObjectState GetState(int obj);
 
 	protected:
-		std::vector<PhysicsObject*> objs;
+		std::vector<PhysicsObject> objs;
 		void Update(PhysicsObject* obj, int elapsedTime);
 		bool updating;
 };

@@ -27,6 +27,8 @@ namespace SORE_Kernel
 	const unsigned int KEYUP           = 0x20;
 	const unsigned int KEYCLICK        = 0x40;
 	
+	const unsigned int RESIZE          = 0x80;
+	
 	const unsigned int MOUSE_BUTTON1   = 0x01;
 	const unsigned int MOUSE_BUTTON2   = 0x02;
 	const unsigned int MOUSE_BUTTON3   = 0x04;
@@ -44,11 +46,17 @@ namespace SORE_Kernel
 		unsigned int modState;
 	};
 	
+	struct ResizeInfo
+	{
+		int w,h;
+	};
+	
 	struct Event
 	{
 		unsigned int type;
 		KeyInfo key;
 		MouseInfo mouse;
+		ResizeInfo resize;
 	};
 	
 	typedef unsigned int event_listener_ref;

@@ -64,6 +64,7 @@ namespace SORE_Kernel
 			~GameKernel();
 			static GameKernel* gk;
 			int lastTicks;
+			bool paused;
 	};
 }
 

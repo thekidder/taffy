@@ -14,9 +14,7 @@
 
 SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
 {
-	static GlobalInputFunctor temp(func);
-	temp = GlobalInputFunctor(func);
-	return &temp;
+	return new GlobalInputFunctor(func);
 }
 
 SORE_Kernel::InputTask::InputTask()
@@ -64,6 +62,11 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.type = KEYUP;
 				event.key.keySym = sdl_event.key.keysym.sym;
 				break;
+			case SDL_VIDEORESIZE:
+				event.type = RESIZE;
+				event.resize.w = sdl_event.resize.w;
+				event.resize.h = sdl_event.resize.h;
+				break;
 		}
 		std::multimap<unsigned int, InputFunctor*>::iterator it;
 		for(it=allListeners.begin();it!=allListeners.end();it++)
@@ -73,7 +76,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				//InputFunctor* temp = (it->second);
 				//if((it->second)(&event))
 				//	break;
-				if((*it->second)(&event))
+				if((*it->second)(&event) && event.type!=RESIZE) //ALWAYS propagate resize events...can be used by more than one function
 					break;
 			}
 		}

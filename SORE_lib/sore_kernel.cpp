@@ -41,6 +41,7 @@ SORE_Kernel::GameKernel::GameKernel()
 	lastTicks = SDL_GetTicks();
 	quitFlag = false;
 	lastTicks = 0;
+	paused = false;
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
@@ -50,6 +51,7 @@ SORE_Kernel::GameKernel::~GameKernel()
 
 void SORE_Kernel::GameKernel::Frame()
 {
+	if(paused) return;
 	const int maxDeltaT = 2000; //if frame time is over 2 seconds don't run frame
 	task_ref it;
 	int ticks = SDL_GetTicks();
@@ -84,6 +86,7 @@ void SORE_Kernel::GameKernel::Pause()
 	{
 		it->second.task->Pause();
 	}
+	paused = true;
 }
 
 void SORE_Kernel::GameKernel::Resume()
@@ -93,6 +96,7 @@ void SORE_Kernel::GameKernel::Resume()
 	{
 		it->second.task->Resume();
 	}
+	paused = false;
 }
 
 SORE_Kernel::task_ref SORE_Kernel::GameKernel::AddConstTask(unsigned int priority, unsigned int ms, Task* task)

@@ -58,12 +58,13 @@ Vector3D<double> PhysicsTask::SumForces(ObjectState state, double dt)
 {
 	Vector3D<double> f (0.0, -0.00001, 0.0);
 	
-	f += collision(state);
+	f += collisionGround(state);
+	f += collisionBalls(state, objs);
 	
 	return f;
 }
 
-Vector3Dd PhysicsTask::collision(ObjectState state)
+Vector3Dd PhysicsTask::collisionGround(ObjectState state)
 {
 	double depth = tg->GetHeight(state.position[0], state.position[2])-state.position[1]+0.2;
 	if(depth<0.0) return Vector3Dd(0.0,0.0,0.0);
@@ -79,6 +80,34 @@ Vector3Dd PhysicsTask::collision(ObjectState state)
 	Vector3Dd friction = -((normal*state.velocity.Magnitude()) + state.velocity)*f;
 	
 	return force - damping + friction;
+}
+
+Vector3Dd PhysicsTask::collisionBalls(ObjectState state, std::vector<PhysicsObject> balls)
+{
+	Vector3Dd total;
+	for(int i=0;i<balls.size();i++)
+	{
+		PhysicsObject ball = balls[i];
+		double diff = fabs((ball.state.position[0]-state.position[0](+(ball.state.position[1]-state.position[1])+(ball.state.position[2]-state.position[2]));
+		if(diff>0.6 || diff<0.01) continue;
+		double depth = SORE_Math::distance(state.position, ball.state.position);
+		if(depth>0.4) continue;
+		depth = fabs(0.4-depth);
+		Vector3Dd normal((state.position - ball.state.position).Normalize());
+		
+		double k = 0.5;
+		double b = 0.3;
+		double f = 0.001;
+	
+		Vector3Dd force = normal*k*depth;
+		Vector3Dd damping = normal*b*(normal.dot(state.velocity));
+	
+		Vector3Dd friction = -((normal*state.velocity.Magnitude()) + state.velocity)*f;
+	
+		total += force - damping;
+		
+	}
+	return total;
 }
 
 PhysicsBall::PhysicsBall()
@@ -110,10 +139,10 @@ void PhysicsBall::Zero()
 
 void PhysicsTask::Frame(int elapsedTime)
 {
-	std::vector<PhysicsObject*>::iterator it;
+	std::vector<PhysicsObject>::iterator it;
 	for(it=objs.begin();it<objs.end();it++)
 	{
-		Update(*it, elapsedTime);
+		Update(&(*it), elapsedTime);
 	}
 }
 
@@ -131,9 +160,20 @@ void PhysicsTask::Pause()
 {
 }
 
-void PhysicsTask::AddObject(PhysicsObject* obj)
+void PhysicsTask::AddObject(PhysicsObject obj)
 {
 	objs.push_back(obj);
+}
+
+int PhysicsTask::GetNumObjs()
+{
+	return objs.size();
+}
+
+ObjectState PhysicsTask::GetState(int obj)
+{
+	ObjectState temp = objs[obj].state;
+	return temp;
 }
 
 bool PhysicsTask::PhysicsCallback(SORE_Kernel::Event* event)

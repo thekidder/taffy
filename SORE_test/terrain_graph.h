@@ -13,6 +13,8 @@
 #ifndef  __TERRAIN_GRAPH_H__
 #define  __TERRAIN_GRAPH_H__
 
+#include <vector>
+
 #include <sore.h>
 #include "perlin.h"
 #include "physics.h"
@@ -35,17 +37,17 @@ namespace SORE_Graphics
 			void ToggleHeightmapColoring() {heightColor = !heightColor;}
 			bool LightMoveCallback(SORE_Kernel::Event* event);
 			
-			
 			double    GetHeight(double x, double y);
 			SORE_Math::Vector3Dd GetNormal(double x, double y);
-			
 			
 			void Pause() {}
 			void Resume() {}
 			void Frame(int elapsedTime);
 			
 			const char* GetName() const {return "TerrainGraph input task";}
-			PhysicsBall ball;
+			
+			void AddPhysicsEngine(PhysicsTask* task);
+			
 		protected:
 			
 			void InitShaders();
@@ -60,6 +62,8 @@ namespace SORE_Graphics
 			float lightMoveX, lightMoveY, lightMoveZ;
 			GLuint vertex, fragment, program;
 			GLuint wireBox;
+			PhysicsTask* phys;
+			
 	};
 }
 

@@ -5,6 +5,7 @@
 #include "sore_glext.h"
 #include "sore_font.h"
 #include "sore_logger.h"
+#include "sore_input.h"
 
 namespace SORE_Graphics
 {
@@ -14,6 +15,7 @@ namespace SORE_Graphics
 	void Init_2DCanvas();
 	void Destroy_2DCanvas();
 	
+	bool OnResize(SORE_Kernel::Event* event);
 	void DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...);
 	
 	void InitExtensions();
