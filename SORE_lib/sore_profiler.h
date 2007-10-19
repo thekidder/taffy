@@ -15,8 +15,31 @@
 
 namespace SORE_Profiler
 {
-	class Profile
+	const unsigned int MAX_SAMPLES = 20;
+	class Sample
 	{
+		public:
+			Sample(char* name);
+		protected:
+			
+			static struct SampleData
+			{
+				SampleData()
+				{
+					startTime = endTime = 0;
+					minTime = maxTime = 0;
+					avgTime = 0.0;
+				}
+				unsigned int   startTime;
+				unsigned int   endTime;
+				
+				unsigned float avgTime;
+				unsigned int   minTime;
+				unsigned int   maxTime;
+				char name[20];
+				
+				unsigned int lastOpened;
+			} samples[MAX_SAMPLES];
 	};
 }
 
