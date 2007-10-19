@@ -33,7 +33,7 @@ namespace SORE_Profiler
 				unsigned int   startTime;
 				unsigned int   endTime;
 				
-				unsigned float avgTime;
+				         float avgTime;
 				unsigned int   minTime;
 				unsigned int   maxTime;
 				char name[20];

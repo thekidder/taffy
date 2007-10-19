@@ -51,10 +51,6 @@ void PhysicsTask::Integrate(ObjectState& state, int dt)
 	state.position = state.position + dxdt * double(dt);
 	state.momentum = state.momentum + dvdt * double(dt);
 	state.recalculate();
-	if(state.position[1]>15.0)
-	{
-		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "lol");
-	}
 	//APP_LOG(SORE_Logging::LVL_DEBUG2, "position: %f", state.position.GetValue()[1]);
 }
 
@@ -92,10 +88,10 @@ Vector3Dd PhysicsTask::collisionBalls(ObjectState state, std::vector<PhysicsObje
 	for(int i=0;i<balls.size();i++)
 	{
 		PhysicsObject ball = balls[i];
-		double diff = fabs(double(ball.state.position[0]-state.position[0])+(ball.state.position[1]-state.position[1])+(ball.state.position[2]-state.position[2]));
-		if(diff>0.6 || diff<0.01) continue;
+		//double diff = fabs(ball.state.position[0]-state.position[0])+fabs(ball.state.position[1]-state.position[1])+fabs(ball.state.position[2]-state.position[2]);
+		//if(diff>0.6 || diff<0.01) continue;
 		double depth = SORE_Math::distance(state.position, ball.state.position);
-		if(depth>0.4) continue;
+		if(depth>0.4 || depth<0.03) continue;
 		depth = fabs(0.4-depth);
 		Vector3Dd normal((state.position - ball.state.position).Normalize());
 		
