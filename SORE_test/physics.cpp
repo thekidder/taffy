@@ -88,7 +88,7 @@ Vector3Dd PhysicsTask::collisionBalls(ObjectState state, std::vector<PhysicsObje
 	for(int i=0;i<balls.size();i++)
 	{
 		PhysicsObject ball = balls[i];
-		double diff = fabs((ball.state.position[0]-state.position[0])+(ball.state.position[1]-state.position[1])+(ball.state.position[2]-state.position[2]));
+		double diff = fabs(double(ball.state.position[0]-state.position[0])+(ball.state.position[1]-state.position[1])+(ball.state.position[2]-state.position[2]));
 		if(diff>0.6 || diff<0.01) continue;
 		double depth = SORE_Math::distance(state.position, ball.state.position);
 		if(depth>0.4) continue;
