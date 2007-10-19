@@ -51,6 +51,10 @@ void PhysicsTask::Integrate(ObjectState& state, int dt)
 	state.position = state.position + dxdt * double(dt);
 	state.momentum = state.momentum + dvdt * double(dt);
 	state.recalculate();
+	if(state.position[1]>15.0)
+	{
+		APP_LOG_S(SORE_Logging::LVL_DEBUG2, "lol");
+	}
 	//APP_LOG(SORE_Logging::LVL_DEBUG2, "position: %f", state.position.GetValue()[1]);
 }
 
@@ -60,7 +64,7 @@ Vector3D<double> PhysicsTask::SumForces(ObjectState state, double dt)
 	
 	f += collisionGround(state);
 	f += collisionBalls(state, objs);
-	
+
 	return f;
 }
 
