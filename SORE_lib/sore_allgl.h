@@ -22,7 +22,7 @@
 	#define _USE_MATH_DEFINES
 #else /* GLX */
 	#include <SDL/SDL.h>
-	#include <SDL/SDL_image.h>
+	//#include <SDL/SDL_image.h>
 	#include <SDL/SDL_opengl.h>
 	#include <GL/glx.h>
 	
