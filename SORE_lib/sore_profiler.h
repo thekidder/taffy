@@ -13,14 +13,19 @@
 #ifndef  __SORE_PROFILER_H__
 #define  __SORE_PROFILER_H__
 
+#include <string>
+
 namespace SORE_Profiler
 {
 	const unsigned int MAX_SAMPLES = 20;
 	class Sample
 	{
 		public:
-			Sample(char* name);
+			Sample(std::string name);
+			~Sample();
 		protected:
+			
+			unsigned int index;
 			
 			static struct SampleData
 			{
@@ -32,14 +37,16 @@ namespace SORE_Profiler
 				}
 				unsigned int   startTime;
 				unsigned int   endTime;
+				unsigned int   timesRun;
 				
 				         float avgTime;
 				unsigned int   minTime;
 				unsigned int   maxTime;
-				char name[20];
+				std::string name;
 				
-				unsigned int lastOpened;
 			} samples[MAX_SAMPLES];
+			static unsigned int numSamples;
+			static unsigned int lastOpened;
 	};
 }
 
