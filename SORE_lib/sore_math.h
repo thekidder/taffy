@@ -243,7 +243,7 @@ namespace SORE_Math
 	typedef Vector3D<int>    Vector3Di;
 	
 	float Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
-	float Distance2D(float x1, float y1, float x1, float y2);
+	float Distance2D(float x1, float y1, float x2, float y2);
 }
 
 #endif /*__SORE_MATH_H__*/
