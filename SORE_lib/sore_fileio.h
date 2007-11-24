@@ -6,10 +6,10 @@
 
 namespace SORE_FileIO
 {
-	const unsigned int PACKAGE_START = 1;
-	const unsigned int FILESYSTEM_START = 2147483648;
+	const unsigned long PACKAGE_START = 1;
+	const unsigned long FILESYSTEM_START = 2147483648;
 	
-	typedef unsigned int file_ref;
+	typedef unsigned long file_ref;
 	
 	int          InitFileIO(); //return 0 on success
 	

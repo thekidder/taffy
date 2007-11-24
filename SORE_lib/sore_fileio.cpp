@@ -175,7 +175,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		//fclose(temp);
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from disk", file);
-		if(nOpenFilesystemFiles>=4294967295-FILESYSTEM_START)
+		if(nOpenFilesystemFiles>=(unsigned long)4294967295-FILESYSTEM_START)
 		{
 			ENGINE_LOG_S(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
 			fclose(temp);
@@ -266,7 +266,7 @@ void SORE_FileIO::Close(file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<4294967295)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %d from disk",file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %u from disk",file);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);
@@ -330,7 +330,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 					ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "Reading from file failed:");
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\tNeeded to read %d bytes but only got %d bytes.", size, ret);
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\t %s resides at poisition %d and is %d bytes of size", cachedFiles[file].filename, cachedFiles[file].pos, cachedFiles[file].size);
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\tCurrent package position is %d. Current file position is %d bytes.", ftell(openPackages[cachedFiles[file].package]), cachedFiles[file].currPos);
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\tCurrent package position is %u. Current file position is %u bytes.", ftell(openPackages[cachedFiles[file].package]), cachedFiles[file].currPos);
 					return read;
 				}
 				cachedFiles[file].currPosRaw += ret;

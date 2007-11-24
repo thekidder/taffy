@@ -78,11 +78,6 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	
 	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
 	
-	SORE_Graphics::DrawString(font, 0, 36,  "Controls");
-	SORE_Graphics::DrawString(font, 0, 64,  "m - grab mouse         u - ungrab mouse");
-	SORE_Graphics::DrawString(font, 0, 92,  "l - toggle lighting    n - toggle normals");
-	SORE_Graphics::DrawString(font, 0, 120, "x - toggle wireframe   c - toggle coloring");
-	
 	SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();
 }
@@ -130,7 +125,11 @@ bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity( );
 	/* Set our perspective */
-	gluPerspective( 45.0f, ratio, 0.1f, 300.0f );
+	//gluPerspective( 45.0f, ratio, 0.1f, 300.0f );
+	double x, y;
+	x = 0.5;
+	y = x / ratio;
+	gluOrtho2D(-x, x, y, -y);
 	/* Make sure we're chaning the model view and not the projection */
 	glMatrixMode( GL_MODELVIEW );
 	/* Reset The View */
