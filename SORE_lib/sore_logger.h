@@ -7,8 +7,6 @@
 #include <map>
 #include <cstdio>
 
-//#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, format, __VA_ARGS__)
-//#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, format)
 #ifndef _WIN32
 #define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
 #define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)

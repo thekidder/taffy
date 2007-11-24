@@ -15,7 +15,6 @@ namespace SORE_Utility
 //Functions
 bool  CheckExtension(const char* extensionName);
 float getRandomMinMax( float fMin, float fMax );
-float Distance(float x1, float y1, float z1, float x2, float y2, float z2);
 void  BuildFont();
 void  glPrint(const char *fmt, ...);
 

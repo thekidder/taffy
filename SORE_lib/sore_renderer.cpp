@@ -12,6 +12,7 @@
 
 #include "sore_renderer.h"
 #include "sore_logger.h"
+#include "sore_profiler.h"
 #include "sore_graphics.h"
 #include "sore_util.h"
 #include <cassert>
@@ -47,6 +48,7 @@ SORE_Kernel::Renderer::~Renderer()
 
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
+	SORE_Profiler::Sample graphics("graphics");
 	static int frames = 0;
 	static int T0 = SDL_GetTicks();
 	static float fps;
@@ -56,8 +58,6 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	{
 		if(cam)
 			cam->TransformView();
-		else
-			ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "No camera set, no view transformations possible");
 		sg->Render();
 	}
 	SORE_Graphics::Init_2DCanvas();

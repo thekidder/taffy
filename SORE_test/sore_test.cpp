@@ -106,10 +106,11 @@ int main(int argc, char *argv[])
 	
 	bool done = false;
 	
-	//tg->ball.Zero();
+	int loop = 1;
 	
 	while(!gk->quitFlag)
 	{
+		SORE_Profiler::Sample mainLoop("topmost");
 		ticks = SDL_GetTicks();
 		
 		int ms = ticks - lastTicks;
@@ -119,12 +120,19 @@ int main(int argc, char *argv[])
 			SDL_Delay(1);
 			continue;
 		}
-		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		gk->Frame();
 
-		//APP_LOG(SORE_Logging::LVL_DEBUG2, "time: %d",SDL_GetTicks()-ticks);
 		lastTicks = ticks;
+		//if(loop%100==0)
+		//{
+			//loop = 0;
+			//SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("topmost"));
+		//}
+		//loop++;
 	}
+	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("topmost"));
+	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("physics"));
+	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("graphics"));
 	delete renderer;
 	delete input;
 	Cleanup();

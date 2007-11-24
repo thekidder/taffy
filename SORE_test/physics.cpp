@@ -139,6 +139,7 @@ void PhysicsBall::Zero()
 
 void PhysicsTask::Frame(int elapsedTime)
 {
+	SORE_Profiler::Sample mainLoop("physics");
 	std::vector<PhysicsObject>::iterator it;
 	for(it=objs.begin();it<objs.end();it++)
 	{
