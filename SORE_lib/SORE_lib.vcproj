@@ -270,6 +270,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_profiler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_profiler.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_renderer.h"
 				>
 			</File>

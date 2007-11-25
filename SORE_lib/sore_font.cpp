@@ -407,11 +407,11 @@ int SORE_Font::InitFontSystem()
 	char* dirName = new char[2048];
 	
 #ifdef WIN32
-	char windows_path[MAX_PATH];
+	/*char windows_path[MAX_PATH];
 	GetWindowsDirectory(windows_path, MAX_PATH);
 	strcpy(fontPath, windows_path);
 	strcat(fontPath, "\\Fonts\\");
-	fontPaths.push_back(fontPath);
+	fontPaths.push_back(fontPath);*/
 #else
 	while(dirName = (char*)FcStrListNext(fontDirs))
 	{
