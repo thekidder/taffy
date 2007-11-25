@@ -20,7 +20,7 @@ namespace SORE_Graphics
 			virtual void Render() = 0;
 	};
 	
-	enum ProjectionType {ORTHO, ORTHO2D, PERSPECTIVE};
+	enum ProjectionType {NONE, ORTHO, ORTHO2D, PERSPECTIVE};
 	
 	struct ProjectionInfo
 	{
@@ -28,6 +28,7 @@ namespace SORE_Graphics
 		double fov, ratio;
 		double near, far;
 		double top, bottom, left, right;
+		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
 	};
 }
 
@@ -51,7 +52,7 @@ namespace SORE_Kernel
 			//set default projection type
 			void SetProjection(SORE_Graphics::ProjectionInfo info);
 			//change current perspective - takes effect immediately
-			void ChangeProjection(SORE_Graphics::ProjectionInfo* info);
+			//void ChangeProjection(SORE_Graphics::ProjectionInfo* info);
 			
 			bool OnResize(Event* event);
 			
@@ -60,6 +61,8 @@ namespace SORE_Kernel
 			int  InitializeSDL();
 			int  InitializeGL();
 			void InitExtensions();
+			
+			int ChangeProjection(double ratio); //returns 0 on success
 			
 			template <typename proc>
 					void glextInitProc(proc& dest, const char* name)

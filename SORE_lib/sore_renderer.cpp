@@ -20,10 +20,12 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 	if(InitializeSDL()!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
+		gk->quitFlag = true;
 	}
 	if(InitializeGL()!=0)
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
+		gk->quitFlag = true;
 	}
 
 	/*font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
@@ -34,6 +36,7 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 	}*/
 	sg = NULL;
 	cam = NULL;
+	proj.type = SORE_Graphics::NONE;
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -122,12 +125,37 @@ bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 	double x, y;
 	x = 0.5;
 	y = x / ratio;
-	gluOrtho2D(-x, x, y, -y);
+	//gluOrtho2D(-x, x, y, -y);
+	if(ChangeProjection(ratio)!=0)
+		return false;
 	/* Make sure we're chaning the model view and not the projection */
 	glMatrixMode( GL_MODELVIEW );
 	/* Reset The View */
 	glLoadIdentity( );
 	return true;
+}
+
+int SORE_Kernel::Renderer::ChangeProjection(double ratio)
+{
+	switch(proj.type)
+	{
+		case SORE_Graphics::NONE:
+			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "No projection type set, could not initialize GL");
+			return -1;
+			break;
+		case SORE_Graphics::ORTHO2D:
+			if(proj.useScreenCoords)
+				gluOrtho2D(0, viewport[2], 0, viewport[3]);
+			else
+				gluOrtho2D(proj.left, proj.right, proj.bottom, proj.top);
+			break;
+		case SORE_Graphics::ORTHO:
+			//TODO: finish ortho projection
+			break;
+		case SORE_Graphics::PERSPECTIVE:
+			gluPerspective(proj.fov, ratio, proj.near, proj.far );
+			break;
+	}
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()
@@ -184,7 +212,10 @@ int SORE_Kernel::Renderer::InitializeGL()
 	/* Really Nice Perspective Calculations */
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	OnResize();
+	if(!OnResize())
+	{
+		return 1;
+	}
 	InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
 	if(wglSwapIntervalEXT)
@@ -203,7 +234,7 @@ void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo info)
 	proj = info;
 }
 
-void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
+/*void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
 {
 	switch(info->type)
 	{
@@ -215,7 +246,7 @@ void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info
 		case SORE_Graphics::PERSPECTIVE:
 			break;
 	}
-}
+}*/
 
 void SORE_Kernel::Renderer::InitExtensions()
 {
