@@ -24,11 +24,13 @@ namespace SORE_Graphics
 	
 	struct ProjectionInfo
 	{
+		ProjectionInfo() {type = NONE; fov = ratio = near = far = top = bottom = left = right = 0.0; useScreenCoords = useScreenRatio = false; }
 		ProjectionType type;
-		double fov, ratio;
+		double fov,ratio;
 		double near, far;
 		double top, bottom, left, right;
 		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
+		bool useScreenRatio; //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
 	};
 }
 

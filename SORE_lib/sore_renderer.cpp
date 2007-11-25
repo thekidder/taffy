@@ -17,6 +17,13 @@
 
 SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
+	sg = NULL;
+	cam = NULL;
+	proj.type = SORE_Graphics::PERSPECTIVE;
+	proj.fov = 45.0;
+	proj.near = 0.1;
+	proj.far  = 200.0;
+	proj.useScreenRatio = true;
 	if(InitializeSDL()!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
@@ -34,9 +41,6 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
 		gk->quitFlag = true;
 	}*/
-	sg = NULL;
-	cam = NULL;
-	proj.type = SORE_Graphics::NONE;
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -122,9 +126,7 @@ bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 	glLoadIdentity( );
 	/* Set our perspective */
 	//gluPerspective( 45.0f, ratio, 0.1f, 300.0f );
-	double x, y;
-	x = 0.5;
-	y = x / ratio;
+
 	//gluOrtho2D(-x, x, y, -y);
 	if(ChangeProjection(ratio)!=0)
 		return false;
@@ -147,15 +149,30 @@ int SORE_Kernel::Renderer::ChangeProjection(double ratio)
 			if(proj.useScreenCoords)
 				gluOrtho2D(0, viewport[2], 0, viewport[3]);
 			else
+			{
+				if(proj.useScreenRatio)
+				{
+					proj.top = proj.left / ratio;
+					proj.bottom = proj.right / ratio;
+				}
 				gluOrtho2D(proj.left, proj.right, proj.bottom, proj.top);
+			}
 			break;
 		case SORE_Graphics::ORTHO:
 			//TODO: finish ortho projection
 			break;
 		case SORE_Graphics::PERSPECTIVE:
-			gluPerspective(proj.fov, ratio, proj.near, proj.far );
+			if(proj.useScreenRatio)
+			{
+				proj.ratio = ratio;
+			}
+			gluPerspective(proj.fov, proj.ratio, proj.near, proj.far );
+			break;
+		default:
+			return -1;
 			break;
 	}
+	return 0;
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()
@@ -232,6 +249,7 @@ int SORE_Kernel::Renderer::InitializeGL()
 void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo info)
 {
 	proj = info;
+	OnResize();
 }
 
 /*void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
