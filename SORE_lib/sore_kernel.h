@@ -18,10 +18,12 @@
 
 namespace SORE_Kernel
 {
+	class GameKernel;
+	
 	class Task
 	{
 		public:
-			Task();
+			Task(GameKernel* _gk);
 			virtual ~Task() {}
 			
 			virtual void Frame(int elapsedTime)  = 0;
@@ -30,6 +32,7 @@ namespace SORE_Kernel
 			
 			virtual const char* GetName() const = 0;
 		protected:
+			GameKernel* gk;
 	};
 	
 	struct const_task
@@ -44,8 +47,8 @@ namespace SORE_Kernel
 	class GameKernel
 	{
 		public:
-			static GameKernel* GetKernel();
-			static void        Cleanup();
+			GameKernel();
+			~GameKernel();
 			
 			void     Pause();
 			void     Frame();
@@ -60,9 +63,6 @@ namespace SORE_Kernel
 		protected:
 			std::multimap<unsigned int, const_task> tasks;
 			//std::multimap<unsigned int, const_task> constTasks;
-			GameKernel();
-			~GameKernel();
-			static GameKernel* gk;
 			int lastTicks;
 			bool paused;
 	};

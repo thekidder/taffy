@@ -11,13 +11,11 @@
 //
 
 #include "sore_renderer.h"
-#include "sore_logger.h"
 #include "sore_profiler.h"
-#include "sore_graphics.h"
 #include "sore_util.h"
 #include <cassert>
 
-SORE_Kernel::Renderer::Renderer()
+SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
 	if(InitializeSDL()!=0)
 	{
@@ -27,17 +25,13 @@ SORE_Kernel::Renderer::Renderer()
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
 	}
-	if(InitializeSOREGraphics()!=0)
-	{
-		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize SORE Graphics subsystems");
-	}
-	font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
+
+	/*font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	if(font == 0)
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
-		GameKernel* gk = GameKernel::GetKernel();
 		gk->quitFlag = true;
-	}
+	}*/
 	sg = NULL;
 	cam = NULL;
 }
@@ -60,7 +54,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 			cam->TransformView();
 		sg->Render();
 	}
-	SORE_Graphics::Init_2DCanvas();
+	/*SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
 	
@@ -78,7 +72,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 	
 	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
 	
-	SORE_Graphics::Destroy_2DCanvas();
+	SORE_Graphics::Destroy_2DCanvas();*/
 	SDL_GL_SwapBuffers();
 }
 
@@ -105,10 +99,9 @@ bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 	GLint width, height;
 	if(event==NULL)
 	{
-		GLint viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
-		width = viewport[2];
-		height = viewport[3];
+		width = viewport[2]-viewport[0];
+		height = viewport[3]-viewport[1];
 	}
 	else
 	{
@@ -192,7 +185,7 @@ int SORE_Kernel::Renderer::InitializeGL()
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	OnResize();
-	SORE_Graphics::InitExtensions();
+	InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
 	if(wglSwapIntervalEXT)
 	{
@@ -205,8 +198,34 @@ int SORE_Kernel::Renderer::InitializeGL()
 	return 0;
 }
 
-int SORE_Kernel::Renderer::InitializeSOREGraphics()
+void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo info)
 {
-	SORE_Graphics::Init2DOverlay();
-	return 0;
+	proj = info;
+}
+
+void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
+{
+	switch(info->type)
+	{
+		case SORE_Graphics::ORTHO2D:
+			
+			break;
+		case SORE_Graphics::ORTHO:
+			break;
+		case SORE_Graphics::PERSPECTIVE:
+			break;
+	}
+}
+
+void SORE_Kernel::Renderer::InitExtensions()
+{
+	// Initialize OpenGL extension function pointers
+#define GLEXT_PROC(proc, name) glextInitProc(name, #name);
+#include "glextproc.h"
+#undef GLEXT_PROC
+}
+
+GLint* SORE_Kernel::Renderer::GetViewport()
+{
+	return viewport;
 }

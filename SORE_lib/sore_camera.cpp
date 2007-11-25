@@ -120,14 +120,14 @@ void SORE_Graphics::Camera::LogPosition()
 	ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "position: (%f, %f, %f) rotation: (%f, %f, %f)",x,y,z,xr,yr,zr);
 }
 
-SORE_Graphics::CameraTask::CameraTask()
+SORE_Graphics::CameraTask::CameraTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
 	forward = back = left = right = false;
 	cam = NULL;
 	grabbed = false;
 }
 
-SORE_Graphics::CameraTask::CameraTask(Camera* camera)
+SORE_Graphics::CameraTask::CameraTask(Camera* camera, SORE_Kernel::GameKernel* gk) : Task(gk) 
 {
 	forward = back = left = right = false;
 	SetCamera(camera);

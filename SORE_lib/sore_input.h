@@ -113,7 +113,7 @@ namespace SORE_Kernel
 	class InputTask : public Task
 	{
 		public:
-			InputTask();
+			InputTask(SORE_Kernel::GameKernel* gk);
 			~InputTask();
 			
 			void Frame(int elapsedTime);

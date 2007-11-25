@@ -15,24 +15,9 @@
 #include "sore_logger.h"
 #include "sore_allgl.h"
 
-SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::gk = NULL;
-
-SORE_Kernel::Task::Task()
+SORE_Kernel::Task::Task(GameKernel* _gk)
 {
-}
-
-SORE_Kernel::GameKernel* SORE_Kernel::GameKernel::GetKernel()
-{
-	if(gk == NULL)
-	{
-		gk = new GameKernel();
-	}
-	return gk;
-}
-
-void SORE_Kernel::GameKernel::Cleanup()
-{
-	delete gk;
+	gk = _gk;
 }
 
 SORE_Kernel::GameKernel::GameKernel()

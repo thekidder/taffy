@@ -17,7 +17,7 @@ SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
 	return new GlobalInputFunctor(func);
 }
 
-SORE_Kernel::InputTask::InputTask()
+SORE_Kernel::InputTask::InputTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
 }
 
@@ -34,7 +34,6 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 		{
 			case SDL_QUIT:
 			{
-				GameKernel* gk = GameKernel::GetKernel();
 				gk->quitFlag = true;
 				break;
 			}

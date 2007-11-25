@@ -30,7 +30,7 @@ void SORE_Util::Console::Render()
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	//glScissor(x/settings.xMin*viewport[0],y/settings.yMin*viewport[2], width/settings.xMax*viewport[1], height/settings.yMax*viewport[3]);
 	//glScissor(viewport[0], viewport[2], viewport[1], viewport[3]);
-	SORE_Font::Print(consoleFont, x+xPos, y-yPos, outbuffer.c_str());
+	SORE_Font::Print(consoleFont, int(x+xPos), int(y-yPos), outbuffer.c_str());
 	//glDisable(GL_SCISSOR_TEST);
 }
 

@@ -17,41 +17,41 @@
 
 namespace SORE_Graphics
 {
+	SORE_Kernel::Renderer* r;
 	void WindowToReal(int* window, int* real);
-	
-	GLint viewport[4];
 }
 
-void SORE_Graphics::InitExtensions()
+void SORE_Graphics::SetRenderer(SORE_Kernel::Renderer* _r) 
 {
-	// Initialize OpenGL extension function pointers
-#define GLEXT_PROC(proc, name) glextInitProc(name, #name);
-#include "glextproc.h"
-#undef GLEXT_PROC
-} 
+	r = _r;
+}
+
+ 
 
 void SORE_Graphics::WindowToReal(int* window, int* real)
 {
+	GLint* viewport = r->GetViewport();
 	if(window[0]>viewport[2] || window[1]>viewport[3] || window[0]<0 || window[1]<0)
 		return;
 	real[0] = window[0];
 	real[1] = viewport[3]-window[1];
 }
 
-void SORE_Graphics::Init2DOverlay()
+/*void SORE_Graphics::Init2DOverlay()
 {
 	UpdateViewport();
 }
 
 void SORE_Graphics::UpdateViewport()
 {
-	glGetIntegerv(GL_VIEWPORT, viewport);
+	GLint* viewport = r->GetViewport();
 	//std::cout << viewport[0] << ":" << viewport[1] << ":" << viewport[2] << ":" << viewport[3] << std::endl;
 	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "OpenGL viewport: (%d, %d, %d, %d)", viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 void SORE_Graphics::Init_2DCanvas()
 {
+	GLint* viewport = r->GetViewport();
 	glPushAttrib(GL_TRANSFORM_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -62,11 +62,19 @@ void SORE_Graphics::Init_2DCanvas()
 	glLoadIdentity();
 }
 
+void SORE_Graphics::Destroy_2DCanvas()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}
+
 bool SORE_Graphics::OnResize(SORE_Kernel::Event* event=NULL)
 {
 	UpdateViewport();
 	return true;
-}
+}*/
 
 void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
 {
@@ -94,14 +102,6 @@ void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const cha
 		va_end(ap);
 		SORE_Font::Print(font, real[0], real[1], text);
 	}
-}
-
-void SORE_Graphics::Destroy_2DCanvas()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
 }
 
 /*inline void SORE_Font::PushScreenCoordMatrix()

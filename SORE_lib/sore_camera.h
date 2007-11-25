@@ -42,8 +42,8 @@ namespace SORE_Graphics
 	class CameraTask : public SORE_Kernel::Task
 	{
 		public:
-			CameraTask();
-			CameraTask(Camera* camera);
+			CameraTask(SORE_Kernel::GameKernel* gk);
+			CameraTask(Camera* camera, SORE_Kernel::GameKernel* gk);
 			~CameraTask() {}
 			
 			void Pause();
