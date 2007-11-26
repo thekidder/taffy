@@ -240,6 +240,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	{
 		message.replace(pos, 1, "&amp;");
 	}
+
 	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());
 	//sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);

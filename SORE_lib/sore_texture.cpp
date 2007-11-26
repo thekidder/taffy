@@ -27,6 +27,11 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	GLuint texture;
 	
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
+	if(file == 0 ) 
+	{
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not open texture file");
+		return;
+	}
 	if(SORE_FileIO::Read(header, 1, 18, file)<18)
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");

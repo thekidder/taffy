@@ -21,8 +21,8 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 	cam = NULL;
 	proj.type = SORE_Graphics::PERSPECTIVE;
 	proj.fov = 45.0;
-	proj.near = 0.1;
-	proj.far  = 200.0;
+	proj.znear = 0.1;
+	proj.zfar  = 200.0;
 	proj.useScreenRatio = true;
 	if(InitializeSDL()!=0)
 	{
@@ -166,7 +166,7 @@ int SORE_Kernel::Renderer::ChangeProjection(double ratio)
 			{
 				proj.ratio = ratio;
 			}
-			gluPerspective(proj.fov, proj.ratio, proj.near, proj.far );
+			gluPerspective(proj.fov, proj.ratio, proj.znear, proj.zfar );
 			break;
 		default:
 			return -1;

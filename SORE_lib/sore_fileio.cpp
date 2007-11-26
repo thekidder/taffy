@@ -239,6 +239,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	}
 	else
 	{
+		if(temp) fclose(temp);
 		return 0;
 	}
 }
