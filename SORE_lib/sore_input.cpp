@@ -66,6 +66,8 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.resize.w = sdl_event.resize.w;
 				event.resize.h = sdl_event.resize.h;
 				break;
+			default: //don't care about this event, so don't handle it!
+				return;
 		}
 		std::multimap<unsigned int, InputFunctor*>::iterator it;
 		for(it=allListeners.begin();it!=allListeners.end();it++)

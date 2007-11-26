@@ -36,7 +36,6 @@ SORE_Kernel::GameKernel::~GameKernel()
 
 void SORE_Kernel::GameKernel::Frame()
 {
-	if(paused) return;
 	const int maxDeltaT = 2000; //if frame time is over 2 seconds don't run frame
 	task_ref it;
 	int ticks = SDL_GetTicks();
@@ -82,6 +81,11 @@ void SORE_Kernel::GameKernel::Resume()
 		it->second.task->Resume();
 	}
 	paused = false;
+}
+
+bool SORE_Kernel::GameKernel::Running()
+{
+	return !paused;
 }
 
 SORE_Kernel::task_ref SORE_Kernel::GameKernel::AddConstTask(unsigned int priority, unsigned int ms, Task* task)

@@ -54,6 +54,8 @@ namespace SORE_Kernel
 			void     Frame();
 			void     Resume();
 			
+			bool     Running();
+			
 			task_ref AddTask      (unsigned int priority, Task* task);
 			task_ref AddConstTask (unsigned int priority, unsigned int ms, Task* task);
 			Task*    RemoveTask(task_ref task);
