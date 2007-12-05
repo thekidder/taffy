@@ -2,7 +2,7 @@
 #ifndef  __SORE_INTERPOLATER_H__
 #define  __SORE_INTERPOLATER_H__
 
-#include <sore_kernel.h>
+#include "sore_kernel.h"
 
 namespace SORE_Utility
 {

@@ -1,5 +1,5 @@
 
-#include <sore_interpolater.h>
+#include "sore_interpolater.h"
 
 namespace SORE_Utility
 {	

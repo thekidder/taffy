@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_interpolater.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_kernel.cpp"
 				>
 			</File>
@@ -255,6 +259,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_input.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_interpolater.h"
 				>
 			</File>
 			<File
