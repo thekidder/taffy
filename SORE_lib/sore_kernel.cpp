@@ -131,6 +131,19 @@ SORE_Kernel::Task* SORE_Kernel::GameKernel::RemoveTask(const char* taskName)
 	return NULL;
 }
 
+SORE_Kernel::task_list SORE_Kernel::GameKernel::GetTasksByName(const char* taskName)
+{
+	task_list list;
+	for(task_ref it=tasks.begin();it!=tasks.end();it++)
+	{
+		if(strcmp(it->second.task->GetName(), taskName)==0)
+		{
+			list.insert(std::pair<unsigned int, const_task>(it->first, it->second));
+		}
+	}
+	return list;
+}
+
 void SORE_Kernel::GameKernel::RemoveAllTasks()
 {
 	tasks.clear();

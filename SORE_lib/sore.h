@@ -16,6 +16,7 @@
 #include "sore_font.h"
 #include "sore_graphics.h"
 #include "sore_input.h"
+#include "sore_interpolater.h"
 #include "sore_kernel.h"
 #include "sore_logger.h"
 #include "sore_math.h"

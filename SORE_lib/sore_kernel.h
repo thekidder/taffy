@@ -42,7 +42,9 @@ namespace SORE_Kernel
 		unsigned int accum;
 	};
 	
-	typedef std::multimap<unsigned int, const_task>::iterator task_ref;
+	typedef std::multimap<unsigned int, const_task> task_list;
+	
+	typedef task_list::iterator task_ref;
 	
 	class GameKernel
 	{
@@ -50,20 +52,23 @@ namespace SORE_Kernel
 			GameKernel();
 			~GameKernel();
 			
-			void     Pause();
-			void     Frame();
-			void     Resume();
+			void      Pause();
+			void      Frame();
+			void      Resume();
 			
-			bool     Running();
+			bool      Running();
 			
-			task_ref AddTask      (unsigned int priority, Task* task);
-			task_ref AddConstTask (unsigned int priority, unsigned int ms, Task* task);
-			Task*    RemoveTask(task_ref task);
-			Task*    RemoveTask(const char* taskName);
-			void     RemoveAllTasks();
+			task_ref  AddTask      (unsigned int priority, Task* task);
+			task_ref  AddConstTask (unsigned int priority, unsigned int ms, Task* task);
+			Task*     RemoveTask(task_ref task);
+			Task*     RemoveTask(const char* taskName);
+			void      RemoveAllTasks();
+			
+			task_list GetTasksByName(const char* taskName);
+			
 			bool     quitFlag;
 		protected:
-			std::multimap<unsigned int, const_task> tasks;
+			task_list tasks;
 			//std::multimap<unsigned int, const_task> constTasks;
 			int lastTicks;
 			bool paused;
