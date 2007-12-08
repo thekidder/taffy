@@ -199,7 +199,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	height = videoInfo->current_h;
 
 	videoFlags = SDL_OPENGL;
-	videoFlags |= SDL_FULLSCREEN;
+	//videoFlags |= SDL_FULLSCREEN;
 	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
 	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_RESIZABLE;
