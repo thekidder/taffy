@@ -13,35 +13,13 @@
 #ifndef  __SORE_KERNEL_H__
 #define  __SORE_KERNEL_H__
 
+#include "sore_task.h"
+#include "sore_interpolater.h"
 #include <vector>
 #include <map>
 
 namespace SORE_Kernel
 {
-	class GameKernel;
-	
-	class Task
-	{
-		public:
-			Task(GameKernel* _gk);
-			virtual ~Task() {}
-			
-			virtual void Frame(int elapsedTime)  = 0;
-			virtual void Pause()  = 0;
-			virtual void Resume() = 0;
-			
-			virtual const char* GetName() const = 0;
-		protected:
-			GameKernel* gk;
-	};
-	
-	struct const_task
-	{
-		Task* task;
-		unsigned int ms;
-		unsigned int accum;
-	};
-	
 	typedef std::multimap<unsigned int, const_task> task_list;
 	
 	typedef task_list::iterator task_ref;
@@ -67,11 +45,14 @@ namespace SORE_Kernel
 			task_list GetTasksByName(const char* taskName);
 			
 			bool     quitFlag;
+			
+			void     AddInterpolater(SORE_Utility::IInterpolater* i);
 		protected:
 			task_list tasks;
 			//std::multimap<unsigned int, const_task> constTasks;
 			int lastTicks;
 			bool paused;
+			SORE_Utility::InterpolaterTask itask;
 	};
 }
 

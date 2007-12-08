@@ -244,6 +244,7 @@ namespace SORE_Math
 	
 	float Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
 	float Distance2D(float x1, float y1, float x2, float y2);
+	float Distance2DS(float x1, float y1, float x2, float y2); //distance squared
 }
 
 #endif /*__SORE_MATH_H__*/

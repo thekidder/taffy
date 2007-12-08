@@ -10,11 +10,12 @@ using namespace std;
 namespace SORE_Utility
 {
 	int GetFileExt(const char* filename, char* ext); //returns 0 on success
+	float getRandomMinMax( float fMin, float fMax );
 }
 
 //Functions
 bool  CheckExtension(const char* extensionName);
-float getRandomMinMax( float fMin, float fMax );
+
 void  BuildFont();
 void  glPrint(const char *fmt, ...);
 

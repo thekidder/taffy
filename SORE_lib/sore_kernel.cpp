@@ -20,13 +20,14 @@ SORE_Kernel::Task::Task(GameKernel* _gk)
 	gk = _gk;
 }
 
-SORE_Kernel::GameKernel::GameKernel()
+SORE_Kernel::GameKernel::GameKernel() : itask(this)
 {
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
 	lastTicks = SDL_GetTicks();
 	quitFlag = false;
 	lastTicks = 0;
 	paused = false;
+	AddTask(1, &itask);
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
@@ -147,4 +148,9 @@ SORE_Kernel::task_list SORE_Kernel::GameKernel::GetTasksByName(const char* taskN
 void SORE_Kernel::GameKernel::RemoveAllTasks()
 {
 	tasks.clear();
+}
+
+void SORE_Kernel::GameKernel::AddInterpolater(SORE_Utility::IInterpolater* i)
+{
+	itask.AddInterpolater(i);
 }

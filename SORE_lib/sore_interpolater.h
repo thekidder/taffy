@@ -1,8 +1,20 @@
+//
+// C++ Interface: sore_interpolater
+//
+// Description: 
+//
+//
+// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #ifndef  __SORE_INTERPOLATER_H__
 #define  __SORE_INTERPOLATER_H__
 
-#include "sore_kernel.h"
+#include "sore_task.h"
+#include <vector>
 
 namespace SORE_Utility
 {
@@ -97,11 +109,11 @@ namespace SORE_Utility
 			InterpolaterFunctor<T>* func;
 	};
 	
-	//template<class T>
-			class LinearInterpolater : public Interpolater<double>
+	template<class T>
+			class LinearInterpolater : public Interpolater<T>
 	{
 		public:
-			LinearInterpolater(double input, double _factor, double _limit, InterpolaterFunctor<double>* callback) : Interpolater<double>(input, callback)
+			LinearInterpolater(T input, T _factor, T _limit, InterpolaterFunctor<T>* callback) : Interpolater<T>(input, callback)
 			{
 				factor = _factor;
 				done = false;
@@ -110,12 +122,11 @@ namespace SORE_Utility
 			
 			void Update(int elapsedTime)
 			{
-				interpolatedValue += elapsedTime*factor;
-				if(factor>0 && interpolatedValue>limit) 
+				Interpolater<T>::interpolatedValue += elapsedTime*factor;
+				if(factor>0 && Interpolater<T>::interpolatedValue>limit) 
 					done = true;
-				else if(factor<0 && interpolatedValue<limit) 
+				else if(factor<0 && Interpolater<T>::interpolatedValue<limit) 
 					done = true;
-				//func(factor);
 			}
 			
 			bool Done()
@@ -127,6 +138,36 @@ namespace SORE_Utility
 			double factor;
 			double limit;
 			bool done;
+	};
+	
+	template<class T>
+			class LinearTwoInterpolater : public Interpolater<T>
+	{
+		public:
+			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, InterpolaterFunctor<T>* callback) : Interpolater<T>(input, callback)
+			{
+				factor = _factor;
+				limit1 = _limit1;
+				limit2 = _limit2;
+			}
+			
+			void Update(int elapsedTime)
+			{
+				Interpolater<T>::interpolatedValue += elapsedTime*factor;
+				if(factor>0 && Interpolater<T>::interpolatedValue>limit2) 
+					factor = -factor;
+				else if(factor<0 && Interpolater<T>::interpolatedValue<limit1) 
+					factor = -factor;
+			}
+			
+			bool Done()
+			{
+				return false;
+			}
+			
+		protected:
+			double factor;
+			double limit1,limit2;
 	};
 	
 	class InterpolaterTask  : public SORE_Kernel::Task

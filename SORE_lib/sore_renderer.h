@@ -52,7 +52,7 @@ namespace SORE_Kernel
 			void SetCamera    (SORE_Graphics::Camera*     camera);
 			
 			//set default projection type
-			void SetProjection(SORE_Graphics::ProjectionInfo info);
+			void SetProjection(SORE_Graphics::ProjectionInfo& info);
 			//change current perspective - takes effect immediately
 			//void ChangeProjection(SORE_Graphics::ProjectionInfo* info);
 			

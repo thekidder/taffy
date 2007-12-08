@@ -19,7 +19,7 @@ bool CheckExtension(const char* extensionName)
 	return false;
 }
 
-float getRandomMinMax( float fMin, float fMax )
+float SORE_Utility::getRandomMinMax( float fMin, float fMax )
 {
 	float fRandNum = (float)rand () / RAND_MAX;
 	return fMin + (fMax - fMin) * fRandNum;

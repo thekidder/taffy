@@ -246,10 +246,13 @@ int SORE_Kernel::Renderer::InitializeGL()
 	return 0;
 }
 
-void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo info)
+void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo& info)
 {
 	proj = info;
 	OnResize();
+	info.top = proj.top;
+	info.bottom = proj.bottom;
+	info.ratio = proj.ratio;
 }
 
 /*void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
