@@ -45,6 +45,9 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 
 SORE_Kernel::Renderer::~Renderer()
 {
+	if(videoFlags & SDL_FULLSCREEN)
+		SDL_SetVideoMode(width, height, 0, videoFlags);
+	SDL_ShowCursor(SDL_ENABLE);
 }
 
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
@@ -191,8 +194,12 @@ int SORE_Kernel::Renderer::InitializeSDL()
 		ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, "Video query failed: %s", SDL_GetError());
 		return 1;
 	}
+	//save current resolution
+	width = videoInfo->current_w;
+	height = videoInfo->current_h;
 
 	videoFlags = SDL_OPENGL;
+	videoFlags |= SDL_FULLSCREEN;
 	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
 	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_RESIZABLE;
@@ -207,7 +214,13 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	/* This checks if hardware blits can be done */
 	if ( videoInfo->blit_hw )
 		videoFlags |= SDL_HWACCEL;
+	
+	//Uint8* mask = SORE_Utility::GetBMPMask("data/snake.bmp");
+	
+	SDL_WM_SetIcon(SDL_LoadBMP("data/snake.bmp"), NULL);
+	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
 	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
+	SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
 

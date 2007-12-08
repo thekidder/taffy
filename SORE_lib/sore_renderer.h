@@ -77,6 +77,7 @@ namespace SORE_Kernel
 			} 
 			
 			SDL_Surface* drawContext;
+			int width,height;
 			Uint32 videoFlags;
 			SORE_Font::font_ref font;
 			

@@ -11,6 +11,7 @@ namespace SORE_Utility
 {
 	int GetFileExt(const char* filename, char* ext); //returns 0 on success
 	float getRandomMinMax( float fMin, float fMax );
+	Uint8* GetBMPMask(const char* filename);
 }
 
 //Functions
