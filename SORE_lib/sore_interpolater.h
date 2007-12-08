@@ -14,6 +14,7 @@
 #define  __SORE_INTERPOLATER_H__
 
 #include "sore_task.h"
+#include "sore_logger.h"
 #include <vector>
 
 namespace SORE_Utility
@@ -79,6 +80,8 @@ namespace SORE_Utility
 	class IInterpolater
 	{
 		public:
+			IInterpolater() { ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Created interpolater"); }
+			virtual ~IInterpolater() { ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater"); }
 			virtual void Frame(int elapsedTime)  = 0;
 			virtual void Update(int elapsedTime) = 0;
 			virtual bool Done() = 0;

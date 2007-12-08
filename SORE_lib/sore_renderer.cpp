@@ -48,6 +48,7 @@ SORE_Kernel::Renderer::~Renderer()
 	if(videoFlags & SDL_FULLSCREEN)
 		SDL_SetVideoMode(width, height, 0, videoFlags);
 	SDL_ShowCursor(SDL_ENABLE);
+	SDL_FreeSurface(drawContext);
 }
 
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
@@ -216,8 +217,10 @@ int SORE_Kernel::Renderer::InitializeSDL()
 		videoFlags |= SDL_HWACCEL;
 	
 	//Uint8* mask = SORE_Utility::GetBMPMask("data/snake.bmp");
+	SDL_Surface* icon = SDL_LoadBMP("data/snake.bmp");
 	
-	SDL_WM_SetIcon(SDL_LoadBMP("data/snake.bmp"), NULL);
+	SDL_WM_SetIcon(icon, NULL);
+	SDL_FreeSurface(icon);
 	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
 	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
 	//SDL_ShowCursor(SDL_DISABLE);

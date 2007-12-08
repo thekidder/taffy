@@ -17,6 +17,7 @@
 #include "sore_interpolater.h"
 #include <vector>
 #include <map>
+#include <memory>
 
 namespace SORE_Kernel
 {

@@ -20,6 +20,13 @@ namespace SORE_Utility
 	
 	InterpolaterTask::~InterpolaterTask()
 	{
+		std::vector<IInterpolater*>::iterator it, temp;
+		for(it=interpolaters.begin();it<interpolaters.end();)
+		{
+			temp = it;
+			it++;
+			delete *temp;
+		}
 	}
 	
 	void InterpolaterTask::Frame(int elapsedTime)
@@ -31,7 +38,11 @@ namespace SORE_Utility
 			it++;
 			(*temp)->Frame(elapsedTime);
 			if((*temp)->Done())
+			{
+				delete *temp;
 				interpolaters.erase(temp);
+				
+			}
 		}
 	}
 	
