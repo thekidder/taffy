@@ -220,7 +220,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	SDL_WM_SetIcon(SDL_LoadBMP("data/snake.bmp"), NULL);
 	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
 	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
-	SDL_ShowCursor(SDL_DISABLE);
+	//SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
 

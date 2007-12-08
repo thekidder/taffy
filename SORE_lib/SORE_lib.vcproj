@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_shaders.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_texture.cpp"
 				>
 			</File>
@@ -291,6 +295,14 @@
 			</File>
 			<File
 				RelativePath=".\sore_resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_shaders.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_task.h"
 				>
 			</File>
 			<File
