@@ -111,7 +111,7 @@ SORE_Resource::ResourceManager* SORE_Resource::ResourceManager::rm = NULL;
 
 SORE_Resource::ResourceManager::ResourceManager()
 {
-	std::cout << "Resource manager created.\n";
+	//std::cout << "Resource manager created.\n";
 	resources[0] = NULL;
 }
 

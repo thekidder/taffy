@@ -15,8 +15,11 @@
 #define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
 #endif
 
-#define SORE_CONSOLE_LOG
-
+#ifdef DEBUG
+//#define SORE_CONSOLE_LOG
+#else
+#undef SORE_CONSOLE_LOG
+#endif
 namespace SORE_Logging
 {
 	const int LVL_CRITICAL = 0x01;
@@ -96,6 +99,7 @@ namespace SORE_Logging
 			FILE* filePtr;
 			char prevFunc[256];
 			bool first;
+			bool inFunc;
 	};
 	
 	class Logger

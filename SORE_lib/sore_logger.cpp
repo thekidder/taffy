@@ -10,6 +10,8 @@
 //
 //
 
+#include "sore_defines.h"
+
 #include "sore_allgl.h"
 #include "sore_logger.h"
 #include <cstring>
@@ -40,7 +42,9 @@ void SORE_Logging::InitLogging()
 	lvlNames[LVL_DEBUG1  ] = "Debug 1 ";
 	lvlNames[LVL_DEBUG2  ] = "Debug 2 ";
 	sore_log.AddBackend(&sore_file_logger);
+#ifdef SORE_CONSOLE_LOG
 	sore_log.AddBackend(&sore_console_logger);
+#endif
 }
 
 void SORE_Logging::AddLogLevel(int lvl, const char* name)
@@ -149,6 +153,7 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
 	fwrite(end, sizeof(char), strlen(end), filePtr);
 	prevFunc[0] = '\0';
 	first = true;
+	inFunc = false;
 }
 
 SORE_Logging::XMLLogger::~XMLLogger()
@@ -168,7 +173,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	char levelint[9];
 	int pos = 0;
 	
-	if(!first && ((log->func==NULL && strlen(prevFunc)>0) || strcmp(prevFunc, log->func)!=0))
+	if(!first && ((log->func==NULL && strlen(prevFunc)>0) || (!(log->func==NULL && strlen(prevFunc)==0) && strcmp(prevFunc, log->func))!=0))
 	{
 		sprintf(buffer, "</function>\n");
 		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
@@ -304,6 +309,9 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
+#ifdef DEBUG
+	Flush();
+#endif
 }
 
 void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, const char* format, ...)

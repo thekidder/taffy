@@ -2,9 +2,7 @@
 #ifndef  __SORE_ALL__
 #define  __SORE_ALL__
 
-#ifndef NDEBUG
-#define DEBUG 1
-#endif
+#include "sore_defines.h"
 
 #include "sore_glext.h"
 
