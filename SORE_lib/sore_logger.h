@@ -16,7 +16,7 @@
 #endif
 
 #ifdef DEBUG
-//#define SORE_CONSOLE_LOG
+#define SORE_CONSOLE_LOG
 #else
 #undef SORE_CONSOLE_LOG
 #endif
