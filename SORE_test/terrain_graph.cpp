@@ -16,7 +16,7 @@
 
 using namespace SORE_Math;
 
-SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y)
+SORE_Graphics::TerrainGraph::TerrainGraph(int x, int y, SORE_Kernel::GameKernel* gk) : Task(gk)
 {
 	APP_LOG_S(SORE_Logging::LVL_DEBUG2, "In TerrainGraph constructor");
 	mainLog->Flush();ng:

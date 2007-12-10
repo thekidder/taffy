@@ -75,7 +75,7 @@ class PhysicsBall : public PhysicsObject
 class PhysicsTask : public SORE_Kernel::Task
 {
 	public:
-		PhysicsTask() {updating = false;}
+		PhysicsTask(SORE_Kernel::GameKernel* gk): Task(gk) {updating = false;}
 		void Frame(int elapsedTime);
 		void Resume();
 		void Pause();

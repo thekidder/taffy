@@ -26,7 +26,7 @@ namespace SORE_Graphics
 	class TerrainGraph : public SceneGraph, public SORE_Kernel::Task
 	{
 		public:
-			TerrainGraph(int x, int y);
+			TerrainGraph(int x, int y, SORE_Kernel::GameKernel* gk);
 			~TerrainGraph();
 		
 			void Render();

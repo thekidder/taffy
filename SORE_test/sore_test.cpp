@@ -18,9 +18,8 @@ SORE_Logging::Logger* mainLog;
 SORE_Logging::XMLLogger* fileLog;
 SORE_Logging::ConsoleLogger* consoleLog;
 SORE_Graphics::Camera cam;
-SORE_Graphics::CameraTask camTask(&cam);
+
 SORE_Graphics::TerrainGraph* tg;
-PhysicsTask physTask;
 
 bool OptionCallback(SORE_Kernel::Event* event);
 bool BallListen(SORE_Kernel::Event* event);
@@ -42,8 +41,7 @@ int main(int argc, char *argv[])
 	
 	SORE_Font::InitFontSystem();
 	
-	SORE_Kernel::Renderer* renderer;
-	SORE_Kernel::InputTask* input;
+	
 	
 	cam.SetRotationUpperLimit(AXIS_X,  90.0f);
 	cam.SetRotationLowerLimit(AXIS_X, -90.0f);
@@ -52,9 +50,12 @@ int main(int argc, char *argv[])
 	cam.Translate(0.0f, 2.0f, 0.0f);
 	
 	
-	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
-	renderer = new SORE_Kernel::Renderer;
-	input    = new SORE_Kernel::InputTask;
+	SORE_Kernel::GameKernel gk;
+	PhysicsTask physTask(&gk);
+	SORE_Kernel::Renderer renderer(&gk);
+	SORE_Kernel::InputTask input(&gk);
+	
+	SORE_Graphics::CameraTask camTask(&cam, &gk);
 	
 	char version[4];
 	
@@ -65,17 +66,15 @@ int main(int argc, char *argv[])
 	if(major<2)
 	{
 		APP_LOG_S(SORE_Logging::LVL_CRITICAL, "OpenGL Version is less than 2.0. Aborting.");
-		delete renderer;
-		delete input;
-		Cleanup();
-		return 0;
+
+		gk.quitFlag = true;
 	}
 		
-	tg = new SORE_Graphics::TerrainGraph(70, 70);
+	tg = new SORE_Graphics::TerrainGraph(70, 70, &gk);
 	tg->WritePGM("map.pgm");
 	
-	renderer->SetSceneGraph(tg);
-	renderer->SetCamera(&cam);
+	renderer.SetSceneGraph(tg);
+	renderer.SetCamera(&cam);
 	
 	tg->AddPhysicsEngine(&physTask);
 		
@@ -85,18 +84,18 @@ int main(int argc, char *argv[])
 	PhysicsBall newBall2(100.0, 14.0, 100.0);
 	physTask.AddObject(newBall2);
 	
-	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
-	input->AddListener(SORE_Kernel::KEYDOWN, SORE_Kernel::MakeFunctor<PhysicsTask>(&physTask, &PhysicsTask::PhysicsCallback));
-	input->AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor<SORE_Kernel::Renderer>(renderer, &SORE_Kernel::Renderer::OnResize));
-	input->AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor(SORE_Graphics::OnResize));
-	input->AddListener(SORE_Kernel::KEYDOWN , SORE_Kernel::MakeFunctor(BallListen));
-	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
-	input->AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor<SORE_Graphics::TerrainGraph>(tg, &SORE_Graphics::TerrainGraph::LightMoveCallback));
-	gk->AddTask(20, renderer);
-	gk->AddTask(10, input);
-	gk->AddTask(30, &camTask);
-	gk->AddTask(40, tg);
-	gk->AddConstTask(50, 1, &physTask);
+	input.AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP | SORE_Kernel::MOUSEMOVE, SORE_Kernel::MakeFunctor<SORE_Graphics::CameraTask>(&camTask, &SORE_Graphics::CameraTask::CameraCallback));
+	input.AddListener(SORE_Kernel::KEYDOWN, SORE_Kernel::MakeFunctor<PhysicsTask>(&physTask, &PhysicsTask::PhysicsCallback));
+	input.AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor<SORE_Kernel::Renderer>(&renderer, &SORE_Kernel::Renderer::OnResize));
+	//input.AddListener(SORE_Kernel::RESIZE , SORE_Kernel::MakeFunctor(SORE_Graphics::OnResize));
+	input.AddListener(SORE_Kernel::KEYDOWN , SORE_Kernel::MakeFunctor(BallListen));
+	input.AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor(OptionCallback));
+	input.AddListener(SORE_Kernel::KEYDOWN | SORE_Kernel::KEYUP, SORE_Kernel::MakeFunctor<SORE_Graphics::TerrainGraph>(tg, &SORE_Graphics::TerrainGraph::LightMoveCallback));
+	gk.AddTask(20, &renderer);
+	gk.AddTask(10, &input);
+	gk.AddTask(30, &camTask);
+	gk.AddTask(40, tg);
+	gk.AddConstTask(50, 1, &physTask);
 	
 	const double maxFPS = 500.0;
 	
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
 	
 	int loop = 1;
 	
-	while(!gk->quitFlag)
+	while(!gk.quitFlag)
 	{
 		SORE_Profiler::Sample mainLoop("topmost");
 		ticks = SDL_GetTicks();
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
 			SDL_Delay(1);
 			continue;
 		}
-		gk->Frame();
+		gk.Frame();
 
 		lastTicks = ticks;
 		//if(loop%100==0)
@@ -133,22 +132,20 @@ int main(int argc, char *argv[])
 	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("topmost"));
 	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("physics"));
 	SORE_Profiler::Sample::DisplayAvgTime(SORE_Profiler::Sample::GetSampleByName("graphics"));
-	delete renderer;
-	delete input;
-	Cleanup();
-	return 0;
-}
 
-void Cleanup()
-{
-	SORE_Kernel::GameKernel* gk = SORE_Kernel::GameKernel::GetKernel();
-	gk->RemoveAllTasks();
-	gk->Cleanup();
+	gk.RemoveAllTasks();
+	//gk.Cleanup();
 	
 	delete mainLog;
 	delete fileLog;
 	delete consoleLog;
 	delete tg;
+	return 0;
+}
+
+void Cleanup()
+{
+	
 }
 
 bool OptionCallback(SORE_Kernel::Event* event)
@@ -219,8 +216,8 @@ void RenderSphere(float r, int div)
 
 void AddBall()
 {
-	PhysicsBall newBall(100.0, 14.0, 100.0);
-	physTask.AddObject(newBall);
+	//PhysicsBall newBall(100.0, 14.0, 100.0);
+	//physTask.AddObject(newBall);
 }
 
 bool BallListen(SORE_Kernel::Event* event)
