@@ -200,7 +200,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	height = videoInfo->current_h;
 
 	videoFlags = SDL_OPENGL;
-	//videoFlags |= SDL_FULLSCREEN;
+	videoFlags |= SDL_FULLSCREEN;
 	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
 	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_RESIZABLE;
@@ -222,8 +222,8 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
 	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
-	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
-	//SDL_ShowCursor(SDL_DISABLE);
+	drawContext = SDL_SetVideoMode(1920, 1080, 0, videoFlags);
+	SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
 
