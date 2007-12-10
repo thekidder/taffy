@@ -35,12 +35,12 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 		gk->quitFlag = true;
 	}
 
-	/*font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
+	font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	if(font == 0)
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
 		gk->quitFlag = true;
-	}*/
+	}
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -65,7 +65,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 			cam->TransformView();
 		sg->Render();
 	}
-	/*SORE_Graphics::Init_2DCanvas();
+	//SORE_Graphics::Init_2DCanvas();
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", 1000.0/float(elapsedTime));
 	
@@ -81,9 +81,23 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 		}
 	}
 	
-	SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
+	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
+	/*glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0,800,0,600);
+	glPopAttrib();
+	glLoadIdentity();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);	
+	//SORE_Graphics::DrawString(font, 0, 0, "FPS: %5.2f", fps);
+	SORE_Font::Print(font, 400,300, "this is a test");
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();*/
 	
-	SORE_Graphics::Destroy_2DCanvas();*/
+	//SORE_Graphics::Destroy_2DCanvas();
 	SDL_GL_SwapBuffers();
 }
 

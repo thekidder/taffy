@@ -75,10 +75,10 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint*
 	float x=(float)bitmap.width / (float)width, y=(float)bitmap.rows / (float)height;
 	
 	glBegin(GL_QUADS);
-	glTexCoord2d(0,0); glVertex2f(0.0f,bitmap.rows);
-	glTexCoord2d(0,y); glVertex2f(0.0f,0.0f);
-	glTexCoord2d(x,y); glVertex2f(bitmap.width,0.0f);
-	glTexCoord2d(x,0); glVertex2f(bitmap.width,bitmap.rows);
+	glTexCoord2d(0,0); glVertex3f(0.0f,bitmap.rows,-0.1f);
+	glTexCoord2d(0,y); glVertex3f(0.0f,0.0f,-0.1f);
+	glTexCoord2d(x,y); glVertex3f(bitmap.width,0.0f,-0.1f);
+	glTexCoord2d(x,0); glVertex3f(bitmap.width,bitmap.rows,-0.1f);
 	glEnd();
 	glPopMatrix();
 	glTranslatef(face->glyph->advance.x >> 6 ,0.0f,0.0f);
@@ -193,7 +193,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	//glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+	glDisable(GL_BLEND);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -237,7 +237,7 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 	glDisable(GL_LIGHTING);
 	//glActiveTexture(GL_TEXTURE1);
 	//glDisable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
