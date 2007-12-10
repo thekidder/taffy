@@ -76,15 +76,19 @@ bool SORE_Graphics::OnResize(SORE_Kernel::Event* event=NULL)
 	return true;
 }*/
 
+#include <iostream>
+
 void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
 {
 	int window[2];
+	int real[2];
 	window[0] = x;
 	window[1] = y;
-	int real[2];
-	
-	WindowToReal(window, real);
-	
+	real[0] = 0;
+	real[1] = 0;
+
+	std::cout << real[0] << "\n";
+	SORE_Graphics::WindowToReal(window, real);
 	
 	int h = SORE_Font::FontHeight(font);
 	
