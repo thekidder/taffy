@@ -180,8 +180,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	}
 	if(start_line) 
 	{
-		string line;
-		for(const char *n=start_line;n<c;n++) line.append(1,*n);
+		string line = start_line;
 		lines.push_back(line);
 	}
 	
@@ -284,7 +283,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	
 	int length = strlen(fontName);
 	if(length>59) return INVALID_FONT_NAME;
-	if(fontPaths.size()==0) Init();
+	if(fontPaths.size()==0) InitFontSystem();
 	
 	char* dirName = new char[512];
 	char*  fontPath = new char[2048];

@@ -76,8 +76,6 @@ bool SORE_Graphics::OnResize(SORE_Kernel::Event* event=NULL)
 	return true;
 }*/
 
-#include <iostream>
-
 void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
 {
 	int window[2];

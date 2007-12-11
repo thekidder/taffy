@@ -35,12 +35,12 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 		gk->quitFlag = true;
 	}
 
-	font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
+	/*font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	if(font == 0)
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
 		gk->quitFlag = true;
-	}
+	}*/
 }
 
 SORE_Kernel::Renderer::~Renderer()
