@@ -26,7 +26,24 @@ void SORE_Graphics::SetRenderer(SORE_Kernel::Renderer* _r)
 	r = _r;
 }
 
- 
+void SORE_Graphics::PushProjection(SORE_Graphics::ProjectionInfo& info)
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	r->SetProjection(info);
+	glPopAttrib();
+	glLoadIdentity();
+}
+
+void SORE_Graphics::PopProjection()
+{
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}
 
 void SORE_Graphics::WindowToReal(int* window, int* real)
 {

@@ -14,6 +14,8 @@ namespace SORE_Graphics
 	
 	void DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...);
 	
+	void PushProjection(SORE_Graphics::ProjectionInfo& info);
+	void PopProjection();
 }
 
 #endif /*__SORE_H__*/
