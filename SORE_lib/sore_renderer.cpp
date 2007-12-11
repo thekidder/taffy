@@ -217,7 +217,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	//videoFlags |= SDL_FULLSCREEN;
 	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
 	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
-	videoFlags |= SDL_RESIZABLE;
+	//videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
 	videoFlags |= SDL_HWPALETTE; 
 	/* This checks to see if surfaces can be stored in memory */
