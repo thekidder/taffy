@@ -47,7 +47,8 @@ namespace SORE_Kernel
 			
 			bool     quitFlag;
 			
-			void     AddInterpolater(SORE_Utility::IInterpolater* i);
+			SORE_Utility::interpolater_iterator AddInterpolater(SORE_Utility::IInterpolater* i);
+			void RemoveInterpolater(SORE_Utility::interpolater_iterator i);
 		protected:
 			task_list tasks;
 			//std::multimap<unsigned int, const_task> constTasks;

@@ -32,6 +32,15 @@ namespace SORE_Graphics
 		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
 		bool useScreenRatio; //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
 	};
+	
+	struct ScreenInfo
+	{
+		int width, height;
+		double ratio; //set by SORE_Renderer after screen is created
+		bool showCursor;
+		bool fullscreen;
+		bool resizable;
+	};	
 }
 
 namespace SORE_Kernel
@@ -39,7 +48,7 @@ namespace SORE_Kernel
 	class Renderer : public Task
 	{
 		public:
-			Renderer(SORE_Kernel::GameKernel* gk);
+			Renderer(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen);
 			~Renderer();
 		
 			void Frame(int elapsedTime);
@@ -59,6 +68,7 @@ namespace SORE_Kernel
 			bool OnResize(Event* event);
 			
 			GLint* GetViewport();
+			SORE_Graphics::ScreenInfo* GetScreen();
 		protected:
 			int  InitializeSDL();
 			int  InitializeGL();
@@ -84,6 +94,7 @@ namespace SORE_Kernel
 			SORE_Graphics::SceneGraph* sg;
 			SORE_Graphics::Camera*     cam;
 			SORE_Graphics::ProjectionInfo proj;
+			SORE_Graphics::ScreenInfo screen;
 			
 			GLint viewport[4];
 			

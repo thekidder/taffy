@@ -16,6 +16,12 @@ namespace SORE_Graphics
 	
 	void PushProjection(SORE_Graphics::ProjectionInfo& info);
 	void PopProjection();
+	
+	void PushOverlay();
+	void PopOverlay();
+	
+	int  GetHeight();
+	int  GetWidth();
 }
 
 #endif /*__SORE_H__*/

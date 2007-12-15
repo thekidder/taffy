@@ -150,7 +150,12 @@ void SORE_Kernel::GameKernel::RemoveAllTasks()
 	tasks.clear();
 }
 
-void SORE_Kernel::GameKernel::AddInterpolater(SORE_Utility::IInterpolater* i)
+SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(SORE_Utility::IInterpolater* i)
 {
-	itask.AddInterpolater(i);
+	return itask.AddInterpolater(i);
+}
+
+void SORE_Kernel::GameKernel::RemoveInterpolater(SORE_Utility::interpolater_iterator i)
+{
+	itask.RemoveInterpolater(i);
 }

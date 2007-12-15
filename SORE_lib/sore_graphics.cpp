@@ -45,6 +45,33 @@ void SORE_Graphics::PopProjection()
 	glPopAttrib();
 }
 
+void SORE_Graphics::PushOverlay()
+{
+	static SORE_Graphics::ProjectionInfo overlay;
+	overlay.type   = SORE_Graphics::ORTHO2D;
+	overlay.left   = 0;
+	overlay.right  = r->GetScreen()->width;
+	overlay.top    = 0;
+	overlay.bottom = r->GetScreen()->height;
+	overlay.useScreenRatio = false;
+	PushProjection(overlay);
+}
+
+void SORE_Graphics::PopOverlay()
+{
+	PopProjection();
+}
+
+int SORE_Graphics::GetWidth()
+{
+	return r->GetScreen()->width;
+}
+
+int SORE_Graphics::GetHeight()
+{
+	return r->GetScreen()->height;
+}
+
 void SORE_Graphics::WindowToReal(int* window, int* real)
 {
 	GLint* viewport = r->GetViewport();
@@ -53,45 +80,6 @@ void SORE_Graphics::WindowToReal(int* window, int* real)
 	real[0] = window[0];
 	real[1] = viewport[3]-window[1];
 }
-
-/*void SORE_Graphics::Init2DOverlay()
-{
-	UpdateViewport();
-}
-
-void SORE_Graphics::UpdateViewport()
-{
-	GLint* viewport = r->GetViewport();
-	//std::cout << viewport[0] << ":" << viewport[1] << ":" << viewport[2] << ":" << viewport[3] << std::endl;
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "OpenGL viewport: (%d, %d, %d, %d)", viewport[0], viewport[1], viewport[2], viewport[3]);
-}
-
-void SORE_Graphics::Init_2DCanvas()
-{
-	GLint* viewport = r->GetViewport();
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	//glOrtho(viewport[0],viewport[2],viewport[3],viewport[1], -1.0f, -1.0f);
-	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
-	glPopAttrib();
-	glLoadIdentity();
-}
-
-void SORE_Graphics::Destroy_2DCanvas()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-}
-
-bool SORE_Graphics::OnResize(SORE_Kernel::Event* event=NULL)
-{
-	UpdateViewport();
-	return true;
-}*/
 
 void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
 {
@@ -121,23 +109,3 @@ void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const cha
 		SORE_Font::Print(font, real[0], real[1], text);
 	}
 }
-
-/*inline void SORE_Font::PushScreenCoordMatrix()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
-	glPopAttrib();
-}
-
-inline void SORE_Font::PopProjectionMatrix()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-}*/

@@ -19,7 +19,6 @@
 	#define uglGetProcAddress(x) wglGetProcAddress(x)
 	
 	//We need M_PI
-	#define _USE_MATH_DEFINES
 #else /* GLX */
 	#include <SDL/SDL.h>
 	//#include <SDL/SDL_image.h>

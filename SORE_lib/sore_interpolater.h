@@ -15,7 +15,7 @@
 
 #include "sore_task.h"
 #include "sore_logger.h"
-#include <vector>
+#include <list>
 
 namespace SORE_Utility
 {
@@ -80,12 +80,17 @@ namespace SORE_Utility
 	class IInterpolater
 	{
 		public:
-			IInterpolater() { ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Created interpolater"); }
-			virtual ~IInterpolater() { ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater"); }
+			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Created interpolater (%d created, %d destroyed)",created, destroyed); }
+			virtual ~IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater (%d created, %d destroyed)",created, destroyed); }
 			virtual void Frame(int elapsedTime)  = 0;
 			virtual void Update(int elapsedTime) = 0;
 			virtual bool Done() = 0;
+		protected:
+			static int created;
+			static int destroyed;
 	};
+	
+	typedef std::list<IInterpolater*>::iterator interpolater_iterator;
 	
 	//Interpolater interface. Interpolaters take an input value and apply an operation on it each timestep
 	template<class T>
@@ -97,6 +102,15 @@ namespace SORE_Utility
 				interpolatedValue = input;
 				func = callback;
 				(*func)(input);
+				death = NULL;
+				created++;
+			}
+			
+			~Interpolater()
+			{
+				if(death)
+					(*death)(interpolatedValue);
+				destroyed++;
 			}
 			
 			void Frame(int elapsedTime)
@@ -107,9 +121,12 @@ namespace SORE_Utility
 			
 			virtual bool Done() { return false; }
 			
+			virtual void Update(int elapsedTime) {}
+			
 		protected:
 			T interpolatedValue;
 			InterpolaterFunctor<T>* func;
+			InterpolaterFunctor<T>* death;
 	};
 	
 	template<class T>
@@ -147,30 +164,43 @@ namespace SORE_Utility
 			class LinearTwoInterpolater : public Interpolater<T>
 	{
 		public:
-			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, InterpolaterFunctor<T>* callback) : Interpolater<T>(input, callback)
+			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, bool _repeat, InterpolaterFunctor<T>* callback, InterpolaterFunctor<T>* onDeath) : Interpolater<T>(input, callback)
 			{
 				factor = _factor;
 				limit1 = _limit1;
 				limit2 = _limit2;
+				repeat = _repeat;
+				done = 0;
+				Interpolater<T>::death = onDeath;
 			}
 			
 			void Update(int elapsedTime)
 			{
 				Interpolater<T>::interpolatedValue += elapsedTime*factor;
-				if(factor>0 && Interpolater<T>::interpolatedValue>limit2) 
+				if(factor>0 && Interpolater<T>::interpolatedValue>limit2)
+				{
 					factor = -factor;
+					done++;
+				}
 				else if(factor<0 && Interpolater<T>::interpolatedValue<limit1) 
+				{
 					factor = -factor;
+					done++;
+				}
 			}
 			
 			bool Done()
 			{
-				return false;
+				if(!repeat)
+					return done>=2;
+				else return false;
 			}
 			
 		protected:
 			double factor;
 			double limit1,limit2;
+			bool repeat;
+			int done;
 	};
 	
 	class InterpolaterTask  : public SORE_Kernel::Task
@@ -185,9 +215,10 @@ namespace SORE_Utility
 			void Pause();
 			void Resume();
 			
-			void AddInterpolater(IInterpolater* i);
+			interpolater_iterator AddInterpolater(IInterpolater* i);
+			void           RemoveInterpolater(interpolater_iterator i);
 		protected:
-			std::vector<IInterpolater*> interpolaters;
+			std::list<IInterpolater*> interpolaters;
 	};
 }
 

@@ -15,7 +15,7 @@
 #include "sore_util.h"
 #include <cassert>
 
-SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
+SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen) : Task(gk)
 {
 	sg = NULL;
 	cam = NULL;
@@ -24,6 +24,8 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk) : Task(gk)
 	proj.znear = 0.1;
 	proj.zfar  = 200.0;
 	proj.useScreenRatio = true;
+	_screen.ratio = double(_screen.width)/double(_screen.height);
+	screen = _screen;
 	if(InitializeSDL()!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
@@ -181,10 +183,14 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	height = videoInfo->current_h;
 
 	videoFlags = SDL_OPENGL;
-	//videoFlags |= SDL_FULLSCREEN;
-	//if(FULLSCREEN) videoFlags |= SDL_FULLSCREEN;
-	//if(RESIZEABLE) videoFlags |= SDL_RESIZABLE;
-	//videoFlags |= SDL_RESIZABLE;
+	if(screen.fullscreen)
+		videoFlags |= SDL_FULLSCREEN;
+	if(screen.showCursor)
+		SDL_ShowCursor(SDL_ENABLE);
+	else
+		SDL_ShowCursor(SDL_DISABLE);
+	if(screen.resizable)
+		videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
 	videoFlags |= SDL_HWPALETTE; 
 	/* This checks to see if surfaces can be stored in memory */
@@ -203,8 +209,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
 	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
-	drawContext = SDL_SetVideoMode(800, 600, 0, videoFlags);
-	//SDL_ShowCursor(SDL_DISABLE);
+	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
 	return 0;
 }
 
@@ -277,4 +282,9 @@ void SORE_Kernel::Renderer::InitExtensions()
 GLint* SORE_Kernel::Renderer::GetViewport()
 {
 	return viewport;
+}
+
+SORE_Graphics::ScreenInfo* SORE_Kernel::Renderer::GetScreen()
+{
+	return &screen;
 }

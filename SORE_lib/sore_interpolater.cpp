@@ -13,15 +13,18 @@
 #include "sore_interpolater.h"
 
 namespace SORE_Utility
-{	
+{
+	int IInterpolater::created = 0;
+	int IInterpolater::destroyed = 0;	
+	
 	InterpolaterTask::InterpolaterTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 	{
 	}
 	
 	InterpolaterTask::~InterpolaterTask()
 	{
-		std::vector<IInterpolater*>::iterator it, temp;
-		for(it=interpolaters.begin();it<interpolaters.end();)
+		interpolater_iterator it, temp;
+		for(it=interpolaters.begin();it!=interpolaters.end();)
 		{
 			temp = it;
 			it++;
@@ -31,17 +34,15 @@ namespace SORE_Utility
 	
 	void InterpolaterTask::Frame(int elapsedTime)
 	{
-		std::vector<IInterpolater*>::iterator it, temp;
-		for(it=interpolaters.begin();it<interpolaters.end();)
+		interpolater_iterator it, temp;
+		for(it=interpolaters.begin();it!=interpolaters.end();)
 		{
 			temp = it;
 			it++;
 			(*temp)->Frame(elapsedTime);
 			if((*temp)->Done())
 			{
-				delete *temp;
-				interpolaters.erase(temp);
-				
+				RemoveInterpolater(temp);
 			}
 		}
 	}
@@ -54,8 +55,16 @@ namespace SORE_Utility
 	{
 	}
 	
-	void InterpolaterTask::AddInterpolater(IInterpolater* i)
+	interpolater_iterator InterpolaterTask::AddInterpolater(IInterpolater* i)
 	{
 		interpolaters.push_back(i);
+		interpolater_iterator it = --interpolaters.end();
+		return it;
+	}
+	
+	void InterpolaterTask::RemoveInterpolater(interpolater_iterator i)
+	{
+		delete *i;
+		interpolaters.erase(i);
 	}
 }
