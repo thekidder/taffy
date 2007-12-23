@@ -140,7 +140,7 @@ namespace SORE_Graphics
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compile);
 		if(compile!=GL_TRUE)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to compile %s shader", shaderType.c_str(),compile,link,GL_TRUE);
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to compile %s shader", shaderType.c_str());
 			
 			int infologLength = 0;
 			int charsWritten  = 0;

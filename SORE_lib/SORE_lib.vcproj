@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_timing.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_util.cpp"
 				>
 			</File>
@@ -243,6 +247,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_console.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_defines.h"
 				>
 			</File>
 			<File
@@ -307,6 +315,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_texture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_timing.h"
 				>
 			</File>
 			<File

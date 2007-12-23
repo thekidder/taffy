@@ -6,13 +6,15 @@
 #include <windows.h>
 #endif
 
+#define GL_GLEXT_PROTOTYPES
+#undef GL_ARB_shader_objects
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
 
 #ifdef WIN32
 	#include <SDL.h>
-	//#include <SDL_image.h>
 	
 	//wglGetProcAddress
 	#include <GL/wglext.h>

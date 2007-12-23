@@ -3,13 +3,18 @@
 #include "sore_allgl.h"
 #include "sore_logger.h"
 
+#ifndef WIN32
 #include <sys/time.h>
+#else
+#include <windows.h>
+#endif
 #include <cassert>
 
 namespace SORE_Timing
 {
 	unsigned int GetGlobalTicks() //in 1/10000 second increments
 	{
+#ifndef WIN32
 		static unsigned long start_s = 0;
 		static long start_us = 0;
 		
@@ -29,5 +34,18 @@ namespace SORE_Timing
 			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Global ticks count is less than zero (ticks=%s)", time);
 		}
 		return time;
+#else
+		static __int64 start_count = 0;
+		static __int64 freq        = 0;
+		if(start_count == 0 && freq == 0)
+		{
+			QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+			QueryPerformanceCounter((LARGE_INTEGER*)&start_count);
+		}
+		__int64 ticks;
+		QueryPerformanceCounter((LARGE_INTEGER*)&ticks);
+		double secs = (double)(ticks - start_count) / (double)freq;
+		return (unsigned int)(secs/10000.0);
+#endif
 	}
 }

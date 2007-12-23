@@ -1,3 +1,4 @@
+#include "sore_defines.h"
 #include "sore_camera.h"
 #include "sore_logger.h"
 #include <cmath>
