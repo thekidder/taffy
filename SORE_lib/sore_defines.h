@@ -4,6 +4,8 @@
 
 #ifndef NDEBUG
 #define DEBUG 1
+#else
+#undef DEBUG
 #endif
 
 

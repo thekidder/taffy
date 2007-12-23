@@ -14,6 +14,7 @@
 #include "sore_kernel.h"
 #include "sore_logger.h"
 #include "sore_allgl.h"
+#include "sore_timing.h"
 
 SORE_Kernel::Task::Task(GameKernel* _gk)
 {
@@ -23,7 +24,7 @@ SORE_Kernel::Task::Task(GameKernel* _gk)
 SORE_Kernel::GameKernel::GameKernel() : itask(this)
 {
 	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
-	lastTicks = SDL_GetTicks();
+	lastTicks = SORE_Timing::GetGlobalTicks();
 	quitFlag = false;
 	lastTicks = 0;
 	paused = false;
@@ -39,11 +40,11 @@ void SORE_Kernel::GameKernel::Frame()
 {
 	const int maxDeltaT = 2000; //if frame time is over 2 seconds don't run frame
 	task_ref it;
-	int ticks = SDL_GetTicks();
+	int ticks = SORE_Timing::GetGlobalTicks();
 	int deltaT = ticks - lastTicks;
-	for(it=tasks.begin();it!=tasks.end();it++)
+	if(deltaT<maxDeltaT)
 	{
-		if(deltaT<maxDeltaT)
+		for(it=tasks.begin();it!=tasks.end();it++)
 		{
 			if(it->second.ms>0)
 			{

@@ -148,9 +148,20 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
 	strncpy(file, filename, 255);
 	file[255] = '\0';
 	filePtr = fopen(file, "w");
-	fwrite(begin, sizeof(char), strlen(begin), filePtr);
-	fwrite(filename, sizeof(char), strlen(filename), filePtr);
-	fwrite(end, sizeof(char), strlen(end), filePtr);
+	if(filePtr==NULL || ferror(filePtr)!=0)
+	{
+		//we'll log this in case there is another error stream that is ok
+		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Failed to open log file for writing");
+		ok = false;
+	}
+	else
+		ok = true;
+	if(ok)
+	{
+		fwrite(begin, sizeof(char), strlen(begin), filePtr);
+		fwrite(filename, sizeof(char), strlen(filename), filePtr);
+		fwrite(end, sizeof(char), strlen(end), filePtr);
+	}
 	prevFunc[0] = '\0';
 	first = true;
 	inFunc = false;
@@ -158,16 +169,18 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
 
 SORE_Logging::XMLLogger::~XMLLogger()
 {
-	if(!first)
+	if(!first && ok)
 		fwrite("</function>\n", sizeof(char), 12, filePtr);
 
 	const char end[] = "</log>\n";
-	fwrite(end, sizeof(char), strlen(end), filePtr);
+	if(ok)
+		fwrite(end, sizeof(char), strlen(end), filePtr);
 	fclose(filePtr);
 }
 
 void SORE_Logging::XMLLogger::Write(log_message* log)
 {
+	if(!ok) return;
 	static char buffer[2048];
 	char levelstr[9];
 	char levelint[9];
@@ -255,7 +268,8 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 
 void SORE_Logging::XMLLogger::Flush()
 {
-	fflush(filePtr);
+	if(ok)
+		fflush(filePtr);
 }
 
 SORE_Logging::Logger::Logger()

@@ -13,6 +13,7 @@
 #include "sore_renderer.h"
 #include "sore_profiler.h"
 #include "sore_util.h"
+#include "sore_timing.h"
 #include <cassert>
 
 SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen) : Task(gk)
@@ -57,7 +58,7 @@ void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	SORE_Profiler::Sample graphics("graphics");
 	static int frames = 0;
-	static int T0 = SDL_GetTicks();
+	static int T0 = SORE_Timing::GetGlobalTicks();
 	static float fps;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//assert(sg!=NULL && "No scene graph");

@@ -278,6 +278,100 @@ GLEXT_PROC( PFNGLVERTEXATTRIB4USVPROC,          glVertexAttrib4usv          );
 GLEXT_PROC( PFNGLVERTEXATTRIBPOINTERPROC,       glVertexAttribPointer       );
 
 // ---------------------------------------------------------------------------
+// We obtain backwards compatibility with OpenGL < 2.0 by using the ARB extensions
+// for shaders
+// ---------------------------------------------------------------------------
+
+GLEXT_PROC( PFNGLATTACHSHADERPROC,              glAttachObjectARB              );
+GLEXT_PROC( PFNGLBINDATTRIBLOCATIONPROC,        glBindAttribLocationARB        );
+GLEXT_PROC( PFNGLCOMPILESHADERPROC,             glCompileShaderARB             );
+GLEXT_PROC( PFNGLCREATEPROGRAMPROC,             glCreateProgramARB             );
+GLEXT_PROC( PFNGLCREATESHADERPROC,              glCreateShaderARB              );
+GLEXT_PROC( PFNGLDELETEPROGRAMPROC,             glDeleteProgramARB             );
+GLEXT_PROC( PFNGLDELETESHADERPROC,              glDeleteShaderARB              );
+GLEXT_PROC( PFNGLDETACHSHADERPROC,              glDetachShaderARB              );
+GLEXT_PROC( PFNGLDISABLEVERTEXATTRIBARRAYPROC,  glDisableVertexAttribArrayARB  );
+GLEXT_PROC( PFNGLENABLEVERTEXATTRIBARRAYPROC,   glEnableVertexAttribArrayARB   );
+GLEXT_PROC( PFNGLGETACTIVEATTRIBPROC,           glGetActiveAttribARB           );
+GLEXT_PROC( PFNGLGETACTIVEUNIFORMPROC,          glGetActiveUniformARB          );
+GLEXT_PROC( PFNGLGETATTACHEDSHADERSPROC,        glGetAttachedShadersARB        );
+GLEXT_PROC( PFNGLGETATTRIBLOCATIONPROC,         glGetAttribLocationARB         );
+GLEXT_PROC( PFNGLGETPROGRAMIVPROC,              glGetProgramivARB              );
+GLEXT_PROC( PFNGLGETPROGRAMINFOLOGPROC,         glGetProgramInfoLogARB         );
+GLEXT_PROC( PFNGLGETSHADERIVPROC,               glGetShaderivARB               );
+GLEXT_PROC( PFNGLGETSHADERINFOLOGPROC,          glGetShaderInfoLogARB          );
+GLEXT_PROC( PFNGLGETSHADERSOURCEPROC,           glGetShaderSourceARB           );
+GLEXT_PROC( PFNGLGETUNIFORMLOCATIONPROC,        glGetUniformLocationARB        );
+GLEXT_PROC( PFNGLGETUNIFORMFVPROC,              glGetUniformfvARB              );
+GLEXT_PROC( PFNGLGETUNIFORMIVPROC,              glGetUniformivARB              );
+GLEXT_PROC( PFNGLGETVERTEXATTRIBDVPROC,         glGetVertexAttribdvARB         );
+GLEXT_PROC( PFNGLGETVERTEXATTRIBFVPROC,         glGetVertexAttribfvARB         );
+GLEXT_PROC( PFNGLGETVERTEXATTRIBIVPROC,         glGetVertexAttribivARB         );
+GLEXT_PROC( PFNGLGETVERTEXATTRIBPOINTERVPROC,   glGetVertexAttribPointervARB   );
+GLEXT_PROC( PFNGLISPROGRAMPROC,                 glIsProgramARB                 );
+GLEXT_PROC( PFNGLISSHADERPROC,                  glIsShaderARB                  );
+GLEXT_PROC( PFNGLLINKPROGRAMPROC,               glLinkProgramARB               );
+GLEXT_PROC( PFNGLSHADERSOURCEPROC,              glShaderSourceARB              );
+GLEXT_PROC( PFNGLUSEPROGRAMPROC,                glUseProgramObjectARB          );
+GLEXT_PROC( PFNGLUNIFORM1FPROC,                 glUniform1fARB                 );
+GLEXT_PROC( PFNGLUNIFORM2FPROC,                 glUniform2fARB                 );
+GLEXT_PROC( PFNGLUNIFORM3FPROC,                 glUniform3fARB                 );
+GLEXT_PROC( PFNGLUNIFORM4FPROC,                 glUniform4fARB                 );
+GLEXT_PROC( PFNGLUNIFORM1IPROC,                 glUniform1iARB                 );
+GLEXT_PROC( PFNGLUNIFORM2IPROC,                 glUniform2iARB                 );
+GLEXT_PROC( PFNGLUNIFORM3IPROC,                 glUniform3iARB                 );
+GLEXT_PROC( PFNGLUNIFORM4IPROC,                 glUniform4iARB                 );
+GLEXT_PROC( PFNGLUNIFORM1FVPROC,                glUniform1fvARB                );
+GLEXT_PROC( PFNGLUNIFORM2FVPROC,                glUniform2fvARB                );
+GLEXT_PROC( PFNGLUNIFORM3FVPROC,                glUniform3fvARB                );
+GLEXT_PROC( PFNGLUNIFORM4FVPROC,                glUniform4fvARB                );
+GLEXT_PROC( PFNGLUNIFORM1IVPROC,                glUniform1ivARB                );
+GLEXT_PROC( PFNGLUNIFORM2IVPROC,                glUniform2ivARB                );
+GLEXT_PROC( PFNGLUNIFORM3IVPROC,                glUniform3ivARB                );
+GLEXT_PROC( PFNGLUNIFORM4IVPROC,                glUniform4ivARB                );
+GLEXT_PROC( PFNGLUNIFORMMATRIX2FVPROC,          glUniformMatrix2fvARB          );
+GLEXT_PROC( PFNGLUNIFORMMATRIX3FVPROC,          glUniformMatrix3fvARB          );
+GLEXT_PROC( PFNGLUNIFORMMATRIX4FVPROC,          glUniformMatrix4fvARB          );
+GLEXT_PROC( PFNGLVALIDATEPROGRAMPROC,           glValidateProgramARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB1DPROC,            glVertexAttrib1dARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB1DVPROC,           glVertexAttrib1dvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB1FPROC,            glVertexAttrib1fARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB1FVPROC,           glVertexAttrib1fvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB1SPROC,            glVertexAttrib1sARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB1SVPROC,           glVertexAttrib1svARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB2DPROC,            glVertexAttrib2dARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB2DVPROC,           glVertexAttrib2dvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB2FPROC,            glVertexAttrib2fARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB2FVPROC,           glVertexAttrib2fvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB2SPROC,            glVertexAttrib2sARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB2SVPROC,           glVertexAttrib2svARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB3DPROC,            glVertexAttrib3dARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB3DVPROC,           glVertexAttrib3dvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB3FPROC,            glVertexAttrib3fARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB3FVPROC,           glVertexAttrib3fvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB3SPROC,            glVertexAttrib3sARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB3SVPROC,           glVertexAttrib3svARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NBVPROC,          glVertexAttrib4NbvARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NIVPROC,          glVertexAttrib4NivARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NSVPROC,          glVertexAttrib4NsvARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NUBPROC,          glVertexAttrib4NubARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NUBVPROC,         glVertexAttrib4NubvARB         );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NUIVPROC,         glVertexAttrib4NuivARB         );
+GLEXT_PROC( PFNGLVERTEXATTRIB4NUSVPROC,         glVertexAttrib4NusvARB         );
+GLEXT_PROC( PFNGLVERTEXATTRIB4BVPROC,           glVertexAttrib4bvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4DPROC,            glVertexAttrib4dARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB4DVPROC,           glVertexAttrib4dvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4FPROC,            glVertexAttrib4fARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB4FVPROC,           glVertexAttrib4fvARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4IVPROC,           glVertexAttrib4ivARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4SPROC,            glVertexAttrib4sARB            );
+GLEXT_PROC( PFNGLVERTEXATTRIB4SVPROC,           glVertexAttrib4svARB           );
+GLEXT_PROC( PFNGLVERTEXATTRIB4UBVPROC,          glVertexAttrib4ubvARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4UIVPROC,          glVertexAttrib4uivARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIB4USVPROC,          glVertexAttrib4usvARB          );
+GLEXT_PROC( PFNGLVERTEXATTRIBPOINTERPROC,       glVertexAttribPointerARB       );
+
+// ---------------------------------------------------------------------------
 // OpenGL 2.1 extensions
 // ---------------------------------------------------------------------------
 

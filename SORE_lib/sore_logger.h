@@ -100,6 +100,7 @@ namespace SORE_Logging
 			char prevFunc[256];
 			bool first;
 			bool inFunc;
+			bool ok; //file stream is good for writing
 	};
 	
 	class Logger

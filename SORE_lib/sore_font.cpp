@@ -109,26 +109,6 @@ void SORE_Font::FontInfo::Cleanup()
 		delete [] fontInfo;
 }
 
-/*inline void SORE_Font::PushScreenCoordMatrix()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
-	glPopAttrib();
-}
-
-inline void SORE_Font::PopProjectionMatrix()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-}*/
-
 int SORE_Font::FontHeight(font_ref font)
 {
 	if(font >= 0)
@@ -143,9 +123,7 @@ int SORE_Font::FontHeight(font_ref font)
 int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 {
 	if(fontIndex == 0) return 0;
-	//std::cout << "test\n";
 	FontInfo* font = &fontStack[fontIndex];
-	//std::cout << "font.h: " << font.height << std::endl;
 	if(!font || font->height == 0) return INVALID_FONT_OBJ;
 	
 	
@@ -192,9 +170,9 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glListBase(fontList);
 	//int* listBase = new int[1];

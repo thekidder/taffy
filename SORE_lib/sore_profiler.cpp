@@ -13,6 +13,7 @@
 #include "sore_logger.h"
 #include "sore_profiler.h"
 #include "sore_allgl.h"
+#include "sore_timing.h"
 
 unsigned int SORE_Profiler::Sample::numSamples = 0;
 unsigned int SORE_Profiler::Sample::lastOpened = 0;
@@ -29,14 +30,14 @@ namespace SORE_Profiler
 			index = numSamples++; 
 			samples[index].name = name;
 			samples[index].timesRun = 1;
-			samples[index].startTime = SDL_GetTicks();
+			samples[index].startTime = SORE_Timing::GetGlobalTicks();
 			lastOpened = index;
 			samples[index].intervalCount = 1;
 		}
 		else
 		{
 			index = lastOpened = currIndex;
-			samples[index].startTime = SDL_GetTicks();
+			samples[index].startTime = SORE_Timing::GetGlobalTicks();
 			samples[index].timesRun++;
 			samples[index].intervalCount++;
 		}
@@ -44,7 +45,7 @@ namespace SORE_Profiler
 	
 	Sample::~Sample()
 	{
-		samples[index].endTime = SDL_GetTicks();
+		samples[index].endTime = SORE_Timing::GetGlobalTicks();
 		samples[index].lastTime = samples[index].endTime - samples[index].startTime;
 		samples[index].avgTime = (samples[index].avgTime*samples[index].timesRun+(samples[index].lastTime))/++samples[index].timesRun;
 		samples[index].shortAvgTime+=samples[index].lastTime;
