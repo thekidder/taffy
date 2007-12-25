@@ -6,8 +6,8 @@
 #include <windows.h>
 #endif
 
-#define GL_GLEXT_PROTOTYPES
-#undef GL_ARB_shader_objects
+//#define GL_GLEXT_PROTOTYPES
+//#undef GL_ARB_shader_objects
 
 #include <GL/gl.h>
 #include <GL/glu.h>

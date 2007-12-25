@@ -47,7 +47,7 @@ namespace SORE_Kernel
 			
 			bool     quitFlag;
 			
-			SORE_Utility::interpolater_iterator AddInterpolater(SORE_Utility::IInterpolater* i);
+			SORE_Utility::interpolater_iterator AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i);
 			void RemoveInterpolater(SORE_Utility::interpolater_iterator i);
 		protected:
 			task_list tasks;

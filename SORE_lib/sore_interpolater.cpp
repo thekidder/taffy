@@ -14,8 +14,7 @@
 
 namespace SORE_Utility
 {
-	int IInterpolater::created = 0;
-	int IInterpolater::destroyed = 0;	
+	int IInterpolater::open = 0;
 	
 	InterpolaterTask::InterpolaterTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 	{
@@ -28,7 +27,13 @@ namespace SORE_Utility
 		{
 			temp = it;
 			it++;
-			delete *temp;
+			//delete *temp;
+		}
+		for(it=oldInterpolaters.begin();it!=oldInterpolaters.end();)
+		{
+			temp = it;
+			it++;
+			//delete *temp;
 		}
 	}
 	
@@ -55,7 +60,7 @@ namespace SORE_Utility
 	{
 	}
 	
-	interpolater_iterator InterpolaterTask::AddInterpolater(IInterpolater* i)
+	interpolater_iterator InterpolaterTask::AddInterpolater(boost::shared_ptr<IInterpolater> i)
 	{
 		interpolaters.push_back(i);
 		interpolater_iterator it = --interpolaters.end();
@@ -64,7 +69,8 @@ namespace SORE_Utility
 	
 	void InterpolaterTask::RemoveInterpolater(interpolater_iterator i)
 	{
-		delete *i;
+		//delete *i;
+		//oldInterpolaters.push_back(*i);
 		interpolaters.erase(i);
 	}
 }

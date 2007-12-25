@@ -13,6 +13,6 @@
 #include "sore_glext.h"
 
 // OpenGL extension function pointers
-//#define GLEXT_PROC(proc, name) proc name = NULL
-//#include "glextproc.h"
-//#undef GLEXT_PROC
+#define GLEXT_PROC(proc, name) proc name = NULL
+#include "glextproc.h"
+#undef GLEXT_PROC

@@ -15,6 +15,7 @@
 #include "sore_logger.h"
 #include "sore_allgl.h"
 #include "sore_timing.h"
+#include <boost/shared_ptr.hpp>
 
 SORE_Kernel::Task::Task(GameKernel* _gk)
 {
@@ -28,7 +29,7 @@ SORE_Kernel::GameKernel::GameKernel() : itask(this)
 	quitFlag = false;
 	lastTicks = 0;
 	paused = false;
-	AddTask(1, &itask);
+	AddConstTask(1, 200, &itask);
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
@@ -151,7 +152,7 @@ void SORE_Kernel::GameKernel::RemoveAllTasks()
 	tasks.clear();
 }
 
-SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(SORE_Utility::IInterpolater* i)
+SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i)
 {
 	return itask.AddInterpolater(i);
 }

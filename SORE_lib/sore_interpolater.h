@@ -16,6 +16,7 @@
 #include "sore_task.h"
 #include "sore_logger.h"
 #include <list>
+#include <boost/shared_ptr.hpp>
 
 namespace SORE_Utility
 {
@@ -80,17 +81,16 @@ namespace SORE_Utility
 	class IInterpolater
 	{
 		public:
-			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Created interpolater (%d created, %d destroyed)",created, destroyed); }
-			virtual ~IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater (%d created, %d destroyed)",created, destroyed); }
+			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Created interpolater (%d interpolaters opened)",open); }
+			virtual ~IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater (%d interpolaters opened)",open); }
 			virtual void Frame(int elapsedTime)  = 0;
 			virtual void Update(int elapsedTime) = 0;
 			virtual bool Done() = 0;
 		protected:
-			static int created;
-			static int destroyed;
+			static int open;
 	};
 	
-	typedef std::list<IInterpolater*>::iterator interpolater_iterator;
+	typedef std::list<boost::shared_ptr<IInterpolater> >::iterator interpolater_iterator;
 	
 	//Interpolater interface. Interpolaters take an input value and apply an operation on it each timestep
 	template<class T>
@@ -103,14 +103,14 @@ namespace SORE_Utility
 				func = callback;
 				(*func)(input);
 				death = NULL;
-				created++;
+				open++;
 			}
 			
 			~Interpolater()
 			{
 				if(death)
 					(*death)(interpolatedValue);
-				destroyed++;
+				open--;
 			}
 			
 			void Frame(int elapsedTime)
@@ -215,10 +215,11 @@ namespace SORE_Utility
 			void Pause();
 			void Resume();
 			
-			interpolater_iterator AddInterpolater(IInterpolater* i);
+			interpolater_iterator AddInterpolater(boost::shared_ptr<IInterpolater> i);
 			void           RemoveInterpolater(interpolater_iterator i);
 		protected:
-			std::list<IInterpolater*> interpolaters;
+			std::list<boost::shared_ptr<IInterpolater> > interpolaters;
+			std::list<boost::shared_ptr<IInterpolater> > oldInterpolaters;
 	};
 }
 
