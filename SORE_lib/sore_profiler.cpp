@@ -29,7 +29,7 @@ namespace SORE_Profiler
 		{
 			index = numSamples++; 
 			samples[index].name = name;
-			samples[index].timesRun = 1;
+			samples[index].timesRun = 0;
 			samples[index].startTime = SORE_Timing::GetGlobalTicks();
 			lastOpened = index;
 			samples[index].intervalCount = 1;
@@ -47,7 +47,7 @@ namespace SORE_Profiler
 	{
 		samples[index].endTime = SORE_Timing::GetGlobalTicks();
 		samples[index].lastTime = samples[index].endTime - samples[index].startTime;
-		samples[index].avgTime = (samples[index].avgTime*samples[index].timesRun+(samples[index].lastTime))/++samples[index].timesRun;
+		samples[index].avgTime = (samples[index].avgTime*samples[index].timesRun+(samples[index].lastTime))/(++samples[index].timesRun);
 		samples[index].shortAvgTime+=samples[index].lastTime;
 		if(samples[index].intervalCount%SHORT_INTERVAL==0)
 		{
