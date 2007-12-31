@@ -18,7 +18,7 @@
 namespace SORE_Math
 {
 	template<class T>
-	struct Point3D
+			struct Point3D
 	{
 		Point3D(T _x, T _y, T _z)
 		{
@@ -53,7 +53,38 @@ namespace SORE_Math
 	};
 	
 	template<class T>
-	class Vector3D
+			struct Point2D
+	{
+		Point2D(T _x, T _y)
+		{
+			x = _x;
+			y = _y;
+		}
+		Point2D()
+		{
+			x = T(0);
+			y = T(0);
+		}
+		
+		Point2D<T> operator+(Point2D<T>& t)
+		{
+			Point2D<T> temp;
+			temp.x = x + t.x;
+			temp.y = y + t.y;
+			return temp;
+		}
+		Point2D<T> operator-(Point2D<T>& t)
+		{
+			Point2D<T> temp;
+			temp.x = x - t.x;
+			temp.y = y - t.y;
+			return temp;
+		}
+		T x,y;
+	};
+	
+	template<class T>
+			class Vector3D
 	{
 		public:
 			Vector3D()
@@ -188,6 +219,134 @@ namespace SORE_Math
 	};
 	
 	template<class T>
+			class Vector2D
+	{
+		public:
+			Vector2D()
+			{
+				value[0] = T(0);
+				value[1] = T(0);
+			}
+			Vector2D(T x, T y)
+			{
+				value[0] = x;
+				value[1] = y;
+			}
+			Vector2D(Point2D<T> p)
+			{
+				value[0] = p.x;
+				value[1] = p.y;
+			}
+			
+			Vector2D(const Vector2D<T>& v)
+			{
+				value[0] = v.value[0];
+				value[1] = v.value[1];
+			}
+			
+			void Set(T x, T y)
+			{
+				value[0] = x;
+				value[1] = y;
+			}
+			
+			T* GetValue()
+			{
+				return value;
+			}
+			
+			T operator[] (int index) const
+			{
+				if(index<0 || index>1) return T(0.0);
+				return value[index];
+			}
+
+			T dot(Vector2D<T>& v)
+			{
+				T temp = v[0]*value[0] + v[1]*value[1];
+				return temp;
+			}
+			
+			Vector2D<T>& operator+=(Vector2D<T> v)
+			{
+				value[0] += v.value[0];
+				value[1] += v.value[1];
+				return *this;
+			}
+			Vector2D<T>& operator-=(Vector2D<T> v)
+			{
+				value[0] -= v.value[0];
+				value[1] -= v.value[1];
+				return *this;
+			}
+			
+			Vector2D<T>& operator*=(Vector2D<T> v)
+			{
+				value[0] *= v.value[0];
+				value[1] *= v.value[1];
+				return *this;
+			}
+			
+			Vector2D<T>& operator/=(Vector2D<T> v)
+			{
+				value[0] /= v.value[0];
+				value[1] /= v.value[1];
+				return *this;
+			}
+			
+			//template<class OP>
+			Vector2D<T>& operator+=(T v)
+			{
+				value[0] += v;
+				value[1] += v;
+				return *this;
+			}
+			Vector2D<T>& operator-=(T v)
+			{
+				value[0] -= v;
+				value[1] -= v;
+				return *this;
+			}
+			//template<class OP>
+			Vector2D<T>& operator*=(T v)
+			{
+				value[0] *= v;
+				value[1] *= v;
+				return *this;
+			}
+			
+			
+			//template<class OP>
+			Vector2D<T>& operator/=(T num)
+			{
+				value[0] /= num;
+				value[1] /= num;
+				return *this;
+			}
+			
+			double Magnitude()
+			{
+				return sqrt(pow(value[0],2)+pow(value[1],2));
+			}
+			
+			Vector2D Normalize()
+			{
+				double mag = Magnitude();
+				if(mag==0.0) return Vector2D(0.0,0.0);
+				Vector2D<T> temp(value[0]/mag,value[1]/mag);
+				return temp;
+			}
+			
+			void Log(unsigned int severity)
+			{
+				ENGINE_LOG(severity, "(%fi, %fj)",value[0],value[1]);
+			}
+				
+		protected:
+			T value[2];
+	};
+	
+	template<class T>
 			double distance(Vector3D<T> one, Vector3D<T> two)
 	{
 		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1])+(one[2]-two[2])*(one[2]-two[2]));
@@ -238,9 +397,63 @@ namespace SORE_Math
 		return v1*num;
 	}
 	
+	template<class T>
+			double distance(Vector2D<T> one, Vector2D<T> two)
+	{
+		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1]));
+	}
+	
+	template<class T>
+			Vector2D<T> operator-(Vector2D<T> v)
+	{
+		Vector2D<T> temp(-v[0],-v[1]);
+		return temp;
+	}
+	
+	template<class T>
+			Vector2D<T> operator+(Vector2D<T> v1, Vector2D<T> v2)
+	{
+		Vector2D<T> r = v1;
+		r += v2;
+		return r;
+	}
+	
+	template<class T>
+			Vector2D<T> operator-(Vector2D<T> v1, Vector2D<T> v2)
+	{
+		Vector2D<T> r = v1;
+		r += -v2;
+		return r;
+	}
+	
+	template<class T>
+			Vector2D<T> operator/(Vector2D<T> v1, T& num)
+	{
+		Vector2D<T> r = v1;
+		r /= num;
+		return r;
+	}
+	
+	template<class T>
+			Vector2D<T> operator*(Vector2D<T> v1, T num)
+	{
+		Vector2D<T> r = v1;
+		r *= num;
+		return r;
+	}
+	
+	template<class T>
+			Vector2D<T> operator*(T num, Vector2D<T> v1)
+	{
+		return v1*num;
+	}
+	
 	typedef Vector3D<double> Vector3Dd;
 	typedef Vector3D<float>  Vector3Df;
 	typedef Vector3D<int>    Vector3Di;
+	typedef Vector2D<double> Vector2Dd;
+	typedef Vector2D<float>  Vector2Df;
+	typedef Vector2D<int>    Vector2Di;
 	
 	float Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
 	float Distance2D(float x1, float y1, float x2, float y2);
