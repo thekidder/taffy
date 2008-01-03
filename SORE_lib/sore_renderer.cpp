@@ -140,8 +140,8 @@ int SORE_Kernel::Renderer::ChangeProjection(double ratio)
 			{
 				if(proj.useScreenRatio)
 				{
-					proj.top = proj.left / ratio;
-					proj.bottom = proj.right / ratio;
+					proj.bottom = proj.left / ratio;
+					proj.top = proj.right / ratio;
 				}
 				gluOrtho2D(proj.left, proj.right, proj.top, proj.bottom);
 			}
