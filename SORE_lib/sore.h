@@ -4,8 +4,6 @@
 
 #include "sore_defines.h"
 
-#include "sore_glext.h"
-
 #include "sore_allgl.h"
 #include "sore_buffer.h"
 #include "sore_camera.h"

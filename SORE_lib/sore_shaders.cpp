@@ -14,9 +14,15 @@
 
 namespace SORE_Graphics
 {
-	void InitShaders()
+	int InitShaders()
 	{
-		if(!glCreateProgram && glCreateProgramARB)
+		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
+		{
+			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
+			return -1;
+		}
+		return 0;
+		/*if(!glCreateProgram && glCreateProgramARB)
 			glCreateProgram = glCreateProgramARB;
 		if(!glCreateShader && glCreateShaderARB)
 			glCreateShader = glCreateShaderARB;
@@ -35,7 +41,7 @@ namespace SORE_Graphics
 		if(!glDetachShader && glDetachShaderARB)
 			glDetachShader = glDetachShaderARB;
 		if(!glDeleteShader && glDeleteShaderARB)
-			glDeleteShader = glDeleteShaderARB;
+			glDeleteShader = glDeleteShaderARB;*/
 	}
 	
 	void UnbindShaders()

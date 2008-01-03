@@ -3,7 +3,6 @@
 #define  __SORE_H__
 
 #include "sore_renderer.h"
-#include "sore_glext.h"
 #include "sore_font.h"
 #include "sore_logger.h"
 #include "sore_input.h"

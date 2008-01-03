@@ -15,7 +15,6 @@
 
 #include "sore_fileio.h"
 #include "sore_allgl.h"
-#include "sore_glext.h"
 #include "sore_logger.h"
 
 #include <vector>
@@ -23,7 +22,7 @@
 
 namespace SORE_Graphics
 {
-	void InitShaders();
+	int InitShaders();
 	void UnbindShaders();
 	
 	class GLSLShader

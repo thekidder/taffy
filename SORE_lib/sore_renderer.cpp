@@ -238,14 +238,16 @@ int SORE_Kernel::Renderer::InitializeGL()
 	}
 	InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
-	if(wglSwapIntervalEXT)
+#ifdef WIN32
+	if(WGLEW_wglSwapInterval)
 	{
-		wglSwapIntervalEXT(0); //turn off vsync
+		wglSwapInterval(0); //turn off vsync
 	}
 	else
 	{
 		ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "Vsync control not available");
 	}
+#endif
 	return 0;
 }
 
@@ -258,26 +260,14 @@ void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo& info)
 	info.ratio = proj.ratio;
 }
 
-/*void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo* info)
-{
-	switch(info->type)
-	{
-		case SORE_Graphics::ORTHO2D:
-			
-			break;
-		case SORE_Graphics::ORTHO:
-			break;
-		case SORE_Graphics::PERSPECTIVE:
-			break;
-	}
-}*/
-
 void SORE_Kernel::Renderer::InitExtensions()
 {
-	// Initialize OpenGL extension function pointers
-#define GLEXT_PROC(proc, name) glextInitProc(name, #name);
-#include "glextproc.h"
-#undef GLEXT_PROC
+	glewExperimental = GL_TRUE;
+	GLenum glewError = glewInit();
+	if(glewError != GLEW_OK)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to initialize OpenGL extensions. GLEW Error: %s", glewGetErrorString(glewError));
+	}
 }
 
 GLint* SORE_Kernel::Renderer::GetViewport()

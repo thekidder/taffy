@@ -5,7 +5,6 @@
 #include "sore_kernel.h"
 #include "sore_font.h"
 #include "sore_allgl.h"
-#include "sore_glext.h"
 #include "sore_camera.h"
 #include "sore_logger.h"
 
@@ -76,7 +75,7 @@ namespace SORE_Kernel
 			
 			int ChangeProjection(double ratio); //returns 0 on success
 			
-			template <typename proc>
+			/*template <typename proc>
 					void glextInitProc(proc& dest, const char* name)
 			{
 				dest = reinterpret_cast<proc>(uglGetProcAddress(name));
@@ -84,7 +83,7 @@ namespace SORE_Kernel
 				{
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, "Could not set up extension %s", name);
 				}
-			} 
+			} */
 			
 			SDL_Surface* drawContext;
 			int width,height;
