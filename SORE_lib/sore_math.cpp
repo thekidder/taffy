@@ -28,4 +28,9 @@ namespace SORE_Math
 	{
 		return ((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 	}
+	
+	bool DoubleEquals(double value, double compare, double epsilon)
+	{
+		return fabs(value-compare)<epsilon;
+	}
 }

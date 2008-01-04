@@ -19,6 +19,7 @@ SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
 
 SORE_Kernel::InputTask::InputTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
+	event.mouse.buttonState = 0x00;
 }
 
 SORE_Kernel::InputTask::~InputTask()
@@ -45,12 +46,24 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.mouse.ymove = sdl_event.motion.yrel;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button down: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
 				event.type = MOUSEBUTTONDOWN;
-				event.mouse.buttonState = sdl_event.button.button;
+				if(sdl_event.motion.state & SDL_BUTTON_LEFT) event.mouse.buttonState |= MOUSE_BUTTON1;
+				if(sdl_event.motion.state & SDL_BUTTON_MIDDLE) event.mouse.buttonState |= MOUSE_BUTTON3;
+				if(sdl_event.motion.state & SDL_BUTTON_RIGHT) event.mouse.buttonState |= MOUSE_BUTTON2;
+				//event.mouse.buttonState = sdl_event.button.button;
 				break;
 			case SDL_MOUSEBUTTONUP:
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button up: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
 				event.type = MOUSEBUTTONUP;
-				event.mouse.buttonState = sdl_event.button.button;
+				if(sdl_event.button.button & SDL_BUTTON_LEFT) event.mouse.buttonState -= MOUSE_BUTTON1;
+				if(sdl_event.button.button & SDL_BUTTON_RIGHT) event.mouse.buttonState -= MOUSE_BUTTON2;
+				if(sdl_event.button.button & SDL_BUTTON_MIDDLE) event.mouse.buttonState -= MOUSE_BUTTON3;
+				//event.mouse.buttonState = 0x00;
+				//if(sdl_event.motion.state & SDL_BUTTON_LEFT) event.mouse.buttonState |= MOUSE_BUTTON1;
+				//if(sdl_event.motion.state & SDL_BUTTON_MIDDLE) event.mouse.buttonState |= MOUSE_BUTTON3;
+				//if(sdl_event.motion.state & SDL_BUTTON_RIGHT) event.mouse.buttonState |= MOUSE_BUTTON2;
+				//event.mouse.buttonState = sdl_event.button.button;
 				break;
 			case SDL_KEYDOWN:
 				event.type = KEYDOWN;
