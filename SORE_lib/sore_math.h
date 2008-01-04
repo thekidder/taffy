@@ -447,6 +447,12 @@ namespace SORE_Math
 	{
 		return v1*num;
 	}
+
+	template<class T>
+			bool operator>(Vector2D<T> one, Vector2D<T> two)
+	{
+		return one.Magnitude() > two.Magnitude();
+	}
 	
 	typedef Vector3D<double> Vector3Dd;
 	typedef Vector3D<float>  Vector3Df;

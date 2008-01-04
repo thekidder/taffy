@@ -35,17 +35,18 @@ namespace SORE_Timing
 		}
 		return time;
 #else
-		static __int64 start_count = 0;
-		static __int64 freq        = 0;
+		static unsigned __int64 start_count = 0;
+		static unsigned __int64 freq        = 0;
 		if(start_count == 0 && freq == 0)
 		{
 			QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
 			QueryPerformanceCounter((LARGE_INTEGER*)&start_count);
 		}
-		__int64 ticks;
+		unsigned __int64 ticks;
 		QueryPerformanceCounter((LARGE_INTEGER*)&ticks);
 		double secs = (double)(ticks - start_count) / (double)freq;
-		return (unsigned int)(secs/10000.0);
+		return (unsigned int)(secs*10000.0);
+		//return 10*SDL_GetTicks();
 #endif
 	}
 }
