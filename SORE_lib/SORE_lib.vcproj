@@ -164,10 +164,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sore_glext.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\sore_graphics.cpp"
 				>
 			</File>
@@ -222,10 +218,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\glextproc.h"
-				>
-			</File>
-			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
@@ -259,10 +251,6 @@
 			</File>
 			<File
 				RelativePath=".\sore_font.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_glext.h"
 				>
 			</File>
 			<File
