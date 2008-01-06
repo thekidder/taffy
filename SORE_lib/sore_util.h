@@ -15,17 +15,4 @@ namespace SORE_Utility
 	Uint8* GetBMPMask(const char* filename);
 }
 
-//Functions
-bool  CheckExtension(const char* extensionName);
-
-void  BuildFont();
-void  glPrint(const char *fmt, ...);
-
-const float PI_180 = (float)M_PI/180.0f;
-
-//extern PFNGLPOINTPARAMETERFARBPROC  glPointParameterf;
-//extern PFNGLPOINTPARAMETERFVARBPROC  glPointParameterfv;
-//extern GLuint fontList;
-
-
 #endif //__SORE_UTIL_H__

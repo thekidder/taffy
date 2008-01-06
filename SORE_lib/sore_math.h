@@ -17,6 +17,8 @@
 
 namespace SORE_Math
 {
+	const float PI_180 = (float)M_PI/180.0f;
+	
 	template<class T>
 			struct Point3D
 	{

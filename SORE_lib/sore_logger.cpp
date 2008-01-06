@@ -14,11 +14,14 @@
 
 #include "sore_allgl.h"
 #include "sore_logger.h"
+#include "sore_timing.h"
 #include <cstring>
 #include <string>
 #include <ctime>
 #include <cstdarg>
 #include <cstdlib>
+
+#define FLUSH_MESSAGES
 
 namespace SORE_Logging
 {
@@ -229,9 +232,10 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	const char begin[] = "\t<message>\n";
 	const char end[]   = "\t</message>\n";
 	fwrite(begin, sizeof(char), strlen(begin), filePtr);
-	tm* currtime;
+	/*tm* currtime;
 	currtime = localtime(&(log->time));
-	strftime(buffer, 127, "%X", currtime);
+	strftime(buffer, 127, "%X", currtime);*/
+	sprintf(buffer, "+%.1f ms", (double)SORE_Timing::GetGlobalTicks()/10.0);
 	fwrite("\t\t<time>", sizeof(char), 8, filePtr);
 	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
 	fwrite("</time>\n", sizeof(char), 8, filePtr);
@@ -323,7 +327,7 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
-#ifdef DEBUG
+#ifdef FLUSH_MESSAGES
 	Flush();
 #endif
 }

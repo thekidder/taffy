@@ -2,23 +2,6 @@
 #include "sore_util.h"
 #include "sore_logger.h"
 
-bool CheckExtension(const char* extensionName)
-{
-	char* extensionsList = (char*) glGetString(GL_EXTENSIONS);
-	
-	while(*extensionsList)
-	{
-		size_t length = strcspn(extensionsList, " ");
-		
-		if(length == strlen(extensionName) && strstr(extensionsList, extensionName)==0)
-		{
-			return true;
-		}
-		extensionsList += length+1;
-	}
-	return false;
-}
-
 float SORE_Utility::getRandomMinMax( float fMin, float fMax )
 {
 	float fRandNum = (float)rand () / RAND_MAX;

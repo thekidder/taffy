@@ -22,31 +22,31 @@ namespace SORE_Graphics
 			return -1;
 		}
 		return 0;
-		/*if(!glCreateProgram && glCreateProgramARB)
-			glCreateProgram = glCreateProgramARB;
-		if(!glCreateShader && glCreateShaderARB)
-			glCreateShader = glCreateShaderARB;
-		if(!glShaderSource && glShaderSourceARB)
-			glShaderSource = glShaderSourceARB;
-		if(!glCompileShader && glCompileShaderARB)
-			glCompileShader = glCompileShaderARB;
-		if(!glAttachShader && glAttachObjectARB)
-			glAttachShader = glAttachObjectARB;
-		if(!glGetShaderiv && glGetShaderivARB)
-			glGetShaderiv = glGetShaderivARB;
-		if(!glGetShaderInfoLog && glGetShaderInfoLogARB)
-			glGetShaderInfoLog = glGetShaderInfoLogARB;
-		if(!glUseProgram && glUseProgramObjectARB)
-			glUseProgram = glUseProgramObjectARB;
-		if(!glDetachShader && glDetachShaderARB)
-			glDetachShader = glDetachShaderARB;
-		if(!glDeleteShader && glDeleteShaderARB)
-			glDeleteShader = glDeleteShaderARB;*/
+		/*if(!glCreateProgramARB && glCreateProgramARBARB)
+			glCreateProgramARB = glCreateProgramARBARB;
+		if(!glCreateShaderARB && glCreateShaderARBARB)
+			glCreateShaderARB = glCreateShaderARBARB;
+		if(!glShaderSourceARB && glShaderSourceARBARB)
+			glShaderSourceARB = glShaderSourceARBARB;
+		if(!glCompileShaderARB && glCompileShaderARBARB)
+			glCompileShaderARB = glCompileShaderARBARB;
+		if(!glAttachObjectARB && glAttachObjectARBARB)
+			glAttachObjectARB = glAttachObjectARBARB;
+		if(!glGetShaderivARB && glGetShaderivARBARB)
+			glGetShaderivARB = glGetShaderivARBARB;
+		if(!glGetShaderInfoLogARB && glGetShaderInfoLogARBARB)
+			glGetShaderInfoLogARB = glGetShaderInfoLogARBARB;
+		if(!glUseProgramObjectARB && glUseProgramObjectARB)
+			glUseProgramObjectARB = glUseProgramObjectARB;
+		if(!glDetachShaderARB && glDetachShaderARBARB)
+			glDetachShaderARB = glDetachShaderARBARB;
+		if(!glDeleteShaderARBARB && glDeleteShaderARBARB)
+			glDeleteShaderARB = glDeleteShaderARBARB;*/
 	}
 	
 	void UnbindShaders()
 	{
-		glUseProgram(0);
+		glUseProgramObjectARB(0);
 	}
 	
 	GLSLShader::GLSLShader(const char* vertex, const char* fragment)
@@ -63,13 +63,13 @@ namespace SORE_Graphics
 		std::vector<GLuint>::iterator it;
 		for(it=vertexShaders.begin();it!=vertexShaders.end();it++)
 		{
-			glDetachShader(program, *it);
-			glDeleteShader(*it);
+			glDetachObjectARB(program, *it);
+			glDeleteObjectARB(*it);
 		}
 		for(it=fragmentShaders.begin();it!=fragmentShaders.end();it++)
 		{
-			glDetachShader(program, *it);
-			glDeleteShader(*it);
+			glDetachObjectARB(program, *it);
+			glDeleteObjectARB(*it);
 		}
 		glDeleteProgram(program);
 	}
@@ -110,7 +110,7 @@ namespace SORE_Graphics
 	
 	int GLSLShader::Init()
 	{
-		program = glCreateProgram();
+		program = glCreateProgramObjectARB();
 		if(program == 0)
 		{
 			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Error creating shader program");
@@ -128,7 +128,7 @@ namespace SORE_Graphics
 			return 1;
 		}
 		GLuint shader;
-		shader = glCreateShader(type);
+		shader = glCreateShaderObjectARB(type);
 		std::string shaderType, source;
 		if(type==GL_VERTEX_SHADER) shaderType = "vertex";
 		else if(type==GL_FRAGMENT_SHADER) shaderType = "fragment";
@@ -137,13 +137,13 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating %s shader object.", shaderType.c_str());
 			return 1;
 		}
-		glShaderSource(shader, 1, &src, NULL);
-		glCompileShader(shader);
-		glAttachShader(program, shader);
+		glShaderSourceARB(shader, 1, &src, NULL);
+		glCompileShaderARB(shader);
+		glAttachObjectARB(program, shader);
 		
 		//now let's check if everything is ok
 		int compile;
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &compile);
+		glGetObjectParameterivARB(shader, GL_COMPILE_STATUS, &compile);
 		if(compile!=GL_TRUE)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to compile %s shader", shaderType.c_str());
@@ -152,11 +152,11 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 	
-			glGetShaderiv(shader, GL_INFO_LOG_LENGTH,&infologLength);
+			glGetUniformivARB(shader, GL_INFO_LOG_LENGTH,&infologLength);
 			if (infologLength > 0)
 			{
 				infoLog = new char[infologLength];
-				glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
+				glGetInfoLogARB(shader, infologLength, &charsWritten, infoLog);
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, "Info log:\n%s", infoLog);
 				delete[] infoLog;
 			}
@@ -211,7 +211,7 @@ namespace SORE_Graphics
 	
 	void GLSLShader::Bind()
 	{
-		glUseProgram(program);
+		glUseProgramObjectARB(program);
 	}
 	
 	void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
