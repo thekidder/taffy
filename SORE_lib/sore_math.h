@@ -13,6 +13,7 @@
 #ifndef  __SORE_MATH_H__
 #define  __SORE_MATH_H__
 
+#include "sore_defines.h"
 #include <cmath>
 
 namespace SORE_Math
