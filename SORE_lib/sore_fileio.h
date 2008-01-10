@@ -3,11 +3,13 @@
 #define  __SORE_FILEIO__
 
 #include  <cstdio>
+#include <limits>
 
 namespace SORE_FileIO
 {
 	const unsigned long PACKAGE_START = 1;
-	const unsigned long FILESYSTEM_START = 2147483648;
+	const unsigned long FILESYSTEM_START = std::numeric_limits<unsigned long>::max()/2;
+	const unsigned long FILESYSTEM_END   = std::numeric_limits<unsigned long>::max();
 	
 	typedef unsigned long file_ref;
 	

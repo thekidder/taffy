@@ -34,26 +34,3 @@ int SORE_Utility::GetFileExt(const char* filename, char* ext)
 	}
 	return 0;
 }
-
-Uint8* SORE_Utility::GetBMPMask(const char* filename)
-{
-	static Uint8* mask;
-	Uint8 alpha;
-	Uint32 pixel,temp;
-	SDL_Surface* bmp = SDL_LoadBMP(filename);
-	mask = new Uint8[bmp->w*bmp->h];
-	SDL_PixelFormat* pf = bmp->format;
-	SDL_LockSurface(bmp);
-	
-	for(int i=0;i<bmp->w*bmp->h;i++)
-	{
-		pixel=*((Uint32*)bmp->pixels+(Uint32)(i*pf->BytesPerPixel));
-		temp=pixel&pf->Amask; /* Isolate alpha component */
-		temp=temp>>pf->Ashift;/* Shift it down to 8-bit */
-		temp=temp<<pf->Aloss; /* Expand to a full 8-bit number */
-		alpha=(Uint8)temp;
-		mask[i] = alpha;
-	}
-	SDL_UnlockSurface(bmp);
-	return mask;
-}

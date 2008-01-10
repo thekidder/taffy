@@ -293,7 +293,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 				break;
 			}
 			strcpy(fontPath, "");
-			fontObj = NULL;
+			fontObj = 0;
 		}
 	}
 	else

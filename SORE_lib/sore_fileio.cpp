@@ -175,7 +175,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		//fclose(temp);
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from disk", file);
-		if(nOpenFilesystemFiles>=(unsigned long)4294967295-FILESYSTEM_START)
+		if(nOpenFilesystemFiles>=(unsigned long)FILESYSTEM_END-FILESYSTEM_START)
 		{
 			ENGINE_LOG_S(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
 			fclose(temp);
@@ -265,7 +265,7 @@ void SORE_FileIO::Close(file_ref file)
 			openPackages.erase(cachedFiles[file].package);
 		}
 	}
-	else if(file>=FILESYSTEM_START && file<4294967295)
+	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %u from disk",file);
 		nOpenFilesystemFiles--;
@@ -415,7 +415,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		cachedFiles[file].currPosRaw += read;
 		return read;
 	}
-	else if(file>=FILESYSTEM_START && file<4294967295)
+	else if(file>=FILESYSTEM_START && file<std::numeric_limits<unsigned long>::max())
 	{
 		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
 		if(read != size*nmemb)
