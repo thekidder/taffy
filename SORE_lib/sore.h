@@ -19,6 +19,7 @@
 #include "sore_profiler.h"
 #include "sore_renderer.h"
 #include "sore_resource.h"
+#include "sore_settings.h"
 #include "sore_shaders.h"
 #include "sore_texture.h"
 #include "sore_timing.h"
