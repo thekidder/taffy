@@ -18,7 +18,7 @@ namespace SORE_Graphics
 	{
 		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
 			return -1;
 		}
 		return 0;
@@ -86,7 +86,7 @@ namespace SORE_Graphics
 		glGetProgramiv(program, GL_LINK_STATUS, &link);
 		if(link!=GL_TRUE)
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Failed to link shader program");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to link shader program");
 			int infologLength = 0;
 			int charsWritten  = 0;
 			char *infoLog;
@@ -97,13 +97,13 @@ namespace SORE_Graphics
 			{
 				infoLog = new char[infologLength];
 				glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
-				ENGINE_LOG(SORE_Logging::LVL_ERROR, "Info log:\n%s", infoLog);
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Info log:\n%s") % infoLog);
 				delete[] infoLog;
 			}
 		}
 		else
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_DEBUG1, "Shader program linked OK");
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Shader program linked OK");
 			linked = true;
 		}
 	}
@@ -113,7 +113,7 @@ namespace SORE_Graphics
 		program = glCreateProgramObjectARB();
 		if(program == 0)
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Error creating shader program");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program");
 			ok = false;
 			return 1; //error
 		}
@@ -124,7 +124,7 @@ namespace SORE_Graphics
 	{
 		if(!(type==GL_VERTEX_SHADER || type==GL_FRAGMENT_SHADER))
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempted to create shader of unknown type (type given: %u)", type);
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Attempted to create shader of unknown type (type given: %u)") % type);
 			return 1;
 		}
 		GLuint shader;
@@ -134,7 +134,7 @@ namespace SORE_Graphics
 		else if(type==GL_FRAGMENT_SHADER) shaderType = "fragment";
 		if(shader==0)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating %s shader object.", shaderType.c_str());
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error creating %s shader object.") % shaderType.c_str());
 			return 1;
 		}
 		glShaderSourceARB(shader, 1, &src, NULL);
@@ -146,7 +146,7 @@ namespace SORE_Graphics
 		glGetObjectParameterivARB(shader, GL_COMPILE_STATUS, &compile);
 		if(compile!=GL_TRUE)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to compile %s shader", shaderType.c_str());
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to compile %s shader") % shaderType.c_str());
 			
 			int infologLength = 0;
 			int charsWritten  = 0;
@@ -157,14 +157,14 @@ namespace SORE_Graphics
 			{
 				infoLog = new char[infologLength];
 				glGetInfoLogARB(shader, infologLength, &charsWritten, infoLog);
-				ENGINE_LOG(SORE_Logging::LVL_ERROR, "Info log:\n%s", infoLog);
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Info log:\n%s") % infoLog);
 				delete[] infoLog;
 			}
 			else
-				ENGINE_LOG(SORE_Logging::LVL_INFO, "No info log for %s shader",shaderType.c_str());
+				ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("No info log for %s shader") % shaderType.c_str());
 			return 1;
 		}
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Compiling %s shader successful", shaderType.c_str());
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Compiling %s shader successful") % shaderType.c_str());
 		
 		if(type==GL_VERTEX_SHADER)
 			vertexShaders.push_back(shader);

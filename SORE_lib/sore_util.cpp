@@ -19,12 +19,12 @@ int SORE_Utility::GetFileExt(const char* filename, char* ext)
 	}
 	if(i==0) 
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "No file extension");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "No file extension");
 		return -1;
 	}
 	if(len-i>10)
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Extension is too long");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Extension is too long");
 		return -1;
 	}
 	strcpy(ext, filename+i+1);

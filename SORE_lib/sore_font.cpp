@@ -310,7 +310,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
 	{
 		//std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)", size, err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)") % size % err);
 		SORE_FileIO::Close(fontObj);
 		return FONT_LOAD_FAILED;
 	}
@@ -321,10 +321,10 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		FT_Done_FreeType(library);
 		delete[] dirName;
 		//std::cerr << "Font load failed: Freetype error code " << err << std::endl;
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Font load failed: Freetype error code %d", err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Font load failed: Freetype error code %d") % err);
 #ifdef DEBUG
 		//std::cout << ft_errors[err] << std::endl;
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Freetype error: %s", ft_errors[err]);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Freetype error: %s") % ft_errors[err]);
 #endif
 		return FONT_LOAD_FAILED;
 	}
@@ -336,7 +336,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	while((error=glGetError())!=GL_NO_ERROR)
 	{
 		//std::cout << "error detected: " << error << "\n";
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "GL Error: %d", error);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
 		delete[] fontPath;
 	
 		FT_Done_Face(face);
@@ -415,7 +415,7 @@ SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
 	if((err=newFont.LoadFont(font))!=0)
 	{
 		//std::cerr << "Failed to load font; error code " << err << std::endl;
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to load font: error code %d", err);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to load font: error code %d") % err);
 		return 0;
 	}
 	font_ref index = fontStack.size();

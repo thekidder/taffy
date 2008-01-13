@@ -81,8 +81,8 @@ namespace SORE_Utility
 	class IInterpolater
 	{
 		public:
-			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Created interpolater (%d interpolaters opened)",open); }
-			virtual ~IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Destroyed interpolater (%d interpolaters opened)",open); }
+			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Created interpolater (%d interpolaters opened)") % open); }
+			virtual ~IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Destroyed interpolater (%d interpolaters opened)") % open); }
 			virtual void Frame(int elapsedTime)  = 0;
 			virtual void Update(int elapsedTime) = 0;
 			virtual bool Done() = 0;

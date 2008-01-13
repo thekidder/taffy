@@ -6,13 +6,13 @@
 #include <vector>
 #include <map>
 #include <cstdio>
+#include <string>
+#include <boost/format.hpp>
 
 #ifndef _WIN32
-#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, __VA_ARGS__) 
-#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+#define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
 #else
-#define ENGINE_LOG(lvl, format, ...) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format, __VA_ARGS__) 
-#define ENGINE_LOG_S(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
+#define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
 #endif
 
 #ifdef DEBUG
@@ -34,18 +34,16 @@ namespace SORE_Logging
 	const int SHOW_WARNING      = SHOW_ERROR    | LVL_WARNING;
 	const int SHOW_INFO         = SHOW_WARNING  | LVL_INFO;
 	const int SHOW_ALL          = SHOW_INFO     | LVL_DEBUG1 | LVL_DEBUG2;
-	
-	const int BUFFER_LEN = 2048;
-	
+		
 	struct log_message
 	{
 		int level;
 		int line;
 		const char* func;
 		const char* file;
-		char buffer[BUFFER_LEN];
+		std::string buffer;
 		time_t time;
-		char* logName;
+		std::string logName;
 	};
 	
 	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
@@ -65,13 +63,13 @@ namespace SORE_Logging
 	class FileLogger : public LoggerBackend
 	{
 		public:
-			FileLogger(int lvl, const char* filename);
+			FileLogger(int lvl, std::string filename);
 			~FileLogger();
 			
 			void Flush();
 		protected:
 			void Write(log_message* log);
-			char file[256];
+			std::string file;
 			FILE* filePtr;
 	};
 	
@@ -89,15 +87,15 @@ namespace SORE_Logging
 	class XMLLogger : public LoggerBackend
 	{
 		public:
-			XMLLogger(int lvl, const char* filename);
+			XMLLogger(int lvl, std::string filename);
 			~XMLLogger();
 			
 			void Flush();
 		protected:
 			void Write(log_message* log);
-			char file[256];
+			std::string file;
 			FILE* filePtr;
-			char prevFunc[256];
+			std::string prevFunc;
 			bool first;
 			bool inFunc;
 			bool ok; //file stream is good for writing
@@ -111,8 +109,11 @@ namespace SORE_Logging
 			~Logger();
 		
 			void AddBackend(LoggerBackend* newLog);
-			void Log(int lvl, const char* format, ...);
-			void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);
+			//void Log(int lvl, const char* format, ...);
+			void Log(int lvl, std::string message);
+			//void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);
+			void Log(int lvl, int line, const char* func, const char* file, std::string message);
+			void Log(int lvl, int line, const char* func, const char* file, boost::format message);
 			void Flush();
 			
 			const char* GetName() const;
@@ -120,7 +121,7 @@ namespace SORE_Logging
 			std::vector<LoggerBackend*> logs;
 			std::vector<LoggerBackend*>::iterator it;
 			std::vector<log_message> buffers;
-			char logName[32];
+			std::string logName;
 	};
 	extern Logger sore_log;
 }

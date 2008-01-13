@@ -69,12 +69,11 @@ void SORE_Logging::LoggerBackend::Log(log_message* log)
 		Write(log);
 }
 
-SORE_Logging::FileLogger::FileLogger(int lvl, const char* filename)
+SORE_Logging::FileLogger::FileLogger(int lvl, std::string filename)
 {
 	level = lvl;
-	strncpy(file, filename, 255);
-	file[255] = '\0';
-	filePtr = fopen(file, "w");
+	file = filename;
+	filePtr = fopen(file.c_str(), "w");
 }
 
 SORE_Logging::FileLogger::~FileLogger()
@@ -118,43 +117,40 @@ void SORE_Logging::ConsoleLogger::Flush()
 
 void SORE_Logging::ConsoleLogger::Write(log_message* log)
 {
-	static char buffer[2048];
-	char levelstr[9];
-	char name[13];
-	if(strlen(log->logName)==0)
+	std::string buffer;
+	std::string level;
+	std::string name;
+	if(log->logName.empty())
 	{
-		strcpy(name, "Unnamed");
+		name = "Unnamed";
 	}
 	else
 	{
-		strncpy(name, log->logName, 12);
-		name[12] = '\0';
+		name = log->logName;
 	}
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 8);
-		levelstr[8] = '\0';
+		level = boost::str(boost::format("%-8s") % lvlNames[log->level]);
 	}
 	else
 	{
-		sprintf(levelstr, "%-8d", log->level);
+		level = boost::str(boost::format("%-8d") % log->level);
 	}
-	sprintf(buffer, "[%-12s] [%s] %s\n", name, levelstr, log->buffer);
-	fwrite(buffer, sizeof(char), strlen(buffer), stdout);
+	buffer = boost::str(boost::format("[%-12s] [%s] %s\n") % name % level % log->buffer);
+	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), stdout);
 }
 
-SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
+SORE_Logging::XMLLogger::XMLLogger(int lvl, std::string filename)
 {
 	const char begin[] = "<?xml version=\"1.0\"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?>\n<log filename=\"";
 	const char end[] = "\">\n";
 	level = lvl;
-	strncpy(file, filename, 255);
-	file[255] = '\0';
-	filePtr = fopen(file, "w");
+	file = filename;
+	filePtr = fopen(file.c_str(), "w");
 	if(filePtr==NULL || ferror(filePtr)!=0)
 	{
 		//we'll log this in case there is another error stream that is ok
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Failed to open log file for writing");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to open log file for writing");
 		ok = false;
 	}
 	else
@@ -162,10 +158,9 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, const char* filename)
 	if(ok)
 	{
 		fwrite(begin, sizeof(char), strlen(begin), filePtr);
-		fwrite(filename, sizeof(char), strlen(filename), filePtr);
+		fwrite(filename.c_str(), sizeof(char), strlen(filename.c_str()), filePtr);
 		fwrite(end, sizeof(char), strlen(end), filePtr);
 	}
-	prevFunc[0] = '\0';
 	first = true;
 	inFunc = false;
 }
@@ -184,17 +179,16 @@ SORE_Logging::XMLLogger::~XMLLogger()
 void SORE_Logging::XMLLogger::Write(log_message* log)
 {
 	if(!ok) return;
-	static char buffer[2048];
-	char levelstr[9];
-	char levelint[9];
+	std::string buffer;
+	std::string levelstr;
+	std::string levelint;
 	int pos = 0;
 	
-	if(!first && ((log->func==NULL && strlen(prevFunc)>0) || (!(log->func==NULL && strlen(prevFunc)==0) && strcmp(prevFunc, log->func))!=0))
+	if(!first && ((log->func==NULL && !prevFunc.empty() ) || (!(log->func==NULL && prevFunc.empty()) && prevFunc!=log->func)))
 	{
-		sprintf(buffer, "</function>\n");
-		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+		buffer += "</function>\n";
 	}
-	if(log->func!=NULL && strcmp(prevFunc, log->func)!=0)
+	if(log->func!=NULL && prevFunc!=log->func)
 	{
 		std::string func = log->func;
 		while((pos=func.find("&", pos+1))!=std::string::npos)
@@ -202,72 +196,53 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 			func.replace(pos, 1, "&amp;");
 		}
 		
-		sprintf(buffer, "<function>\n\t<name>%s</name>\n", func.c_str());
-		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+		buffer += boost::str(boost::format("<function>\n\t<name>%s</name>\n") % func.c_str());
 	}
-	else if(log->func==NULL && (strlen(prevFunc)>0 || first))
+	else if(log->func==NULL && (!prevFunc.empty() || first))
 	{
-		sprintf(buffer, "<function>\n\t<name></name>\n");
-		fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+		buffer += "<function>\n\t<name></name>\n";
 	}
 	first = false;
-	if(log->func==NULL)
-		prevFunc[0] = '\0';
-	else
+	if(log->func!=NULL)
 	{
-		strncpy(prevFunc, log->func, 255);
-		prevFunc[255] = '\0';
+		prevFunc = log->func;
 	}
 		
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 8);
-		levelstr[8] = '\0';
+		levelstr = lvlNames[log->level];
 	}
-	else
-	{
-		levelstr[0]='\0';
-	}
-	sprintf(levelint, "%d", log->level);
+	
+	levelint = boost::str(boost::format("%d") % log->level);
 	const char begin[] = "\t<message>\n";
 	const char end[]   = "\t</message>\n";
-	fwrite(begin, sizeof(char), strlen(begin), filePtr);
-	/*tm* currtime;
-	currtime = localtime(&(log->time));
-	strftime(buffer, 127, "%X", currtime);*/
-	sprintf(buffer, "+%.1f ms", (double)SORE_Timing::GetGlobalTicks()/10.0);
-	fwrite("\t\t<time>", sizeof(char), 8, filePtr);
-	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
-	fwrite("</time>\n", sizeof(char), 8, filePtr);
-	fwrite("\t\t<level>", sizeof(char), 9, filePtr);
-	fwrite(levelint, sizeof(char), strlen(levelint), filePtr);
-	fwrite("</level>\n", sizeof(char), 9, filePtr);
-	fwrite("\t\t<levelstr>", sizeof(char), 12, filePtr);
-	fwrite(levelstr, sizeof(char), strlen(levelstr), filePtr);
-	fwrite("</levelstr>\n", sizeof(char), 12, filePtr);
-	sprintf(buffer, "\t\t<line>%d</line>\n", log->line);
-	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
-	sprintf(buffer, "\t\t<file>%s</file>\n", log->file);
-	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
-	std::string message = log->buffer;
-	while((pos=message.find("<"))!=std::string::npos)
+	buffer += begin;
+	buffer += "\t\t<time>";
+	buffer += boost::str(boost::format("+%.1f ms") % double(SORE_Timing::GetGlobalTicks()/10.0));
+	buffer += "</time>\n\t\t<level>";
+	buffer += levelint;
+	buffer += "</level>\n\t\t<levelstr>";
+	buffer += levelstr;
+	buffer += "</levelstr>\n";
+	buffer += boost::str(boost::format("\t\t<line>%d</line>\n") % log->line);
+	buffer += boost::str(boost::format("\t\t<file>%s</file>\n") % log->file);
+	while((pos=log->buffer.find("<"))!=std::string::npos)
 	{
-		message.replace(pos, 1, "&lt;");
+		log->buffer.replace(pos, 1, "&lt;");
 	}
-	while((pos=message.find(">"))!=std::string::npos)
+	while((pos=log->buffer.find(">"))!=std::string::npos)
 	{
-		message.replace(pos, 1, "&gt;");
+		log->buffer.replace(pos, 1, "&gt;");
 	}
-	while((pos=message.find("&"))!=std::string::npos)
+	while((pos=log->buffer.find("&"))!=std::string::npos)
 	{
-		message.replace(pos, 1, "&amp;");
+		log->buffer.replace(pos, 1, "&amp;");
 	}
 
-	sprintf(buffer, "\t\t<data>%s</data>\n", message.c_str());
-	//sprintf(buffer, "\t\t<data>%s</data>\n", log->buffer);
-	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
-	
-	fwrite(end, sizeof(char), strlen(end), filePtr);
+	buffer += boost::str(boost::format("\t\t<data>%s</data>\n") % log->buffer);
+	buffer += end;
+
+	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), filePtr);
 }
 
 void SORE_Logging::XMLLogger::Flush()
@@ -280,23 +255,22 @@ SORE_Logging::Logger::Logger()
 {
 	buffers.clear();
 	Log(LVL_INFO, "Unnamed log started");
-	logName[0] = '\0';
+	logName = "";
 }
 
 SORE_Logging::Logger::Logger(const char* name)
 {
 	buffers.clear();
-	strncpy(logName, name, 31);
-	logName[31] = '\0';
-	Log(LVL_INFO, "%s log started", logName);
+	logName = name;
+	Log(LVL_INFO, boost::str(boost::format("%s log started") % logName));
 }
 
 SORE_Logging::Logger::~Logger()
 {
-	if(strlen(logName)==0)
+	if(logName.empty())
 		Log(LVL_INFO, "Unnamed log terminated");
 	else
-		Log(LVL_INFO, "%s log terminated", logName);
+		Log(LVL_INFO, boost::str(boost::format("%s log terminated") % logName));
 	Flush();
 }
 
@@ -305,7 +279,7 @@ void SORE_Logging::Logger::AddBackend(LoggerBackend* newLog)
 	logs.push_back(newLog);
 }
 
-void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
+void SORE_Logging::Logger::Log(int lvl, std::string message)
 {
 	log_message temp;
 	temp.level = lvl;
@@ -316,10 +290,30 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 	temp.logName = logName;
 	if(lvlNames.size()==0)
 		InitLogging();
-	va_list args;
-	va_start (args, format);
-	vsprintf (temp.buffer,format, args);
-	va_end (args);
+	temp.buffer = message;
+	for(it=logs.begin();it<logs.end();it++)
+	{
+		for(int i=0;i<buffers.size();i++)
+			(*it)->Log(&buffers[i]);
+	}
+	if(logs.size()>0) buffers.clear();
+#ifdef FLUSH_MESSAGES
+	Flush();
+#endif
+}
+
+void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, std::string message)
+{
+	log_message temp;
+	temp.level = lvl;
+	temp.line = line;
+	temp.func = func;
+	temp.file = file;
+	temp.time = time(NULL);
+	temp.logName = logName;
+	if(lvlNames.size()==0)
+		InitLogging();
+	temp.buffer = message;
 	buffers.push_back(temp);
 	for(it=logs.begin();it<logs.end();it++)
 	{
@@ -332,28 +326,9 @@ void SORE_Logging::Logger::Log(int lvl, const char* format, ...)
 #endif
 }
 
-void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, const char* format, ...)
+void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, boost::format message)
 {
-	log_message temp;
-	temp.level = lvl;
-	temp.line = line;
-	temp.func = func;
-	temp.file = file;
-	temp.time = time(NULL);
-	temp.logName = logName;
-	if(lvlNames.size()==0)
-		InitLogging();
-	va_list args;
-	va_start (args, format);
-	vsprintf (temp.buffer,format, args);
-	va_end (args);
-	buffers.push_back(temp);
-	for(it=logs.begin();it<logs.end();it++)
-	{
-		for(int i=0;i<buffers.size();i++)
-			(*it)->Log(&buffers[i]);
-	}
-	if(logs.size()>0) buffers.clear();
+	Log(lvl, line, func, file, boost::str(message));
 }
 
 void SORE_Logging::Logger::Flush()
@@ -369,5 +344,5 @@ void SORE_Logging::Logger::Flush()
 
 const char* SORE_Logging::Logger::GetName() const
 {
-	return logName;
+	return logName.c_str();
 }

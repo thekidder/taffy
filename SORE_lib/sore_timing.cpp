@@ -31,7 +31,7 @@ namespace SORE_Timing
 		unsigned int time = nano_s + nano_us;
 		if(time<0)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Global ticks count is less than zero (ticks=%s)", time);
+			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Global ticks count is less than zero (ticks=%s)") % time);
 		}
 		return time;
 #else

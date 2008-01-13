@@ -15,7 +15,7 @@ void SORE_Resource::Texture::Load()
 	}
 	else
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unknown file format %s", ext);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Unknown file format %s") % ext);
 	}
 }
 
@@ -29,20 +29,20 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
 	if(file == 0 ) 
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not open texture file");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not open texture file");
 		return;
 	}
 	if(SORE_FileIO::Read(header, 1, 18, file)<18)
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
 	
-	ENGINE_LOG_S(SORE_Logging::LVL_DEBUG2, "Loaded header");
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Name: %s", filename);
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Width: %d Height: %d", int(header[12]+header[13]*256), int(header[14]+header[15]*256));
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "BPP: %d Image type: %d", (int)header[16], (int)header[2]);
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Loaded header");
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Name: %s") % filename);
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Width: %d Height: %d") % int(header[12]+header[13]*256) % int(header[14]+header[15]*256));
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("BPP: %d Image type: %d") % (int)header[16] % (int)header[2]);
 	
 	//do some basic checks to make sure we can handle the file
 	
@@ -73,7 +73,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	
 	if(SORE_FileIO::Read(filler, sizeof(char), int(header[0]), file)!=int(header[0]))
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}
@@ -88,7 +88,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	if(SORE_FileIO::Read(imgData, 1, dataSize, file)!=dataSize)
 	{
 		delete[] imgData;
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
 		SORE_FileIO::Close(file);
 		return;
 	}

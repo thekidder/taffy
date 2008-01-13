@@ -63,8 +63,9 @@ namespace SORE_Kernel
 			void SetProjection(SORE_Graphics::ProjectionInfo& info);
 			//change current perspective - takes effect immediately
 			//void ChangeProjection(SORE_Graphics::ProjectionInfo* info);
+			void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
 			
-			bool OnResize(Event* event);
+			bool OnResize(Event* event=NULL);
 			
 			GLint* GetViewport();
 			SORE_Graphics::ScreenInfo* GetScreen();
@@ -74,6 +75,7 @@ namespace SORE_Kernel
 			void InitExtensions();
 			
 			int ChangeProjection(double ratio); //returns 0 on success
+			void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
 			
 			/*template <typename proc>
 					void glextInitProc(proc& dest, const char* name)

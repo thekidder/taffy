@@ -71,11 +71,11 @@ namespace SORE_Profiler
 	
 	void Sample::DisplayAvgTime(int sID)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Average time for sample ID %d: %f", sID, samples[sID].avgTime);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Average time for sample ID %d: %f") % sID % samples[sID].avgTime);
 	}
 	
 	void Sample::DisplayTime(int sID)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Time for sample ID %d: %d", sID, samples[sID].lastTime);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Time for sample ID %d: %d") % sID % samples[sID].lastTime);
 	}
 }

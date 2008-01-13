@@ -118,7 +118,7 @@ void SORE_Graphics::Camera::TransformView()
 
 void SORE_Graphics::Camera::LogPosition()
 {
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "position: (%f, %f, %f) rotation: (%f, %f, %f)",x,y,z,xr,yr,zr);
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("position: (%f, %f, %f) rotation: (%f, %f, %f)")%x%y%z%xr%yr%zr);
 }
 
 SORE_Graphics::CameraTask::CameraTask(SORE_Kernel::GameKernel* gk) : Task(gk)
@@ -215,7 +215,7 @@ bool SORE_Graphics::CameraTask::CameraCallback(SORE_Kernel::Event* event)
 					{
 						SDL_WM_GrabInput(SDL_GRAB_ON);
 						SDL_ShowCursor(SDL_DISABLE);
-						ENGINE_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse grabbed");
+						ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Mouse grabbed");
 						grabbed = !grabbed; 
 						return true;
 					}
@@ -228,7 +228,7 @@ bool SORE_Graphics::CameraTask::CameraCallback(SORE_Kernel::Event* event)
 					{
 						SDL_WM_GrabInput(SDL_GRAB_OFF);
 						SDL_ShowCursor(SDL_ENABLE);
-						ENGINE_LOG_S(SORE_Logging::LVL_DEBUG1, "Mouse ungrabbed");
+						ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Mouse ungrabbed");
 						grabbed = !grabbed;
 						return true;
 					}

@@ -65,7 +65,7 @@ namespace SORE_FileIO
 	
 }
 
-int SORE_FileIO::InitFileIO()
+int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
 {
 	file_info temp;
 	cachedFiles.clear();
@@ -75,6 +75,7 @@ int SORE_FileIO::InitFileIO()
 	openPackageCount.clear();
 	openFilesystemFiles.clear();
 	nOpenFilesystemFiles = 0;
+	if(!InitFileNotify(gk)) return 1;
 	return 0;
 }
 
@@ -87,7 +88,7 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 	in = fopen(package, "rb");
 	if(!in || ferror(in)!=0)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not open package file %s, aborting.", package);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not open package file %s, aborting.") % package);
 		//SORE_Logging::sore_log.Log(SORE_Logging::LVL_ERROR, __LINE__, __PRETTY_FUNCTION__, __FILE__, "Could not open package file %s, aborting.", package);
 		return -1;
 	}
@@ -95,18 +96,18 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 	
 	if(header[0]!='S' || header[1]!='D' || header[2]!='P')
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Not a SORE Data Package file", 0);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Not a SORE Data Package file");
 		return -1;
 	}
 	
 	if(int(header[3])>MAX_MAJOR || int(header[4])>MAX_MINOR)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Can't decode SDP files greater than version %d.%d", MAX_MAJOR, MAX_MINOR);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Can't decode SDP files greater than version %d.%d") % MAX_MAJOR % MAX_MINOR);
 	}
 	
 	unsigned short int numPackageFiles = (header[5]) + (header[6]<<8);
 	
-	ENGINE_LOG(SORE_Logging::LVL_INFO, "Now processing %s containing %d files and directories...", package, numPackageFiles);
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Now processing %s containing %d files and directories...") % package % numPackageFiles);
 		
 	char flags, c;
 	int pos;
@@ -146,13 +147,13 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 		strcpy(tempInfo.package, package);
 		if(cachedFiles.size()>=FILESYSTEM_START-1)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Too many cached files...aborting", 0); //marked as critical because this should never happen...unless you load LOTS of resources
+			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Too many cached files...aborting"); //marked as critical because this should never happen...unless you load LOTS of resources
 			fclose(in);
 			return -2;
 		}
 		cachedFiles.push_back(tempInfo);
 		BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1], cachedFiles[cachedFiles.size()-1]);
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Adding %s to cache", cachedFiles[cachedFiles.size()-1].fullname);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Adding %s to cache") % cachedFiles[cachedFiles.size()-1].fullname);
 		fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
 	}
 	
@@ -174,10 +175,10 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	if(temp && ferror(temp)==0)
 	{
 		//fclose(temp);
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from disk", file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from disk") % file);
 		if(nOpenFilesystemFiles>=(unsigned long)FILESYSTEM_END-FILESYSTEM_START)
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
+			ENGINE_LOG(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
 			fclose(temp);
 			return 0;
 		}
@@ -198,16 +199,16 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		if(cachedFiles[it->second].isOpen)
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_WARNING,"This file is already open, aborting.");
+			ENGINE_LOG(SORE_Logging::LVL_WARNING,"This file is already open, aborting.");
 			return 0;
 		}
 		cachedFiles[it->second].currPos = 0;
 		cachedFiles[it->second].currPosRaw  = 0;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Opening file %s from package %s", file, cachedFiles[it->second].package);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from package %s") % file % cachedFiles[it->second].package);
 		if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
 		{
 			FILE* temp;
-			ENGINE_LOG(SORE_Logging::LVL_INFO, "Opening package %s", cachedFiles[it->second].package);
+			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Opening package %s") % cachedFiles[it->second].package);
 			temp = fopen(cachedFiles[it->second].package, "rb");
 			openPackages[cachedFiles[it->second].package] = temp;
 			if(openPackageCount.find(cachedFiles[it->second].package)==openPackageCount.end())
@@ -248,7 +249,7 @@ void SORE_FileIO::Close(file_ref file)
 {
 	if(file<FILESYSTEM_START && file>=PACKAGE_START)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file %s from package cache", cachedFiles[file].filename);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache") % cachedFiles[file].filename);
 		cachedFiles[file].isOpen = false;
 		if(cachedFiles[file].compressed)
 		{
@@ -260,14 +261,14 @@ void SORE_FileIO::Close(file_ref file)
 		}
 		if(--openPackageCount[cachedFiles[file].package]==0)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_INFO, "Closing package %s", cachedFiles[file].package);
+			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % cachedFiles[file].package);
 			fclose(openPackages[cachedFiles[file].package]);
 			openPackages.erase(cachedFiles[file].package);
 		}
 	}
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Closing file reference %u from disk",file);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Closing file reference %u from disk") % file);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);
@@ -282,7 +283,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 	{
 		if(cachedFiles[file].isOpen==false)
 		{
-			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "File is not open");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "File is not open");
 			return 0;
 		}
 		unsigned int bytesToRead = cachedFiles[file].size - cachedFiles[file].currPos; //how many bytes we need to read -adjusted from size*nmemb to make sure we don't go past the end of the file in our stream
@@ -328,10 +329,10 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 				if((ret=fread(in_buf, 1, size, openPackages[cachedFiles[file].package]))!=size)
 				{
 					cachedFiles[file].currPos += ret;
-					ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "Reading from file failed:");
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\tNeeded to read %d bytes but only got %d bytes.", size, ret);
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\t %s resides at poisition %d and is %d bytes of size", cachedFiles[file].filename, cachedFiles[file].pos, cachedFiles[file].size);
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "\tCurrent package position is %u. Current file position is %u bytes.", ftell(openPackages[cachedFiles[file].package]), cachedFiles[file].currPos);
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, "Reading from file failed:");
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("\tNeeded to read %d bytes but only got %d bytes.") % size % ret);
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("\t %s resides at poisition %d and is %d bytes of size") % cachedFiles[file].filename % cachedFiles[file].pos % cachedFiles[file].size);
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("\tCurrent package position is %u. Current file position is %u bytes.") % ftell(openPackages[cachedFiles[file].package]) % cachedFiles[file].currPos);
 					return read;
 				}
 				cachedFiles[file].currPosRaw += ret;
@@ -420,13 +421,80 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
 		if(read != size*nmemb)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read all %d bytes: ", size*nmemb);
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "ferror: %s, feof: %s", ferror(openFilesystemFiles[file]),  feof(openFilesystemFiles[file]));
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not read all %d bytes: ") % (size*nmemb));
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]));
 		}
 		return read;
 	}
 	else
 		return 0;
+}
+
+int strpos(char* str, char* chars)
+{
+	int len = 0;
+	for(char* i=str;*i!='\0';i++,len++)
+	{
+		for(char* j=chars;*j!='\0';j++)
+		{
+			if(*j==*i) return len;
+		}
+	}
+	return -1;
+}
+
+int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
+{
+	assert(num<=2048 && "Trying to read too many characters");
+	static char data[2049]="";
+	static int length = 0;
+	//static char toReturn[2049];
+	if(*data=='\0')
+	{
+		int len = Read(data, sizeof(char), num, file);
+		int stop = strpos((char*)data,(char*)separator);
+		if(stop==-1)
+		{
+			memcpy(ptr, data, len);
+			ptr[len] = '\0';
+			*data = '\0';
+			length = 0;
+			return len;
+		}
+		else
+		{
+			memcpy(ptr, data, stop);
+			ptr[stop] = '\0';
+			length = len - stop;
+			memcpy(data, data+stop+1, length);
+			data[length] = '\0';
+			return stop;
+		}
+	}
+	else
+	{
+		int len = Read(data+length, sizeof(char), num-length, file);
+		int stop = strpos((char*)data,(char*)separator);
+		if(stop==-1)
+		{
+			memcpy(ptr, data, len+length);
+			ptr[len+length] = '\0';
+			*data = '\0';
+			len+=length;
+			length = 0;
+			return len;
+		}
+		else
+		{
+			memcpy(ptr, data, stop);
+			ptr[stop] = '\0';
+			length = length - stop;
+			memcpy(data, data+stop+1, length);
+			data[length] = '\0';
+			return stop;
+		}
+	}
+	return 0;
 }
 
 void SORE_FileIO::BuildFullName(file_list& list, file_info& file, file_info& orig)

@@ -24,7 +24,7 @@ SORE_Kernel::Task::Task(GameKernel* _gk)
 
 SORE_Kernel::GameKernel::GameKernel() : itask(this)
 {
-	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel initialized");
+	ENGINE_LOG(SORE_Logging::LVL_INFO, "Kernel initialized");
 	lastTicks = SORE_Timing::GetGlobalTicks();
 	quitFlag = false;
 	lastTicks = 0;
@@ -34,7 +34,7 @@ SORE_Kernel::GameKernel::GameKernel() : itask(this)
 
 SORE_Kernel::GameKernel::~GameKernel()
 {
-	ENGINE_LOG_S(SORE_Logging::LVL_INFO, "Kernel destroyed");
+	ENGINE_LOG(SORE_Logging::LVL_INFO, "Kernel destroyed");
 }
 
 void SORE_Kernel::GameKernel::Frame()

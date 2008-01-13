@@ -46,7 +46,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.mouse.ymove = sdl_event.motion.yrel;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button down: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button down: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
 				event.type = MOUSEBUTTONDOWN;
 				if(sdl_event.motion.state & SDL_BUTTON_LEFT) event.mouse.buttonState |= MOUSE_BUTTON1;
 				if(sdl_event.motion.state & SDL_BUTTON_MIDDLE) event.mouse.buttonState |= MOUSE_BUTTON3;
@@ -54,7 +54,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				//event.mouse.buttonState = sdl_event.button.button;
 				break;
 			case SDL_MOUSEBUTTONUP:
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button up: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button up: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
 				event.type = MOUSEBUTTONUP;
 				if(sdl_event.button.button & SDL_BUTTON_LEFT) event.mouse.buttonState -= MOUSE_BUTTON1;
 				if(sdl_event.button.button & SDL_BUTTON_RIGHT) event.mouse.buttonState -= MOUSE_BUTTON2;

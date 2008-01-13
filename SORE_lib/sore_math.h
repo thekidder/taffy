@@ -15,6 +15,7 @@
 
 #include "sore_defines.h"
 #include <cmath>
+#include "sore_logger.h"
 
 namespace SORE_Math
 {
@@ -214,7 +215,7 @@ namespace SORE_Math
 			
 			void Log(unsigned int severity)
 			{
-				ENGINE_LOG(severity, "(%fi, %fj,%fk)",value[0],value[1],value[2]);
+				ENGINE_LOG(severity, boost::format("(%fi, %fj,%fk)") % value[0] % value[1] % value[2]);
 			}
 				
 		protected:
@@ -342,7 +343,7 @@ namespace SORE_Math
 			
 			void Log(unsigned int severity)
 			{
-				ENGINE_LOG(severity, "(%fi, %fj)",value[0],value[1]);
+				ENGINE_LOG(severity, boost::format("(%fi, %fj)") % value[0] % value[1]);
 			}
 				
 		protected:

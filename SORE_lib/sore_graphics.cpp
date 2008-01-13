@@ -93,9 +93,6 @@ void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const cha
 	SORE_Graphics::WindowToReal(window, real);
 	
 	int h = SORE_Font::FontHeight(font);
-	
-	//std::cout << "height: " << h << " " << real[1] << std::endl;
-	
 	real[1] -= h;
 	assert(real[1]>=0);
 	char text[256];

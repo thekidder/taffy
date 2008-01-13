@@ -15,6 +15,7 @@
 #include "sore_util.h"
 #include "sore_timing.h"
 #include <cassert>
+#include <boost/format.hpp>
 
 SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen) : Task(gk)
 {
@@ -25,25 +26,43 @@ SORE_Kernel::Renderer::Renderer(SORE_Kernel::GameKernel* gk, SORE_Graphics::Scre
 	proj.znear = 0.1;
 	proj.zfar  = 200.0;
 	proj.useScreenRatio = true;
-	_screen.ratio = double(_screen.width)/double(_screen.height);
-	screen = _screen;
 	if(InitializeSDL()!=0)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize SDL (SDL error %s)", SDL_GetError());
+		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
 		gk->quitFlag = true;
 	}
+	SDLScreenChange(_screen);
 	if(InitializeGL()!=0)
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
+		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
 		gk->quitFlag = true;
 	}
+}
 
-	/*font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
-	if(font == 0)
-	{
-		ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "Could not load renderer font");
-		gk->quitFlag = true;
-	}*/
+void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
+{
+	_screen.ratio = double(_screen.width)/double(_screen.height);
+	screen = _screen;
+	if(screen.fullscreen)
+		videoFlags |= SDL_FULLSCREEN;
+	else
+		videoFlags ^= SDL_FULLSCREEN;
+	if(screen.showCursor)
+		SDL_ShowCursor(SDL_ENABLE);
+	else
+		SDL_ShowCursor(SDL_DISABLE);
+	if(screen.resizable)
+		videoFlags |= SDL_RESIZABLE;
+	else
+		videoFlags ^= SDL_RESIZABLE;
+	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
+}
+
+void SORE_Kernel::Renderer::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
+{
+	SDL_FreeSurface(drawContext);
+	SDLScreenChange(_screen);
+	OnResize();
 }
 
 SORE_Kernel::Renderer::~Renderer()
@@ -52,14 +71,12 @@ SORE_Kernel::Renderer::~Renderer()
 		SDL_SetVideoMode(width, height, 0, videoFlags);
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_FreeSurface(drawContext);
+	SDL_Quit();
 }
 
 void SORE_Kernel::Renderer::Frame(int elapsedTime)
 {
 	SORE_Profiler::Sample graphics("graphics");
-	static int frames = 0;
-	static int T0 = SORE_Timing::GetGlobalTicks();
-	static float fps;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//assert(sg!=NULL && "No scene graph");
 	if(sg)
@@ -89,14 +106,13 @@ void SORE_Kernel::Renderer::SetCamera(SORE_Graphics::Camera* camera)
 	cam = camera;
 }
 
-bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
+bool SORE_Kernel::Renderer::OnResize(Event* event)
 {
 	GLint width, height;
 	if(event==NULL)
 	{
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		width = viewport[2]-viewport[0];
-		height = viewport[3]-viewport[1];
+		width = screen.width;
+		height = screen.height;
 	}
 	else
 	{
@@ -122,6 +138,7 @@ bool SORE_Kernel::Renderer::OnResize(Event* event=NULL)
 	glMatrixMode( GL_MODELVIEW );
 	/* Reset The View */
 	glLoadIdentity( );
+	glGetIntegerv(GL_VIEWPORT, viewport);
 	return true;
 }
 
@@ -130,7 +147,7 @@ int SORE_Kernel::Renderer::ChangeProjection(double ratio)
 	switch(proj.type)
 	{
 		case SORE_Graphics::NONE:
-			ENGINE_LOG_S(SORE_Logging::LVL_ERROR, "No projection type set, could not initialize projection");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No projection type set, could not initialize projection");
 			return -1;
 			break;
 		case SORE_Graphics::ORTHO2D:
@@ -176,7 +193,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 
 	if ( !videoInfo )
 	{
-		ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, "Video query failed: %s", SDL_GetError());
+		ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, boost::format("Video query failed: %s") % SDL_GetError());
 		return 1;
 	}
 	//save current resolution
@@ -184,14 +201,6 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	height = videoInfo->current_h;
 
 	videoFlags = SDL_OPENGL;
-	if(screen.fullscreen)
-		videoFlags |= SDL_FULLSCREEN;
-	if(screen.showCursor)
-		SDL_ShowCursor(SDL_ENABLE);
-	else
-		SDL_ShowCursor(SDL_DISABLE);
-	if(screen.resizable)
-		videoFlags |= SDL_RESIZABLE;
 	videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
 	videoFlags |= SDL_HWPALETTE; 
 	/* This checks to see if surfaces can be stored in memory */
@@ -199,9 +208,7 @@ int SORE_Kernel::Renderer::InitializeSDL()
 		videoFlags |= SDL_HWSURFACE;
 	else
 		videoFlags |= SDL_SWSURFACE;
-
-	/* This checks if hardware blits can be done */
-	if ( videoInfo->blit_hw )
+	if(videoInfo->blit_hw)
 		videoFlags |= SDL_HWACCEL;
 	
 	//Uint8* mask = SORE_Utility::GetBMPMask("data/snake.bmp");
@@ -210,7 +217,6 @@ int SORE_Kernel::Renderer::InitializeSDL()
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
 	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
-	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
 	return 0;
 }
 
@@ -237,7 +243,7 @@ int SORE_Kernel::Renderer::InitializeGL()
 		return 1;
 	}
 	InitExtensions();
-	ENGINE_LOG(SORE_Logging::LVL_INFO, "OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s",(char*)glGetString(GL_RENDERER),(char*)glGetString(GL_VENDOR),(char*)glGetString(GL_VERSION));
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
 #ifdef WIN32
 	if(WGLEW_EXT_swap_control)
 	{
@@ -245,7 +251,7 @@ int SORE_Kernel::Renderer::InitializeGL()
 	}
 	else
 	{
-		ENGINE_LOG_S(SORE_Logging::LVL_WARNING, "Vsync control not available");
+		ENGINE_LOG(SORE_Logging::LVL_WARNING, "Vsync control not available");
 	}
 #endif
 	return 0;
@@ -266,7 +272,7 @@ void SORE_Kernel::Renderer::InitExtensions()
 	GLenum glewError = glewInit();
 	if(glewError != GLEW_OK)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to initialize OpenGL extensions. GLEW Error: %s", glewGetErrorString(glewError));
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to initialize OpenGL extensions. GLEW Error: %s") % glewGetErrorString(glewError));
 	}
 }
 
