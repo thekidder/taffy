@@ -421,7 +421,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
 		if(read != size*nmemb)
 		{
-			unsigned int errLvl = SORE_Logging::LVL_DEBUG1;
+			unsigned int errLvl = SORE_Logging::LVL_DEBUG2;
 			if(ferror(openFilesystemFiles[file])!=0)
 			{
 				errLvl = SORE_Logging::LVL_ERROR;

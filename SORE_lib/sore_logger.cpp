@@ -9,17 +9,24 @@
 // Copyright: See COPYING file that comes with this distribution
 // $Id$
 //
+// This file will be rebuilt on every revision change - due to svn_rev logging
 
 #include "sore_defines.h"
 
 #include "sore_allgl.h"
 #include "sore_logger.h"
 #include "sore_timing.h"
+
+#include "sore_svnrev.h"
+
 #include <cstring>
 #include <string>
 #include <ctime>
 #include <cstdarg>
 #include <cstdlib>
+
+#define MAJOR 0
+#define MINOR 1
 
 #define FLUSH_MESSAGES
 
@@ -54,6 +61,11 @@ void SORE_Logging::InitLogging()
 #ifdef SORE_CONSOLE_LOG
 	sore_log.AddBackend(&sore_console_logger);
 #endif
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE);
+	if(SVN_MODIFIED)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified since last commit (version number will be inaccurate)");
+	}
 }
 
 void SORE_Logging::AddLogLevel(int lvl, const char* name)

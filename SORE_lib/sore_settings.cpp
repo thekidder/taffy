@@ -79,7 +79,7 @@ namespace SORE_Utility
 					value=setting.substr(eqPos+1);
 					name = Trim(name);
 					value = Trim(value);
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("'%s:%s'") % name % value);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s'") % name % value);
 					Store(name, value);
 					if(sm)
 						sm->Changed(name);
