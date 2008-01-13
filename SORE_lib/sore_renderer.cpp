@@ -43,10 +43,10 @@ void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
 	_screen.ratio = double(_screen.width)/double(_screen.height);
 	screen = _screen;
-	if(screen.fullscreen)
-		videoFlags |= SDL_FULLSCREEN;
-	else
-		videoFlags ^= SDL_FULLSCREEN;
+	//if(screen.fullscreen)
+	//	videoFlags |= SDL_FULLSCREEN;
+	//else
+	//	videoFlags ^= SDL_FULLSCREEN;
 	if(screen.showCursor)
 		SDL_ShowCursor(SDL_ENABLE);
 	else
@@ -60,7 +60,7 @@ void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 
 void SORE_Kernel::Renderer::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
 {
-	SDL_FreeSurface(drawContext);
+	//SDL_FreeSurface(drawContext);
 	SDLScreenChange(_screen);
 	OnResize();
 }
@@ -284,4 +284,9 @@ GLint* SORE_Kernel::Renderer::GetViewport()
 SORE_Graphics::ScreenInfo* SORE_Kernel::Renderer::GetScreen()
 {
 	return &screen;
+}
+
+SORE_Graphics::ProjectionInfo SORE_Kernel::Renderer::GetProjection()
+{
+	return proj;
 }

@@ -69,6 +69,7 @@ namespace SORE_Kernel
 			
 			GLint* GetViewport();
 			SORE_Graphics::ScreenInfo* GetScreen();
+			SORE_Graphics::ProjectionInfo  GetProjection();
 		protected:
 			int  InitializeSDL();
 			int  InitializeGL();

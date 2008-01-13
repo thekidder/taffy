@@ -18,6 +18,7 @@
 namespace SORE_Graphics
 {
 	SORE_Kernel::Renderer* r;
+	ProjectionInfo old;
 	void WindowToReal(int* window, int* real);
 }
 
@@ -43,10 +44,12 @@ void SORE_Graphics::PopProjection()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glPopAttrib();
+	r->SetProjection(old);
 }
 
 void SORE_Graphics::PushOverlay()
 {
+	old = r->GetProjection();
 	static SORE_Graphics::ProjectionInfo overlay;
 	overlay.type   = SORE_Graphics::ORTHO2D;
 	overlay.left   = 0;

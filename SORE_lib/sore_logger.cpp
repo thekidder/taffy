@@ -7,7 +7,7 @@
 // Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
 //
 // Copyright: See COPYING file that comes with this distribution
-//
+// $Id$
 //
 
 #include "sore_defines.h"
@@ -23,10 +23,16 @@
 
 #define FLUSH_MESSAGES
 
+#ifdef DEBUG
+#define FILE_LOG_LVL SHOW_ALL
+#else
+#define FILE_LOG_LVL SHOW_INFO
+#endif
+
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
-	XMLLogger sore_file_logger(SHOW_INFO | LVL_DEBUG1, "logs/sore_log.xml");
+	XMLLogger sore_file_logger(FILE_LOG_LVL, "logs/sore_log.xml");
 #ifdef SORE_CONSOLE_LOG
 	ConsoleLogger sore_console_logger(SHOW_ALL);
 #endif

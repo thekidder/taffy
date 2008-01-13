@@ -398,7 +398,6 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 				else
 				{
 					LinkedListCopy((unsigned char*)ptr+read, &cachedFiles[file].out_buf, cachedFiles[file].out_filled);
-					//LinkedListEat(cachedFiles[file].out_buf, bytesToRead);
 					read += cachedFiles[file].out_filled;
 					cachedFiles[file].currPos += cachedFiles[file].out_filled;
 					cachedFiles[file].out_filled = 0;
@@ -421,8 +420,13 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
 		if(read != size*nmemb)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not read all %d bytes: ") % (size*nmemb));
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]));
+			unsigned int errLvl = SORE_Logging::LVL_DEBUG1;
+			if(ferror(openFilesystemFiles[file])!=0)
+			{
+				errLvl = SORE_Logging::LVL_ERROR;
+			}
+			ENGINE_LOG(errLvl, boost::format("Could not read all %d bytes: ") % (size*nmemb));
+			ENGINE_LOG(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]));
 		}
 		return read;
 	}
@@ -445,13 +449,13 @@ int strpos(char* str, char* chars)
 
 int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
 {
-	assert(num<=2048 && "Trying to read too many characters");
-	static char data[2049]="";
+	assert(num<=64 && "Trying to read too many characters");
+	static char data[64]="";
 	static int length = 0;
-	//static char toReturn[2049];
 	if(*data=='\0')
 	{
 		int len = Read(data, sizeof(char), num, file);
+		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
 		{
@@ -465,8 +469,8 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = len - stop;
-			memcpy(data, data+stop+1, length);
+			length = len - stop -1;
+			memcpy(data, data+stop+1, length+len);
 			data[length] = '\0';
 			return stop;
 		}
@@ -474,6 +478,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 	else
 	{
 		int len = Read(data+length, sizeof(char), num-length, file);
+		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
 		{
@@ -488,9 +493,9 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = length - stop;
+			length = length - stop + len;
 			memcpy(data, data+stop+1, length);
-			data[length] = '\0';
+			//data[length] = '\0';
 			return stop;
 		}
 	}

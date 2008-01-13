@@ -20,12 +20,13 @@
 
 #include "sore_fileio.h"
 #include <map>
-#include <inotifytools/inotifytools.h>
-#include <inotifytools/inotify.h>
+#include "inotify-cxx.h"
 
 namespace SORE_FileIO
 {
 	std::multimap<std::string, file_callback> callbacks;
+	std::vector<InotifyWatch> watches;
+	Inotify in;
 	
 	class LinuxINotifyWatch : public SORE_Kernel::Task
 	{
@@ -36,7 +37,7 @@ namespace SORE_FileIO
 				std::multimap<std::string, file_callback>::iterator it;
 				for(it=callbacks.begin();it!=callbacks.end();it++)
 				{
-					inotifytools_remove_watch_by_filename(it->first.c_str());
+					
 				}
 			}
 			
@@ -45,21 +46,18 @@ namespace SORE_FileIO
 			void Frame(int elapsedTime) 
 			{
 				if(callbacks.empty()) return;
-				inotify_event* event;
-				do
+				InotifyEvent ie;
+				in.WaitForEvents();
+				if(in.GetEventCount()==0) return;
+				in.GetEvent(ie);
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % ie.GetWatch()->GetPath());
+				std::multimap<std::string, file_callback>::iterator it;
+				it = callbacks.find(ie.GetWatch()->GetPath());
+				while(it!=callbacks.end() && it->first == ie.GetWatch()->GetPath())
 				{
-					event = inotifytools_next_event(0);
-					if(event==NULL) break;
-					char buffer[1024];
-					inotifytools_snprintf(buffer, 1024, event, "%w");
-					std::multimap<std::string, file_callback>::iterator it = callbacks.find(buffer);
-					while(it!=callbacks.end() && it->first==buffer)
-					{
-						it->second(it->first);
-						it++;
-					}
+					it->second(it->first);
+					it++;
 				}
-				while(event!=NULL);
 			}
 			
 			const char* GetName() const { return "File Notify task";}
@@ -69,21 +67,20 @@ namespace SORE_FileIO
 	
 	bool InitFileNotify(SORE_Kernel::GameKernel* gk)
 	{
-		bool success =  (bool)inotifytools_initialize();
-		if(success)
-		{
-			static LinuxINotifyWatch watchTask(gk);
-			gk->AddConstTask(0, 1000, &watchTask);
-		}
+		in.SetNonBlock(true);
+		static LinuxINotifyWatch watchTask(gk);
+		gk->AddConstTask(0, 5000, &watchTask);
 	}
 	
 	void Notify(std::string filename, boost::function<void (std::string filename)> callback)
 	{
-		if(inotifytools_watch_file(filename.c_str(), IN_MODIFY)==0)
+		watches.push_back(InotifyWatch(filename, IN_MODIFY));
+		in.Add(*(watches.end()-1));
+		/*if()
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to start watch on file %s") % filename);
-		}
-		else
+		}*/
+		//else
 			callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
 	}
 }
