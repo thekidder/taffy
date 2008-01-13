@@ -101,19 +101,22 @@ SORE_Logging::FileLogger::~FileLogger()
 
 void SORE_Logging::FileLogger::Write(log_message* log)
 {
-	static char buffer[2048];
-	char levelstr[9];
+	std::string buffer;
+	std::string levelstr;
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
-		strncpy(levelstr, lvlNames[log->level], 8);
-		levelstr[8] = '\0';
+		levelstr = boost::str(boost::format("%-8s") % lvlNames[log->level]);
+		//strncpy(levelstr, lvlNames[log->level], 8);
+		//levelstr[8] = '\0';
 	}
 	else
 	{
-		sprintf(levelstr, "%-8d", log->level);
+		//sprintf(levelstr, "%-8d", log->level);
+		levelstr = boost::str(boost::format("%-8d") % log->level);
 	}
-	sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
-	fwrite(buffer, sizeof(char), strlen(buffer), filePtr);
+	buffer = boost::str(boost::format("[%s] %s\n") % levelstr % log->buffer);
+	//sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
+	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), filePtr);
 }
 
 void SORE_Logging::FileLogger::Flush()
