@@ -1,3 +1,4 @@
+// $Id$
 
 #include "sore_resource.h"
 #include "sore_util.h"

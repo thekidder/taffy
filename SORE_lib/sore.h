@@ -1,3 +1,4 @@
+// $Id$
 
 #ifndef  __SORE_ALL__
 #define  __SORE_ALL__

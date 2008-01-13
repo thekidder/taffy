@@ -1,8 +1,8 @@
+// $Id$
 
 #ifndef  __SORE_LOGGER_H__
 #define  __SORE_LOGGER_H__
 
-//#include "sore_fileio.h"
 #include <vector>
 #include <map>
 #include <cstdio>

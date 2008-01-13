@@ -1,3 +1,4 @@
+// $Id$
 
 #include "sore_texture.h"
 #include "sore_util.h"

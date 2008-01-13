@@ -1,3 +1,4 @@
+// $Id$
 
 #ifndef  __SORE_UTIL_H__
 #define  __SORE_UTIL_H__

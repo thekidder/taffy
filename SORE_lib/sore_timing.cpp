@@ -1,3 +1,4 @@
+// $Id$
 
 #include "sore_timing.h"
 #include "sore_allgl.h"

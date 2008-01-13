@@ -1,3 +1,4 @@
+// $Id$
 
 #ifndef  __SORE_FILEIO__
 #define  __SORE_FILEIO__

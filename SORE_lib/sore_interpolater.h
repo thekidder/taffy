@@ -8,7 +8,8 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 //
-//
+// $Id$
+
 
 #ifndef  __SORE_INTERPOLATER_H__
 #define  __SORE_INTERPOLATER_H__

@@ -1,3 +1,5 @@
+// $Id$
+
 #ifndef  __SORE_CAMERA_H__
 #define  __SORE_CAMERA_H__
 

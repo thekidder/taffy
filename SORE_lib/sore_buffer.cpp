@@ -8,7 +8,8 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 //
-//
+// $Id$
+
 
 #include "sore_buffer.h"
 

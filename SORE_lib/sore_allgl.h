@@ -1,3 +1,4 @@
+// $Id$
 
 #ifndef  __ALLGL_H__
 #define  __ALLGL_H__

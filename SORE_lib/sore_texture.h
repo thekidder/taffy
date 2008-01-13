@@ -1,3 +1,4 @@
+// $Id$
 
 #ifndef  __SORE_TEXTURE_H__
 #define  __SORE_TEXTURE_H__

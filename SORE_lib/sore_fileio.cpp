@@ -1,3 +1,4 @@
+ // $Id$
 
 #include "sore_fileio.h"
 #include "sore_logger.h"

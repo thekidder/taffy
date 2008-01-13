@@ -1,3 +1,5 @@
+// $Id$
+
 #include "sore_allgl.h"
 #include "sore_font.h"
 
