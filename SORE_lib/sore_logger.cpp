@@ -106,16 +106,12 @@ void SORE_Logging::FileLogger::Write(log_message* log)
 	if(lvlNames.find(log->level)!=lvlNames.end())
 	{
 		levelstr = boost::str(boost::format("%-8s") % lvlNames[log->level]);
-		//strncpy(levelstr, lvlNames[log->level], 8);
-		//levelstr[8] = '\0';
 	}
 	else
 	{
-		//sprintf(levelstr, "%-8d", log->level);
 		levelstr = boost::str(boost::format("%-8d") % log->level);
 	}
 	buffer = boost::str(boost::format("[%s] %s\n") % levelstr % log->buffer);
-	//sprintf(buffer, "[%s] %s\n", levelstr, log->buffer);
 	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), filePtr);
 }
 
