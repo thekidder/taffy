@@ -36,9 +36,14 @@ namespace SORE_Utility
 	class IDatum
 	{
 		public:
-			virtual operator int()=0;
-			virtual operator std::string()=0;
+			IDatum(std::string _datum = "");
+			operator int();
+			operator std::string();
+			operator double();
+			operator float();
+			operator char();
 		protected:
+			std::string datum;
 	};
 	
 	template<class T>
@@ -70,8 +75,8 @@ namespace SORE_Utility
 	{
 		public:
 			ISettingsBackend();
-			virtual std::string Retrieve(std::string name)=0;
-			virtual void       Store   (std::string name, std::string datum)=0;
+			virtual IDatum Retrieve(std::string name)=0;
+			virtual void       Store   (std::string name, IDatum datum)=0;
 			void               NotifyOnChange(SettingsManager* _sm);
 		protected:
 			SettingsManager* sm;
@@ -81,26 +86,26 @@ namespace SORE_Utility
 	{
 		public:
 			IniSettingsBackend(std::string fileName);
-			std::string Retrieve(std::string name);
-			void    Store(std::string name, std::string datum);
+			IDatum Retrieve(std::string name);
+			void    Store(std::string name, IDatum datum);
 			void    OnChange(std::string name);
 		protected:
 			void ParseFile();
 			std::string file;
-			std::map<std::string, std::string> data;
+			std::map<std::string, IDatum> data;
 	};
 	
-	typedef boost::function<void (std::string)> DatumCallback;
+	typedef boost::function<void (IDatum)> DatumCallback;
 	
 	class SettingsManager
 	{
 		public:
 			SettingsManager(ISettingsBackend* _sb);
 			
-			std::string GetVariable(std::string name);
-			void       SetVariable(std::string name, std::string var);
+			IDatum GetVariable(std::string name);
+			void       SetVariable(std::string name, IDatum var);
 			
-			std::string WatchVariable(std::string name, DatumCallback func);
+			IDatum WatchVariable(std::string name, DatumCallback func);
 			
 			void Changed(std::string name); //notify all registered callbacks of name of a change
 			

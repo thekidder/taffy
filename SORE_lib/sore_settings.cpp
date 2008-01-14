@@ -26,6 +26,63 @@
 
 namespace SORE_Utility
 {
+	IDatum::IDatum(std::string _datum) : datum(_datum)
+	{
+	}
+	
+	IDatum::operator int()
+	{
+		try
+		{
+			return boost::lexical_cast<int>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return 0;
+		}
+	}
+	
+	IDatum::operator std::string()
+	{
+		return datum;
+	}
+	
+	IDatum::operator double()
+	{
+		try
+		{
+			return boost::lexical_cast<double>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return 0.0;
+		}
+	}
+	
+	IDatum::operator float()
+	{
+		try
+		{
+			return boost::lexical_cast<float>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return 0.0f;
+		}
+	}
+	
+	IDatum::operator char()
+	{
+		try
+		{
+			return boost::lexical_cast<char>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return '0';
+		}
+	}
+	
 	ISettingsBackend::ISettingsBackend()
 	{
 		sm = NULL;
@@ -95,14 +152,14 @@ namespace SORE_Utility
 		ParseFile();
 	}
 	
-	std::string IniSettingsBackend::Retrieve(std::string name)
+	IDatum IniSettingsBackend::Retrieve(std::string name)
 	{
 		if(data.find(name)==data.end())
-			return std::string("0");
+			return IDatum("");
 		return data[name];
 	}
 	
-	void IniSettingsBackend::Store(std::string name, std::string datum)
+	void IniSettingsBackend::Store(std::string name, IDatum datum)
 	{
 		data[name] = datum;
 	}
@@ -111,19 +168,19 @@ namespace SORE_Utility
 	{
 	}
 	
-	std::string SettingsManager::GetVariable(std::string name)
+	IDatum SettingsManager::GetVariable(std::string name)
 	{
 		assert(sb!=NULL && "Settings backend is null");
 		return sb->Retrieve(name);
 	}
 	
-	void SettingsManager::SetVariable(std::string name, std::string datum)
+	void SettingsManager::SetVariable(std::string name, IDatum datum)
 	{
 		assert(sb!=NULL && "Settings backend is null");
 		sb->Store(name, datum);
 	}
 	
-	std::string SettingsManager::WatchVariable(std::string name, DatumCallback func)
+	IDatum SettingsManager::WatchVariable(std::string name, DatumCallback func)
 	{
 		callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
 		return GetVariable(name);
@@ -134,7 +191,7 @@ namespace SORE_Utility
 		std::multimap<std::string, DatumCallback>::iterator it;
 		it = callbacks.find(name);
 		if(it == callbacks.end()) return;
-		std::string var = GetVariable(name);
+		IDatum var = GetVariable(name);
 		//if(var==NULL) return;
 		while(it!=callbacks.end() && it->first == name)
 		{
