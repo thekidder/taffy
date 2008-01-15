@@ -23,7 +23,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *"
+				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *.cpp *.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -86,7 +86,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *"
+				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *.cpp *.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -310,6 +310,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_shaders.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_svnrev.h"
 				>
 			</File>
 			<File
