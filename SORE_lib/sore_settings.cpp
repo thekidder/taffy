@@ -26,6 +26,9 @@
 
 namespace SORE_Utility
 {
+	using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+
 	IDatum::IDatum(std::string _datum) : datum(_datum)
 	{
 	}
@@ -34,9 +37,9 @@ namespace SORE_Utility
 	{
 		try
 		{
-			return boost::lexical_cast<int>(datum);
+			return lexical_cast<int>(datum);
 		}
-		catch(boost::bad_lexical_cast e)
+		catch(bad_lexical_cast e)
 		{
 			return 0;
 		}

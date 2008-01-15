@@ -11,8 +11,8 @@
 namespace SORE_FileIO
 {
 	const unsigned long PACKAGE_START = 1;
-	const unsigned long FILESYSTEM_START = std::numeric_limits<unsigned long>::max()/2;
-	const unsigned long FILESYSTEM_END   = std::numeric_limits<unsigned long>::max();
+#define FILESYSTEM_START  std::numeric_limits<unsigned long>::max()/2
+#define FILESYSTEM_END    std::numeric_limits<unsigned long>::max()
 	
 	typedef unsigned long file_ref;
 	typedef boost::function<void (std::string)> file_callback;
