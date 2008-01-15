@@ -23,26 +23,6 @@ namespace SORE_Graphics
 			return -1;
 		}
 		return 0;
-		/*if(!glCreateProgramARB && glCreateProgramARBARB)
-			glCreateProgramARB = glCreateProgramARBARB;
-		if(!glCreateShaderARB && glCreateShaderARBARB)
-			glCreateShaderARB = glCreateShaderARBARB;
-		if(!glShaderSourceARB && glShaderSourceARBARB)
-			glShaderSourceARB = glShaderSourceARBARB;
-		if(!glCompileShaderARB && glCompileShaderARBARB)
-			glCompileShaderARB = glCompileShaderARBARB;
-		if(!glAttachObjectARB && glAttachObjectARBARB)
-			glAttachObjectARB = glAttachObjectARBARB;
-		if(!glGetShaderivARB && glGetShaderivARBARB)
-			glGetShaderivARB = glGetShaderivARBARB;
-		if(!glGetShaderInfoLogARB && glGetShaderInfoLogARBARB)
-			glGetShaderInfoLogARB = glGetShaderInfoLogARBARB;
-		if(!glUseProgramObjectARB && glUseProgramObjectARB)
-			glUseProgramObjectARB = glUseProgramObjectARB;
-		if(!glDetachShaderARB && glDetachShaderARBARB)
-			glDetachShaderARB = glDetachShaderARBARB;
-		if(!glDeleteShaderARBARB && glDeleteShaderARBARB)
-			glDeleteShaderARB = glDeleteShaderARBARB;*/
 	}
 	
 	void UnbindShaders()
@@ -72,7 +52,7 @@ namespace SORE_Graphics
 			glDetachObjectARB(program, *it);
 			glDeleteObjectARB(*it);
 		}
-		glDeleteProgram(program);
+		glDeleteObjectARB(program);
 	}
 	
 	bool GLSLShader::Ready()
@@ -82,9 +62,9 @@ namespace SORE_Graphics
 	
 	void GLSLShader::Link()
 	{
-		glLinkProgram(program);
+		glLinkProgramARB(program);
 		int link;
-		glGetProgramiv(program, GL_LINK_STATUS, &link);
+		glGetObjectParameterivARB(program, GL_LINK_STATUS, &link);
 		if(link!=GL_TRUE)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to link shader program");
@@ -92,12 +72,12 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH,&infologLength);
+			glGetObjectParameterivARB(program, GL_INFO_LOG_LENGTH,&infologLength);
 		
 			if (infologLength > 0)
 			{
 				infoLog = new char[infologLength];
-				glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
+				glGetInfoLogARB(program, infologLength, &charsWritten, infoLog);
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Info log:\n%s") % infoLog);
 				delete[] infoLog;
 			}
@@ -221,12 +201,12 @@ namespace SORE_Graphics
 		GLint location;
 		if((it=uniforms.find(name))==uniforms.end())
 		{
-			location = glGetUniformLocation(program, name.c_str());
+			location = glGetUniformLocationARB(program, name.c_str());
 			uniforms.insert(std::pair<std::string,GLint>(name,location));
 		}
 		else
 			location = it->second;
-		glUniform4f(location,v0,v1,v2,v3);
+		glUniform4fARB(location,v0,v1,v2,v3);
 	}
 
 } //end of namespace SORE_Graphics
