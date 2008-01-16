@@ -245,6 +245,14 @@ int SORE_Kernel::Renderer::InitializeGL()
 	}
 	InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s") % (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+	std::string extensions = (char*)glGetString(GL_EXTENSIONS);
+	int pos;
+	while((pos=extensions.find(" "))!=std::string::npos)
+	{
+		extensions.replace(pos, 1, "\n");
+	}
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL extension string:\n%s") % extensions);
 #ifdef WIN32
 	if(WGLEW_EXT_swap_control)
 	{
