@@ -71,7 +71,7 @@ namespace SORE_Graphics
 	{
 		glLinkProgramARB(program);
 		int link;
-		glGetObjectParameterivARB(program, GL_LINK_STATUS, &link);
+		glGetObjectParameterivARB(program, GL_OBJECT_LINK_STATUS_ARB, &link);
 		if(link!=GL_TRUE)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to link shader program");
@@ -79,7 +79,7 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 
-			glGetObjectParameterivARB(program, GL_INFO_LOG_LENGTH,&infologLength);
+			glGetObjectParameterivARB(program, GL_OBJECT_INFO_LOG_LENGTH_ARB ,&infologLength);
 		
 			if (infologLength > 0)
 			{
@@ -131,7 +131,7 @@ namespace SORE_Graphics
 		
 		//now let's check if everything is ok
 		int compile;
-		glGetObjectParameterivARB(shader, GL_COMPILE_STATUS, &compile);
+		glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &compile);
 		if(compile!=GL_TRUE)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to compile %s shader") % shaderType.c_str());
@@ -140,7 +140,7 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 	
-			glGetUniformivARB(shader, GL_INFO_LOG_LENGTH,&infologLength);
+			glGetUniformivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB ,&infologLength);
 			if (infologLength > 0)
 			{
 				infoLog = new char[infologLength];
