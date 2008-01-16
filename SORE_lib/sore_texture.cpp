@@ -30,7 +30,7 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
 	if(file == 0 ) 
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not open texture file");
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not open texture file '%s'") % filename);
 		return;
 	}
 	if(SORE_FileIO::Read(header, 1, 18, file)<18)
