@@ -23,12 +23,12 @@
 
 namespace SORE_Graphics
 {
-	int InitShaders();
-	void UnbindShaders();
-	
 	class GLSLShader
 	{
 		public:
+			static int InitShaders();
+			static void UnbindShaders();
+			
 			GLSLShader(const char* vertex, const char* fragment);
 			~GLSLShader();
 			
@@ -52,6 +52,7 @@ namespace SORE_Graphics
 			GLuint program;
 			bool ok,linked;
 			std::map<std::string,GLint> uniforms;
+			static bool initCalled;
 	};
 }
 

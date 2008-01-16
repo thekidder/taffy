@@ -15,8 +15,11 @@
 
 namespace SORE_Graphics
 {
-	int InitShaders()
+	bool GLSLShader::initCalled = false;
+	
+	int GLSLShader::InitShaders()
 	{
+		initCalled = true;
 		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
@@ -27,13 +30,15 @@ namespace SORE_Graphics
 		return 0;
 	}
 	
-	void UnbindShaders()
+	void GLSLShader::UnbindShaders()
 	{
 		glUseProgramObjectARB(0);
 	}
 	
 	GLSLShader::GLSLShader(const char* vertex, const char* fragment)
 	{
+		if(!initCalled)
+			InitShaders();
 		Init();
 		AddVertexFile(vertex);
 		AddFragmentFile(fragment);
