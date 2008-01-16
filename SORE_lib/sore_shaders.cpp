@@ -22,6 +22,8 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
 			return -1;
 		}
+		else
+			ENGINE_LOG(SORE_Logging::LVL_INFO, "System is ready for GLSL shaders");
 		return 0;
 	}
 	
