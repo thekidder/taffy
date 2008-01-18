@@ -28,12 +28,15 @@ namespace SORE_Logging
 	const int LVL_INFO     = 0x08;
 	const int LVL_DEBUG1   = 0x10;
 	const int LVL_DEBUG2   = 0x20;
+	const int LVL_DEBUG3   = 0x40;
 	
 	const int SHOW_CRITICAL     = LVL_CRITICAL;
 	const int SHOW_ERROR        = SHOW_CRITICAL | LVL_ERROR;
 	const int SHOW_WARNING      = SHOW_ERROR    | LVL_WARNING;
 	const int SHOW_INFO         = SHOW_WARNING  | LVL_INFO;
-	const int SHOW_ALL          = SHOW_INFO     | LVL_DEBUG1 | LVL_DEBUG2;
+	const int SHOW_ALL          = SHOW_INFO     | LVL_DEBUG1 | LVL_DEBUG2 | LVL_DEBUG3;
+	
+	const int MODULE_NONE  = 0;
 		
 	struct log_message
 	{
@@ -44,6 +47,7 @@ namespace SORE_Logging
 		std::string buffer;
 		time_t time;
 		std::string logName;
+		int module;
 	};
 	
 	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
@@ -112,9 +116,11 @@ namespace SORE_Logging
 			//void Log(int lvl, const char* format, ...);
 			void Log(int lvl, std::string message);
 			//void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);
-			void Log(int lvl, int line, const char* func, const char* file, std::string message);
-			void Log(int lvl, int line, const char* func, const char* file, boost::format message);
+			void Log(int lvl, int line, const char* func, const char* file, std::string message, int module=MODULE_NONE);
+			void Log(int lvl, int line, const char* func, const char* file, boost::format message, int module=MODULE_NONE);
 			void Flush();
+			
+			void IgnoreModule(int module, int level);
 			
 			const char* GetName() const;
 		protected:
@@ -122,6 +128,7 @@ namespace SORE_Logging
 			std::vector<LoggerBackend*>::iterator it;
 			std::vector<log_message> buffers;
 			std::string logName;
+			std::vector<std::pair<int,int> > ignoredModules;
 	};
 	extern Logger sore_log;
 }

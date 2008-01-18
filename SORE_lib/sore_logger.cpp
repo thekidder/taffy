@@ -305,6 +305,7 @@ void SORE_Logging::Logger::Log(int lvl, std::string message)
 	temp.file = 0;
 	temp.time = time(NULL);
 	temp.logName = logName;
+	temp.module = MODULE_NONE;
 	if(lvlNames.size()==0)
 		InitLogging();
 	temp.buffer = message;
@@ -319,8 +320,15 @@ void SORE_Logging::Logger::Log(int lvl, std::string message)
 #endif
 }
 
-void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, std::string message)
+void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, std::string message, int module)
 {
+	std::vector<std::pair<int,int> >::iterator lit;
+	for(lit=ignoredModules.begin();lit!=ignoredModules.end();lit++)
+	{
+		if(lit->first==module)
+			if(lit->second & lvl)
+				return;
+	}
 	log_message temp;
 	temp.level = lvl;
 	temp.line = line;
@@ -328,11 +336,12 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 	temp.file = file;
 	temp.time = time(NULL);
 	temp.logName = logName;
+	temp.module = module;
 	if(lvlNames.size()==0)
 		InitLogging();
 	temp.buffer = message;
 	buffers.push_back(temp);
-	for(it=logs.begin();it<logs.end();it++)
+	for(it=logs.begin();it!=logs.end();it++)
 	{
 		for(int i=0;i<buffers.size();i++)
 			(*it)->Log(&buffers[i]);
@@ -343,9 +352,9 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 #endif
 }
 
-void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, boost::format message)
+void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, boost::format message, int module)
 {
-	Log(lvl, line, func, file, boost::str(message));
+	Log(lvl, line, func, file, boost::str(message), module);
 }
 
 void SORE_Logging::Logger::Flush()
@@ -357,6 +366,11 @@ void SORE_Logging::Logger::Flush()
 		(*it)->Flush();
 	}
 	if(logs.size()>0) buffers.clear();
+}
+
+void SORE_Logging::Logger::IgnoreModule(int module, int level)
+{
+	ignoredModules.push_back(std::pair<int,int>(module,level));
 }
 
 const char* SORE_Logging::Logger::GetName() const
