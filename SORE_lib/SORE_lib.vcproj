@@ -23,7 +23,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *&#x0D;&#x0A;"
+				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i sore_*.h sore_*.cpp&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -86,7 +86,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i *&#x0D;&#x0A;"
+				CommandLine="cd C:\Users\thekidder\Visual Studio Projects\sore_engine\trunk\SORE_lib&#x0D;&#x0A;svnrev.exe -osore_svnrev.h&#x0D;&#x0A;svnrev.exe -osore_svnrev.h -i sore_*.h sore_*.cpp&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
