@@ -39,7 +39,7 @@
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
-	XMLLogger sore_file_logger(FILE_LOG_LVL, "logs/sore_log.xml");
+	XMLLogger sore_file_logger(FILE_LOG_LVL, "logs/sore_log.xml", "SORE Engine Log");
 #ifdef SORE_CONSOLE_LOG
 	ConsoleLogger sore_console_logger(SHOW_ALL);
 #endif
@@ -157,11 +157,14 @@ void SORE_Logging::ConsoleLogger::Write(log_message* log)
 	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), stdout);
 }
 
-SORE_Logging::XMLLogger::XMLLogger(int lvl, std::string filename)
+SORE_Logging::XMLLogger::XMLLogger(int lvl, std::string filename, std::string logName)
 {
+	
 	const char begin[] = "<?xml version=\"1.0\"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?>\n<log filename=\"";
 	const char end[] = "\">\n";
+	std::string name_str = "<logname>"+logName+"</logname>\n";
 	level = lvl;
+	name = logName;
 	file = filename;
 	filePtr = fopen(file.c_str(), "w");
 	if(filePtr==NULL || ferror(filePtr)!=0)
@@ -177,6 +180,7 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, std::string filename)
 		fwrite(begin, sizeof(char), strlen(begin), filePtr);
 		fwrite(filename.c_str(), sizeof(char), strlen(filename.c_str()), filePtr);
 		fwrite(end, sizeof(char), strlen(end), filePtr);
+		fwrite(name_str.c_str(), sizeof(char), strlen(name_str.c_str()), filePtr);
 	}
 	first = true;
 	inFunc = false;

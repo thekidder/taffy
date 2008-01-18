@@ -10,5 +10,4 @@ noinst_HEADERS = inotify-cxx.h sore.h sore_allgl.h sore_buffer.h sore_camera.h \
 	sore_console.h sore_defines.h sore_fileio.h sore_font.h sore_graphics.h sore_input.h \
 	sore_interpolater.h sore_kernel.h sore_logger.h sore_math.h sore_profiler.h sore_renderer.h \
 	sore_resource.h sore_settings.h sore_shaders.h sore_task.h sore_texture.h sore_util.h
-libsore_a_LDFLAGS = -lGL -lGLEW -lGLU -lSDL -lfontconfig -lfreetype -lz \
-	-linotifytools
+libsore_a_LDFLAGS = -lGL -lGLEW -lGLU -lSDL -lfontconfig -lfreetype -lz

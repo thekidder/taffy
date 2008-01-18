@@ -93,13 +93,13 @@ namespace SORE_Logging
 	class XMLLogger : public LoggerBackend
 	{
 		public:
-			XMLLogger(int lvl, std::string filename);
+			XMLLogger(int lvl, std::string filename, std::string logName);
 			~XMLLogger();
 			
 			void Flush();
 		protected:
 			void Write(log_message* log);
-			std::string file;
+			std::string file, name;
 			FILE* filePtr;
 			std::string prevFunc;
 			bool first;
