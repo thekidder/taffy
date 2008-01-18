@@ -10,6 +10,8 @@
 #include <zlib.h>
 #include <cassert>
 
+#define MODULE_FILEIO 1
+
 namespace SORE_FileIO
 {
 	const int CHUNK = 131072;
@@ -68,6 +70,7 @@ namespace SORE_FileIO
 
 int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
 {
+	SORE_Logging::sore_log.IgnoreModule(MODULE_FILEIO, SORE_Logging::LVL_DEBUG2 | SORE_Logging::LVL_DEBUG3);
 	file_info temp;
 	cachedFiles.clear();
 	cachedFiles.push_back(temp);
@@ -154,7 +157,7 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 		}
 		cachedFiles.push_back(tempInfo);
 		BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1], cachedFiles[cachedFiles.size()-1]);
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Adding %s to cache") % cachedFiles[cachedFiles.size()-1].fullname);
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Adding %s to cache") % cachedFiles[cachedFiles.size()-1].fullname, MODULE_FILEIO);
 		fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
 	}
 	
@@ -175,7 +178,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	temp = fopen(file, "rb");
 	if(temp && ferror(temp)==0)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from disk") % file);
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from disk") % file, MODULE_FILEIO);
 		if(nOpenFilesystemFiles>=(unsigned long)FILESYSTEM_END-FILESYSTEM_START)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
@@ -202,7 +205,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 		}
 		cachedFiles[it->second].currPos = 0;
 		cachedFiles[it->second].currPosRaw  = 0;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from package %s") % file % cachedFiles[it->second].package);
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from package %s") % file % cachedFiles[it->second].package, MODULE_FILEIO);
 		if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
 		{
 			FILE* temp;
@@ -247,7 +250,7 @@ void SORE_FileIO::Close(file_ref file)
 {
 	if(file<FILESYSTEM_START && file>=PACKAGE_START)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache") % cachedFiles[file].filename);
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache") % cachedFiles[file].filename, MODULE_FILEIO);
 		cachedFiles[file].isOpen = false;
 		if(cachedFiles[file].compressed)
 		{
@@ -266,7 +269,7 @@ void SORE_FileIO::Close(file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Closing file reference %u from disk") % file);
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file reference %u from disk") % file, MODULE_FILEIO);
 		nOpenFilesystemFiles--;
 		fclose(openFilesystemFiles[file]);
 		openFilesystemFiles.erase(file);
@@ -423,8 +426,8 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 			{
 				errLvl = SORE_Logging::LVL_ERROR;
 			}
-			ENGINE_LOG(errLvl, boost::format("Could not read all %d bytes: ") % (size*nmemb));
-			ENGINE_LOG(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]));
+			ENGINE_LOG_M(errLvl, boost::format("Could not read all %d bytes: ") % (size*nmemb), MODULE_FILEIO);
+			ENGINE_LOG_M(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]), MODULE_FILEIO);
 		}
 		return read;
 	}
@@ -591,3 +594,5 @@ unsigned int SORE_FileIO::CompressedSize(file_ref file)
 		return Size(file);
 	return cachedFiles[file].sizeRaw;
 }
+
+#undef MODULE_FILEIO
