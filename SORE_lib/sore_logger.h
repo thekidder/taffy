@@ -11,8 +11,10 @@
 
 #ifndef _WIN32
 #define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
+#define ENGINE_LOG_M(lvl, format, module) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format, module)
 #else
 #define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format)
+#define ENGINE_LOG_M(lvl, format, module) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format, module)
 #endif
 
 #ifdef DEBUG
