@@ -175,7 +175,6 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	temp = fopen(file, "rb");
 	if(temp && ferror(temp)==0)
 	{
-		//fclose(temp);
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from disk") % file);
 		if(nOpenFilesystemFiles>=(unsigned long)FILESYSTEM_END-FILESYSTEM_START)
 		{
@@ -184,8 +183,6 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			return 0;
 		}
 			
-		//FILE* temp;
-		//temp = fopen(file, "rb");
 		unsigned int cur = nOpenFilesystemFiles;
 			/*TODO:
 		Currently, the approach below doesnt completely "free" file_ref's to be used when a file is closed - so theoretically, after opening files a couple billion times, we may be unable to open any more. This should be made more elegant sometime in the future.
@@ -496,7 +493,6 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			ptr[stop] = '\0';
 			length = length - stop + len;
 			memcpy(data, data+stop+1, length);
-			//data[length] = '\0';
 			return stop;
 		}
 	}
@@ -516,17 +512,12 @@ void SORE_FileIO::BuildFullName(file_list& list, file_info& file, file_info& ori
 	}		
 	if(!file.file)
 		strcat(orig.fullname, "/");
-	//return 0;
 }
 
 void SORE_FileIO::DeleteLinkedList(linked_list* curr)
 {
 	if(curr->next!=NULL)
 		DeleteLinkedList(curr->next);
-	/*if(curr->size==1)
-		delete curr->data;
-	else
-		delete[] curr->data;*/
 	delete curr;
 }
 
