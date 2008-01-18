@@ -16,22 +16,50 @@
 namespace SORE_Graphics
 {
 	bool GLSLShader::initCalled = false;
+	bool GLSLShader::supported  = false;
 	
 	int GLSLShader::InitShaders()
 	{
 		initCalled = true;
-		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
+		char* version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+		if(version==NULL)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not initialize shaders - check OpenGL version and extensions string");
-			return -1;
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Card reports GLSL not supported");
+			supported = false;
 		}
 		else
+		{
+			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s") % version);
+			supported = true;
+		}
+		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No shader support - check OpenGL version and extensions string");
+			supported = false;
+		}
+		else
+		{
+			supported = true;
+		}
+		if(supported)
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "System is ready for GLSL shaders");
+		else
+			return -1;
 		return 0;
+	}
+	
+	bool GLSLShader::ShadersSupported()
+	{
+		if(!initCalled) InitShaders();
+		return supported;
 	}
 	
 	void GLSLShader::UnbindShaders()
 	{
+		if(!ShadersSupported())
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+		}
 		glUseProgramObjectARB(0);
 	}
 	
@@ -48,6 +76,10 @@ namespace SORE_Graphics
 	
 	GLSLShader::~GLSLShader()
 	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+		}
 		std::vector<GLuint>::iterator it;
 		for(it=vertexShaders.begin();it!=vertexShaders.end();it++)
 		{
@@ -64,7 +96,7 @@ namespace SORE_Graphics
 	
 	bool GLSLShader::Ready()
 	{
-		return ok && linked;
+		return ok && linked && ShadersSupported() && program!=0;
 	}
 	
 	void GLSLShader::Link()
@@ -98,6 +130,11 @@ namespace SORE_Graphics
 	
 	int GLSLShader::Init()
 	{
+		if(!ShadersSupported())
+		{
+			program = 0;
+			return 1;
+		}
 		program = glCreateProgramObjectARB();
 		if(program == 0)
 		{
@@ -114,6 +151,10 @@ namespace SORE_Graphics
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Attempted to create shader of unknown type (type given: %u)") % type);
 			return 1;
+		}
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
 		}
 		GLuint shader;
 		shader = glCreateShaderObjectARB(type);
@@ -199,11 +240,19 @@ namespace SORE_Graphics
 	
 	void GLSLShader::Bind()
 	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+		}
 		glUseProgramObjectARB(program);
 	}
 	
 	void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+		}
 		std::map<std::string, GLint>::iterator it;
 		GLint location;
 		if((it=uniforms.find(name))==uniforms.end())

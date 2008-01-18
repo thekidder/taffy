@@ -26,8 +26,9 @@ namespace SORE_Graphics
 	class GLSLShader
 	{
 		public:
-			static int InitShaders();
+			static int  InitShaders();
 			static void UnbindShaders();
+			static bool ShadersSupported();
 			
 			GLSLShader(const char* vertex, const char* fragment);
 			~GLSLShader();
@@ -53,6 +54,7 @@ namespace SORE_Graphics
 			bool ok,linked;
 			std::map<std::string,GLint> uniforms;
 			static bool initCalled;
+			static bool supported;
 	};
 }
 
