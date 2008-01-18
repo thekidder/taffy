@@ -59,6 +59,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported())
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
 		}
 		glUseProgramObjectARB(0);
 	}
@@ -79,6 +80,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported() || program==0)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
 		}
 		std::vector<GLuint>::iterator it;
 		for(it=vertexShaders.begin();it!=vertexShaders.end();it++)
@@ -101,6 +103,11 @@ namespace SORE_Graphics
 	
 	void GLSLShader::Link()
 	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
+		}
 		glLinkProgramARB(program);
 		int link;
 		glGetObjectParameterivARB(program, GL_OBJECT_LINK_STATUS_ARB, &link);
@@ -133,6 +140,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported())
 		{
 			program = 0;
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program (shaders are not supported on this system)");
 			return 1;
 		}
 		program = glCreateProgramObjectARB();
@@ -155,6 +163,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported() || program==0)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return 1;
 		}
 		GLuint shader;
 		shader = glCreateShaderObjectARB(type);
@@ -243,6 +252,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported() || program==0)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
 		}
 		glUseProgramObjectARB(program);
 	}
@@ -252,6 +262,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported() || program==0)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
 		}
 		std::map<std::string, GLint>::iterator it;
 		GLint location;
