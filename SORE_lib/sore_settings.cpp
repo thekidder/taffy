@@ -104,6 +104,10 @@ namespace SORE_Utility
 		{
 			trimmed.erase(pos,1);
 		}
+		while((pos=trimmed.find('\r'))!=trimmed.npos) //windows files
+		{
+			trimmed.erase(pos,1);
+		}
 		return trimmed;
 	}
 

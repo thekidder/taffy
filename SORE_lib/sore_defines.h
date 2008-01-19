@@ -5,6 +5,7 @@
 
 #ifdef NDEBUG
 #undef DEBUG
+#define DEBUG 1
 #else
 #define DEBUG 1
 #endif

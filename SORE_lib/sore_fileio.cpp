@@ -452,6 +452,8 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 	assert(num<=64 && "Trying to read too many characters");
 	static char data[64]="";
 	static int length = 0;
+	if(length<0) length = 0;
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %c %d %d") % (*data) % length % num);
 	if(*data=='\0')
 	{
 		int len = Read(data, sizeof(char), num, file);
@@ -470,6 +472,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
 			length = len - stop -1;
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("1 %d %d %d") % length % len % stop);
 			memcpy(data, data+stop+1, length+len);
 			data[length] = '\0';
 			return stop;
@@ -494,6 +497,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
 			length = length - stop + len;
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("2 %d %d %d") % length % len % stop);
 			memcpy(data, data+stop+1, length);
 			return stop;
 		}
