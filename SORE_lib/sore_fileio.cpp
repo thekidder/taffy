@@ -453,7 +453,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 	static char data[64]="";
 	static int length = 0;
 	if(length<0) length = 0;
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %c %d %d") % (*data) % length % num);
+	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %d %d %c") % (*data) % length % num);
 	if(*data=='\0')
 	{
 		int len = Read(data, sizeof(char), num, file);
