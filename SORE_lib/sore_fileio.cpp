@@ -453,7 +453,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 	static char data[64]="";
 	static int length = 0;
 	if(length<0) length = 0;
-	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %d %d %c") % (*data) % length % num);
+	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %d %d %c")  % length % num % (*data));
 	if(*data=='\0')
 	{
 		int len = Read(data, sizeof(char), num, file);
@@ -465,16 +465,18 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			ptr[len] = '\0';
 			*data = '\0';
 			length = 0;
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("line: %s") % ptr);
 			return len;
 		}
 		else
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = len - stop -1;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("1 %d %d %d") % length % len % stop);
-			memcpy(data, data+stop+1, length+len);
+			length = len - stop - 1;
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("1 %d %d %d") % length % len % stop);
+			memmove(data, data+stop+1, length);
 			data[length] = '\0';
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("data: %s") % data);
 			return stop;
 		}
 	}
@@ -490,6 +492,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			*data = '\0';
 			len+=length;
 			length = 0;
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("data: %s") % data);
 			return len;
 		}
 		else
@@ -497,8 +500,9 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
 			length = length - stop + len;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("2 %d %d %d") % length % len % stop);
-			memcpy(data, data+stop+1, length);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("2 %d %d %d") % length % len % stop);
+			memmove(data, data+stop+1, length);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("line: %s") % ptr);
 			return stop;
 		}
 	}

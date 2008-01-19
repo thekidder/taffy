@@ -17,11 +17,6 @@
 #define ENGINE_LOG_M(lvl, format, module) SORE_Logging::sore_log.Log(lvl, __LINE__, __FUNCTION__, __FILE__, format, module)
 #endif
 
-#ifdef DEBUG
-#define SORE_CONSOLE_LOG
-#else
-#undef SORE_CONSOLE_LOG
-#endif
 namespace SORE_Logging
 {
 	const int LVL_CRITICAL = 0x01;

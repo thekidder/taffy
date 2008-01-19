@@ -28,6 +28,12 @@
 #define FLUSH_MESSAGES
 
 #ifdef DEBUG
+#define SORE_CONSOLE_LOG
+#else
+#undef SORE_CONSOLE_LOG
+#endif
+
+#ifdef DEBUG
 #define FILE_LOG_LVL SHOW_ALL
 #else
 #define FILE_LOG_LVL SHOW_INFO

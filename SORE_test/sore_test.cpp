@@ -29,7 +29,7 @@ bool BallListen(SORE_Kernel::Event* event);
 int main(int argc, char *argv[])
 {
 	mainLog = new SORE_Logging::Logger("SORE_test");
-	fileLog = new SORE_Logging::XMLLogger(SORE_Logging::SHOW_INFO, "logs/program_log.xml");
+	fileLog = new SORE_Logging::XMLLogger(SORE_Logging::SHOW_INFO, "logs/program_log.xml", "Snake Log");
 	consoleLog = new SORE_Logging::ConsoleLogger(SORE_Logging::SHOW_ALL);
 	mainLog->AddBackend(fileLog);
 	mainLog->AddBackend(consoleLog);
