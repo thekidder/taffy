@@ -17,16 +17,13 @@
 #include "sore_logger.h"
 #include "sore_timing.h"
 
-#include "sore_svnrev.h"
+#include "sore_logginginit.h"
 
 #include <cstring>
 #include <string>
 #include <ctime>
 #include <cstdarg>
 #include <cstdlib>
-
-#define MAJOR 0
-#define MINOR 1
 
 #define FLUSH_MESSAGES
 
@@ -61,11 +58,7 @@ void SORE_Logging::InitLogging()
 #ifdef SORE_CONSOLE_LOG
 	sore_log.AddBackend(&sore_console_logger);
 #endif
-	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE);
-	if(SVN_MODIFIED)
-	{
-		ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified since last commit (version number will be inaccurate)");
-	}
+	LoggingStartMessages();
 }
 
 void SORE_Logging::AddLogLevel(int lvl, const char* name)
