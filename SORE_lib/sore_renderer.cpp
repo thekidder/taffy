@@ -44,10 +44,10 @@ void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
 	_screen.ratio = double(_screen.width)/double(_screen.height);
 	screen = _screen;
-	//if(screen.fullscreen)
-	//	videoFlags |= SDL_FULLSCREEN;
-	//else
-	//	videoFlags ^= SDL_FULLSCREEN;
+	if(screen.fullscreen)
+		videoFlags |= SDL_FULLSCREEN;
+	else
+		if(videoFlags & SDL_FULLSCREEN) videoFlags ^= SDL_FULLSCREEN;
 	if(screen.showCursor)
 		SDL_ShowCursor(SDL_ENABLE);
 	else
@@ -61,7 +61,7 @@ void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 
 void SORE_Kernel::Renderer::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
 {
-	//SDL_FreeSurface(drawContext);
+	SDL_FreeSurface(drawContext);
 	SDLScreenChange(_screen);
 	OnResize();
 }
@@ -119,66 +119,62 @@ bool SORE_Kernel::Renderer::OnResize(Event* event)
 	{
 		width  = event->resize.w;
 		height = event->resize.h;
+		screen.width = width;
+		screen.height = height;
+		screen.ratio = (double)width/(double)height;
 		drawContext = SDL_SetVideoMode(width, height, 0, videoFlags);
 	}
-	/* Height / width ration */
-	GLfloat ratio;
-	ratio = ( GLfloat )width / ( GLfloat )height;
 	/* Setup our viewport. */
 	glViewport( 0, 0, ( GLsizei )width, ( GLsizei )height );
-	/* change to the projection matrix and set our viewing volume. */
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity( );
-	/* Set our perspective */
-	//gluPerspective( 45.0f, ratio, 0.1f, 300.0f );
-
-	//gluOrtho2D(-x, x, y, -y);
-	if(ChangeProjection(ratio)!=0)
-		return false;
-	/* Make sure we're chaning the model view and not the projection */
-	glMatrixMode( GL_MODELVIEW );
-	/* Reset The View */
-	glLoadIdentity( );
 	glGetIntegerv(GL_VIEWPORT, viewport);
+	
+	if(ChangeProjectionMatrix(proj)!=0)
+		return false;	
 	return true;
 }
 
-int SORE_Kernel::Renderer::ChangeProjection(double ratio)
+int SORE_Kernel::Renderer::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection)
 {
-	switch(proj.type)
+	int returnCode = 0;
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity( );
+	switch(projection.type)
 	{
 		case SORE_Graphics::NONE:
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No projection type set, could not initialize projection");
-			return -1;
+			returnCode = -1;
 			break;
 		case SORE_Graphics::ORTHO2D:
-			if(proj.useScreenCoords)
+			if(projection.useScreenCoords)
 				gluOrtho2D(0, viewport[2], 0, viewport[3]);
 			else
 			{
-				if(proj.useScreenRatio)
+				if(projection.useScreenRatio)
 				{
-					proj.bottom = proj.left / ratio;
-					proj.top = proj.right / ratio;
+					projection.bottom = projection.left / screen.ratio;
+					projection.top = projection.right / screen.ratio;
 				}
-				gluOrtho2D(proj.left, proj.right, proj.top, proj.bottom);
+				gluOrtho2D(projection.left, projection.right, projection.top, projection.bottom);
 			}
 			break;
 		case SORE_Graphics::ORTHO:
-			//TODO: finish ortho projection
+			//TODO: finish ortho projectionection
 			break;
 		case SORE_Graphics::PERSPECTIVE:
-			if(proj.useScreenRatio)
+			if(projection.useScreenRatio)
 			{
-				proj.ratio = ratio;
+				projection.ratio = screen.ratio;
 			}
-			gluPerspective(proj.fov, proj.ratio, proj.znear, proj.zfar );
+			gluPerspective(projection.fov, projection.ratio, projection.znear, projection.zfar );
 			break;
 		default:
-			return -1;
+			returnCode = -1;
 			break;
 	}
-	return 0;
+	glMatrixMode( GL_MODELVIEW );
+	/* Reset The View */
+	glLoadIdentity( );
+	return returnCode;
 }
 
 int SORE_Kernel::Renderer::InitializeSDL()
@@ -268,10 +264,17 @@ int SORE_Kernel::Renderer::InitializeGL()
 void SORE_Kernel::Renderer::SetProjection(SORE_Graphics::ProjectionInfo& info)
 {
 	proj = info;
-	OnResize();
+	//OnResize();
+	ChangeProjectionMatrix(proj);
 	info.top = proj.top;
 	info.bottom = proj.bottom;
 	info.ratio = proj.ratio;
+}
+
+void SORE_Kernel::Renderer::ChangeProjection(SORE_Graphics::ProjectionInfo& info)
+{
+	//OnResize();
+	ChangeProjectionMatrix(info);
 }
 
 void SORE_Kernel::Renderer::InitExtensions()

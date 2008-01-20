@@ -7,7 +7,7 @@
 
 using SORE_Font::font_ref;
 
-namespace SORE_Util
+namespace SORE_Utility
 {
 	class Console
 	{

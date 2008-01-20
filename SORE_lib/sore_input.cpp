@@ -57,9 +57,9 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 			case SDL_MOUSEBUTTONUP:
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button up: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
 				event.type = MOUSEBUTTONUP;
-				if(sdl_event.button.button & SDL_BUTTON_LEFT) event.mouse.buttonState -= MOUSE_BUTTON1;
-				if(sdl_event.button.button & SDL_BUTTON_RIGHT) event.mouse.buttonState -= MOUSE_BUTTON2;
-				if(sdl_event.button.button & SDL_BUTTON_MIDDLE) event.mouse.buttonState -= MOUSE_BUTTON3;
+				if(sdl_event.button.button & SDL_BUTTON_LEFT && event.mouse.buttonState & MOUSE_BUTTON1) event.mouse.buttonState ^= MOUSE_BUTTON1;
+				if(sdl_event.button.button & SDL_BUTTON_RIGHT && event.mouse.buttonState & MOUSE_BUTTON2) event.mouse.buttonState ^= MOUSE_BUTTON2;
+				if(sdl_event.button.button & SDL_BUTTON_MIDDLE && event.mouse.buttonState & MOUSE_BUTTON3) event.mouse.buttonState ^= MOUSE_BUTTON3;
 				//event.mouse.buttonState = 0x00;
 				//if(sdl_event.motion.state & SDL_BUTTON_LEFT) event.mouse.buttonState |= MOUSE_BUTTON1;
 				//if(sdl_event.motion.state & SDL_BUTTON_MIDDLE) event.mouse.buttonState |= MOUSE_BUTTON3;

@@ -19,7 +19,7 @@
 namespace SORE_Graphics
 {
 	SORE_Kernel::Renderer* r;
-	ProjectionInfo old;
+	//ProjectionInfo old;
 	void WindowToReal(int* window, int* real);
 }
 
@@ -34,7 +34,7 @@ void SORE_Graphics::PushProjection(SORE_Graphics::ProjectionInfo& info)
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	r->SetProjection(info);
+	r->ChangeProjection(info);
 	glPopAttrib();
 	glLoadIdentity();
 }
@@ -45,19 +45,15 @@ void SORE_Graphics::PopProjection()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glPopAttrib();
-	r->SetProjection(old);
+	//r->ChangeProjection(old);
 }
 
 void SORE_Graphics::PushOverlay()
 {
-	old = r->GetProjection();
+	//old = r->GetProjection();
 	static SORE_Graphics::ProjectionInfo overlay;
 	overlay.type   = SORE_Graphics::ORTHO2D;
-	overlay.left   = 0;
-	overlay.right  = r->GetScreen()->width;
-	overlay.top    = 0;
-	overlay.bottom = r->GetScreen()->height;
-	overlay.useScreenRatio = false;
+	overlay.useScreenCoords = true;
 	PushProjection(overlay);
 }
 
@@ -80,7 +76,10 @@ void SORE_Graphics::WindowToReal(int* window, int* real)
 {
 	GLint* viewport = r->GetViewport();
 	if(window[0]>viewport[2] || window[1]>viewport[3] || window[0]<0 || window[1]<0)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Viewport is inconsistent: (%d, %d, %d, %d) to (%d, %d)") % viewport[0] % viewport[1] % viewport[2] % viewport[3] % window[0] % window[1]);
 		return;
+	}
 	real[0] = window[0];
 	real[1] = viewport[3]-window[1];
 }

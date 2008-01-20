@@ -60,10 +60,11 @@ namespace SORE_Kernel
 			void SetSceneGraph(SORE_Graphics::SceneGraph* scene);
 			void SetCamera    (SORE_Graphics::Camera*     camera);
 			
-			//set default projection type
+			//both of the following change the projection matrix - the difference is that SetProjection saves it as the default
+			//(this means when screen is resized, the default will be applied)
 			void SetProjection(SORE_Graphics::ProjectionInfo& info);
-			//change current perspective - takes effect immediately
-			//void ChangeProjection(SORE_Graphics::ProjectionInfo* info);
+			void ChangeProjection(SORE_Graphics::ProjectionInfo& info);
+			
 			void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
 			
 			bool OnResize(Event* event=NULL);
@@ -76,18 +77,8 @@ namespace SORE_Kernel
 			int  InitializeGL();
 			void InitExtensions();
 			
-			int ChangeProjection(double ratio); //returns 0 on success
+			int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection); //returns 0 on success
 			void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
-			
-			/*template <typename proc>
-					void glextInitProc(proc& dest, const char* name)
-			{
-				dest = reinterpret_cast<proc>(uglGetProcAddress(name));
-				if ( !dest )
-				{
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "Could not set up extension %s", name);
-				}
-			} */
 			
 			SDL_Surface* drawContext;
 			int width,height;

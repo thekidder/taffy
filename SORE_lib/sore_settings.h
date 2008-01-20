@@ -42,31 +42,10 @@ namespace SORE_Utility
 			operator double();
 			operator float();
 			operator char();
+			operator bool();
+			bool operator==(IDatum& other);
 		protected:
 			std::string datum;
-	};
-	
-	template<class T>
-			class TemplateDatum : public IDatum
-	{
-		public:
-			TemplateDatum<T>() : IDatum() {}
-			TemplateDatum<T>(T t) : datum(t) {}
-			T GetVar() {return datum;}
-			operator int()
-			{
-				int* value = reinterpret_cast<int*>(&datum);
-				if(value) return *value;
-				else return 0;
-			}
-			operator std::string()
-			{
-				std::string* value = reinterpret_cast<std::string*>(&datum);
-				if(value) return *value;
-				else return "";
-			}
-		protected:
-			T datum;
 	};
 	
 	class SettingsManager;

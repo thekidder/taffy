@@ -4,7 +4,7 @@
 #include "sore_allgl.h"
 #include "sore_graphics.h"
 
-SORE_Util::Console::Console(font_ref fontID, int x, int y, int width, unsigned int height)
+SORE_Utility::Console::Console(font_ref fontID, int x, int y, int width, unsigned int height)
 {
 	this->x = x;
 	this->y = y;
@@ -18,12 +18,12 @@ SORE_Util::Console::Console(font_ref fontID, int x, int y, int width, unsigned i
 	numLines = 1;
 }
 
-void SORE_Util::Console::InitFont(font_ref fontID)
+void SORE_Utility::Console::InitFont(font_ref fontID)
 {
 	consoleFont = fontID;
 }
 
-void SORE_Util::Console::Render()
+void SORE_Utility::Console::Render()
 {
 	glColor3f(1.0f, 1.0f, 1.0f);
 	//glEnable(GL_SCISSOR_TEST);
@@ -36,13 +36,13 @@ void SORE_Util::Console::Render()
 	//glDisable(GL_SCISSOR_TEST);
 }
 
-void SORE_Util::Console::PutChar(char c)
+void SORE_Utility::Console::PutChar(char c)
 {
 	outbuffer += c;
 	if(c=='\n') numLines++;
 }
 
-char SORE_Util::Console::GetChar()
+char SORE_Utility::Console::GetChar()
 {
 	return ' ';
 }

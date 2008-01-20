@@ -27,10 +27,15 @@
 namespace SORE_Utility
 {
 	using boost::lexical_cast;
-    using boost::bad_lexical_cast;
+	using boost::bad_lexical_cast;
 
 	IDatum::IDatum(std::string _datum) : datum(_datum)
 	{
+	}
+	
+	bool IDatum::operator==(IDatum& other)
+	{
+		return datum==other.datum;
 	}
 	
 	IDatum::operator int()
@@ -59,6 +64,20 @@ namespace SORE_Utility
 		catch(boost::bad_lexical_cast e)
 		{
 			return 0.0;
+		}
+	}
+	
+	IDatum::operator bool()
+	{
+		if(datum=="true") return true;
+		if(datum=="false") return false;
+		try
+		{
+			return boost::lexical_cast<bool>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return false;
 		}
 	}
 	
@@ -134,7 +153,7 @@ namespace SORE_Utility
 			
 			while(len>0)
 			{
-				std::string name, value;
+				std::string name, value, oldValue;
 				std::string setting = dataStr;
 				int eqPos=setting.find('=');
 				if(eqPos!=-1)
@@ -143,9 +162,10 @@ namespace SORE_Utility
 					value=setting.substr(eqPos+1);
 					name = Trim(name);
 					value = Trim(value);
+					oldValue = (std::string)Retrieve(name);
 					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s'") % name % value);
 					Store(name, value);
-					if(sm)
+					if(sm && oldValue!=value)
 						sm->Changed(name);
 				}
 				len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);

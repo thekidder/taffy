@@ -7,12 +7,12 @@
 #include "sore_kernel.h"
 #include "sore_input.h"
 
-const int AXIS_X = 1;
-const int AXIS_Y = 2;
-const int AXIS_Z = 3;
-
 namespace SORE_Graphics
 {
+	const int AXIS_X = 1;
+	const int AXIS_Y = 2;
+	const int AXIS_Z = 3; 
+	
 	struct RotationLimit
 	{
 		RotationLimit(): upperLimit(false), lowerLimit(false) {}

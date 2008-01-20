@@ -499,9 +499,9 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = length - stop + len;
+			length = length - stop + len - 1;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("2 %d %d %d") % length % len % stop);
-			memmove(data, data+stop+1, length);
+			memmove(data, data+stop+1, length+1);
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("line: %s") % ptr);
 			return stop;
 		}
