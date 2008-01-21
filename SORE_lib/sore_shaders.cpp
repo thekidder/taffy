@@ -32,7 +32,7 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s") % version);
 			supported = true;
 		}
-		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_program && GLEW_ARB_fragment_program)))
+		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No shader support - check OpenGL version and extensions string");
 			supported = false;
