@@ -41,6 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="C:\DEVEL\include"
+				PreprocessorDefinitions="_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
@@ -104,7 +105,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="C:\DEVEL\include"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="_WIN32_WINNT=0x500"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"

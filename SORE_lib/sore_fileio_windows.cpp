@@ -20,15 +20,56 @@
  // $Id$
 
 #include "sore_fileio.h"
+#include <windows.h>
 
 namespace SORE_FileIO
 {
 	std::multimap<std::string, file_callback> callbacks;
 	
+	HANDLE hDir;
+
+	DWORD WINAPI ThreadFunc(LPVOID args)
+	{
+		//std::cout << SORE_Logging::LVL_INFO, "ThreadFunc called";
+		hDir = CreateFile(".\\",
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_READ|FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			NULL);
+		if(hDir==INVALID_HANDLE_VALUE)
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to get directory handle");
+		FILE_NOTIFY_INFORMATION buffer[1024];
+		DWORD bytesReturned;
+		while(ReadDirectoryChangesW(hDir,
+			&buffer,
+			sizeof(buffer),
+			TRUE,
+			FILE_NOTIFY_CHANGE_LAST_WRITE,
+			&bytesReturned,
+			NULL,
+			NULL))
+		{
+			ENGINE_LOG(SORE_Logging::LVL_INFO, "directory modified");
+		}
+		int err = GetLastError();
+		return 0;
+	}
+
 	class WindowsFileWatch : public SORE_Kernel::Task
 	{
 		public:
-			WindowsFileWatch(SORE_Kernel::GameKernel* gk) : Task(gk) {}
+			WindowsFileWatch(SORE_Kernel::GameKernel* gk) : Task(gk)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_INFO, "Spawning file watch thread");
+				thread = CreateThread(NULL,
+					0,
+					ThreadFunc,
+					NULL,
+					0,
+					&dwThreadId);
+			}
 			~WindowsFileWatch()
 			{
 				
@@ -42,11 +83,14 @@ namespace SORE_FileIO
 			
 			const char* GetName() const { return "File Notify task";}
 		protected:
-			
+			HANDLE thread;	
+			DWORD dwThreadId;
 	};
 	
 	bool InitFileNotify(SORE_Kernel::GameKernel* gk)
 	{
+		static WindowsFileWatch watchTask(gk);
+		gk->AddConstTask(0, 5000, &watchTask);
 		return true;
 	}
 	
