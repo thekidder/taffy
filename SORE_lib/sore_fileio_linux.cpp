@@ -71,6 +71,7 @@ namespace SORE_FileIO
 		in.SetNonBlock(true);
 		static LinuxINotifyWatch watchTask(gk);
 		gk->AddConstTask(0, 5000, &watchTask);
+		return true;
 	}
 	
 	void Notify(std::string filename, boost::function<void (std::string filename)> callback)
