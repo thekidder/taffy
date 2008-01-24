@@ -33,17 +33,19 @@
 
 namespace SORE_Utility
 {
-	class IDatum
+	class Datum
 	{
 		public:
-			IDatum(std::string _datum = "");
+			Datum(std::string _datum = "");
+			//Datum(Datum& _datum);
 			operator int();
 			operator std::string();
 			operator double();
 			operator float();
 			operator char();
 			operator bool();
-			bool operator==(IDatum& other);
+			bool operator==(Datum& other);
+			Datum operator=(Datum& _datum);
 		protected:
 			std::string datum;
 	};
@@ -54,8 +56,8 @@ namespace SORE_Utility
 	{
 		public:
 			ISettingsBackend();
-			virtual IDatum Retrieve(std::string name)=0;
-			virtual void       Store   (std::string name, IDatum datum)=0;
+			virtual Datum Retrieve(std::string name)=0;
+			virtual void       Store   (std::string name, Datum datum)=0;
 			void               NotifyOnChange(SettingsManager* _sm);
 		protected:
 			SettingsManager* sm;
@@ -65,32 +67,45 @@ namespace SORE_Utility
 	{
 		public:
 			IniSettingsBackend(std::string fileName);
-			IDatum Retrieve(std::string name);
-			void    Store(std::string name, IDatum datum);
+			Datum Retrieve(std::string name);
+			void    Store(std::string name, Datum datum);
 			void    OnChange(std::string name);
 		protected:
 			void ParseFile();
 			std::string file;
-			std::map<std::string, IDatum> data;
+			std::map<std::string, Datum> data;
 	};
 	
-	typedef boost::function<void (IDatum)> DatumCallback;
+	typedef boost::function<void (Datum)> DatumCallback;
 	
 	class SettingsManager
 	{
 		public:
 			SettingsManager(ISettingsBackend* _sb);
 			
-			IDatum GetVariable(std::string name);
-			void       SetVariable(std::string name, IDatum var);
+			Datum GetVariable(std::string name);
+			void       SetVariable(std::string name, Datum var);
 			
-			IDatum WatchVariable(std::string name, DatumCallback func);
+			Datum WatchVariable(std::string name, DatumCallback func);
 			
 			void Changed(std::string name); //notify all registered callbacks of name of a change
 			
 		protected:
 			std::multimap<std::string, DatumCallback > callbacks;
 			ISettingsBackend* sb;
+	};
+	
+	class WatchedDatum : public Datum
+	{
+		public:
+			WatchedDatum(std::string _name, Datum& _datum, SettingsManager* _sm);
+			WatchedDatum(std::string _name, std::string _datum, SettingsManager* _sm);
+			WatchedDatum(std::string _name, SettingsManager* _sm);
+		protected:
+			void InitWatch();
+			void WatchFunction(Datum _datum);
+			SettingsManager* sm;
+			std::string name;
 	};
 };
 

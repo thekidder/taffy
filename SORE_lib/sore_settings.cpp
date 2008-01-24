@@ -29,16 +29,26 @@ namespace SORE_Utility
 	using boost::lexical_cast;
 	using boost::bad_lexical_cast;
 
-	IDatum::IDatum(std::string _datum) : datum(_datum)
+	Datum::Datum(std::string _datum) : datum(_datum)
 	{
 	}
 	
-	bool IDatum::operator==(IDatum& other)
+	//Datum::Datum(Datum& _datum) :datum(_datum)
+	//{
+	//}
+	
+	Datum Datum::operator=(Datum& _datum)
+	{
+		datum = _datum.datum;
+		return *this;
+	}
+	
+	bool Datum::operator==(Datum& other)
 	{
 		return datum==other.datum;
 	}
 	
-	IDatum::operator int()
+	Datum::operator int()
 	{
 		try
 		{
@@ -50,12 +60,12 @@ namespace SORE_Utility
 		}
 	}
 	
-	IDatum::operator std::string()
+	Datum::operator std::string()
 	{
 		return datum;
 	}
 	
-	IDatum::operator double()
+	Datum::operator double()
 	{
 		try
 		{
@@ -67,7 +77,7 @@ namespace SORE_Utility
 		}
 	}
 	
-	IDatum::operator bool()
+	Datum::operator bool()
 	{
 		if(datum=="true") return true;
 		if(datum=="false") return false;
@@ -81,7 +91,7 @@ namespace SORE_Utility
 		}
 	}
 	
-	IDatum::operator float()
+	Datum::operator float()
 	{
 		try
 		{
@@ -93,7 +103,7 @@ namespace SORE_Utility
 		}
 	}
 	
-	IDatum::operator char()
+	Datum::operator char()
 	{
 		try
 		{
@@ -164,7 +174,7 @@ namespace SORE_Utility
 					value = Trim(value);
 					oldValue = (std::string)Retrieve(name);
 					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s'") % name % value);
-					Store(name, value);
+					Store(name, Datum(value));
 					if(sm && oldValue!=value)
 						sm->Changed(name);
 				}
@@ -179,14 +189,14 @@ namespace SORE_Utility
 		ParseFile();
 	}
 	
-	IDatum IniSettingsBackend::Retrieve(std::string name)
+	Datum IniSettingsBackend::Retrieve(std::string name)
 	{
 		if(data.find(name)==data.end())
-			return IDatum("");
+			return Datum("");
 		return data[name];
 	}
 	
-	void IniSettingsBackend::Store(std::string name, IDatum datum)
+	void IniSettingsBackend::Store(std::string name, Datum datum)
 	{
 		data[name] = datum;
 	}
@@ -195,19 +205,19 @@ namespace SORE_Utility
 	{
 	}
 	
-	IDatum SettingsManager::GetVariable(std::string name)
+	Datum SettingsManager::GetVariable(std::string name)
 	{
 		assert(sb!=NULL && "Settings backend is null");
 		return sb->Retrieve(name);
 	}
 	
-	void SettingsManager::SetVariable(std::string name, IDatum datum)
+	void SettingsManager::SetVariable(std::string name, Datum datum)
 	{
 		assert(sb!=NULL && "Settings backend is null");
 		sb->Store(name, datum);
 	}
 	
-	IDatum SettingsManager::WatchVariable(std::string name, DatumCallback func)
+	Datum SettingsManager::WatchVariable(std::string name, DatumCallback func)
 	{
 		callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
 		return GetVariable(name);
@@ -218,12 +228,38 @@ namespace SORE_Utility
 		std::multimap<std::string, DatumCallback>::iterator it;
 		it = callbacks.find(name);
 		if(it == callbacks.end()) return;
-		IDatum var = GetVariable(name);
+		Datum var = GetVariable(name);
 		//if(var==NULL) return;
 		while(it!=callbacks.end() && it->first == name)
 		{
 			it->second(var);
 			it++;
 		}
+	}
+	
+	WatchedDatum::WatchedDatum(std::string _name, Datum& _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name)
+	{
+		InitWatch();
+	}
+	
+	WatchedDatum::WatchedDatum(std::string _name, std::string _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name)
+	{
+		InitWatch();
+	}
+	
+	WatchedDatum::WatchedDatum(std::string _name, SettingsManager* _sm) : sm(_sm), name(_name)
+	{
+		InitWatch();
+	}
+	
+	void WatchedDatum::InitWatch()
+	{
+		std::string temp = sm->WatchVariable(name, std::bind1st(boost::mem_fn(&WatchedDatum::WatchFunction), this));
+		datum = temp;
+	}
+	
+	void WatchedDatum::WatchFunction(Datum _datum)
+	{
+		datum = (std::string)_datum;
 	}
 }
