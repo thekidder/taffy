@@ -158,7 +158,7 @@ int SORE_Kernel::Renderer::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo&
 			}
 			break;
 		case SORE_Graphics::ORTHO:
-			//TODO: finish ortho projectionection
+			//TODO: finish ortho projection
 			break;
 		case SORE_Graphics::PERSPECTIVE:
 			if(projection.useScreenRatio)
