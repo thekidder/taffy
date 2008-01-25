@@ -29,7 +29,7 @@ namespace SORE_Utility
 	using boost::lexical_cast;
 	using boost::bad_lexical_cast;
 
-	Datum::Datum(std::string _datum) : datum(_datum)
+	Datum::Datum(std::string _datum) : datum(_datum), changed(false)
 	{
 	}
 	
@@ -175,10 +175,18 @@ namespace SORE_Utility
 					oldValue = (std::string)Retrieve(name);
 					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s'") % name % value);
 					Store(name, Datum(value));
-					if(sm && oldValue!=value)
-						sm->Changed(name);
+					if(value!=oldValue) data[name].changed = true;
 				}
 				len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
+			}
+			std::map<std::string, Datum>::iterator it;
+			for(it=data.begin();it!=data.end();it++)
+			{
+				if(sm && it->second.changed)
+				{
+					it->second.changed = false;
+					sm->Changed(it->first);
+				}
 			}
 			SORE_FileIO::Close(settingsFile);
 		}
@@ -217,10 +225,21 @@ namespace SORE_Utility
 		sb->Store(name, datum);
 	}
 	
+	Datum SettingsManager::WatchVariable(std::string name, DatumCallback func, datum_watch_id& id)
+	{
+		id = callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
+		return GetVariable(name);
+	}
+	
 	Datum SettingsManager::WatchVariable(std::string name, DatumCallback func)
 	{
 		callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
 		return GetVariable(name);
+	}
+	
+	void SettingsManager::RemoveWatch(datum_watch_id id)
+	{
+		callbacks.erase(id);
 	}
 			
 	void SettingsManager::Changed(std::string name) //notify all registered callbacks of name of a change
@@ -252,10 +271,19 @@ namespace SORE_Utility
 		InitWatch();
 	}
 	
+	WatchedDatum::~WatchedDatum()
+	{
+		if(sm)
+			sm->RemoveWatch(watch);
+	}
+	
 	void WatchedDatum::InitWatch()
 	{
-		std::string temp = sm->WatchVariable(name, std::bind1st(boost::mem_fn(&WatchedDatum::WatchFunction), this));
-		datum = temp;
+		if(sm)
+		{
+			std::string temp = sm->WatchVariable(name, std::bind1st(boost::mem_fn(&WatchedDatum::WatchFunction), this), watch);
+			datum = temp;
+		}
 	}
 	
 	void WatchedDatum::WatchFunction(Datum _datum)

@@ -55,7 +55,7 @@ void SORE_Kernel::Renderer::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 	if(screen.resizable)
 		videoFlags |= SDL_RESIZABLE;
 	else
-		videoFlags ^= SDL_RESIZABLE;
+		if(videoFlags & SDL_RESIZABLE) videoFlags ^= SDL_RESIZABLE;
 	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
 }
 

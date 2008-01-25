@@ -46,6 +46,7 @@ namespace SORE_Utility
 			operator bool();
 			bool operator==(Datum& other);
 			Datum operator=(Datum& _datum);
+			bool changed;
 		protected:
 			std::string datum;
 	};
@@ -77,6 +78,7 @@ namespace SORE_Utility
 	};
 	
 	typedef boost::function<void (Datum)> DatumCallback;
+	typedef std::multimap<std::string, DatumCallback >::iterator datum_watch_id;
 	
 	class SettingsManager
 	{
@@ -86,7 +88,9 @@ namespace SORE_Utility
 			Datum GetVariable(std::string name);
 			void       SetVariable(std::string name, Datum var);
 			
+			Datum WatchVariable(std::string name, DatumCallback func, datum_watch_id& id);
 			Datum WatchVariable(std::string name, DatumCallback func);
+			void  RemoveWatch(datum_watch_id id);
 			
 			void Changed(std::string name); //notify all registered callbacks of name of a change
 			
@@ -101,11 +105,13 @@ namespace SORE_Utility
 			WatchedDatum(std::string _name, Datum& _datum, SettingsManager* _sm);
 			WatchedDatum(std::string _name, std::string _datum, SettingsManager* _sm);
 			WatchedDatum(std::string _name, SettingsManager* _sm);
+			~WatchedDatum();
 		protected:
 			void InitWatch();
 			void WatchFunction(Datum _datum);
 			SettingsManager* sm;
 			std::string name;
+			datum_watch_id watch; 
 	};
 };
 
