@@ -22,38 +22,126 @@
 #include "sore_fileio.h"
 #include <windows.h>
 
+#include <stdio.h>
+#include <tchar.h>
+#include <string.h>
+#include <psapi.h>
+#include <strsafe.h>
+
 namespace SORE_FileIO
 {
+#define BUFSIZE 512
+
+/*BOOL GetFileNameFromHandle(HANDLE hFile) 
+{
+  BOOL bSuccess = FALSE;
+  TCHAR pszFilename[MAX_PATH+1];
+  HANDLE hFileMap;
+
+  // Get the file size.
+  DWORD dwFileSizeHi = 0;
+  DWORD dwFileSizeLo = GetFileSize(hFile, &dwFileSizeHi); 
+
+  if( dwFileSizeLo == 0 && dwFileSizeHi == 0 )
+  {
+     printf("Cannot map a file with a length of zero.\n");
+     return FALSE;
+  }
+
+  // Create a file mapping object.
+  hFileMap = CreateFileMapping(hFile, 
+                    NULL, 
+                    PAGE_READONLY,
+                    0, 
+                    MAX_PATH,
+                    NULL);
+
+  if (hFileMap) 
+  {
+    // Create a file mapping to get the file name.
+    void* pMem = MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 1);
+
+    if (pMem) 
+    {
+      if (GetMappedFileName (GetCurrentProcess(), 
+                             pMem, 
+                             pszFilename,
+                             MAX_PATH)) 
+      {
+
+        // Translate path with device name to drive letters.
+        TCHAR szTemp[BUFSIZE];
+        szTemp[0] = '\0';
+
+        if (GetLogicalDriveStrings(BUFSIZE-1, szTemp)) 
+        {
+          TCHAR szName[MAX_PATH];
+          TCHAR szDrive[3] = TEXT(" :");
+          BOOL bFound = FALSE;
+          TCHAR* p = szTemp;
+
+          do 
+          {
+            // Copy the drive letter to the template string
+            *szDrive = *p;
+
+            // Look up each device name
+            if (QueryDosDevice(szDrive, szName, BUFSIZE))
+            {
+              UINT uNameLen = _tcslen(szName);
+
+              if (uNameLen < MAX_PATH) 
+              {
+                bFound = _tcsnicmp(pszFilename, szName, 
+                    uNameLen) == 0;
+
+                if (bFound) 
+                {
+                  // Reconstruct pszFilename using szTempFile
+                  // Replace device path with DOS path
+                  TCHAR szTempFile[MAX_PATH];
+                  StringCchPrintf(szTempFile,
+                            MAX_PATH,
+                            TEXT("%s%s"),
+                            szDrive,
+                            pszFilename+uNameLen);
+                  StringCchCopyN(pszFilename, MAX_PATH+1, szTempFile, _tcslen(szTempFile));
+                }
+              }
+            }
+
+            // Go to the next NULL character.
+            while (*p++);
+          } while (!bFound && *p); // end of string
+        }
+      }
+      bSuccess = TRUE;
+      UnmapViewOfFile(pMem);
+    } 
+
+    CloseHandle(hFileMap);
+  }
+  _tprintf(TEXT("File name is %s\n"), pszFilename);
+  return(bSuccess);
+}
+
+*/	
 	std::multimap<std::string, file_callback> callbacks;
 	
 	HANDLE hDir;
 
 	DWORD WINAPI ThreadFunc(LPVOID args)
 	{
-		//std::cout << SORE_Logging::LVL_INFO, "ThreadFunc called";
-		hDir = CreateFile(".\\",
-			FILE_LIST_DIRECTORY,
-			FILE_SHARE_READ|FILE_SHARE_DELETE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_FLAG_BACKUP_SEMANTICS,
-			NULL);
-		if(hDir==INVALID_HANDLE_VALUE)
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to get directory handle");
-		FILE_NOTIFY_INFORMATION buffer[1024];
-		DWORD bytesReturned;
-		while(ReadDirectoryChangesW(hDir,
-			&buffer,
-			sizeof(buffer),
-			TRUE,
-			FILE_NOTIFY_CHANGE_LAST_WRITE,
-			&bytesReturned,
-			NULL,
-			NULL))
+		HANDLE file;
+		file = FindFirstChangeNotification(".\\", FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+		WaitForSingleObject(file, INFINITE);
+		while(true)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_INFO, "directory modified");
+			FindNextChangeNotification(file);
+			WaitForSingleObject(file, INFINITE);
+			HANDLE i = file;
 		}
-		int err = GetLastError();
+		//GetFileNameFromHandle(file);
 		return 0;
 	}
 
@@ -63,12 +151,14 @@ namespace SORE_FileIO
 			WindowsFileWatch(SORE_Kernel::GameKernel* gk) : Task(gk)
 			{
 				ENGINE_LOG(SORE_Logging::LVL_INFO, "Spawning file watch thread");
-				thread = CreateThread(NULL,
+				/*thread = CreateThread(NULL,
 					0,
 					ThreadFunc,
 					NULL,
 					0,
-					&dwThreadId);
+					&dwThreadId);*/
+				file = FindFirstChangeNotification(".\\", FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+				WaitForSingleObject(file, 0);
 			}
 			~WindowsFileWatch()
 			{
@@ -79,11 +169,17 @@ namespace SORE_FileIO
 			void Resume() {}
 			void Frame(int elapsedTime) 
 			{
+				FindNextChangeNotification(file);
+				WaitForSingleObject(file, 0);
+				if(file!=INVALID_HANDLE_VALUE)
+				{
+					ENGINE_LOG(SORE_Logging::LVL_INFO, "change");
+				}
 			}
 			
 			const char* GetName() const { return "File Notify task";}
 		protected:
-			HANDLE thread;	
+			HANDLE thread, file;	
 			DWORD dwThreadId;
 	};
 	
