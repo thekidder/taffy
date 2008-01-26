@@ -241,7 +241,10 @@ int SORE_Kernel::Renderer::InitializeGL()
 	}
 	InitExtensions();
 	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
-	std::string extensions = (char*)glGetString(GL_EXTENSIONS);
+	char* glExtensions = (char*)glGetString(GL_EXTENSIONS);
+	std::string extensions;
+	if(glExtensions==NULL) extensions = "";
+	else extensions = glExtensions;
 	int pos;
 	while((pos=extensions.find(" "))!=std::string::npos)
 	{
