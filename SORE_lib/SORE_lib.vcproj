@@ -149,6 +149,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\sore_2dscenegraph.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_buffer.cpp"
 				>
 			</File>
@@ -209,6 +213,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_screen.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_settings.cpp"
 				>
 			</File>
@@ -240,6 +248,14 @@
 			</File>
 			<File
 				RelativePath=".\sore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_2dprimitives.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_2dscenegraph.h"
 				>
 			</File>
 			<File
@@ -312,6 +328,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_screen.h"
 				>
 			</File>
 			<File
