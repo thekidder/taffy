@@ -18,12 +18,12 @@
 
 namespace SORE_Graphics
 {
-	SORE_Kernel::Renderer* r;
+	SORE_Kernel::Screen* r;
 	//ProjectionInfo old;
 	void WindowToReal(int* window, int* real);
 }
 
-void SORE_Graphics::SetRenderer(SORE_Kernel::Renderer* _r) 
+void SORE_Graphics::SetScreen(SORE_Kernel::Screen* _r) 
 {
 	r = _r;
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
- *   thekidder@gmail.com                                                   *
+ *   Copyright (C) 2007 by Adam Kidder   *
+ *   thekidder@gmail.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,39 +19,26 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_RENDERER__
-#define  __SORE_RENDERER__
+#ifndef  __SORE_2DPRIMITIVES__
+#define  __SORE_2DPRIMITIVES__
 
-#include "sore_2dprimitives.h"
+#include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-	typedef unsigned int gc_id;
-	
-	class IRenderer
+	struct GeometryChunk2D
 	{
-		public:
-			IRenderer() {}
-			virtual ~IRenderer() {}
-			
-			virtual void Render() = 0;
+		double x,y,depth;
+		double width,height;
+		double r,g,b,a;
+		GLuint texture;
+		GLSLShader* shader;
 	};
 	
-	class Renderer2D : public IRenderer
+	struct Sprite2D : public GeometryChunk2D
 	{
-		public:
-			Renderer2D();
-			~Renderer2D();
-			
-			gc_id AddGeometryChunk(GeometryChunk2D gc);
-			GeometryChunk2D* GeometryChunkPtr(gc_id id);
-			void RemoveGeometryChunk(gc_id gc);
-			
-			void Render();
-		protected:
-			std::map<gc_id, GeometryChunk2D> geometry;
-			std::list<gc_id> unusedIds;
+		
 	};
 }
 
-#endif /*__SORE_RENDERER__*/
+#endif /*__SORE_2DPRIMITIVES__*/

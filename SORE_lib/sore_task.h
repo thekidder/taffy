@@ -14,8 +14,8 @@ namespace SORE_Kernel
 			virtual ~Task() {}
 			
 			virtual void Frame(int elapsedTime)  = 0;
-			virtual void Pause()  = 0;
-			virtual void Resume() = 0;
+			virtual void Pause() {}
+			virtual void Resume() {}
 			
 			virtual const char* GetName() const = 0;
 		protected:
