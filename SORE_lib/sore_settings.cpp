@@ -161,7 +161,9 @@ namespace SORE_Utility
 			unsigned int size = SORE_FileIO::Size(settingsFile);
 			len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
 			
-			while(len>0)
+			std::string currSection;
+			
+			while(len>0 || !SORE_FileIO::Eof(settingsFile))
 			{
 				std::string name, value, oldValue;
 				std::string setting = dataStr;
@@ -172,20 +174,35 @@ namespace SORE_Utility
 					value=setting.substr(eqPos+1);
 					name = Trim(name);
 					value = Trim(value);
-					oldValue = (std::string)Retrieve(name);
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s'") % name % value);
-					Store(name, Datum(value));
-					if(value!=oldValue) data[name].changed = true;
+					oldValue = (std::string)Retrieve(currSection, name);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
+					Store(currSection, name, Datum(value));
+					if(value!=oldValue) (data[currSection][name]).changed = true;
+				}
+				else
+				{
+					setting = Trim(setting);
+					if(setting[0]=='[' && setting.find(']')!=std::string::npos)
+						currSection = Trim(setting.substr(1, setting.find(']')-1));
+					else
+						ENGINE_LOG(SORE_Logging::LVL_WARNING, "Parsing line of settings file failed.");
 				}
 				len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
 			}
-			std::map<std::string, Datum>::iterator it;
-			for(it=data.begin();it!=data.end();it++)
+			std::map<std::string, settingsList>::iterator it;
+			std::map<std::string, Datum>::iterator it2;
+			if(sm)
 			{
-				if(sm && it->second.changed)
+				for(it=data.begin();it!=data.end();it++)
 				{
-					it->second.changed = false;
-					sm->Changed(it->first);
+					for(it2=it->second.begin();it2!=it->second.end();it2++)
+					{
+						if(it2->second.changed)
+						{
+							it2->second.changed = false;
+							sm->Changed(it->first, it2->first);
+						}
+					}
 				}
 			}
 			SORE_FileIO::Close(settingsFile);
@@ -197,44 +214,48 @@ namespace SORE_Utility
 		ParseFile();
 	}
 	
-	Datum IniSettingsBackend::Retrieve(std::string name)
+	Datum IniSettingsBackend::Retrieve(std::string section, std::string name)
 	{
-		if(data.find(name)==data.end())
+		if(data.find(section)==data.end())
 			return Datum("");
-		return data[name];
+		if(data[section].find(name)==data[section].end())
+			return Datum("");
+		return data[section][name];
 	}
 	
-	void IniSettingsBackend::Store(std::string name, Datum datum)
+	void IniSettingsBackend::Store(std::string section, std::string name, Datum datum)
 	{
-		data[name] = datum;
+		if(data.find("section")==data.end())
+			data.insert(std::pair<std::string, settingsList >(section, settingsList()));
+		(data[section])[name] = datum;
 	}
 	
 	SettingsManager::SettingsManager(ISettingsBackend* _sb) : sb(_sb)
 	{
 	}
 	
-	Datum SettingsManager::GetVariable(std::string name)
+	Datum SettingsManager::GetVariable(std::string section, std::string name)
 	{
 		assert(sb!=NULL && "Settings backend is null");
-		return sb->Retrieve(name);
+		return sb->Retrieve(section, name);
 	}
 	
-	void SettingsManager::SetVariable(std::string name, Datum datum)
+	void SettingsManager::SetVariable(std::string section, std::string name, Datum datum)
 	{
 		assert(sb!=NULL && "Settings backend is null");
-		sb->Store(name, datum);
+		sb->Store(section, name, datum);
 	}
 	
-	Datum SettingsManager::WatchVariable(std::string name, DatumCallback func, datum_watch_id& id)
+	Datum SettingsManager::WatchVariable(std::string section, std::string name, DatumCallback func, datum_watch_id& id)
 	{
-		id = callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
-		return GetVariable(name);
+		id = callbacks.insert(std::pair<setting_identifier, DatumCallback>(setting_identifier(section,name), func));
+		return GetVariable(section, name);
 	}
 	
-	Datum SettingsManager::WatchVariable(std::string name, DatumCallback func)
+	Datum SettingsManager::WatchVariable(std::string section, std::string name, DatumCallback func)
 	{
-		callbacks.insert(std::pair<std::string, DatumCallback>(name, func));
-		return GetVariable(name);
+		callbacks.insert(std::pair<setting_identifier, DatumCallback>(setting_identifier(section,name), func));
+		return GetVariable(section, name);
 	}
 	
 	void SettingsManager::RemoveWatch(datum_watch_id id)
@@ -242,31 +263,31 @@ namespace SORE_Utility
 		callbacks.erase(id);
 	}
 			
-	void SettingsManager::Changed(std::string name) //notify all registered callbacks of name of a change
+	void SettingsManager::Changed(std::string section, std::string name) //notify all registered callbacks of name of a change
 	{
-		std::multimap<std::string, DatumCallback>::iterator it;
-		it = callbacks.find(name);
+		std::multimap<setting_identifier, DatumCallback>::iterator it;
+		it = callbacks.find(setting_identifier(section,name));
 		if(it == callbacks.end()) return;
-		Datum var = GetVariable(name);
+		Datum var = GetVariable(section, name);
 		//if(var==NULL) return;
-		while(it!=callbacks.end() && it->first == name)
+		while(it!=callbacks.end() && it->first == setting_identifier(section,name))
 		{
 			it->second(var);
 			it++;
 		}
 	}
 	
-	WatchedDatum::WatchedDatum(std::string _name, Datum& _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name)
+	WatchedDatum::WatchedDatum(std::string _section, std::string _name, Datum& _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name), section(_section)
 	{
 		InitWatch();
 	}
 	
-	WatchedDatum::WatchedDatum(std::string _name, std::string _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name)
+	WatchedDatum::WatchedDatum(std::string _section, std::string _name, std::string _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name), section(_section)
 	{
 		InitWatch();
 	}
 	
-	WatchedDatum::WatchedDatum(std::string _name, SettingsManager* _sm) : sm(_sm), name(_name)
+	WatchedDatum::WatchedDatum(std::string _section, std::string _name, SettingsManager* _sm) : sm(_sm), name(_name), section(_section)
 	{
 		InitWatch();
 	}
@@ -281,7 +302,7 @@ namespace SORE_Utility
 	{
 		if(sm)
 		{
-			std::string temp = sm->WatchVariable(name, std::bind1st(boost::mem_fn(&WatchedDatum::WatchFunction), this), watch);
+			std::string temp = sm->WatchVariable(section, name, std::bind1st(boost::mem_fn(&WatchedDatum::WatchFunction), this), watch);
 			datum = temp;
 		}
 	}
@@ -289,5 +310,19 @@ namespace SORE_Utility
 	void WatchedDatum::WatchFunction(Datum _datum)
 	{
 		datum = (std::string)_datum;
+	}
+	
+	bool operator<(setting_identifier one, setting_identifier two)
+	{
+		if(one.section<two.section) return true;
+		if(one.section>two.section) return true;
+		if(one.name<two.name) return true;
+		return false;
+	}
+	
+	bool operator==( setting_identifier one, setting_identifier two )
+	{
+		if(one.section==two.section && one.name==two.name) return true;
+		return false;
 	}
 }

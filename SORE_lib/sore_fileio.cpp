@@ -193,6 +193,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			cur++;
 		openFilesystemFiles[FILESYSTEM_START+cur] = temp;
 		nOpenFilesystemFiles++;
+		
 		return FILESYSTEM_START+cur;
 	}
 	else if((it=fileMap.find(file))!=fileMap.end())
@@ -242,6 +243,24 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		if(temp) fclose(temp);
 		return 0;
+	}
+}
+
+bool SORE_FileIO::Eof(file_ref file)
+{
+	if(file<FILESYSTEM_START && file>=PACKAGE_START)
+	{
+		if(cachedFiles[file].isOpen==false)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "File is not open");
+			return true;
+		}
+		if(cachedFiles[file].currPos==cachedFiles[file].size) return true;
+		return false;
+	}
+	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
+	{
+		return feof(openFilesystemFiles[file]);
 	}
 }
 

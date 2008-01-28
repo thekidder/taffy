@@ -32,6 +32,7 @@ namespace SORE_FileIO
 	int          Read(char* ptr, size_t num, const char* separator, file_ref file);           // reads until num number of bytes or until any character in separator has been reached
 	unsigned int Size(file_ref file);
 	unsigned int CompressedSize(file_ref file);
+	bool         Eof(file_ref file);
 	
 	void         Notify(std::string filename, file_callback callback); //only implemented on local files now (no packages)
 	

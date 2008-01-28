@@ -51,14 +51,36 @@ namespace SORE_Utility
 			std::string datum;
 	};
 	
+	//typedefs and structs to make for less typing
+	struct setting_identifier
+	{
+		setting_identifier(std::string s, std::string n) {section = s; name = n; }
+		std::string section;
+		std::string name;
+	};
+	
+	bool operator< ( setting_identifier one, setting_identifier two );
+	bool operator==( setting_identifier one, setting_identifier two );
+	
+	typedef boost::function<void (Datum)> DatumCallback;
+	typedef std::map<std::string, Datum> settingsList;
+	typedef std::multimap<setting_identifier, DatumCallback >::iterator datum_watch_id;
+	/*struct datum_watch_id
+	{
+		std::map<std::string, settingsList >::iterator section;
+		settingsList::iterator var;
+	};*/
+	
+	
+	
 	class SettingsManager;
 		
 	class ISettingsBackend
 	{
 		public:
 			ISettingsBackend();
-			virtual Datum Retrieve(std::string name)=0;
-			virtual void       Store   (std::string name, Datum datum)=0;
+			virtual Datum Retrieve(std::string section, std::string name)=0;
+			virtual void       Store   (std::string section, std::string name, Datum datum)=0;
 			void               NotifyOnChange(SettingsManager* _sm);
 		protected:
 			SettingsManager* sm;
@@ -68,49 +90,46 @@ namespace SORE_Utility
 	{
 		public:
 			IniSettingsBackend(std::string fileName);
-			Datum Retrieve(std::string name);
-			void    Store(std::string name, Datum datum);
+			Datum Retrieve(std::string section, std::string name);
+			void    Store(std::string section, std::string name, Datum datum);
 			void    OnChange(std::string name);
 		protected:
 			void ParseFile();
 			std::string file;
-			std::map<std::string, Datum> data;
+			std::map<std::string, settingsList > data;
 	};
-	
-	typedef boost::function<void (Datum)> DatumCallback;
-	typedef std::multimap<std::string, DatumCallback >::iterator datum_watch_id;
 	
 	class SettingsManager
 	{
 		public:
 			SettingsManager(ISettingsBackend* _sb);
 			
-			Datum GetVariable(std::string name);
-			void       SetVariable(std::string name, Datum var);
+			Datum GetVariable(std::string section, std::string name);
+			void       SetVariable(std::string section, std::string name, Datum var);
 			
-			Datum WatchVariable(std::string name, DatumCallback func, datum_watch_id& id);
-			Datum WatchVariable(std::string name, DatumCallback func);
+			Datum WatchVariable(std::string section, std::string name, DatumCallback func, datum_watch_id& id);
+			Datum WatchVariable(std::string section, std::string name, DatumCallback func);
 			void  RemoveWatch(datum_watch_id id);
 			
-			void Changed(std::string name); //notify all registered callbacks of name of a change
+			void Changed(std::string section, std::string name); //notify all registered callbacks of name of a change
 			
 		protected:
-			std::multimap<std::string, DatumCallback > callbacks;
+			std::multimap<setting_identifier, DatumCallback> callbacks;
 			ISettingsBackend* sb;
 	};
 	
 	class WatchedDatum : public Datum
 	{
 		public:
-			WatchedDatum(std::string _name, Datum& _datum, SettingsManager* _sm);
-			WatchedDatum(std::string _name, std::string _datum, SettingsManager* _sm);
-			WatchedDatum(std::string _name, SettingsManager* _sm);
+			WatchedDatum(std::string _section, std::string _name, Datum& _datum, SettingsManager* _sm);
+			WatchedDatum(std::string _section, std::string _name, std::string _datum, SettingsManager* _sm);
+			WatchedDatum(std::string _section, std::string _name, SettingsManager* _sm);
 			~WatchedDatum();
 		protected:
 			void InitWatch();
 			void WatchFunction(Datum _datum);
 			SettingsManager* sm;
-			std::string name;
+			std::string name, section;
 			datum_watch_id watch; 
 	};
 };
