@@ -50,13 +50,20 @@ namespace SORE_FileIO
 		unsigned int       out_filled;
 		unsigned int       out_size;
 	};
+	
+	struct filesystem_file
+	{
+		FILE* fptr;
+		unsigned int filled;
+		char buffer[2048];
+	};
 
 	typedef std::vector<file_info> file_list;
 	
 	file_list cachedFiles;
 	std::map<std::string, int> fileMap;
 	std::map<std::string, FILE*> openPackages;
-	std::map<unsigned int, FILE*> openFilesystemFiles;
+	std::map<unsigned int, filesystem_file> openFilesystemFiles;
 	std::map<std::string, unsigned int> openPackageCount;
 	unsigned int nOpenFilesystemFiles;
 	
@@ -191,7 +198,11 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			*/
 		while(openFilesystemFiles.find(FILESYSTEM_START+cur)!=openFilesystemFiles.end())
 			cur++;
-		openFilesystemFiles[FILESYSTEM_START+cur] = temp;
+		filesystem_file fileStruct;
+		fileStruct.fptr = temp;
+		fileStruct.filled = 0;
+		fileStruct.buffer[0] = '\0';
+		openFilesystemFiles[FILESYSTEM_START+cur] = fileStruct;
 		nOpenFilesystemFiles++;
 		
 		return FILESYSTEM_START+cur;
@@ -260,7 +271,8 @@ bool SORE_FileIO::Eof(file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
-		return feof(openFilesystemFiles[file]);
+		if(openFilesystemFiles[file].filled>0) return false;
+		return feof(openFilesystemFiles[file].fptr);
 	}
 }
 
@@ -289,12 +301,12 @@ void SORE_FileIO::Close(file_ref file)
 	{
 		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file reference %u from disk") % file, MODULE_FILEIO);
 		nOpenFilesystemFiles--;
-		fclose(openFilesystemFiles[file]);
+		fclose(openFilesystemFiles[file].fptr);
 		openFilesystemFiles.erase(file);
 	}
 }
 
-int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
+int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool ignoreBuffer)
 {
 	if(nmemb == 0 || size == 0)
 		return 0;
@@ -436,18 +448,32 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file)
 	}
 	else if(file>=FILESYSTEM_START && file<std::numeric_limits<unsigned long>::max())
 	{
-		int read = fread(ptr, size, nmemb, openFilesystemFiles[file]);
-		if(read != size*nmemb)
+		int offset = 0;
+		int toRead = size*nmemb;
+		if(!ignoreBuffer)
+		{
+			if(openFilesystemFiles[file].filled>0)
+			{
+				int amount = size*nmemb > openFilesystemFiles[file].filled ? openFilesystemFiles[file].filled : size*nmemb;
+				memcpy(ptr, openFilesystemFiles[file].buffer, amount);
+				offset = amount;
+				toRead -= amount;
+				openFilesystemFiles[file].filled -= amount;
+				openFilesystemFiles[file].buffer[0] = '\0';
+			}
+		}
+		int read = fread((char*)ptr+offset, 1, toRead, openFilesystemFiles[file].fptr);
+		if(read+offset != size*nmemb)
 		{
 			unsigned int errLvl = SORE_Logging::LVL_DEBUG2;
-			if(ferror(openFilesystemFiles[file])!=0)
+			if(ferror(openFilesystemFiles[file].fptr)!=0)
 			{
 				errLvl = SORE_Logging::LVL_ERROR;
 			}
 			ENGINE_LOG_M(errLvl, boost::format("Could not read all %d bytes: ") % (size*nmemb), MODULE_FILEIO);
-			ENGINE_LOG_M(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file]) % feof(openFilesystemFiles[file]), MODULE_FILEIO);
+			ENGINE_LOG_M(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file].fptr) % feof(openFilesystemFiles[file].fptr), MODULE_FILEIO);
 		}
-		return read;
+		return read+offset;
 	}
 	else
 		return 0;
@@ -468,14 +494,16 @@ int strpos(char* str, char* chars)
 
 int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
 {
-	assert(num<=64 && "Trying to read too many characters");
-	static char data[64]="";
-	static int length = 0;
-	if(length<0) length = 0;
+	assert(num<=2048 && "Trying to read too many characters");
+	//static char data[64]="";
+	char* data = openFilesystemFiles[file].buffer;
+	int length = openFilesystemFiles[file].filled;
+	//static int length = 0;
+	//if(length<0) length = 0;
 	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %d %d %c")  % length % num % (*data));
 	if(*data=='\0')
 	{
-		int len = Read(data, sizeof(char), num, file);
+		int len = Read(data, sizeof(char), num, file,true);
 		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
@@ -483,7 +511,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			memcpy(ptr, data, len);
 			ptr[len] = '\0';
 			*data = '\0';
-			length = 0;
+			openFilesystemFiles[file].filled = 0;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("line: %s") % ptr);
 			return len;
 		}
@@ -491,17 +519,17 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = len - stop - 1;
+			openFilesystemFiles[file].filled = len - stop - 1;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("1 %d %d %d") % length % len % stop);
-			memmove(data, data+stop+1, length);
-			data[length] = '\0';
+			memmove(data, data+stop+1, openFilesystemFiles[file].filled);
+			data[openFilesystemFiles[file].filled] = '\0';
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("data: %s") % data);
 			return stop;
 		}
 	}
 	else
 	{
-		int len = Read(data+length, sizeof(char), num-length, file);
+		int len = Read(data+length, sizeof(char), num-length, file,true);
 		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
@@ -510,7 +538,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 			ptr[len+length] = '\0';
 			*data = '\0';
 			len+=length;
-			length = 0;
+			openFilesystemFiles[file].filled = 0;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("data: %s") % data);
 			return len;
 		}
@@ -518,9 +546,9 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 		{
 			memcpy(ptr, data, stop);
 			ptr[stop] = '\0';
-			length = length - stop + len - 1;
+			openFilesystemFiles[file].filled = length - stop + len - 1;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("2 %d %d %d") % length % len % stop);
-			memmove(data, data+stop+1, length+1);
+			memmove(data, data+stop+1, openFilesystemFiles[file].filled+1);
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("line: %s") % ptr);
 			return stop;
 		}
@@ -604,10 +632,10 @@ unsigned int SORE_FileIO::Size(file_ref file)
 {
 	if(file >= FILESYSTEM_START)
 	{
-		unsigned int currPos = ftell(openFilesystemFiles[file]);
-		fseek(openFilesystemFiles[file], 0, SEEK_END);
-		unsigned int len = ftell(openFilesystemFiles[file]);
-		fseek(openFilesystemFiles[file], currPos, SEEK_SET);
+		unsigned int currPos = ftell(openFilesystemFiles[file].fptr);
+		fseek(openFilesystemFiles[file].fptr, 0, SEEK_END);
+		unsigned int len = ftell(openFilesystemFiles[file].fptr);
+		fseek(openFilesystemFiles[file].fptr, currPos, SEEK_SET);
 		return len;
 	}
 	else

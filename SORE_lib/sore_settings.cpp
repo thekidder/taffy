@@ -23,6 +23,7 @@
 #include <functional>
 #include "sore_settings.h"
 #include "sore_logger.h"
+#include "sore_util.h"
 
 namespace SORE_Utility
 {
@@ -124,21 +125,6 @@ namespace SORE_Utility
 	{
 		sm = _sm;
 	}
-	
-	std::string Trim(std::string toTrim)
-	{
-		std::string trimmed = toTrim;
-		size_t pos;
-		while((pos=trimmed.find(' '))!=trimmed.npos)
-		{
-			trimmed.erase(pos,1);
-		}
-		while((pos=trimmed.find('\r'))!=trimmed.npos) //windows files
-		{
-			trimmed.erase(pos,1);
-		}
-		return trimmed;
-	}
 
 	IniSettingsBackend::IniSettingsBackend(std::string fileName)
 	{
@@ -149,63 +135,44 @@ namespace SORE_Utility
 	
 	void IniSettingsBackend::ParseFile()
 	{
-		SORE_FileIO::file_ref settingsFile = SORE_FileIO::Open(file.c_str());
-		int len;
-		if(settingsFile == 0)
+		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(file.c_str());
+		std::map<std::string, settingsList>::iterator it;
+		std::map<std::string, Datum>::iterator it2;
+		
+		std::map<std::string, std::map<std::string, std::string> >::iterator i;
+		std::map<std::string, std::string>::iterator i2;
+		
+		std::string oldValue;
+		
+		for(i=list.begin();i!=list.end();i++)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load settings file %s") % file.c_str());
-		}
-		else
-		{
-			char dataStr[64];
-			unsigned int size = SORE_FileIO::Size(settingsFile);
-			len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
-			
-			std::string currSection;
-			
-			while(len>0 || !SORE_FileIO::Eof(settingsFile))
+			std::string section = i->first;
+			for(i2=i->second.begin();i2!=i->second.end();i2++)
 			{
-				std::string name, value, oldValue;
-				std::string setting = dataStr;
-				int eqPos=setting.find('=');
-				if(eqPos!=-1)
-				{
-					name=setting.substr(0,eqPos);
-					value=setting.substr(eqPos+1);
-					name = Trim(name);
-					value = Trim(value);
-					oldValue = (std::string)Retrieve(currSection, name);
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
-					Store(currSection, name, Datum(value));
-					if(value!=oldValue) (data[currSection][name]).changed = true;
-				}
-				else
-				{
-					setting = Trim(setting);
-					if(setting[0]=='[' && setting.find(']')!=std::string::npos)
-						currSection = Trim(setting.substr(1, setting.find(']')-1));
-					else
-						ENGINE_LOG(SORE_Logging::LVL_WARNING, "Parsing line of settings file failed.");
-				}
-				len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
+				std::string name = i2->first;
+				std::string value = i2->second;
+				oldValue = "";
+				if(data.find(section)!=data.end())
+					if(data[section].find(name)!=data[section].end())
+						oldValue = std::string(data[section][name]);
+				Store(section, name, Datum(value));
+				if(value!=oldValue) (data[section][name]).changed = true;
 			}
-			std::map<std::string, settingsList>::iterator it;
-			std::map<std::string, Datum>::iterator it2;
-			if(sm)
+		}
+		
+		if(sm)
+		{
+			for(it=data.begin();it!=data.end();it++)
 			{
-				for(it=data.begin();it!=data.end();it++)
+				for(it2=it->second.begin();it2!=it->second.end();it2++)
 				{
-					for(it2=it->second.begin();it2!=it->second.end();it2++)
+					if(it2->second.changed)
 					{
-						if(it2->second.changed)
-						{
-							it2->second.changed = false;
-							sm->Changed(it->first, it2->first);
-						}
+						it2->second.changed = false;
+						sm->Changed(it->first, it2->first);
 					}
 				}
 			}
-			SORE_FileIO::Close(settingsFile);
 		}
 	}
 	

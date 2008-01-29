@@ -28,7 +28,7 @@ namespace SORE_FileIO
 	file_ref     Open(const char* file); //return a file_ref on success, 0 on failure
 	void         Close(file_ref file);
 
-	int          Read(void* ptr, size_t size, size_t nmemb, file_ref file);    // returns number of bytes read
+	int          Read(void* ptr, size_t size, size_t nmemb, file_ref file, bool ignoreBuffer=false);    // returns number of bytes read
 	int          Read(char* ptr, size_t num, const char* separator, file_ref file);           // reads until num number of bytes or until any character in separator has been reached
 	unsigned int Size(file_ref file);
 	unsigned int CompressedSize(file_ref file);
