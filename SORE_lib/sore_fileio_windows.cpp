@@ -169,12 +169,12 @@ namespace SORE_FileIO
 			void Resume() {}
 			void Frame(int elapsedTime) 
 			{
-				FindNextChangeNotification(file);
+				/*FindNextChangeNotification(file);
 				WaitForSingleObject(file, 0);
 				if(file!=INVALID_HANDLE_VALUE)
 				{
 					ENGINE_LOG(SORE_Logging::LVL_INFO, "change");
-				}
+				}*/
 			}
 			
 			const char* GetName() const { return "File Notify task";}

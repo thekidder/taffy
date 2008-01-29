@@ -274,6 +274,7 @@ bool SORE_FileIO::Eof(file_ref file)
 		if(openFilesystemFiles[file].filled>0) return false;
 		return feof(openFilesystemFiles[file].fptr);
 	}
+	return true;
 }
 
 void SORE_FileIO::Close(file_ref file)

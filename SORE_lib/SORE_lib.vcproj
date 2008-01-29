@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="C:\DEVEL\include"
-				PreprocessorDefinitions="_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="_WIN32_WINNT=0x500;NDEBUG=true"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
