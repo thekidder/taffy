@@ -45,7 +45,7 @@ std::map<std::string, std::map<std::string, std::string> > SORE_Utility::ParseIn
 	int len;
 	if(settingsFile == 0)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load settings file %s") % file);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load INI file %s") % file);
 	}
 	else
 	{
@@ -59,27 +59,34 @@ std::map<std::string, std::map<std::string, std::string> > SORE_Utility::ParseIn
 		{
 			std::string name, value, oldValue;
 			std::string setting = dataStr;
+			if(setting.find("//")!=std::string::npos)
+				setting = setting.substr(0, setting.find("//")-1);
 			int eqPos=setting.find('=');
-			if(eqPos!=-1)
+			if(eqPos!=-1) //(name, value) pair
 			{
 				name=setting.substr(0,eqPos);
 				value=setting.substr(eqPos+1);
 				name = TrimString(name);
 				value = TrimString(value);
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
 				list[currSection].insert(std::pair<std::string, std::string>(name, value));
 			}
 			else
 			{
 				setting = TrimString(setting);
-				if(setting[0]=='[' && setting.find(']')!=std::string::npos)
+				if(setting[0]=='[' && setting.find(']')!=std::string::npos) //this describes a section heading
 				{
 					currSection = TrimString(setting.substr(1, setting.find(']')-1));
 					list.insert(std::pair<std::string, std::map<std::string, std::string> >(currSection, std::map<std::string, std::string>() ));
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Setting section: '%s'") % currSection);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Setting section: '%s'") % currSection);
 				}
-				else if(!TrimString(setting).empty())
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, "Parsing line of settings file failed.");
+				else if(!TrimString(setting).empty()) //treat this as a valueless setting
+				{
+					name = TrimString(setting);
+					value = "";
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
+					list[currSection].insert(std::pair<std::string, std::string>(name, value));
+				}
 			}
 			len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
 		}

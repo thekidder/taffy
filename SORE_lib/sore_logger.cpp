@@ -60,6 +60,7 @@ void SORE_Logging::InitLogging()
 	lvlNames[LVL_INFO    ] = "Info    ";
 	lvlNames[LVL_DEBUG1  ] = "Debug 1 ";
 	lvlNames[LVL_DEBUG2  ] = "Debug 2 ";
+	lvlNames[LVL_DEBUG3  ] = "Debug 3 ";
 	sore_log.AddBackend(&sore_file_logger);
 #ifdef SORE_CONSOLE_LOG
 	sore_log.AddBackend(&sore_console_logger);

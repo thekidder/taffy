@@ -12,6 +12,7 @@
 
 
 #include "sore_shaders.h"
+#include "sore_util.h"
 
 namespace SORE_Graphics
 {
@@ -73,6 +74,43 @@ namespace SORE_Graphics
 		AddFragmentFile(fragment);
 		ok = true;
 		linked = false;
+	}
+	
+	GLSLShader::GLSLShader(const char* shaderFile)
+	{
+		if(!initCalled)
+			InitShaders();
+		Init();
+		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(shaderFile);
+		
+		std::map<std::string, std::map<std::string, std::string> >::iterator i;
+		std::map<std::string, std::string>::iterator i2;
+		
+		for(i=list.begin();i!=list.end();i++)
+		{
+			std::string section = i->first;
+			
+			for(i2=i->second.begin();i2!=i->second.end();i2++)
+			{
+				std::string name = i2->first;
+				if(section=="Vertex")
+				{
+					AddVertexFile(name.c_str());
+				}
+				else if(section=="Fragment")
+				{
+					AddFragmentFile(name.c_str());
+				}
+				else
+				{
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Invalid material heading: %s") % section);
+				}
+			}
+		}
+		linked = false;
+		ok = true;
+		Link();
+		Bind();
 	}
 	
 	GLSLShader::~GLSLShader()
@@ -215,6 +253,11 @@ namespace SORE_Graphics
 	{
 		char* src;
 		SORE_FileIO::file_ref file = SORE_FileIO::Open(vertex);
+		if(file == 0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load vertex shader program: %s") % vertex);
+			return -1;
+		}
 		unsigned int size = SORE_FileIO::Size(file);
 		src = new char[size+1];
 		SORE_FileIO::Read(src, sizeof(char), size, file);
@@ -232,12 +275,18 @@ namespace SORE_Graphics
 	int GLSLShader::AddFragmentFile(const char* fragment)
 	{
 		char* src;
+		int status;
 		SORE_FileIO::file_ref file = SORE_FileIO::Open(fragment);
+		if(file == 0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load fragment shader program: %s") % fragment);
+			return -1;
+		}
 		unsigned int size = SORE_FileIO::Size(file);
 		src = new char[size+1];
 		SORE_FileIO::Read(src, sizeof(char), size, file);
 		src[size] = '\0';
-		int status = AddShader(GL_FRAGMENT_SHADER, src);
+		status = AddShader(GL_FRAGMENT_SHADER, src);
 		delete[] src;
 		return status;
 	}

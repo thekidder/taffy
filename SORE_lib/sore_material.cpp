@@ -20,16 +20,57 @@
 // $Id$
 
 #include "sore_material.h"
+#include "sore_util.h"
 
 namespace SORE_Graphics
 {
-	Material::Material(const char* materialFile)
+	Material::Material(const char* materialFile) : shader(NULL)
 	{
 		LoadFromFile(materialFile);
 	}
 	
+	Material::~Material()
+	{
+		if(shader) delete shader;
+	}
+	
 	void Material::LoadFromFile(const char* materialFile)
 	{
+		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(materialFile);
 		
+		std::map<std::string, std::map<std::string, std::string> >::iterator i;
+		std::map<std::string, std::string>::iterator i2;
+		
+		for(i=list.begin();i!=list.end();i++)
+		{
+			std::string section = i->first;
+			
+			for(i2=i->second.begin();i2!=i->second.end();i2++)
+			{
+				std::string name = i2->first;
+				std::string value = i2->second;
+				
+				if(section=="Textures")
+				{
+				}
+				else if(section=="Shader")
+				{
+					if(name=="shader_file")
+					{
+						shader = new GLSLShader(value.c_str());
+					}
+				}
+				else if(section=="Fixed-Function")
+				{
+				}
+				else if(section=="Texture-Combine")
+				{
+				}
+				else
+				{
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Invalid material heading: %s") % section);
+				}
+			}
+		}
 	}
 }

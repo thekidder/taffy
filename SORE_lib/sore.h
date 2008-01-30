@@ -16,6 +16,7 @@
 #include "sore_interpolater.h"
 #include "sore_kernel.h"
 #include "sore_logger.h"
+#include "sore_material.h"
 #include "sore_math.h"
 #include "sore_profiler.h"
 #include "sore_resource.h"

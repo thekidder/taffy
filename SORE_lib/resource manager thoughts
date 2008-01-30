@@ -13,3 +13,17 @@ Each type of resource is a class derived from class Resource. It must have Load(
 		
 For ResourceManager to know how to instantiate different types of resources, this method is used:
 ResourceManager keeps two structures mapping file extensions to function pointers. Thus, when a new resource type is needed, a class is derived from Resource, and RES_LOAD and RES_LOAD_DATA functions are defined then registered in ResourceManager.
+
+
+
+-----------------
+new details:
+-Again, all resource types are derived from class Resource
+-ResourceManager is not a singleton, instead it is either passed to each class or a member of GameKernel
+-ResourceManager has no function besides making sure no file is loaded twice
+-a class will query ResourceManager with a filename. If the filename is not in the ResourceManager's cache, it will load it and return a boost::shared_ptr<Resource*> to the resource.
+
+
+Templated ResourceManager? Automagically dynamic_casts the Resource* to requested type
+usage:
+boost::shared_ptr<Texture*> = rm->GetFile<Texture*>("file.tga");
