@@ -4,24 +4,24 @@
 #define  __SORE_TEXTURE_H__
 
 #include "sore_resource.h"
+#include "sore_allgl.h"
 
 namespace SORE_Resource
 {
-	class Texture : public ResourceHandle
+	class Texture2D : public Resource
 	{
 		public:
-			Texture(int iflags, const char* file) : ResourceHandle(iflags, file) {}
+			Texture2D(std::string filename);
+			GLuint GetHandle() const;
+			void Bind() const;
+			const char* Type() const {return "2D texture";}
+			
+		protected:
 			void Load();
-			void Load(const char* bytes, int len) {}
-			void Unload() {}
-			
 			void LoadTGA(const char* filename);
-			//void LoadTGA(const char* bytes, int len);
-			
+			void Unload() {}
+			GLuint handle;
 	};
-	
-	Texture* LoadTexture(const char* filename, int flags);
-	//Texture* LoadDataTexture(const char* bytes, int len, int flags);
 }
 
 #endif /*__SORE_TEXTURE_H__*/

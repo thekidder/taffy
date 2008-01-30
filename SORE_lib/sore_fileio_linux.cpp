@@ -51,10 +51,11 @@ namespace SORE_FileIO
 				in.WaitForEvents();
 				if(in.GetEventCount()==0) return;
 				in.GetEvent(ie);
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % ie.GetWatch()->GetPath());
+				std::string path = ie.GetWatch()->GetPath().empty() ?  "" : ie.GetWatch()->GetPath();
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
 				std::multimap<std::string, file_callback>::iterator it;
-				it = callbacks.find(ie.GetWatch()->GetPath());
-				while(it!=callbacks.end() && it->first == ie.GetWatch()->GetPath())
+				it = callbacks.find(path);
+				while(it!=callbacks.end() && it->first == path)
 				{
 					it->second(it->first);
 					it++;
@@ -74,7 +75,7 @@ namespace SORE_FileIO
 		return true;
 	}
 	
-	void Notify(std::string filename, boost::function<void (std::string filename)> callback)
+	void Notify(std::string filename, boost::function<void (std::string)> callback)
 	{
 		watches.push_back(InotifyWatch(filename, IN_MODIFY));
 		in.Add(*(watches.end()-1));
@@ -83,6 +84,6 @@ namespace SORE_FileIO
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to start watch on file %s") % filename);
 		}*/
 		//else
-			callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
+		callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
 	}
 }

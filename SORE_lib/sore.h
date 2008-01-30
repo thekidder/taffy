@@ -6,9 +6,9 @@
 #include "sore_defines.h"
 
 #include "sore_allgl.h"
-#include "sore_buffer.h"
-#include "sore_camera.h"
-#include "sore_console.h"
+//#include "sore_buffer.h"
+//#include "sore_camera.h"
+//#include "sore_console.h"
 #include "sore_fileio.h"
 #include "sore_font.h"
 #include "sore_graphics.h"

@@ -12,11 +12,10 @@
 
 
 #include "sore_resource.h"
-#include <iostream>
 
 namespace SORE_Resource
 {
-	class Buffer : public ResourceData
+	/*class Buffer : public ResourceData
 	{
 		public:
 			Buffer(int iflags, const char* file) : ResourceData(iflags, file) {std::cout <<"Buffer instantiated\n";}
@@ -27,5 +26,5 @@ namespace SORE_Resource
 	};
 
 	Buffer* LoadBuffer(const char* filename, int flags);
-	Buffer* LoadDataBuffer(const char* bytes, int len, int flags);
+	Buffer* LoadDataBuffer(const char* bytes, int len, int flags);*/
 }

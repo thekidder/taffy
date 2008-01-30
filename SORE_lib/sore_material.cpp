@@ -24,14 +24,13 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(const char* materialFile) : shader(NULL)
+	Material::Material(const char* materialFile, SORE_Resource::ResourceManager* _rm) : rm(_rm), shader(NULL)
 	{
 		LoadFromFile(materialFile);
 	}
 	
 	Material::~Material()
 	{
-		if(shader) delete shader;
 	}
 	
 	void Material::LoadFromFile(const char* materialFile)
@@ -57,7 +56,7 @@ namespace SORE_Graphics
 				{
 					if(name=="shader_file")
 					{
-						shader = new GLSLShader(value.c_str());
+						shader = rm->GetResource<GLSLShader>(value);
 					}
 				}
 				else if(section=="Fixed-Function")

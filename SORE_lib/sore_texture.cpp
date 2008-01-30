@@ -6,13 +6,15 @@
 #include "sore_allgl.h"
 #include "sore_logger.h"
 
-void SORE_Resource::Texture::Load()
+void SORE_Resource::Texture2D::Load()
 {
+	if(handle!=0)
+		glDeleteTextures(1, &handle);
 	char ext[10];
-	SORE_Utility::GetFileExt(filename, ext);
+	SORE_Utility::GetFileExt(filename.c_str(), ext);
 	if(strcmp(ext, "tga")==0)
 	{
-		LoadTGA(filename);
+		LoadTGA(filename.c_str());
 	}
 	else
 	{
@@ -20,12 +22,11 @@ void SORE_Resource::Texture::Load()
 	}
 }
 
-void SORE_Resource::Texture::LoadTGA(const char* filename)
+void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 {
 	handle = 0;
 	bool failed = false;
 	GLubyte header[18];
-	GLuint texture;
 	
 	SORE_FileIO::file_ref file = SORE_FileIO::Open(filename);
 	if(file == 0 ) 
@@ -101,8 +102,8 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 		imgData[i+2] = temp;
 	}
 	
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_2D, handle);
 	
 	GLint type;
 	
@@ -123,26 +124,26 @@ void SORE_Resource::Texture::LoadTGA(const char* filename)
 								height, 0, type,
 				GL_UNSIGNED_BYTE, imgData);
 
-	/* Linear Filtering */
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	
 	delete[] imgData;
 	//inFile.close();
 	SORE_FileIO::Close(file);
-	handle = texture;
 }
 
-SORE_Resource::Texture* SORE_Resource::LoadTexture(const char* filename, int flags)
+SORE_Resource::Texture2D::Texture2D(std::string filename) : Resource(filename)
 {
-	Texture* t = new Texture(flags, filename);
-	t->Load();
-	return t;
+	handle = 0;
+	Load();
 }
 
-/*SORE_Resource::Texture* SORE_Resource::LoadDataTexture(const char* bytes, int len, int flags)
+GLuint SORE_Resource::Texture2D::GetHandle() const
 {
-	Texture* t = new Texture(flags);
-	t->Load(bytes, len);
-	return t;
-}*/
+	return handle;
+}
+
+void SORE_Resource::Texture2D::Bind() const
+{
+	glBindTexture(GL_TEXTURE_2D, handle);
+}

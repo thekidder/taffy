@@ -17,13 +17,14 @@
 #include "sore_fileio.h"
 #include "sore_allgl.h"
 #include "sore_logger.h"
+#include "sore_resource.h"
 
 #include <vector>
 #include <string>
 
 namespace SORE_Graphics
 {
-	class GLSLShader
+	class GLSLShader : public SORE_Resource::Resource
 	{
 		public:
 			static int  InitShaders();
@@ -31,7 +32,7 @@ namespace SORE_Graphics
 			static bool ShadersSupported();
 			
 			GLSLShader(const char* vertex, const char* fragment);
-			GLSLShader(const char* shaderFile); //loads shader as a INI file specifying vertex/shader files
+			GLSLShader(std::string shaderFile); //loads shader as a INI file specifying vertex/shader files
 			~GLSLShader();
 			
 			int  AddVertexFile(const char* vertex);
@@ -45,9 +46,12 @@ namespace SORE_Graphics
 			
 			bool Ready();
 			
+			const char* Type() const {return "GLSL shader";}
+			
 			//Uniform operators
 			void SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 		protected:
+			void Load(); //load from *.shad file
 			int  Init();
 			int  AddShader(GLuint type, const char* src);
 			std::vector<GLuint> vertexShaders, fragmentShaders;

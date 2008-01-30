@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2007-2008 by Adam Kidder                                *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,6 +23,7 @@
 #define  __SORE_MATERIAL__
 
 #include "sore_shaders.h"
+#include "sore_resource.h"
 #include "sore_texture.h"
 
 namespace SORE_Graphics
@@ -30,12 +31,11 @@ namespace SORE_Graphics
 	class Material
 	{
 		public:
-			Material(const char* materialFile);
+			Material(const char* materialFile, SORE_Resource::ResourceManager* _rm);
 			~Material();
 		protected:
 			void LoadFromFile(const char* materialFile);
-			
-			std::vector<SORE_Resource::Texture*> textures;
+			SORE_Resource::ResourceManager* rm;
 			GLSLShader* shader;
 	};
 }
