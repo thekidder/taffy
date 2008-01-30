@@ -201,12 +201,7 @@ int SORE_Kernel::Screen::InitializeSDL()
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER)!=0)
 	{
 		return 1;
-	}	
-	
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 8);
+	}
 	
 	const SDL_VideoInfo *videoInfo;
 	/* Fetch the video info */

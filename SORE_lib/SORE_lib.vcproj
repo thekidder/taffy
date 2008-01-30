@@ -201,6 +201,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_material.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_math.cpp"
 				>
 			</File>
@@ -308,6 +312,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_logginginit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_material.h"
 				>
 			</File>
 			<File
