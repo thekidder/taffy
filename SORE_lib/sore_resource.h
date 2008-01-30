@@ -11,7 +11,7 @@
 #ifndef  __SORE_RESOURCE_H__
 #define  __SORE_RESOURCE_H__
 
-#include <map>z
+#include <map>
 #include <deque>
 
 namespace SORE_Resource
