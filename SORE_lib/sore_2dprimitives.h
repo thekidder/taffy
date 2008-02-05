@@ -43,8 +43,8 @@ namespace SORE_Graphics
 	class Sprite2D : public IRenderable
 	{
 		public:
-			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _width, double _height, color _c);
-			virtual void Draw();
+			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _width, double _height, color _c) {}
+			virtual void Draw() {}
 		protected:
 			Material* m;
 			color c;

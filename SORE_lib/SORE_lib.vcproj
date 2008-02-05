@@ -153,18 +153,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sore_buffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_camera.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_console.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\sore_fileio.cpp"
 				>
 			</File>
@@ -264,18 +252,6 @@
 			</File>
 			<File
 				RelativePath=".\sore_allgl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_camera.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sore_console.h"
 				>
 			</File>
 			<File
