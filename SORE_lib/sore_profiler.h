@@ -41,14 +41,14 @@ namespace SORE_Profiler
 					avgTime = 0.0;
 					intervalCount = 0;
 				}
-				unsigned int   startTime;
-				unsigned int   endTime;
+				double         startTime;
+				double         endTime;
 				unsigned int   timesRun;
-				unsigned int   lastTime;
+				double         lastTime;
 				
-				         float avgTime;
-								 float shortAvgTime;
-				         int   intervalCount;
+				double         avgTime;
+				double         shortAvgTime;
+				int            intervalCount;
 				unsigned int   minTime;
 				unsigned int   maxTime;
 				std::string name;

@@ -18,7 +18,7 @@
 #include <cassert>
 #include <boost/format.hpp>
 
-SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen) : Task(gk)
+SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle) : Task(gk)
 {
 	renderer = NULL;
 	proj.type = SORE_Graphics::PERSPECTIVE;
@@ -27,7 +27,7 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 	proj.zfar  = 200.0;
 	proj.useScreenRatio = true;
 	screen.ratio = (double)_screen.width / (double)_screen.height;
-	if(InitializeSDL()!=0)
+	if(InitializeSDL(windowTitle)!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
 		gk->quitFlag = true;
@@ -196,7 +196,7 @@ int SORE_Kernel::Screen::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& p
 	return returnCode;
 }
 
-int SORE_Kernel::Screen::InitializeSDL()
+int SORE_Kernel::Screen::InitializeSDL(std::string windowTitle)
 {
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER)!=0)
 	{
@@ -232,7 +232,8 @@ int SORE_Kernel::Screen::InitializeSDL()
 	
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
-	SDL_WM_SetCaption("SNAKE!", "SNAKE!");
+	SDL_WM_SetCaption(windowTitle.c_str(), windowTitle.c_str());
+
 	return 0;
 }
 

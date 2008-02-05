@@ -31,17 +31,16 @@ namespace SORE_Profiler
 			index = numSamples++; 
 			samples[index].name = name;
 			samples[index].timesRun = 0;
-			samples[index].startTime = SORE_Timing::GetGlobalTicks();
 			lastOpened = index;
 			samples[index].intervalCount = 1;
 		}
 		else
 		{
 			index = lastOpened = currIndex;
-			samples[index].startTime = SORE_Timing::GetGlobalTicks();
-			samples[index].timesRun++;
+			//samples[index].timesRun++;
 			samples[index].intervalCount++;
 		}
+		samples[index].startTime = SORE_Timing::GetGlobalTicks();
 	}
 	
 	Sample::~Sample()
@@ -72,11 +71,11 @@ namespace SORE_Profiler
 	
 	void Sample::DisplayAvgTime(int sID)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Average time for sample ID %d: %f") % sID % samples[sID].avgTime);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Average time for sample ID %d: %f ms") % sID % (samples[sID].avgTime / 10.0));
 	}
 	
 	void Sample::DisplayTime(int sID)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Time for sample ID %d: %d") % sID % samples[sID].lastTime);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Time for sample ID %d: %f ms") % sID % (samples[sID].lastTime / 10.0));
 	}
 }

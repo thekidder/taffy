@@ -72,6 +72,9 @@ namespace SORE_FileIO
 		in.SetNonBlock(true);
 		static LinuxINotifyWatch watchTask(gk);
 		gk->AddConstTask(0, 5000, &watchTask);
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max events: %d") % Inotify::GetCapability(IN_MAX_EVENTS));
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max instances: %d") % Inotify::GetCapability(IN_MAX_INSTANCES));
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max watchs: %d") % Inotify::GetCapability(IN_MAX_WATCHES));
 		return true;
 	}
 	

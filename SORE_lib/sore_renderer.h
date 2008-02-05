@@ -23,6 +23,8 @@
 #define  __SORE_RENDERER__
 
 #include "sore_2dprimitives.h"
+#include "sore_font.h"
+#include "sore_timing.h"
 
 namespace SORE_Graphics
 {
@@ -34,7 +36,7 @@ namespace SORE_Graphics
 			IRenderer() {}
 			virtual ~IRenderer() {}
 			
-			virtual void Render() = 0;
+			virtual void Render() {}
 	};
 	
 	class Renderer2D : public IRenderer
@@ -43,14 +45,15 @@ namespace SORE_Graphics
 			Renderer2D();
 			~Renderer2D();
 			
-			gc_id AddGeometryChunk(GeometryChunk2D gc);
-			GeometryChunk2D* GeometryChunkPtr(gc_id id);
+			gc_id AddRenderable(IRenderable gc);
+			IRenderable* GeometryChunkPtr(gc_id id);
 			void RemoveGeometryChunk(gc_id gc);
 			
 			void Render();
 		protected:
-			std::map<gc_id, GeometryChunk2D> geometry;
+			std::map<gc_id, IRenderable> geometry;
 			std::list<gc_id> unusedIds;
+			SORE_Font::font_ref font;
 	};
 }
 

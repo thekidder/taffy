@@ -33,14 +33,17 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s") % version);
 			supported = true;
 		}
-		if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
+		if(supported)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No shader support - check OpenGL version and extensions string");
-			supported = false;
-		}
-		else
-		{
-			supported = true;
+			if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, "No shader support - check OpenGL version and extensions string");
+				supported = false;
+			}
+			else
+			{
+				supported = true;
+			}
 		}
 		if(supported)
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "System is ready for GLSL shaders");
@@ -100,7 +103,7 @@ namespace SORE_Graphics
 				std::string name = i2->first;
 				if(section=="Vertex")
 				{
-					AddDependentFile(name);
+					//AddDependentFile(name);
 					AddVertexFile(name.c_str());
 				}
 				else if(section=="Fragment")
@@ -271,6 +274,10 @@ namespace SORE_Graphics
 		src[size] = '\0';
 		int status = AddShader(GL_VERTEX_SHADER, src);
 		delete[] src;
+		if(status == 0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Loaded vertex shader file %s") % vertex);
+		}
 		return status;
 	}
 	
@@ -295,6 +302,10 @@ namespace SORE_Graphics
 		src[size] = '\0';
 		status = AddShader(GL_FRAGMENT_SHADER, src);
 		delete[] src;
+		if(status == 0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Loaded fragment shader file %s") % fragment);
+		}
 		return status;
 	}
 	

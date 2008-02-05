@@ -24,18 +24,18 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(const char* materialFile, SORE_Resource::ResourceManager* _rm) : rm(_rm), shader(NULL)
+	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile)
 	{
-		LoadFromFile(materialFile);
+		Load();
 	}
 	
 	Material::~Material()
 	{
 	}
 	
-	void Material::LoadFromFile(const char* materialFile)
+	void Material::Load()
 	{
-		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(materialFile);
+		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(file.c_str());
 		
 		std::map<std::string, std::map<std::string, std::string> >::iterator i;
 		std::map<std::string, std::string>::iterator i2;
@@ -56,7 +56,10 @@ namespace SORE_Graphics
 				{
 					if(name=="shader_file")
 					{
-						shader = rm->GetResource<GLSLShader>(value);
+						if(rm)
+							shader = rm->GetResource<GLSLShader>(value);
+						else
+							ENGINE_LOG(SORE_Logging::LVL_ERROR, "No resource manager set");
 					}
 				}
 				else if(section=="Fixed-Function")

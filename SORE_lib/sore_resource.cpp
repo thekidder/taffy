@@ -6,6 +6,8 @@
 
 namespace SORE_Resource
 {
+	ResourceManager* Resource::rm = NULL;
+	
 	Resource::Resource(std::string file)
 	{
 		filename = file;

@@ -20,18 +20,20 @@
 // $Id$
 
 #include "sore_renderer.h"
+#include "sore_graphics.h"
 
 namespace SORE_Graphics
 {
 	Renderer2D::Renderer2D()
 	{
+		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	}
 	
 	Renderer2D::~Renderer2D()
 	{
 	}
 			
-	gc_id Renderer2D::AddGeometryChunk(GeometryChunk2D gc)
+	gc_id Renderer2D::AddRenderable(IRenderable gc)
 	{
 		gc_id id;
 		if(!unusedIds.empty())
@@ -41,11 +43,11 @@ namespace SORE_Graphics
 		}
 		else
 			id = geometry.size();
-		geometry.insert(std::pair<gc_id, GeometryChunk2D>(id, gc));
+		geometry.insert(std::pair<gc_id, IRenderable>(id, gc));
 		return id;
 	}
 	
-	GeometryChunk2D* Renderer2D::GeometryChunkPtr(gc_id id)
+	IRenderable* Renderer2D::GeometryChunkPtr(gc_id id)
 	{
 		return &(geometry[id]);
 	}
@@ -58,10 +60,21 @@ namespace SORE_Graphics
 			
 	void Renderer2D::Render()
 	{
-		GLuint currTex = 0;
+		static int frames = 0;
+		static int T0 = SORE_Timing::GetGlobalTicks();
+		static float fps;
+		
+		/*glClearColor(0.0,0.0,0.0,1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		std::map<gc_id, IRenderable>::iterator it;
+		for(it=geometry.begin();it!=geometry.end();it++)
+		{
+			it->second.Draw();
+		}*/
+		/*GLuint currTex = 0;
 		GLSLShader* currShader = NULL;
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		std::map<gc_id, GeometryChunk2D>::iterator it;
+		std::map<gc_id, IRenderable*>::iterator it;
 		glBegin(GL_QUADS);
 		for(it=geometry.begin();it!=geometry.end();it++)
 		{
@@ -90,6 +103,31 @@ namespace SORE_Graphics
 			glVertex3f(it->second.x+it->second.width, it->second.y+it->second.height, it->second.depth);
 			
 		}
-		glEnd();
+		glEnd();*/
+		
+		
+		/*frames++;
+		{
+			GLint t = SORE_Timing::GetGlobalTicks();
+			if (t - T0 >= 500) //calculate FPS every 50 milliseconds
+			{
+				GLfloat seconds = (GLfloat)((t - T0) / 10000.0);
+				fps = frames / seconds;
+				T0 = t;
+				frames = 0;
+			}
+		}
+	
+		SORE_Graphics::GLSLShader::UnbindShaders();
+
+		SORE_Graphics::PushOverlay();
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-140, 0,  "FPS: %4.0f", fps);
+		//SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-360, SORE_Graphics::GetHeight()-30, "Speed: x%3.1f   Combo: x%3.0d", (snakes->begin())->speed()/MOVESPEED, (snakes->begin())->multiplier());
+		//SORE_Graphics::DrawString(font, 0, 0, "Score: %d", int((snakes->begin())->score()));
+		//if((int)(snakes->begin())->highscore()>1.0)
+		//	SORE_Graphics::DrawString(font, 0, SORE_Graphics::GetHeight()-30, "high score: %d", (int)(snakes->begin())->highscore());
+		SORE_Graphics::PopOverlay();
+		*/
 	}
 }

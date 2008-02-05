@@ -22,21 +22,21 @@
 #ifndef  __SORE_MATERIAL__
 #define  __SORE_MATERIAL__
 
-#include "sore_shaders.h"
 #include "sore_resource.h"
+#include "sore_shaders.h"
 #include "sore_texture.h"
 
 namespace SORE_Graphics
 {
-	class Material
+	class Material : public SORE_Resource::Resource
 	{
 		public:
-			Material(const char* materialFile, SORE_Resource::ResourceManager* _rm);
+			Material(std::string materialFile);
 			~Material();
 		protected:
-			void LoadFromFile(const char* materialFile);
-			SORE_Resource::ResourceManager* rm;
+			void Load();
 			GLSLShader* shader;
+			std::string file;
 	};
 }
 

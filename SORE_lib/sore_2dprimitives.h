@@ -22,22 +22,33 @@
 #ifndef  __SORE_2DPRIMITIVES__
 #define  __SORE_2DPRIMITIVES__
 
-#include "sore_shaders.h"
+#include "sore_resource.h"
+#include "sore_material.h"
 
 namespace SORE_Graphics
 {
-	struct GeometryChunk2D
+	struct color
 	{
-		double x,y,depth;
-		double width,height;
 		double r,g,b,a;
-		GLuint texture;
-		GLSLShader* shader;
 	};
 	
-	struct Sprite2D : public GeometryChunk2D
+	class IRenderable
 	{
-		
+		public:
+			IRenderable() {}
+			virtual ~IRenderable() {}
+			virtual void Draw() {}
+	};
+	
+	class Sprite2D : public IRenderable
+	{
+		public:
+			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _width, double _height, color _c);
+			virtual void Draw();
+		protected:
+			Material* m;
+			color c;
+			double x,y,width,height;
 	};
 }
 

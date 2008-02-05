@@ -7,8 +7,8 @@
 #include "sore_kernel.h"
 #include "sore_font.h"
 #include "sore_allgl.h"
-#include "sore_camera.h"
 #include "sore_logger.h"
+#include "sore_input.h"
 
 namespace SORE_Graphics
 {
@@ -40,7 +40,7 @@ namespace SORE_Kernel
 	class Screen : public Task
 	{
 		public:
-			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen);
+			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle="SORE App");
 			~Screen();
 		
 			void Frame(int elapsedTime);
@@ -65,7 +65,7 @@ namespace SORE_Kernel
 			SORE_Graphics::ProjectionInfo  GetProjection();
 			bool keepAspectRatio;
 		protected:
-			int  InitializeSDL();
+			int  InitializeSDL(std::string windowTitle);
 			int  InitializeGL();
 			void InitExtensions();
 			
