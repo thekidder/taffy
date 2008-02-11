@@ -342,5 +342,24 @@ namespace SORE_Graphics
 			location = it->second;
 		glUniform4fARB(location,v0,v1,v2,v3);
 	}
+	
+	/*void GLSLShader::SetUniform1i(std::string name, GLuint i0)
+	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
+		}
+		std::map<std::string, GLint>::iterator it;
+		GLint location;
+		if((it=uniforms.find(name))==uniforms.end())
+		{
+			location = glGetUniformLocationARB(program, name.c_str());
+			uniforms.insert(std::pair<std::string,GLint>(name,location));
+		}
+		else
+			location = it->second;
+		glUniform1iARB(location,i0);
+	}*/
 
 } //end of namespace SORE_Graphics

@@ -33,10 +33,13 @@ namespace SORE_Graphics
 		public:
 			Material(std::string materialFile);
 			~Material();
+			
+			void Bind();
 		protected:
 			void Load();
 			GLSLShader* shader;
 			std::string file;
+			SORE_Resource::Texture2D* tex;
 	};
 }
 

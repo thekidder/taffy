@@ -19,48 +19,72 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_RENDERER__
-#define  __SORE_RENDERER__
+#ifndef  __SORE_TREE_H__
+#define  __SORE_TREE_H__
 
-#include "sore_2dprimitives.h"
-#include "sore_font.h"
-#include "sore_timing.h"
-#include "sore_2dscenegraph.h"
+#include <map>
 
-namespace SORE_Graphics
+namespace SORE_Utility
 {
-	typedef unsigned int gc_id;
-	
-	class IRenderer
+	template<class T>
+			class TreeNode
 	{
 		public:
-			IRenderer() {}
-			virtual ~IRenderer() {}
+			TreeNode(TreeNode<T>* _parent, T _node) : node(_node), parent(_parent)
+			{
+			}
+			TreeNode(T _node) : node(_node), parent(NULL)
+			{
+			}
 			
-			virtual void Render() {}
+			bool TopLevel() {return parent==NULL;}
+			
+		protected:
+			T node;
+			std::vector<TreeNode<T>* > children;
+			TreeNode<T>* parent;
 	};
 	
-	class Renderer2D : public IRenderer
+	template<class T>
+			class NamedTree
 	{
 		public:
-			Renderer2D(SceneGraph2D* _scene);
-			~Renderer2D();
+			//constructors
+			NamedTree<T>(T root_node, std::string name) : nameList("a")
+			{
+				nodes.push_back(std::pair<std::string, TreeNode<T> >(name, TreeNode<T>(root_node)));
+			}
+			NamedTree(TreeNode<T> root_node, std::string name) : nameList("a")
+			{
+				nodes.push_back(std::pair<std::string, TreeNode<T> >(name, root_node));
+			}
+			NamedTree(T root_node) : nameList("a")
+			{
+				std::string name = GetNextUnused();
+				nodes.push_back(std::pair<std::string, TreeNode<T> >(name,TreeNode<T>(root_node)));
+			}
+			NamedTree(TreeNode<T> root_node) : nameList("a")
+			{
+				std::string name = GetNextUnused();
+				nodes.push_back(std::pair<std::string, TreeNode<T> >(name, root_node));
+			}
 			
-			//gc_id AddRenderable(IRenderable gc);
-			//IRenderable* GeometryChunkPtr(gc_id id);
-			//void RemoveGeometryChunk(gc_id gc);
-			void SetSpriteList(std::vector<Sprite2D*> s);
-			
-			void Render();
 		protected:
-			void RenderSprite(Sprite2D* s);
-			//std::map<gc_id, IRenderable> geometry;
-			//std::list<gc_id> unusedIds;
-			SORE_Font::font_ref font;
-			std::vector<Sprite2D*> sprites;
-			SceneGraph2D* scene;
-			Material* currMaterial;
+			std::string GetNextUnused()
+			{
+				std::string toReturn = nameList;
+				
+				if(nameList[nameList.size()-1]<='z')
+					nameList[nameList.size()-1]+=1;
+				else
+					nameList += "a";
+				
+				return toReturn;
+			}
+			
+			std::map<std::string, TreeNode<T> > nodes;
+			std::string nameList;
 	};
 }
 
-#endif /*__SORE_RENDERER__*/
+#endif /*__SORE_TREE_H__*/

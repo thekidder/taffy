@@ -333,10 +333,12 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	
 	listBase=glGenLists(128);
 	GLenum error;
-	while((error=glGetError())!=GL_NO_ERROR)
+	if((error=glGetError())!=GL_NO_ERROR)
 	{
-		//std::cout << "error detected: " << error << "\n";
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
+		do
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
+		} while((error=glGetError())!=GL_NO_ERROR);
 		delete[] fontPath;
 	
 		FT_Done_Face(face);

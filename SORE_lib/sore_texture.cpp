@@ -116,6 +116,7 @@ void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 			type = GL_RGBA;
 			break;
 		default:
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unrecognized image type - only supports 24bit or 32bit (uncompressed) TGAs");
 			delete[] imgData;
 			return;
 	}

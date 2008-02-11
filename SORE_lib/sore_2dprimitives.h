@@ -32,23 +32,20 @@ namespace SORE_Graphics
 		double r,g,b,a;
 	};
 	
-	class IRenderable
+	struct viewport
 	{
-		public:
-			IRenderable() {}
-			virtual ~IRenderable() {}
-			virtual void Draw() {}
+		double x,y,width,height;
 	};
-	
-	class Sprite2D : public IRenderable
+
+	class Sprite2D
 	{
 		public:
-			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _width, double _height, color _c) {}
-			virtual void Draw() {}
-		protected:
+			Sprite2D() {}
+			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _depth, double _width, double _height, color _c);
+			void SetAlpha(double a) {c.a = a; }
 			Material* m;
 			color c;
-			double x,y,width,height;
+			double x,y,width,height,depth;
 	};
 }
 

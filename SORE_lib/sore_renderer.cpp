@@ -24,7 +24,7 @@
 
 namespace SORE_Graphics
 {
-	Renderer2D::Renderer2D()
+	Renderer2D::Renderer2D(SceneGraph2D* _scene) : scene(_scene)
 	{
 		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	}
@@ -33,7 +33,7 @@ namespace SORE_Graphics
 	{
 	}
 			
-	gc_id Renderer2D::AddRenderable(IRenderable gc)
+	/*gc_id Renderer2D::AddRenderable(IRenderable gc)
 	{
 		gc_id id;
 		if(!unusedIds.empty())
@@ -56,57 +56,35 @@ namespace SORE_Graphics
 	{
 		geometry.erase(gc);
 		unusedIds.push_back(gc);
+	}*/
+	
+	void Renderer2D::SetSpriteList(std::vector<Sprite2D*> s)
+	{
+		sprites = s;
 	}
 			
 	void Renderer2D::Render()
 	{
+		SetSpriteList(scene->GetRenderList());
 		static int frames = 0;
 		static int T0 = SORE_Timing::GetGlobalTicks();
 		static float fps;
 		
-		/*glClearColor(0.0,0.0,0.0,1.0);
+		glClearColor(0.0,0.0,0.0,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		std::map<gc_id, IRenderable>::iterator it;
-		for(it=geometry.begin();it!=geometry.end();it++)
+		std::vector<Sprite2D*>::iterator it;
+		
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+		currMaterial = NULL;
+		for(it=sprites.begin();it!=sprites.end();it++)
 		{
-			it->second.Draw();
-		}*/
-		/*GLuint currTex = 0;
-		GLSLShader* currShader = NULL;
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		std::map<gc_id, IRenderable*>::iterator it;
-		glBegin(GL_QUADS);
-		for(it=geometry.begin();it!=geometry.end();it++)
-		{
-			if(it->second.shader != currShader)
-			{
-				glEnd();
-				it->second.shader->Bind();
-				currShader = it->second.shader;
-				glBegin(GL_QUADS);
-			}
-			if(it->second.texture != currTex)
-			{
-				glEnd();
-				glBindTexture(GL_TEXTURE_2D, it->second.texture);
-				currTex = it->second.texture;
-				glBegin(GL_QUADS);
-			}
-			glColor4f(it->second.r, it->second.g, it->second.b, it->second.a);
-			glTexCoord2f(0.0, 0.0);
-			glVertex3f(it->second.x, it->second.y+it->second.height, it->second.depth);
-			glTexCoord2f(0.0, 1.0);
-			glVertex3f(it->second.x, it->second.y, it->second.depth);
-			glTexCoord2f(1.0, 1.0);
-			glVertex3f(it->second.x+it->second.width, it->second.y, it->second.depth);
-			glTexCoord2f(1.0, 0.0);
-			glVertex3f(it->second.x+it->second.width, it->second.y+it->second.height, it->second.depth);
-			
+			RenderSprite(*it);
 		}
-		glEnd();*/
-		
-		
-		/*frames++;
+
+		frames++;
 		{
 			GLint t = SORE_Timing::GetGlobalTicks();
 			if (t - T0 >= 500) //calculate FPS every 50 milliseconds
@@ -128,6 +106,31 @@ namespace SORE_Graphics
 		//if((int)(snakes->begin())->highscore()>1.0)
 		//	SORE_Graphics::DrawString(font, 0, SORE_Graphics::GetHeight()-30, "high score: %d", (int)(snakes->begin())->highscore());
 		SORE_Graphics::PopOverlay();
-		*/
+		
+		GLenum error;
+		while((error=glGetError())!=GL_NO_ERROR)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
+		}
+	}
+	
+	void Renderer2D::RenderSprite(Sprite2D* s)
+	{
+		if(s->m != currMaterial)
+		{
+			s->m->Bind();
+			currMaterial = s->m;
+		}
+		glBegin(GL_QUADS);
+		glColor4f(s->c.r, s->c.g, s->c.b, s->c.a);
+		glTexCoord2f(0.0, 0.0);
+		glVertex3f(s->x, s->y+s->height, s->depth);
+		glTexCoord2f(0.0, 1.0);
+		glVertex3f(s->x, s->y, s->depth);
+		glTexCoord2f(1.0, 1.0);
+		glVertex3f(s->x+s->width, s->y, s->depth);
+		glTexCoord2f(1.0, 0.0);
+		glVertex3f(s->x+s->width, s->y+s->height, s->depth);
+		glEnd();
 	}
 }

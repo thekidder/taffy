@@ -11,7 +11,7 @@ namespace SORE_Resource
 	Resource::Resource(std::string file)
 	{
 		filename = file;
-		SORE_FileIO::Notify(filename, std::bind1st(boost::mem_fn(&Resource::OnNotify), this) );
+		//SORE_FileIO::Notify(filename, std::bind1st(boost::mem_fn(&Resource::OnNotify), this) );
 	}
 	
 	void Resource::AddDependentFile(std::string file)

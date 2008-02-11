@@ -5,6 +5,8 @@
 
 #include "sore_defines.h"
 
+#include "sore_2dprimitives.h"
+#include "sore_2dscenegraph.h"
 #include "sore_allgl.h"
 #include "sore_fileio.h"
 #include "sore_font.h"

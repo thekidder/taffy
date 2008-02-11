@@ -24,7 +24,7 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile)
+	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), tex(NULL)
 	{
 		Load();
 	}
@@ -51,6 +51,7 @@ namespace SORE_Graphics
 				
 				if(section=="Textures")
 				{
+					tex = rm->GetResource<SORE_Resource::Texture2D>(value);
 				}
 				else if(section=="Shader")
 				{
@@ -74,5 +75,11 @@ namespace SORE_Graphics
 				}
 			}
 		}
+	}
+	
+	void Material::Bind()
+	{
+		tex->Bind();
+		shader->Bind();
 	}
 }

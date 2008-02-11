@@ -18,10 +18,11 @@
 #include "sore_logger.h"
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 
 namespace SORE_Utility
 {
-	//lots of messy template code follows
+	/*//lots of messy template code follows
 	//the practical upshot is an easy-to-use, extensible, interpolation system
 	template<class T>
 			class InterpolaterFunctor
@@ -76,7 +77,7 @@ namespace SORE_Utility
 			ClassInterpolaterFunctor<T,C>* MakeFunctor(C* obj, void(C::*func)(T))
 	{
 		return new ClassInterpolaterFunctor<T,C>(obj, func);
-	}
+	}*/
 	
 	//we need to define a template-less interface so we can have a heterogeneous list
 	class IInterpolater
@@ -98,11 +99,11 @@ namespace SORE_Utility
 			class Interpolater : public IInterpolater
 	{
 		public:
-			Interpolater(T input, InterpolaterFunctor<T>* callback)
+			Interpolater(T input, boost::function<void (T)> callback)
 			{
 				interpolatedValue = input;
 				func = callback;
-				(*func)(input);
+				func(input);
 				death = NULL;
 				open++;
 			}
@@ -110,14 +111,14 @@ namespace SORE_Utility
 			~Interpolater()
 			{
 				if(death)
-					(*death)(interpolatedValue);
+					death(interpolatedValue);
 				open--;
 			}
 			
 			void Frame(int elapsedTime)
 			{
 				Update(elapsedTime);
-				(*func)(interpolatedValue);
+				func(interpolatedValue);
 			}
 			
 			virtual bool Done() { return false; }
@@ -126,15 +127,15 @@ namespace SORE_Utility
 			
 		protected:
 			T interpolatedValue;
-			InterpolaterFunctor<T>* func;
-			InterpolaterFunctor<T>* death;
+			boost::function<void (T)> func;
+			boost::function<void (T)> death;
 	};
 	
 	template<class T>
 			class LinearInterpolater : public Interpolater<T>
 	{
 		public:
-			LinearInterpolater(T input, T _factor, T _limit, InterpolaterFunctor<T>* callback) : Interpolater<T>(input, callback)
+			LinearInterpolater(T input, T _factor, T _limit, boost::function<void (T)> callback) : Interpolater<T>(input, callback)
 			{
 				factor = _factor;
 				done = false;
@@ -165,7 +166,7 @@ namespace SORE_Utility
 			class LinearTwoInterpolater : public Interpolater<T>
 	{
 		public:
-			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, bool _repeat, InterpolaterFunctor<T>* callback, InterpolaterFunctor<T>* onDeath) : Interpolater<T>(input, callback)
+			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, bool _repeat, boost::function<void (T)> callback, boost::function<void (T)> onDeath) : Interpolater<T>(input, callback)
 			{
 				factor = _factor;
 				limit1 = _limit1;
