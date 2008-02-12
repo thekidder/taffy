@@ -43,6 +43,8 @@ namespace SORE_Graphics
 			void       ReplaceSprite (std::string name, Sprite2D newSprite);
 			Sprite2D*  GetSprite     (sprite_ref id);
 			Sprite2D*  GetSprite     (std::string name);
+			void       RemoveSprite  (std::string name);
+			void       RemoveSprite  (sprite_ref id);
 			
 		protected:
 			std::map<std::string, Sprite2D> nodes;

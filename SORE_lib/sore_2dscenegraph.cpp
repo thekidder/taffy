@@ -72,4 +72,18 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Trying to return a sprite that doesn't exist");
 		return &nodes[name];
 	}
+	
+	void SceneGraph2D::RemoveSprite(std::string name)
+	{
+		sprite_ref it = nodes.find(name);
+		if(nodes.find(name)!=nodes.end())
+		{
+			RemoveSprite(it);
+		}
+	}
+	
+	void SceneGraph2D::RemoveSprite(sprite_ref id)
+	{
+		nodes.erase(id);
+	}
 }

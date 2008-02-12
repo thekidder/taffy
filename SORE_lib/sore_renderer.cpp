@@ -24,7 +24,7 @@
 
 namespace SORE_Graphics
 {
-	Renderer2D::Renderer2D(SceneGraph2D* _scene) : scene(_scene)
+	Renderer2D::Renderer2D(SORE_Resource::ResourceManager* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
 	{
 		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 	}
@@ -32,31 +32,6 @@ namespace SORE_Graphics
 	Renderer2D::~Renderer2D()
 	{
 	}
-			
-	/*gc_id Renderer2D::AddRenderable(IRenderable gc)
-	{
-		gc_id id;
-		if(!unusedIds.empty())
-		{
-			id = *unusedIds.begin();
-			unusedIds.pop_front();
-		}
-		else
-			id = geometry.size();
-		geometry.insert(std::pair<gc_id, IRenderable>(id, gc));
-		return id;
-	}
-	
-	IRenderable* Renderer2D::GeometryChunkPtr(gc_id id)
-	{
-		return &(geometry[id]);
-	}
-	
-	void Renderer2D::RemoveGeometryChunk(gc_id gc)
-	{
-		geometry.erase(gc);
-		unusedIds.push_back(gc);
-	}*/
 	
 	void Renderer2D::SetSpriteList(std::vector<Sprite2D*> s)
 	{
@@ -79,6 +54,26 @@ namespace SORE_Graphics
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		currMaterial = NULL;
+		
+		SORE_Graphics::color c = {0.0,0.0,0.0,1.0};
+		
+		static Sprite2D glow(rm, "glow", 0.0, 0.0, -0.95, 0.0, 0.0, c);
+		
+		for(it=sprites.begin();it!=sprites.end();it++)
+		{
+			const static double relSize = 2.6;
+			const static double relAlpha = 0.8;
+			double offsetX = ( (*it)->width *relSize)/2.0 - (*it)->width /2.0;
+			double offsetY = ( (*it)->height*relSize)/2.0 - (*it)->height/2.0;
+			glow.x = (*it)->x-offsetX;
+			glow.y = (*it)->y-offsetY;
+			glow.c = (*it)->c;
+			glow.c.a *= relAlpha;
+			glow.width = (*it)->width*relSize;
+			glow.height = (*it)->height*relSize;
+			RenderSprite(&glow);
+		}
+		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
 			RenderSprite(*it);
