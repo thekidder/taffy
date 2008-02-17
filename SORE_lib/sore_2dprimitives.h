@@ -30,6 +30,13 @@ namespace SORE_Graphics
 	struct color
 	{
 		double r,g,b,a;
+		color operator+=(color& c)
+		{
+			r+=c.r;
+			g+=c.g;
+			b+=c.b;
+			return *this;
+		}
 	};
 	
 	struct viewport

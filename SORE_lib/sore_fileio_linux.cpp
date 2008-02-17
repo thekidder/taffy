@@ -90,19 +90,18 @@ namespace SORE_FileIO
 	
 	void Notify(std::string filename, boost::function<void (std::string)> callback)
 	{
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Number of existing watches: %d") % watches.size());
-		//if(watches.size()>0)
-		//	return;
 		boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
 		watches.push_back(iw);
 		//iw = new InotifyWatch(filename, IN_MODIFY);
 		InotifyWatch* ptr = iw.get();
-		in.Add(ptr);
-		/*if()
+		try
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to start watch on file %s") % filename);
-		}*/
-		//else
+			in.Add(ptr);
+		}
+		catch(InotifyException e)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+		}
 		callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
 	}
 }
