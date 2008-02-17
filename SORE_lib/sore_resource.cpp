@@ -4,6 +4,8 @@
 #include "sore_util.h"
 #include "sore_fileio.h"
 
+#include <functional>
+
 namespace SORE_Resource
 {
 	ResourceManager* Resource::rm = NULL;
@@ -11,13 +13,15 @@ namespace SORE_Resource
 	Resource::Resource(std::string file)
 	{
 		filename = file;
-		//SORE_FileIO::Notify(filename, std::bind1st(boost::mem_fn(&Resource::OnNotify), this) );
+		boost::function<void (std::string)> callback = std::bind1st(std::mem_fun(&Resource::OnNotify),this);
+		SORE_FileIO::Notify(filename, callback );
 	}
 	
 	void Resource::AddDependentFile(std::string file)
 	{
 		dependentFiles.push_back(file);
-		SORE_FileIO::Notify(file, std::bind1st(boost::mem_fn(&Resource::OnNotify), this) );
+		boost::function<void (std::string)> callback = std::bind1st(std::mem_fun(&Resource::OnNotify),this);
+		SORE_FileIO::Notify(file, callback );
 	}
 	
 	ResourceManager::ResourceManager()

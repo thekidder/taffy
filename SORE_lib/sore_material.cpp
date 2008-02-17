@@ -80,6 +80,7 @@ namespace SORE_Graphics
 	void Material::Bind()
 	{
 		tex->Bind();
-		shader->Bind();
+		if(GLSLShader::ShadersSupported())
+			shader->Bind();
 	}
 }

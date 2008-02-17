@@ -20,6 +20,7 @@
 // $Id$ 
 
 #include <cassert>
+#include <algorithm>
 #include <functional>
 #include "sore_settings.h"
 #include "sore_logger.h"
@@ -80,8 +81,9 @@ namespace SORE_Utility
 	
 	Datum::operator bool()
 	{
-		if(datum=="true") return true;
-		if(datum=="false") return false;
+		std::transform(datum.begin(),datum.end(),datum.begin(),::tolower);
+		if(datum=="true" || datum=="t") return true;
+		if(datum=="false" || datum=="f") return false;
 		try
 		{
 			return boost::lexical_cast<bool>(datum);
@@ -233,6 +235,7 @@ namespace SORE_Utility
 	void SettingsManager::Changed(std::string section, std::string name) //notify all registered callbacks of name of a change
 	{
 		std::multimap<setting_identifier, DatumCallback>::iterator it;
+		int size = callbacks.size();
 		it = callbacks.find(setting_identifier(section,name));
 		if(it == callbacks.end()) return;
 		Datum var = GetVariable(section, name);
@@ -282,7 +285,7 @@ namespace SORE_Utility
 	bool operator<(setting_identifier one, setting_identifier two)
 	{
 		if(one.section<two.section) return true;
-		if(one.section>two.section) return true;
+		if(one.section>two.section) return false;
 		if(one.name<two.name) return true;
 		return false;
 	}

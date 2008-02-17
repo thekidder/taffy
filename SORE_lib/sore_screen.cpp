@@ -43,9 +43,9 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 void SORE_Kernel::Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
 	double ratio;
-	if(keepAspectRatio)
-		ratio = screen.ratio;
-	else
+	//if(keepAspectRatio)
+	//	ratio = screen.ratio;
+	//else
 		ratio = double(_screen.width)/double(_screen.height);
 	//set everything in screen except width and height - these are set in Resize(int,int)
 	screen.ratio      = ratio;
@@ -198,7 +198,7 @@ int SORE_Kernel::Screen::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& p
 
 int SORE_Kernel::Screen::InitializeSDL(std::string windowTitle)
 {
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER)!=0)
+	if(SDL_Init(SDL_INIT_VIDEO)!=0)
 	{
 		return 1;
 	}

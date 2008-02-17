@@ -70,13 +70,16 @@ namespace SORE_Graphics
 	
 	GLSLShader::GLSLShader(const char* vertex, const char* fragment)
 	{
+		ok = false;
+		linked = false;
 		if(!initCalled)
 			InitShaders();
+		if(!ShadersSupported())
+			return;
 		Init();
 		AddVertexFile(vertex);
 		AddFragmentFile(fragment);
 		ok = true;
-		linked = false;
 	}
 	
 	GLSLShader::GLSLShader(std::string shaderFile) : Resource(shaderFile)
@@ -86,8 +89,12 @@ namespace SORE_Graphics
 	
 	void GLSLShader::Load()
 	{
+		ok = false;
+		linked = false;
 		if(!initCalled)
 			InitShaders();
+		if(!ShadersSupported())
+			return;
 		Init();
 		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(filename.c_str());
 		
@@ -103,12 +110,12 @@ namespace SORE_Graphics
 				std::string name = i2->first;
 				if(section=="Vertex")
 				{
-					//AddDependentFile(name);
+					AddDependentFile(name);
 					AddVertexFile(name.c_str());
 				}
 				else if(section=="Fragment")
 				{
-					//AddDependentFile(name);
+					AddDependentFile(name);
 					AddFragmentFile(name.c_str());
 				}
 				else
@@ -117,7 +124,6 @@ namespace SORE_Graphics
 				}
 			}
 		}
-		linked = false;
 		ok = true;
 		Link();
 		Bind();

@@ -21,13 +21,14 @@
 
 #include "sore_fileio.h"
 #include <map>
+#include <boost/shared_ptr.hpp>
 #include "inotify-cxx.h"
 
 namespace SORE_FileIO
 {
 	std::multimap<std::string, file_callback> callbacks;
-	std::vector<InotifyWatch> watches;
-	Inotify in;
+	std::vector<boost::shared_ptr<InotifyWatch> > watches;
+	static Inotify in;
 	
 	class LinuxINotifyWatch : public SORE_Kernel::Task
 	{
@@ -46,19 +47,28 @@ namespace SORE_FileIO
 			void Resume() {}
 			void Frame(int elapsedTime) 
 			{
-				if(callbacks.empty()) return;
 				InotifyEvent ie;
-				in.WaitForEvents();
-				if(in.GetEventCount()==0) return;
-				in.GetEvent(ie);
-				std::string path = ie.GetWatch()->GetPath().empty() ?  "" : ie.GetWatch()->GetPath();
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
-				std::multimap<std::string, file_callback>::iterator it;
-				it = callbacks.find(path);
-				while(it!=callbacks.end() && it->first == path)
+				try
 				{
-					it->second(it->first);
-					it++;
+					if(callbacks.empty()) return;
+					
+					in.WaitForEvents();
+					if(in.GetEventCount()==0) return;
+					in.GetEvent(ie);
+
+					std::string path = ie.GetWatch()->GetPath().empty() ?  "" : ie.GetWatch()->GetPath();
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
+					std::multimap<std::string, file_callback>::iterator it;
+					it = callbacks.find(path);
+					while(it!=callbacks.end() && it->first == path)
+					{
+						it->second(it->first);
+						it++;
+					}
+				}
+				catch(InotifyException e)
+				{
+					ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
 				}
 			}
 			
@@ -80,8 +90,14 @@ namespace SORE_FileIO
 	
 	void Notify(std::string filename, boost::function<void (std::string)> callback)
 	{
-		watches.push_back(InotifyWatch(filename, IN_MODIFY));
-		in.Add(*(watches.end()-1));
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Number of existing watches: %d") % watches.size());
+		//if(watches.size()>0)
+		//	return;
+		boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
+		watches.push_back(iw);
+		//iw = new InotifyWatch(filename, IN_MODIFY);
+		InotifyWatch* ptr = iw.get();
+		in.Add(ptr);
 		/*if()
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to start watch on file %s") % filename);

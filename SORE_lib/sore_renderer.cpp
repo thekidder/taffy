@@ -91,7 +91,8 @@ namespace SORE_Graphics
 			}
 		}
 	
-		SORE_Graphics::GLSLShader::UnbindShaders();
+		if(SORE_Graphics::GLSLShader::ShadersSupported())
+			SORE_Graphics::GLSLShader::UnbindShaders();
 
 		SORE_Graphics::PushOverlay();
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
