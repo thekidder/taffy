@@ -18,7 +18,7 @@
 #include <cassert>
 #include <boost/format.hpp>
 
-SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle) : Task(gk)
+SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, SORE_Utility::SettingsManager* _sm) : Task(gk), sm(_sm)
 {
 	renderer = NULL;
 	proj.type = SORE_Graphics::PERSPECTIVE;
@@ -32,7 +32,12 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
 		gk->quitFlag = true;
 	}
-	SDLScreenChange(_screen);
+	if(sm!=NULL)
+	{
+		screen.width = sm->GetVariable("screen", "width");
+		screen.height = sm->GetVariable("screen", "height");
+	}
+	SDLScreenChange(screen);
 	if(InitializeGL()!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");

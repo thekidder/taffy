@@ -9,6 +9,7 @@
 #include "sore_allgl.h"
 #include "sore_logger.h"
 #include "sore_input.h"
+#include "sore_settings.h"
 
 namespace SORE_Graphics
 {
@@ -40,7 +41,7 @@ namespace SORE_Kernel
 	class Screen : public Task
 	{
 		public:
-			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle="SORE App");
+			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle="SORE App", SORE_Utility::SettingsManager* _sm=NULL);
 			~Screen();
 		
 			void Frame(int elapsedTime);
@@ -81,6 +82,7 @@ namespace SORE_Kernel
 			SORE_Graphics::IRenderer* renderer;
 			SORE_Graphics::ProjectionInfo proj;
 			SORE_Graphics::ScreenInfo screen;
+			SORE_Utility::SettingsManager* sm;
 			
 			GLint viewport[4];
 			
