@@ -17,9 +17,11 @@
 #include "sore_timing.h"
 #include <cassert>
 #include <boost/format.hpp>
+#include <functional>
 
-SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, SORE_Utility::SettingsManager* _sm) : Task(gk), sm(_sm)
+SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), sm(_sm), resizeCallback(rc)
 {
+	ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
 	renderer = NULL;
 	proj.type = SORE_Graphics::PERSPECTIVE;
 	proj.fov = 45.0;
@@ -34,8 +36,11 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 	}
 	if(sm!=NULL)
 	{
-		screen.width = sm->GetVariable("screen", "width");
-		screen.height = sm->GetVariable("screen", "height");
+		screen.width      = sm->WatchVariable("screen", "width",      boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
+		screen.height     = sm->WatchVariable("screen", "height",     boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
+		screen.fullscreen = sm->WatchVariable("screen", "fullscreen", boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
+		screen.resizable  = sm->WatchVariable("screen", "resizable",  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
+		screen.showCursor = sm->WatchVariable("screen", "showcursor", boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
 	}
 	SDLScreenChange(screen);
 	if(InitializeGL()!=0)
@@ -43,16 +48,21 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
 		gk->quitFlag = true;
 	}
+	if(resizeCallback)
+	{
+		proj = resizeCallback(screen);
+		ChangeProjectionMatrix(proj);
+	}
+}
+
+void SORE_Kernel::Screen::SetResizeCallback(resize_callback callback)
+{
+	resizeCallback = callback;
 }
 
 void SORE_Kernel::Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
-	double ratio;
-	//if(keepAspectRatio)
-	//	ratio = screen.ratio;
-	//else
-		ratio = double(_screen.width)/double(_screen.height);
-	//set everything in screen except width and height - these are set in Resize(int,int)
+	double ratio = double(_screen.width)/double(_screen.height);
 	screen.ratio      = ratio;
 	screen.fullscreen = _screen.fullscreen;
 	screen.showCursor = _screen.showCursor;
@@ -79,6 +89,9 @@ void SORE_Kernel::Screen::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
 	
 	glViewport( 0, 0, ( GLsizei )screen.width, ( GLsizei )screen.height );
 	glGetIntegerv(GL_VIEWPORT, viewport);
+	
+	if(resizeCallback)
+		proj = resizeCallback(_screen);
 	
 	ChangeProjectionMatrix(proj);
 }
@@ -135,20 +148,6 @@ bool SORE_Kernel::Screen::OnResize(Event* event)
 
 void SORE_Kernel::Screen::Resize(int width, int height)
 {
-	/*if(keepAspectRatio)
-	{
-		if(height == screen.height && width!=screen.width)
-		{
-			screen.height = int((double)width / screen.ratio);
-			screen.width = int((double)screen.height * screen.ratio);
-		}
-		else
-		{
-			screen.width = int((double)height * screen.ratio);
-			screen.height = int((double)screen.width / screen.ratio);
-		}
-	}
-	else*/
 	{
 		screen.width = width;
 		screen.height = height;
@@ -159,6 +158,7 @@ void SORE_Kernel::Screen::Resize(int width, int height)
 
 int SORE_Kernel::Screen::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection)
 {
+	SetupProjection(projection);
 	int returnCode = 0;
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity( );
@@ -169,26 +169,13 @@ int SORE_Kernel::Screen::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& p
 			returnCode = -1;
 			break;
 		case SORE_Graphics::ORTHO2D:
-			if(projection.useScreenCoords)
-				gluOrtho2D(0, viewport[2], 0, viewport[3]);
-			else
-			{
-				if(projection.useScreenRatio)
-				{
-					projection.bottom = projection.left / screen.ratio;
-					projection.top = projection.right / screen.ratio;
-				}
-				gluOrtho2D(projection.left, projection.right, projection.top, projection.bottom);
-			}
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("New projection is ortho2d with (%f, %f, %f, %f)") % projection.left % projection.right % projection.bottom % projection.top);
+			gluOrtho2D(projection.left, projection.right, projection.top, projection.bottom);
 			break;
 		case SORE_Graphics::ORTHO:
 			//TODO: finish ortho projection
 			break;
 		case SORE_Graphics::PERSPECTIVE:
-			if(projection.useScreenRatio)
-			{
-				projection.ratio = screen.ratio;
-			}
 			gluPerspective(projection.fov, projection.ratio, projection.znear, projection.zfar );
 			break;
 		default:
@@ -328,4 +315,64 @@ SORE_Graphics::ScreenInfo* SORE_Kernel::Screen::GetScreen()
 SORE_Graphics::ProjectionInfo SORE_Kernel::Screen::GetProjection()
 {
 	return proj;
+}
+
+void SORE_Kernel::Screen::ChangeScreenOnSettingsChange()
+{
+	int iWidth   = (int) sm->GetVariable("screen", "width");
+	int iHeight  = (int) sm->GetVariable("screen", "height");
+	bool bFull   = (bool)sm->GetVariable("screen", "fullscreen");
+	bool bResize = (bool)sm->GetVariable("screen", "resizable");
+	bool bCursor = (bool)sm->GetVariable("screen", "showcursor");
+	static SORE_Graphics::ScreenInfo screen;
+	screen.width=iWidth;
+	screen.height=iHeight;
+	screen.fullscreen=bFull;
+	screen.resizable=bResize;
+	screen.showCursor=bCursor;
+	ChangeScreen(screen);
+}
+
+void SORE_Kernel::Screen::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
+{
+	switch(pi.type)
+	{
+		case SORE_Graphics::NONE:
+			break;
+		case SORE_Graphics::ORTHO2D:
+			if(pi.useScreenCoords)
+			{
+				pi.top = 0;
+				pi.left = 0;
+				pi.bottom = screen.height;
+				pi.right = screen.width;
+				pi.ratio = screen.ratio;
+			}
+			else if(pi.useScreenRatio)
+			{
+				pi.bottom = pi.left / screen.ratio;
+				pi.top = pi.right / screen.ratio;
+				pi.ratio = screen.ratio;
+			}
+			else
+			{
+				pi.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
+			}
+			break;
+		case SORE_Graphics::ORTHO:
+			//TODO: finish ortho projection
+			break;
+		case SORE_Graphics::PERSPECTIVE:
+			if(pi.useScreenRatio)
+			{
+				pi.ratio = screen.ratio;
+			}
+			else
+			{
+				pi.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
+			}
+			break;
+		default:
+			break;
+	}
 }

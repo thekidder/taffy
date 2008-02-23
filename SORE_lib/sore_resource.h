@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include "sore_logger.h"
 
 namespace SORE_Resource
@@ -23,6 +24,8 @@ namespace SORE_Resource
 			std::string GetFile() const {return filename;}
 			
 			static void SetRM(ResourceManager* _rm) {rm = _rm;}
+			
+			virtual void Reload() {Load();}
 		protected:
 			virtual void Load() = 0;
 			void OnNotify(std::string file);
@@ -49,13 +52,15 @@ namespace SORE_Resource
 				}
 				else
 				{
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Retrieved resource: %s") % filename);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Retrieved resource: %s") % filename);
 					Resource* r = resources.find(filename)->second;
 					T* resource = dynamic_cast<T*>(r);
 					if(resource==NULL) ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not downcast resource for filename %s") % filename);
 					return resource;
 				}
 			}
+			
+			void for_each(boost::function<void (Resource*)> func);
 		protected:
 			std::map<std::string, Resource*> resources;
 	};

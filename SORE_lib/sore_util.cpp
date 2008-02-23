@@ -46,6 +46,7 @@ std::map<std::string, std::map<std::string, std::string> > SORE_Utility::ParseIn
 	if(settingsFile == 0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load INI file %s") % file);
+		return list;
 	}
 	else
 	{

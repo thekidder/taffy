@@ -5,6 +5,8 @@
 #include "sore_fileio.h"
 
 #include <functional>
+#include <algorithm>
+#include <boost/bind.hpp>
 
 namespace SORE_Resource
 {
@@ -41,6 +43,16 @@ namespace SORE_Resource
 		for(it=resources.begin();it!=resources.end();it++)
 		{
 			delete it->second;
+		}
+	}
+	
+	void ResourceManager::for_each(boost::function<void (Resource*)> func)
+	{
+		//std::for_each(resources.begin(), resources.end(), boost::bind(func));
+		for(std::map<std::string, Resource*>::iterator it=resources.begin();it!=resources.end();it++)
+		{
+			Resource* r = it->second;
+			func(r);
 		}
 	}
 }

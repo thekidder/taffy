@@ -203,7 +203,6 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	std::string buffer;
 	std::string levelstr;
 	std::string levelint;
-	int pos = 0;
 	
 	if(!first && ((log->func==NULL && !prevFunc.empty() ) || (!(log->func==NULL && prevFunc.empty()) && prevFunc!=log->func)))
 	{
@@ -212,10 +211,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	if(log->func!=NULL && prevFunc!=log->func)
 	{
 		std::string func = log->func;
-		while((pos=func.find("&", pos+1))!=std::string::npos)
-		{
-			func.replace(pos, 1, "&amp;");
-		}
+		SanitizeXML(func);
 		
 		buffer += boost::str(boost::format("<function>\n\t<name>%s</name>\n") % func.c_str());
 	}
@@ -247,23 +243,35 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	buffer += "</levelstr>\n";
 	buffer += boost::str(boost::format("\t\t<line>%d</line>\n") % log->line);
 	buffer += boost::str(boost::format("\t\t<file>%s</file>\n") % log->file);
-	while((pos=log->buffer.find("<"))!=std::string::npos)
-	{
-		log->buffer.replace(pos, 1, "&lt;");
-	}
-	while((pos=log->buffer.find(">"))!=std::string::npos)
-	{
-		log->buffer.replace(pos, 1, "&gt;");
-	}
-	while((pos=log->buffer.find("&"))!=std::string::npos)
-	{
-		log->buffer.replace(pos, 1, "&amp;");
-	}
-
+	
+	SanitizeXML(log->buffer);
+	
 	buffer += boost::str(boost::format("\t\t<data>%s</data>\n") % log->buffer);
 	buffer += end;
 
 	fwrite(buffer.c_str(), sizeof(char), strlen(buffer.c_str()), filePtr);
+}
+
+void SORE_Logging::XMLLogger::SanitizeXML(std::string& str)
+{
+	int pos = 0;
+	while((pos=str.find("&",pos))!=std::string::npos)
+	{
+		str.replace(pos, 1, "&amp;");
+		pos++;
+	}
+	pos = 0;
+	while((pos=str.find("<",pos))!=std::string::npos)
+	{
+		str.replace(pos, 1, "&lt;");
+		pos++;
+	}
+	pos = 0;
+	while((pos=str.find(">",pos))!=std::string::npos)
+	{
+		str.replace(pos, 1, "&gt;");
+		pos++;
+	}
 }
 
 void SORE_Logging::XMLLogger::Flush()

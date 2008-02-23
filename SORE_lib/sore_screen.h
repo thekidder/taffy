@@ -3,6 +3,8 @@
 #ifndef  __SORE_SCREEN__
 #define  __SORE_SCREEN__
 
+#include <boost/function.hpp>
+
 #include "sore_renderer.h"
 #include "sore_kernel.h"
 #include "sore_font.h"
@@ -38,10 +40,11 @@ namespace SORE_Graphics
 
 namespace SORE_Kernel
 {
+	typedef boost::function<SORE_Graphics::ProjectionInfo (SORE_Graphics::ScreenInfo)> resize_callback;
 	class Screen : public Task
 	{
 		public:
-			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle="SORE App", SORE_Utility::SettingsManager* _sm=NULL);
+			Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle="SORE App", resize_callback rc=NULL, SORE_Utility::SettingsManager* _sm=NULL);
 			~Screen();
 		
 			void Frame(int elapsedTime);
@@ -61,10 +64,14 @@ namespace SORE_Kernel
 			
 			bool OnResize(Event* event=NULL);
 			
+			//returns a new projection when resized
+			void SetResizeCallback(boost::function<SORE_Graphics::ProjectionInfo (SORE_Graphics::ScreenInfo)> callback=NULL);
+			
 			GLint* GetViewport();
 			SORE_Graphics::ScreenInfo* GetScreen();
 			SORE_Graphics::ProjectionInfo  GetProjection();
-			bool keepAspectRatio;
+			
+			void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
 		protected:
 			int  InitializeSDL(std::string windowTitle);
 			int  InitializeGL();
@@ -72,12 +79,16 @@ namespace SORE_Kernel
 			
 			int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection); //returns 0 on success
 			void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
+			void ChangeScreenOnSettingsChange(); 
+
 			
 			void Resize(int width, int height); //does the actual resizing
 			
 			SDL_Surface* drawContext;
 			int width, height; //user's previous width and height so we can reset their screen after fullscreen mode
 			Uint32 videoFlags;
+			
+			resize_callback resizeCallback;
 			
 			SORE_Graphics::IRenderer* renderer;
 			SORE_Graphics::ProjectionInfo proj;

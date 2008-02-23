@@ -94,6 +94,7 @@ namespace SORE_Logging
 			void Flush();
 		protected:
 			void Write(log_message* log);
+			void SanitizeXML(std::string& str);
 			std::string file, name;
 			FILE* filePtr;
 			std::string prevFunc;
