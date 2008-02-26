@@ -349,7 +349,7 @@ namespace SORE_Graphics
 		glUniform4fARB(location,v0,v1,v2,v3);
 	}
 	
-	/*void GLSLShader::SetUniform1i(std::string name, GLuint i0)
+	void GLSLShader::SetUniform1i(std::string name, GLuint i0)
 	{
 		if(!ShadersSupported() || program==0)
 		{
@@ -366,6 +366,6 @@ namespace SORE_Graphics
 		else
 			location = it->second;
 		glUniform1iARB(location,i0);
-	}*/
+	}
 
 } //end of namespace SORE_Graphics

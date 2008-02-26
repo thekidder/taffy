@@ -27,10 +27,79 @@ namespace SORE_Graphics
 	Renderer2D::Renderer2D(SORE_Resource::ResourceManager* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
 	{
 		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
+		fbo = img = depthbuffer = 0;
 	}
 	
 	Renderer2D::~Renderer2D()
 	{
+		CleanupFBO();
+	}
+	
+	void Renderer2D::SetupFBO()
+	{
+		//int width = screen->width;
+		//int height = screen->height;
+		int width = 512;
+		int height = 512;
+		
+		glGenFramebuffersEXT(1, &fbo);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+		
+		glGenRenderbuffersEXT(1, &depthbuffer);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthbuffer);
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, width, height);
+		
+		glGenTextures(1, &img);
+		glBindTexture(GL_TEXTURE_2D, img);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,  width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+		//  The following 3 lines enable mipmap filtering and generate the mipmap data so rendering works
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		//glGenerateMipmapEXT(GL_TEXTURE_2D);
+
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthbuffer);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, img, 0);
+		
+		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if(status!=GL_FRAMEBUFFER_COMPLETE_EXT)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create FBO");
+		}
+		else
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "FBO created successfully");
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		}
+	}
+	
+	void Renderer2D::CleanupFBO()
+	{
+		glDeleteFramebuffersEXT(1, &fbo);
+		glDeleteTextures(1, &img);
+		glDeleteRenderbuffersEXT(1, &depthbuffer);
+		fbo = img = depthbuffer = 0;
+	}
+	
+	void Renderer2D::OnScreenChange()
+	{
+		CleanupFBO();
+		SetupFBO();
+	}
+	
+	void IRenderer::SetScreenInfo(ScreenInfo* _screen)
+	{
+		screen = _screen;
+		OnScreenChange();
+	}
+	
+	void IRenderer::SetProjectionInfo(ProjectionInfo* _proj)
+	{
+		proj = _proj;
 	}
 	
 	void Renderer2D::SetSpriteList(std::vector<Sprite2D*> s)
@@ -45,19 +114,29 @@ namespace SORE_Graphics
 		static int T0 = SORE_Timing::GetGlobalTicks();
 		static float fps;
 		
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		std::vector<Sprite2D*>::iterator it;
-		
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		currMaterial = NULL;
 		
 		SORE_Graphics::color c = {0.0,0.0,0.0,1.0};
 		
 		static Sprite2D glow(rm, "glow", 0.0, 0.0, -0.95, 0.0, 0.0, c);
+		
+		int width = screen->width;
+		int height = screen->height;
+		
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+		glPushAttrib(GL_VIEWPORT_BIT);
+		glViewport(0,0,width,height);
+
+		glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+		
+		glClearColor(0.0,0.0,0.0,1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
@@ -79,6 +158,32 @@ namespace SORE_Graphics
 			RenderSprite(*it);
 		}
 
+		glPopAttrib();
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+		glClearColor(0.0,0.0,0.0,1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		if(SORE_Graphics::GLSLShader::ShadersSupported())
+			SORE_Graphics::GLSLShader::UnbindShaders();
+		
+		glBindTexture(GL_TEXTURE_2D, img);
+		glEnable(GL_TEXTURE_2D);
+		
+		//glColor4f(1.0,1.0,1.0,1.0);
+		glBegin(GL_QUADS);
+		//{
+			glTexCoord2f(0.0, 0.0);
+			glVertex3f(proj->left, proj->top, -0.90);
+			glTexCoord2f(0.0, 1.0);
+			glVertex3f(proj->left, proj->bottom, -0.90);
+			glTexCoord2f(1.0, 1.0);
+			glVertex3f(proj->right, proj->bottom, -0.90);
+			glTexCoord2f(1.0, 0.0);
+			glVertex3f(proj->right, proj->top, -0.90);
+		//}
+		glEnd();
+		
 		frames++;
 		{
 			GLint t = SORE_Timing::GetGlobalTicks();

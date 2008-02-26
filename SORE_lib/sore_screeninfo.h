@@ -19,65 +19,32 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_RENDERER__
-#define  __SORE_RENDERER__
-
-#include "sore_2dprimitives.h"
-#include "sore_font.h"
-#include "sore_timing.h"
-#include "sore_2dscenegraph.h"
-#include "sore_screeninfo.h"
+#ifndef  __SORE_SCREENINFO__
+#define  __SORE_SCREENINFO__
 
 namespace SORE_Graphics
 {
-	typedef unsigned int gc_id;
+	enum ProjectionType {NONE, ORTHO, ORTHO2D, PERSPECTIVE};
 	
-	class IRenderer
+	struct ProjectionInfo
 	{
-		public:
-			IRenderer() {}
-			virtual ~IRenderer() {}
-			
-			virtual void Render() = 0;
-			void SetScreenInfo(ScreenInfo* _screen);
-			void SetProjectionInfo(ProjectionInfo* _proj);
-		protected:
-			virtual void OnScreenChange() {}
-			virtual void OnProjectionChange() {}
-			ScreenInfo* screen;
-			ProjectionInfo* proj;
+		ProjectionInfo() {type = NONE; fov = ratio = znear = zfar = top = bottom = left = right = 0.0; useScreenCoords = useScreenRatio = false; }
+		ProjectionType type;
+		double fov,ratio;
+		double znear, zfar;
+		double top, bottom, left, right;
+		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
+		bool useScreenRatio; //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
 	};
 	
-	class Renderer2D : public IRenderer
+	struct ScreenInfo
 	{
-		public:
-			Renderer2D(SORE_Resource::ResourceManager* _rm, SceneGraph2D* _scene);
-			~Renderer2D();
-			
-			//gc_id AddRenderable(IRenderable gc);
-			//IRenderable* GeometryChunkPtr(gc_id id);
-			//void RemoveGeometryChunk(gc_id gc);
-			void SetSpriteList(std::vector<Sprite2D*> s);
-			
-			void Render();
-		protected:
-			void RenderSprite(Sprite2D* s);
-			void OnScreenChange();
-			
-			void CleanupFBO();
-			void SetupFBO();
-			//std::map<gc_id, IRenderable> geometry;
-			//std::list<gc_id> unusedIds;
-			SORE_Font::font_ref font;
-			std::vector<Sprite2D*> sprites;
-			SceneGraph2D* scene;
-			Material* currMaterial;
-			SORE_Resource::ResourceManager* rm;
-			
-			GLuint fbo;
-			GLuint depthbuffer;
-			GLuint img;
-	};
+		int width, height;
+		double ratio; //set by SORE_Screen after screen is created
+		bool showCursor;
+		bool fullscreen;
+		bool resizable;
+	};	
 }
 
-#endif /*__SORE_RENDERER__*/
+#endif /*__SORE_SCREENINFO__*/

@@ -124,6 +124,8 @@ void SORE_Kernel::Screen::Resume()
 void SORE_Kernel::Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
 {
 	renderer = _renderer;
+	renderer->SetScreenInfo(&screen);
+	renderer->SetProjectionInfo(&proj);
 }
 
 bool SORE_Kernel::Screen::OnResize(Event* event)
@@ -153,6 +155,10 @@ void SORE_Kernel::Screen::Resize(int width, int height)
 		screen.height = height;
 	}
 	screen.ratio = (double)screen.width/(double)screen.height;
+	if(renderer)
+	{
+		renderer->SetScreenInfo(&screen);
+	}
 	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
 }
 
@@ -281,6 +287,7 @@ void SORE_Kernel::Screen::SetProjection(SORE_Graphics::ProjectionInfo& info)
 	proj = info;
 	//OnResize();
 	ChangeProjectionMatrix(proj);
+	renderer->SetProjectionInfo(&proj);
 	info.top = proj.top;
 	info.bottom = proj.bottom;
 	info.ratio = proj.ratio;

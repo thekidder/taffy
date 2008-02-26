@@ -10,6 +10,12 @@ float SORE_Utility::getRandomMinMax( float fMin, float fMax )
 	return fMin + (fMax - fMin) * fRandNum;
 }
 
+double SORE_Utility::getRandomMinMax( double dMin, double dMax )
+{
+	double dRandNum = (double)rand () / RAND_MAX;
+	return dMin + (dMax - dMin) * dRandNum;
+}
+
 int SORE_Utility::GetFileExt(const char* filename, char* ext)
 {
 	int len = strlen(filename);
@@ -38,7 +44,7 @@ int SORE_Utility::GetFileExt(const char* filename, char* ext)
 }
 
 
-std::map<std::string, std::map<std::string, std::string> > SORE_Utility::ParseIniFile(const char* file)
+SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 {
 	SORE_FileIO::file_ref settingsFile = SORE_FileIO::Open(file);
 	std::map<std::string, std::map<std::string, std::string> > list;
