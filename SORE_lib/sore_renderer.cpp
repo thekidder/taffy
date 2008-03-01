@@ -42,7 +42,7 @@ namespace SORE_Graphics
 		int width = 512;
 		int height = 512;
 		
-		glGenFramebuffersEXT(1, &fbo);
+		/*glGenFramebuffersEXT(1, &fbo);
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 		
 		glGenRenderbuffersEXT(1, &depthbuffer);
@@ -74,7 +74,7 @@ namespace SORE_Graphics
 		{
 			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "FBO created successfully");
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-		}
+		}*/
 	}
 	
 	void Renderer2D::CleanupFBO()
@@ -125,11 +125,11 @@ namespace SORE_Graphics
 		int width = screen->width;
 		int height = screen->height;
 		
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-		glPushAttrib(GL_VIEWPORT_BIT);
-		glViewport(0,0,width,height);
+		//glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+		//glPushAttrib(GL_VIEWPORT_BIT);
+		//glViewport(0,0,width,height);
 
-		glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 		
 		glClearColor(0.0,0.0,0.0,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -158,20 +158,20 @@ namespace SORE_Graphics
 			RenderSprite(*it);
 		}
 
-		glPopAttrib();
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		//glPopAttrib();
+		//glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClearColor(0.0,0.0,0.0,1.0);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		if(SORE_Graphics::GLSLShader::ShadersSupported())
 			SORE_Graphics::GLSLShader::UnbindShaders();
 		
-		glBindTexture(GL_TEXTURE_2D, img);
-		glEnable(GL_TEXTURE_2D);
+		//glBindTexture(GL_TEXTURE_2D, img);
+		//glEnable(GL_TEXTURE_2D);
 		
 		//glColor4f(1.0,1.0,1.0,1.0);
-		glBegin(GL_QUADS);
+		/*glBegin(GL_QUADS);
 		//{
 			glTexCoord2f(0.0, 0.0);
 			glVertex3f(proj->left, proj->top, -0.90);
@@ -182,7 +182,7 @@ namespace SORE_Graphics
 			glTexCoord2f(1.0, 0.0);
 			glVertex3f(proj->right, proj->top, -0.90);
 		//}
-		glEnd();
+		glEnd();*/
 		
 		frames++;
 		{
