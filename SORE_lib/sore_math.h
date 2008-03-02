@@ -14,13 +14,13 @@
 #ifndef  __SORE_MATH_H__
 #define  __SORE_MATH_H__
 
-#include "sore_defines.h"
 #include <cmath>
-#include "sore_logger.h"
 
 namespace SORE_Math
 {
 	const float PI_180 = (float)M_PI/180.0f;
+	
+	template<class T> class Vector2D;
 	
 	template<class T>
 			struct Point3D
@@ -70,7 +70,18 @@ namespace SORE_Math
 			x = T(0);
 			y = T(0);
 		}
-		
+		Point2D(Vector2D<T>& v)
+		{
+			x = v[0];
+			y = v[1];
+		}
+		Point2D<T> operator=(Vector2D<T>& v)
+		{
+			Point2D<T> temp;
+			temp.x = v[0];
+			temp.y = v[1];
+			return temp;
+		}
 		Point2D<T> operator+(Point2D<T>& t)
 		{
 			Point2D<T> temp;
@@ -213,11 +224,6 @@ namespace SORE_Math
 				Vector3D<T> temp(value[0]/mag,value[1]/mag,value[2]/mag);
 				return temp;
 			}
-			
-			void Log(unsigned int severity)
-			{
-				ENGINE_LOG(severity, boost::format("(%fi, %fj,%fk)") % value[0] % value[1] % value[2]);
-			}
 				
 		protected:
 			T value[3];
@@ -341,12 +347,6 @@ namespace SORE_Math
 				Vector2D<T> temp(value[0]/mag,value[1]/mag);
 				return temp;
 			}
-			
-			void Log(unsigned int severity)
-			{
-				ENGINE_LOG(severity, boost::format("(%fi, %fj)") % value[0] % value[1]);
-			}
-				
 		protected:
 			T value[2];
 	};
@@ -459,6 +459,17 @@ namespace SORE_Math
 		return one.Magnitude() > two.Magnitude();
 	}
 	
+	template<class T>
+	Point2D<T> operator+(Point2D<T> p, Vector2D<T>& v)
+	{
+		Point2D<T> temp;
+		temp.x = p.x + v[0];
+		temp.y = p.y + v[1];
+		return temp;
+	}
+	
+	
+	
 	typedef Vector3D<double> Vector3Dd;
 	typedef Vector3D<float>  Vector3Df;
 	typedef Vector3D<int>    Vector3Di;
@@ -469,6 +480,18 @@ namespace SORE_Math
 	float Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
 	float Distance2D(float x1, float y1, float x2, float y2);
 	float Distance2DS(float x1, float y1, float x2, float y2); //distance squared
+	
+	template<class T>
+			double Distance2D(Point2D<T> one, Point2D<T> two)
+	{
+		return sqrt((double)(two.x-one.x)*(two.x-one.x) + (two.y-one.y)*(two.y-one.y));
+	}
+	
+	template<class T>
+			T Distance2DS(Point2D<T> one, Point2D<T> two)
+	{
+		return (two.x-one.x)*(two.x-one.x) + (two.y-one.y)*(two.y-one.y);
+	}
 	
 	bool DoubleEquals(double value, double compare, double epsilon);
 }
