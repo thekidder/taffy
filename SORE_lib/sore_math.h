@@ -77,10 +77,12 @@ namespace SORE_Math
 		}
 		Point2D<T> operator=(Vector2D<T>& v)
 		{
-			Point2D<T> temp;
+			/*Point2D<T> temp;
 			temp.x = v[0];
 			temp.y = v[1];
-			return temp;
+			return temp;*/
+			x = v[0];
+			y = v[1];
 		}
 		Point2D<T> operator+(Point2D<T>& t)
 		{
