@@ -361,11 +361,14 @@ namespace SORE_Graphics
 		if((it=uniforms.find(name))==uniforms.end())
 		{
 			location = glGetUniformLocationARB(program, name.c_str());
+			//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
+			//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
 			uniforms.insert(std::pair<std::string,GLint>(name,location));
 		}
 		else
 			location = it->second;
 		glUniform1iARB(location,i0);
+		//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
 	}
 
 } //end of namespace SORE_Graphics

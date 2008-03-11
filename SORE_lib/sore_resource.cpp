@@ -21,9 +21,22 @@ namespace SORE_Resource
 	
 	void Resource::AddDependentFile(std::string file)
 	{
-		dependentFiles.push_back(file);
-		boost::function<void (std::string)> callback = std::bind1st(std::mem_fun(&Resource::OnNotify),this);
-		SORE_FileIO::Notify(file, callback );
+		if(!IsDependent(file))
+		{
+			dependentFiles.push_back(file);
+			boost::function<void (std::string)> callback = std::bind1st(std::mem_fun(&Resource::OnNotify),this);
+			SORE_FileIO::Notify(file, callback );
+		}
+	}
+	
+	bool Resource::IsDependent(std::string file)
+	{
+		for(std::vector<std::string>::iterator it=dependentFiles.begin();it!=dependentFiles.end();it++)
+		{
+			if(*it == file)
+				return true;
+		}
+		return false;
 	}
 	
 	ResourceManager::ResourceManager()

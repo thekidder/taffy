@@ -27,6 +27,7 @@
 #include "sore_timing.h"
 #include "sore_2dscenegraph.h"
 #include "sore_screeninfo.h"
+#include "sore_texture.h"
 
 namespace SORE_Graphics
 {
@@ -77,6 +78,8 @@ namespace SORE_Graphics
 			GLuint fbo;
 			GLuint depthbuffer;
 			GLuint img;
+			SORE_Graphics::GLSLShader* fboshad;
+			SORE_Resource::Texture2D* warp;
 	};
 }
 

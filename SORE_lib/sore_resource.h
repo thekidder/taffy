@@ -30,6 +30,7 @@ namespace SORE_Resource
 			virtual void Load() = 0;
 			void OnNotify(std::string file);
 			void AddDependentFile(std::string file); //used for file notification - for example, a shader is made up of multiple files, we want to reload it if the shader files are changed
+			bool IsDependent(std::string file);
 			std::string filename;
 			std::vector<std::string> dependentFiles;
 			static ResourceManager* rm;

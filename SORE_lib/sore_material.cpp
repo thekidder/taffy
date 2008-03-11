@@ -21,10 +21,11 @@
 
 #include "sore_material.h"
 #include "sore_util.h"
+#include <boost/lexical_cast.hpp>
 
 namespace SORE_Graphics
 {
-	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), tex(NULL)
+	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), useShader(true)
 	{
 		Load();
 	}
@@ -35,6 +36,8 @@ namespace SORE_Graphics
 	
 	void Material::Load()
 	{
+		textureMap.clear();
+		textureOrder.clear();
 		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(file.c_str());
 		
 		std::map<std::string, std::map<std::string, std::string> >::iterator i;
@@ -51,7 +54,13 @@ namespace SORE_Graphics
 				
 				if(section=="Textures")
 				{
-					tex = rm->GetResource<SORE_Resource::Texture2D>(value);
+					SORE_Resource::Texture2D* tex = rm->GetResource<SORE_Resource::Texture2D>(value);
+					if(tex!=NULL)
+					{
+						//std::pair<int, SORE_Resource::Texture2D*> s(-1, tex);
+						//textureMap.push_back(std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> >(name, s));
+						textureMap[name].second = tex;
+					}
 				}
 				else if(section=="Shader")
 				{
@@ -62,12 +71,45 @@ namespace SORE_Graphics
 						else
 							ENGINE_LOG(SORE_Logging::LVL_ERROR, "No resource manager set");
 					}
+					else if(name=="use_shader")
+					{
+						std::transform(value.begin(),value.end(),value.begin(),::tolower);
+						
+						try
+						{
+							if(value == "true") useShader = true;
+							else if(value == "false") useShader = false;
+							else useShader = boost::lexical_cast<bool>(value);
+						}
+						catch(boost::bad_lexical_cast)
+						{
+							useShader = true;
+						}
+					}
 				}
 				else if(section=="Fixed-Function")
 				{
 				}
 				else if(section=="Texture-Combine")
 				{
+					std::transform(value.begin(),value.end(),value.begin(),::tolower);
+					/*std::vector<std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> > >::iterator it;
+					for(it=textures.begin();it!=textures.end();it++)
+						if(it->first == name) break;*/
+					//if(it!=textures.end())
+					//{
+						if(value == "modulate")
+							textureMap[name].first = GL_MODULATE;
+						else if(value == "blend")
+							textureMap[name].first = GL_BLEND;
+						else if(value == "decal")
+							textureMap[name].first = GL_DECAL;
+						else if(value == "replace")
+							textureMap[name].first = GL_REPLACE;
+						else
+							textureMap[name].first = GL_MODULATE;
+					//}
+						textureOrder.push_back(name);
 				}
 				else
 				{
@@ -79,9 +121,23 @@ namespace SORE_Graphics
 	
 	void Material::Bind()
 	{
-		if(tex)
-			tex->Bind();
-		if(shader && GLSLShader::ShadersSupported())
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "---setting material---");
+		if(GLSLShader::ShadersSupported() && shader && useShader)
 			shader->Bind();
+		for(int i=0;i<textureOrder.size();i++)
+		{
+			if((GLSLShader::ShadersSupported() && shader && useShader) || textureMap[textureOrder[i]].first!=-1 && textureMap[textureOrder[i]].second!=NULL)
+			{
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture unit %d") % i);
+				glActiveTexture(GL_TEXTURE0 + i);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("binding texture name %s, using file %s") % textureOrder[i] % textureMap[textureOrder[i]].second->GetFile());
+				textureMap[textureOrder[i]].second->Bind();
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture env %d") % textureMap[textureOrder[i]].first);
+				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, textureMap[textureOrder[i]].first);
+				if(GLSLShader::ShadersSupported() && shader  && useShader)
+					shader->SetUniform1i(textureOrder[i], i);
+			}
+		}
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "-----end material-----");
 	}
 }

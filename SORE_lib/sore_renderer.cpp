@@ -28,6 +28,16 @@ namespace SORE_Graphics
 	{
 		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 		fbo = img = depthbuffer = 0;
+		if(_rm)
+		{
+			fboshad = rm->GetResource<SORE_Graphics::GLSLShader>("data/Shaders/warp_fbo.shad");
+			warp = rm->GetResource<SORE_Resource::Texture2D>("data/Textures/warp.tga");
+		}
+		else
+		{
+			fboshad = NULL;
+			warp = NULL;
+		}
 	}
 	
 	Renderer2D::~Renderer2D()
@@ -138,7 +148,7 @@ namespace SORE_Graphics
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		for(it=sprites.begin();it!=sprites.end();it++)
+		/*for(it=sprites.begin();it!=sprites.end();it++)
 		{
 			const static double relSize = 2.6;
 			const static double relAlpha = 0.8;
@@ -151,7 +161,7 @@ namespace SORE_Graphics
 			glow.width = (*it)->width*relSize;
 			glow.height = (*it)->height*relSize;
 			RenderSprite(&glow);
-		}
+		}*/
 		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
@@ -167,6 +177,18 @@ namespace SORE_Graphics
 		if(SORE_Graphics::GLSLShader::ShadersSupported())
 			SORE_Graphics::GLSLShader::UnbindShaders();
 		
+		if(SORE_Graphics::GLSLShader::ShadersSupported() && fboshad && warp)
+		{
+			fboshad->Bind();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, img);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, warp->GetHandle());
+			fboshad->SetUniform1i("fbo_img", 0);
+			fboshad->SetUniform1i("warp", 1);
+		}
+		
+		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, img);
 		

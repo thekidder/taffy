@@ -26,6 +26,9 @@
 #include "sore_shaders.h"
 #include "sore_texture.h"
 
+#include <map>
+#include <vector>
+
 namespace SORE_Graphics
 {
 	class Material : public SORE_Resource::Resource
@@ -38,8 +41,12 @@ namespace SORE_Graphics
 		protected:
 			void Load();
 			GLSLShader* shader;
+			bool useShader;
 			std::string file;
-			SORE_Resource::Texture2D* tex;
+			//std::vector<std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> > > textures;
+			std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> > textureMap;
+			//std::vector<std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> >::iterator> textureOrder;
+			std::vector<std::string> textureOrder;
 	};
 }
 

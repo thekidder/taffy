@@ -90,17 +90,21 @@ namespace SORE_FileIO
 	
 	void Notify(std::string filename, boost::function<void (std::string)> callback)
 	{
-		boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
-		watches.push_back(iw);
-		//iw = new InotifyWatch(filename, IN_MODIFY);
-		InotifyWatch* ptr = iw.get();
-		try
+		if(callbacks.find(filename)==callbacks.end())
 		{
-			in.Add(ptr);
-		}
-		catch(InotifyException e)
-		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+			boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
+			watches.push_back(iw);
+			//iw = new InotifyWatch(filename, IN_MODIFY);
+			InotifyWatch* ptr = iw.get();
+			try
+			{
+				in.Add(ptr);
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Added Inotify watch on path \"%s\"") % filename);
+			}
+			catch(InotifyException e)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+			}
 		}
 		callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
 	}
