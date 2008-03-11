@@ -14,10 +14,9 @@
 #ifndef  __SORE_MATH_H__
 #define  __SORE_MATH_H__
 
-#ifdef _WIN32
-#define _USE_MATH_DEFINES
+#ifndef M_PI
+#define M_PI 3.14159265358979
 #endif
-
 
 #include <cmath>
 
