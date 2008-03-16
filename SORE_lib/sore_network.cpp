@@ -75,7 +75,7 @@ namespace SORE_Network
 					//event.peer->data = "Client information";
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % event.packet->data % event.peer->data % event.channelID);
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % (char*)event.peer->data % event.channelID);
 					/* Clean up the packet now that we're done using it. */
 					enet_packet_destroy (event.packet);
 					break;
@@ -135,6 +135,7 @@ namespace SORE_Network
 	
 	Client::~Client()
 	{
+		enet_peer_disconnect(server, 0);
 		enet_host_destroy(client);
 	}
 	
