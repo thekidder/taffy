@@ -70,9 +70,9 @@ namespace SORE_Network
 			switch (event.type)
 			{
 				case ENET_EVENT_TYPE_CONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %x:%u") % event.peer->address.host % event.peer->address.port);
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
 					/* Store any relevant client information here. */
-					//event.peer->data = "Client information";
+					event.peer->data = const_cast<void*>((const void*)"Client information");
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
@@ -80,7 +80,7 @@ namespace SORE_Network
 					if(event.peer->data!=NULL)
 						peer = (char*)event.peer->data;
 					else
-						peer = "unknown peer";
+						peer = "unknown client";
 					if(event.channelID)
 						channel = event.channelID;
 					else
@@ -91,7 +91,12 @@ namespace SORE_Network
 					break;
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % event.peer->data);
+					std::string peer;
+					if(event.peer->data!=NULL)
+						peer = (char*)event.peer->data;
+					else
+						peer = "unknown client";
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					/* Reset the peer's client information. */
 					event.peer->data = NULL;
 			}
@@ -173,5 +178,43 @@ namespace SORE_Network
 	
 	void Client::Frame(int elapsed)
 	{
+		ENetEvent event;
+		
+		while (enet_host_service (client, &event, 0) > 0)
+		{
+			switch (event.type)
+			{
+				case ENET_EVENT_TYPE_CONNECT:
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
+					/* Store any relevant client information here. */
+					event.peer->data = const_cast<void*>((const void*)"Client information");
+					break;
+				case ENET_EVENT_TYPE_RECEIVE:
+				{
+					std::string peer, channel;
+					if(event.peer->data!=NULL)
+						peer = (char*)event.peer->data;
+					else
+						peer = "unknown client";
+					if(event.channelID)
+						channel = event.channelID;
+					else
+						channel = "0";
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
+					/* Clean up the packet now that we're done using it. */
+					enet_packet_destroy (event.packet);
+					break;
+				}
+				case ENET_EVENT_TYPE_DISCONNECT:
+					std::string peer;
+					if(event.peer->data!=NULL)
+						peer = (char*)event.peer->data;
+					else
+						peer = "unknown client";
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
+					/* Reset the peer's client information. */
+					event.peer->data = NULL;
+			}
+		}
 	}
 }
