@@ -135,7 +135,28 @@ namespace SORE_Network
 	
 	Client::~Client()
 	{
+		ENetEvent event;
 		enet_peer_disconnect(server, 0);
+		
+		/* Allow up to 3 seconds for the disconnect to succeed
+		and drop any packets received packets.
+		*/
+		while (enet_host_service (client, &event, 3000) > 0)
+		{
+			switch (event.type)
+			{
+				case ENET_EVENT_TYPE_RECEIVE:
+					enet_packet_destroy (event.packet);
+					break;
+
+				case ENET_EVENT_TYPE_DISCONNECT:
+					ENGINE_LOG(SORE_Logging::LVL_INFO, "Disconnection succeeded.");
+					return;
+			}
+		}
+		/* We've arrived here, so the disconnect attempt didn't */
+		/* succeed yet.  Force the connection down.             */
+		enet_peer_reset (server);
 		enet_host_destroy(client);
 	}
 	
