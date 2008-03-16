@@ -39,6 +39,7 @@ namespace SORE_Utility
 			Datum(std::string _datum = "");
 			//Datum(Datum& _datum);
 			operator int();
+			operator unsigned int();
 			operator std::string();
 			operator double();
 			operator float();

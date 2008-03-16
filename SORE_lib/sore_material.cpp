@@ -25,7 +25,7 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), useShader(true)
+	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), useShader(false)
 	{
 		Load();
 	}
@@ -93,29 +93,30 @@ namespace SORE_Graphics
 				else if(section=="Texture-Combine")
 				{
 					std::transform(value.begin(),value.end(),value.begin(),::tolower);
-					/*std::vector<std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> > >::iterator it;
-					for(it=textures.begin();it!=textures.end();it++)
-						if(it->first == name) break;*/
-					//if(it!=textures.end())
-					//{
-						if(value == "modulate")
-							textureMap[name].first = GL_MODULATE;
-						else if(value == "blend")
-							textureMap[name].first = GL_BLEND;
-						else if(value == "decal")
-							textureMap[name].first = GL_DECAL;
-						else if(value == "replace")
-							textureMap[name].first = GL_REPLACE;
-						else
-							textureMap[name].first = GL_MODULATE;
-					//}
-						textureOrder.push_back(name);
+
+					if     (value == "modulate")
+						textureMap[name].first = GL_MODULATE;
+					else if(value == "blend")
+						textureMap[name].first = GL_BLEND;
+					else if(value == "decal")
+						textureMap[name].first = GL_DECAL;
+					else if(value == "replace")
+						textureMap[name].first = GL_REPLACE;
+					else
+						textureMap[name].first = GL_MODULATE;
+					
+					textureOrder.push_back(name);
 				}
 				else
 				{
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Invalid material heading: %s") % section);
 				}
 			}
+		}
+		GLenum error;
+		while((error=glGetError())!=GL_NO_ERROR)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Material: GL Error: %d") % error);
 		}
 	}
 	
@@ -124,9 +125,11 @@ namespace SORE_Graphics
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "---setting material---");
 		if(GLSLShader::ShadersSupported() && shader && useShader)
 			shader->Bind();
+		else
+			GLSLShader::UnbindShaders();
 		for(int i=0;i<textureOrder.size();i++)
 		{
-			if((GLSLShader::ShadersSupported() && shader && useShader) || textureMap[textureOrder[i]].first!=-1 && textureMap[textureOrder[i]].second!=NULL)
+			if(( (GLSLShader::ShadersSupported() && shader && useShader) || textureMap[textureOrder[i]].first!=-1) && textureMap[textureOrder[i]].second!=NULL)
 			{
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture unit %d") % i);
 				glActiveTexture(GL_TEXTURE0 + i);

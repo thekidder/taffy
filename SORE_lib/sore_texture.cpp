@@ -131,6 +131,12 @@ void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 	delete[] imgData;
 	//inFile.close();
 	SORE_FileIO::Close(file);
+	
+	GLenum error;
+	while((error=glGetError())!=GL_NO_ERROR)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Texture: GL Error: %d") % error);
+	}
 }
 
 SORE_Resource::Texture2D::Texture2D(std::string filename) : Resource(filename)

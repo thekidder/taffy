@@ -127,6 +127,11 @@ namespace SORE_Graphics
 		ok = true;
 		Link();
 		Bind();
+		GLenum error;
+		while((error=glGetError())!=GL_NO_ERROR)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Shader: GL Error: %d") % error);
+		}
 	}
 	
 	GLSLShader::~GLSLShader()
@@ -172,7 +177,7 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 
-			glGetObjectParameterivARB(program, GL_OBJECT_INFO_LOG_LENGTH_ARB ,&infologLength);
+			glGetObjectParameterivARB(program, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
 		
 			if (infologLength > 0)
 			{
@@ -197,6 +202,7 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program (shaders are not supported on this system)");
 			return 1;
 		}
+		uniforms.clear();
 		program = glCreateProgramObjectARB();
 		if(program == 0)
 		{
@@ -231,7 +237,6 @@ namespace SORE_Graphics
 		}
 		glShaderSourceARB(shader, 1, &src, NULL);
 		glCompileShaderARB(shader);
-		glAttachObjectARB(program, shader);
 		
 		//now let's check if everything is ok
 		int compile;
@@ -244,7 +249,7 @@ namespace SORE_Graphics
 			int charsWritten  = 0;
 			char *infoLog;
 	
-			glGetUniformivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB ,&infologLength);
+			glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
 			if (infologLength > 0)
 			{
 				infoLog = new char[infologLength];
@@ -257,7 +262,7 @@ namespace SORE_Graphics
 			return 1;
 		}
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Compiling %s shader successful") % shaderType.c_str());
-		
+		glAttachObjectARB(program, shader);
 		if(type==GL_VERTEX_SHADER)
 			vertexShaders.push_back(shader);
 		else if(type==GL_FRAGMENT_SHADER)
@@ -330,6 +335,25 @@ namespace SORE_Graphics
 		glUseProgramObjectARB(program);
 	}
 	
+	GLint GLSLShader::GetUniformLocation(std::string name)
+	{
+		std::map<std::string, GLint>::iterator it;
+		GLint location;
+		if((it=uniforms.find(name))==uniforms.end())
+		{
+			location = glGetUniformLocationARB(program, name.c_str());
+			if(location==-1)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL variable '%s'. Variable name probably does not exist") % name);
+				return -1; //don't insert into uniforms database
+			}
+			uniforms.insert(std::pair<std::string,GLint>(name,location));
+		}
+		else
+			location = it->second;
+		return location;
+	}
+	
 	void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 	{
 		if(!ShadersSupported() || program==0)
@@ -337,16 +361,9 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
 			return;
 		}
-		std::map<std::string, GLint>::iterator it;
-		GLint location;
-		if((it=uniforms.find(name))==uniforms.end())
-		{
-			location = glGetUniformLocationARB(program, name.c_str());
-			uniforms.insert(std::pair<std::string,GLint>(name,location));
-		}
-		else
-			location = it->second;
-		glUniform4fARB(location,v0,v1,v2,v3);
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform4fARB(location,v0,v1,v2,v3);
 	}
 	
 	void GLSLShader::SetUniform1i(std::string name, GLuint i0)
@@ -356,19 +373,21 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
 			return;
 		}
-		std::map<std::string, GLint>::iterator it;
-		GLint location;
-		if((it=uniforms.find(name))==uniforms.end())
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform1iARB(location,i0);
+	}
+	
+	void GLSLShader::SetUniform1f(std::string name, GLfloat f0)
+	{
+		if(!ShadersSupported() || program==0)
 		{
-			location = glGetUniformLocationARB(program, name.c_str());
-			//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
-			//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
-			uniforms.insert(std::pair<std::string,GLint>(name,location));
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
 		}
-		else
-			location = it->second;
-		glUniform1iARB(location,i0);
-		//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("error: %d") % glGetError());
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform1fARB(location,f0);
 	}
 
 } //end of namespace SORE_Graphics

@@ -51,10 +51,13 @@ namespace SORE_Graphics
 			//Uniform operators
 			void SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 			void SetUniform1i(std::string name, GLuint i0);
+			void SetUniform1f(std::string name, GLfloat f0);
+			
 		protected:
 			void Load(); //load from *.shad file
 			int  Init();
 			int  AddShader(GLuint type, const char* src);
+			GLint GetUniformLocation(std::string name);
 			std::vector<GLuint> vertexShaders, fragmentShaders;
 			GLuint program;
 			bool ok,linked;

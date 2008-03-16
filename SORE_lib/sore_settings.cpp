@@ -62,6 +62,18 @@ namespace SORE_Utility
 		}
 	}
 	
+	Datum::operator unsigned int()
+	{
+		try
+		{
+			return lexical_cast<unsigned int>(datum);
+		}
+		catch(bad_lexical_cast e)
+		{
+			return 0;
+		}
+	}
+	
 	Datum::operator std::string()
 	{
 		return datum;

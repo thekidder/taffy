@@ -148,7 +148,7 @@ namespace SORE_Graphics
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		/*for(it=sprites.begin();it!=sprites.end();it++)
+		for(it=sprites.begin();it!=sprites.end();it++)
 		{
 			const static double relSize = 2.6;
 			const static double relAlpha = 0.8;
@@ -161,7 +161,7 @@ namespace SORE_Graphics
 			glow.width = (*it)->width*relSize;
 			glow.height = (*it)->height*relSize;
 			RenderSprite(&glow);
-		}*/
+		}
 		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
@@ -174,8 +174,8 @@ namespace SORE_Graphics
 		glClearColor(0.0,0.0,0.0,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		if(SORE_Graphics::GLSLShader::ShadersSupported())
-			SORE_Graphics::GLSLShader::UnbindShaders();
+		//if(SORE_Graphics::GLSLShader::ShadersSupported())
+		//	SORE_Graphics::GLSLShader::UnbindShaders();
 		
 		if(SORE_Graphics::GLSLShader::ShadersSupported() && fboshad && warp)
 		{
@@ -185,7 +185,7 @@ namespace SORE_Graphics
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, warp->GetHandle());
 			fboshad->SetUniform1i("fbo_img", 0);
-			fboshad->SetUniform1i("warp", 1);
+			//fboshad->SetUniform1i("warp", 1);
 		}
 		
 		glActiveTexture(GL_TEXTURE0);
@@ -233,7 +233,7 @@ namespace SORE_Graphics
 		GLenum error;
 		while((error=glGetError())!=GL_NO_ERROR)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Renderer: GL Error: %d") % error);
 		}
 	}
 	
