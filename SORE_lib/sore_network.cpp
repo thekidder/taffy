@@ -70,7 +70,7 @@ namespace SORE_Network
 			switch (event.type)
 			{
 				case ENET_EVENT_TYPE_CONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %x:%u") % event.peer -> address.host % event.peer -> address.port);
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %x:%u") % event.peer->address.host % event.peer->address.port);
 					/* Store any relevant client information here. */
 					//event.peer->data = "Client information";
 					break;
@@ -112,6 +112,15 @@ namespace SORE_Network
 					event.type == ENET_EVENT_TYPE_CONNECT)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % port);
+			ENetPacket * packet = enet_packet_create ("packet", strlen ("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
+
+			/* Send the packet to the peer over channel id 0. */
+			/* One could also broadcast the packet by         */
+			/* enet_host_broadcast (host, 0, packet);         */
+			enet_peer_send (server, 0, packet);
+			enet_host_flush (client);
+
+
 		}
 		else
 		{
