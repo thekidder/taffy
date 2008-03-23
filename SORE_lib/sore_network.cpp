@@ -213,9 +213,9 @@ namespace SORE_Network
 		ENetBuffer buf;
 		buf.data = data;
 		int remote_s = enet_socket_receive(sock, &remote, &buf, 1);
-		data[remote_s] = '\0';
 		if(remote_s>0)
 		{
+			data[remote_s] = '\0';
 			enet_address_get_host_ip(&remote, addr, 63);
 			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\"") % addr % data);
 		}
