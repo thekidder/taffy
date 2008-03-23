@@ -45,6 +45,7 @@ namespace SORE_Kernel
 			void      RemoveAllTasks();
 			
 			task_list GetTasksByName(const char* taskName);
+			void      PrintTasks(int lvl);
 			
 			bool     quitFlag;
 			

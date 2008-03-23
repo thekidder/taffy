@@ -17,6 +17,7 @@
 #include "sore_allgl.h"
 #include "sore_timing.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 
 SORE_Kernel::Task::Task(GameKernel* _gk)
 {
@@ -146,6 +147,24 @@ SORE_Kernel::task_list SORE_Kernel::GameKernel::GetTasksByName(const char* taskN
 		}
 	}
 	return list;
+}
+
+void SORE_Kernel::GameKernel::PrintTasks(int lvl)
+{
+	std::string taskList  = "Printing all registered tasks...\n";
+	taskList             += "------------------------------------\n";
+	taskList             += "Priority\tUpdate (ms)\tName\n";
+	for(task_ref it=tasks.begin();it!=tasks.end();it++)
+	{
+		taskList += boost::lexical_cast<std::string>(it->first);
+		taskList += "\t\t";
+		taskList += boost::lexical_cast<std::string>(it->second.ms/10);
+		taskList += "\t\t";
+		taskList += it->second.task->GetName();
+		taskList += "\n";
+	}
+	taskList             += "------------------------------------";
+	ENGINE_LOG(lvl, taskList);
 }
 
 void SORE_Kernel::GameKernel::RemoveAllTasks()

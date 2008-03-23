@@ -34,16 +34,24 @@
  * UDP/LAN connections and management. This is not permanent and may change at
  * any time.
  */
- 
+
+bool operator<(ENetAddress a, ENetAddress b); 
+
 namespace SORE_Network
 {
 	void InitNetwork();
 	
+	struct net_msg
+	{
+		char* data;
+		unsigned int len;
+	};
+	
 	/*class NetworkConnection : public SORE_Kernel::Task
 	{
 		public:
-			NetworkConnection::NetworkConnection(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
-			NetworkConnection::~NetworkConnection();
+			NetworkConnection(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
+			~NetworkConnection();
 			
 			void Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking connection task";}
@@ -52,19 +60,48 @@ namespace SORE_Network
 			SORE_Utility::SettingsManager sm;
 	};*/
 	
+	class Server;
+	
+	class UDPBroadcaster : public SORE_Kernel::Task
+	{
+		public:
+			UDPBroadcaster(SORE_Kernel::GameKernel* gk, ENetAddress broadcastAddress, boost::function<ENetBuffer (Server*)> c);
+			~UDPBroadcaster();
+			
+			void SetBroadcastAddress(ENetAddress broadcastAddress);
+			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
+			void SetServer(Server* s);
+			
+			void Frame(int elapsed);
+			const char* GetName() const {return "UDP Broadcaster";}
+		protected:
+			ENetSocket broadcaster;
+			ENetAddress address;
+			SORE_Kernel::task_ref thisTask;
+			boost::function<ENetBuffer (Server*)> callback;
+			Server* serv;
+	};
+	
 	class Server : public SORE_Kernel::Task
 	{
 		public:
 			Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
 			~Server();
 			
+			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
+			
+			unsigned int NumPlayers() const;
+			
 			void Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
 		protected:
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
-			ENetSocket sock;
+			UDPBroadcaster broadcaster;
+			unsigned int numPlayers;
 	};
+	
+	typedef std::map<ENetAddress, std::pair<unsigned int, net_msg> > server_list;
 	
 	class Client : public SORE_Kernel::Task
 	{
@@ -73,12 +110,15 @@ namespace SORE_Network
 			~Client();
 			
 			void Frame(int elapsed);
+			server_list GetLANServers() const;
+			
 			const char* GetName() const {return "SORE Networking client task";}
 		protected:
 			ENetHost* client;
 			ENetPeer* server;
 			SORE_Utility::SettingsManager sm;
-			ENetSocket sock;
+			ENetSocket listener;
+			server_list LAN;
 	};
 }
 

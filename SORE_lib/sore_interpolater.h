@@ -22,63 +22,6 @@
 
 namespace SORE_Utility
 {
-	/*//lots of messy template code follows
-	//the practical upshot is an easy-to-use, extensible, interpolation system
-	template<class T>
-			class InterpolaterFunctor
-	{
-		public:
-			virtual void operator()(T){}
-	};
-	
-	template<class T>
-			class GlobalInterpolaterFunctor : public InterpolaterFunctor<T>
-	{
-		protected:
-			typedef void (*INTERPOLATER_CALLBACK)(T);
-			INTERPOLATER_CALLBACK func;
-		public:
-			GlobalInterpolaterFunctor(INTERPOLATER_CALLBACK _func)
-			{
-				func = _func;
-			}
-			bool operator()(T value)
-			{
-				return func(value);
-			}
-	};
-	
-	template<class T, class C>
-			class ClassInterpolaterFunctor : public InterpolaterFunctor<T>
-	{
-		protected:
-			typedef void (C::*INTERPOLATER_CALLBACK)(T);
-			INTERPOLATER_CALLBACK func;
-			C* obj;
-		public:
-			ClassInterpolaterFunctor(C* _obj, INTERPOLATER_CALLBACK _func)
-			{
-				obj = _obj;
-				func = _func;
-			}
-			void operator()(T value)
-			{
-				(obj->*func)(value);
-			}
-	};
-		
-	template<class T>
-			GlobalInterpolaterFunctor<T>* MakeFunctor(void(*func)(T))
-	{
-		return new GlobalInterpolaterFunctor<T>(func);
-	}
-	
-	template<class T, class C>
-			ClassInterpolaterFunctor<T,C>* MakeFunctor(C* obj, void(C::*func)(T))
-	{
-		return new ClassInterpolaterFunctor<T,C>(obj, func);
-	}*/
-	
 	//we need to define a template-less interface so we can have a heterogeneous list
 	class IInterpolater
 	{
@@ -211,7 +154,7 @@ namespace SORE_Utility
 			InterpolaterTask(SORE_Kernel::GameKernel* gk);
 			~InterpolaterTask();
 			
-			const char* GetName() const { return "InterpolaterTask"; };
+			const char* GetName() const { return "Interpolater task"; };
 			
 			void Frame(int elapsedTime);
 			void Pause();

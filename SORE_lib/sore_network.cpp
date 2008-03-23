@@ -21,6 +21,13 @@
 
 #include "sore_network.h"
 
+bool operator<(ENetAddress a, ENetAddress b)
+{
+	if(a.host<b.host) return true;
+	if(a.port<b.port) return true;
+	return false;
+}
+
 namespace SORE_Network
 {
 	bool network_ok = false;
@@ -40,7 +47,55 @@ namespace SORE_Network
 		}
 	}
 	
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
+	UDPBroadcaster::UDPBroadcaster(SORE_Kernel::GameKernel* gk, ENetAddress broadcastAddress, boost::function<ENetBuffer (Server*)> c) : Task(gk), serv(NULL)
+	{
+		SetBroadcastAddress(broadcastAddress);
+		SetBroadcastCallback(c);
+		thisTask = gk->AddConstTask(11, 5000, this);
+		broadcaster = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, NULL);
+		enet_socket_set_option(broadcaster, ENET_SOCKOPT_BROADCAST, 1);
+	}
+	
+	UDPBroadcaster::~UDPBroadcaster()
+	{
+		gk->RemoveTask(thisTask);
+		enet_socket_destroy(broadcaster);
+	}
+	
+	void UDPBroadcaster::Frame(int elapsed)
+	{
+		const char* invalidCallback = "invalid broadcast callback";
+		ENetBuffer data;
+		if(callback == NULL)
+		{
+			data.data = const_cast<void*>(static_cast<const void*>(invalidCallback));
+			data.dataLength = strlen(invalidCallback)+1;
+		}
+		else
+		{
+			data = callback(serv);
+			//data.data = const_cast<void*>(static_cast<const void*>(bdata));
+			//data.dataLength = strlen(bdata) + 1;
+		}
+		int sent = enet_socket_send(broadcaster, &address, &data, 1);
+	}
+	
+	void UDPBroadcaster::SetServer(Server* s)
+	{
+		serv = s;
+	}
+	
+	void UDPBroadcaster::SetBroadcastAddress(ENetAddress broadcastAddress)
+	{
+		address = broadcastAddress;
+	}
+	
+	void UDPBroadcaster::SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c)
+	{
+		callback = c;
+	}
+	
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), numPlayers(0)
 	{
 		/*ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -54,30 +109,24 @@ namespace SORE_Network
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "Created server");
 		}*/
-		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, NULL);
-		enet_socket_set_option(sock, ENET_SOCKOPT_BROADCAST, 1);
-		
+		ENetAddress a;
+		a.port = (int)sm.GetVariable("network", "port");
+		std::string broadcastAddress = sm.GetVariable("network", "broadcast");
+		enet_address_set_host(&a, broadcastAddress.c_str());
+		broadcaster.SetBroadcastAddress(a);
+		broadcaster.SetServer(this);
 	}
 	
 	Server::~Server()
 	{
 		//enet_host_destroy(server);
-		enet_socket_destroy(sock);
+		
 	}
 	
 	void Server::Frame(int elapsed)
 	{
-		ENetAddress address;
-		//address.host = ENET_HOST_BROADCAST;
-		std::string serverName = sm.GetVariable("network", "server");
-		enet_address_set_host (&address, serverName.c_str());
-		address.port = 1234;
-		ENetBuffer data;
-		data.data = (void*)"packet";
-		data.dataLength = sizeof("packet")+1;
-		enet_socket_send(sock, &address, &data, 1);
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "sending packet...");
 		/*static char peerName[256];
+		
 		ENetEvent event;
 		
 		while (enet_host_service (server, &event, 0) > 0)
@@ -122,6 +171,16 @@ namespace SORE_Network
 		}*/
 	}
 	
+	unsigned int Server::NumPlayers() const
+	{
+		return numPlayers;
+	}
+	
+	void Server::SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c)
+	{
+		broadcaster.SetBroadcastCallback(c);
+	}
+	
 	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
 	{
 		/*client = enet_host_create(NULL, 2, 0, 0);
@@ -154,8 +213,6 @@ namespace SORE_Network
 			// enet_host_broadcast (host, 0, packet);
 			enet_peer_send (server, 0, packet);
 			enet_host_flush (client);
-
-
 		}
 		else
 		{
@@ -166,19 +223,18 @@ namespace SORE_Network
 
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % port);
 		}*/
+		
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
 		//enet_address_set_host (&address, "localhost");
-		address.port = 1234;
-		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
-		enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
-		//enet_socket_connect(sock, &address);
-		
+		address.port = (int)sm.GetVariable("network", "port");
+		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
+		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
 	}
 	
 	Client::~Client()
 	{
-		enet_socket_destroy(sock);
+		enet_socket_destroy(listener);
 		/*ENetEvent event;
 		enet_peer_disconnect(server, 0);
 		
@@ -206,18 +262,43 @@ namespace SORE_Network
 	
 	void Client::Frame(int elapsed)
 	{
-		char addr[64];
+		char addr[16];
 		char data[256];
-		//addr.resize(64);
 		ENetAddress remote;
 		ENetBuffer buf;
 		buf.data = data;
-		int remote_s = enet_socket_receive(sock, &remote, &buf, 1);
-		if(remote_s>0)
+		int remote_len = enet_socket_receive(listener, &remote, &buf, 1);
+		server_list::iterator temp;
+		for(server_list::iterator it=LAN.begin();it!=LAN.end();)
 		{
-			data[remote_s] = '\0';
-			enet_address_get_host_ip(&remote, addr, 63);
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\"") % addr % data);
+			temp = it;
+			it++;
+			temp->second.first++;
+			if(temp->second.first>10)
+			{
+				LAN.erase(temp);
+			}
+				
+		}
+		if(remote_len>0)
+		{
+			char* buffer = new char[remote_len+1];
+			strncpy(buffer, (char*)buf.data, remote_len);
+			buffer[remote_len] = '\0';
+			enet_address_get_host_ip(&remote, addr,15);
+			int len = strlen(buffer);
+			int realLen = remote_len;
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\"") % addr % ((char*)buf.data));
+			delete[] buffer;
+			
+			LAN[remote].first = 0;
+			LAN[remote].second.data = static_cast<char*>(buf.data);
+			LAN[remote].second.len = buf.dataLength;
+		}
+		else if(remote_len==-1)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Socket receive failure");
 		}
 		/*ENetEvent event;
 		
@@ -257,5 +338,10 @@ namespace SORE_Network
 					event.peer->data = NULL;
 			}
 		}*/
+	}
+	
+	server_list Client::GetLANServers() const
+	{
+		return LAN;
 	}
 }
