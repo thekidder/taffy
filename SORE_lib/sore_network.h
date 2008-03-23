@@ -38,6 +38,19 @@ namespace SORE_Network
 {
 	void InitNetwork();
 	
+	/*class NetworkConnection : public SORE_Kernel::Task
+	{
+		public:
+			NetworkConnection::NetworkConnection(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
+			NetworkConnection::~NetworkConnection();
+			
+			void Frame(int elapsed);
+			const char* GetName() const {return "SORE Networking connection task";}
+		protected:
+			ENetHost* host;
+			SORE_Utility::SettingsManager sm;
+	};*/
+	
 	class Server : public SORE_Kernel::Task
 	{
 		public:
@@ -49,6 +62,7 @@ namespace SORE_Network
 		protected:
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
+			ENetSocket sock;
 	};
 	
 	class Client : public SORE_Kernel::Task
@@ -63,6 +77,7 @@ namespace SORE_Network
 			ENetHost* client;
 			ENetPeer* server;
 			SORE_Utility::SettingsManager sm;
+			ENetSocket sock;
 	};
 }
 

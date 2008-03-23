@@ -42,7 +42,7 @@ namespace SORE_Network
 	
 	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
 	{
-		ENetAddress address;
+		/*ENetAddress address;
 		address.host = ENET_HOST_ANY;
 		address.port = (unsigned int)sm.GetVariable("network", "port");
 		server = enet_host_create(&address, 32, 0, 0);
@@ -53,16 +53,31 @@ namespace SORE_Network
 		else
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "Created server");
-		}
+		}*/
+		ENetAddress address;
+		address.host = ENET_HOST_ANY;
+		address.port = 1234;
+		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, 0);
+		
 	}
 	
 	Server::~Server()
 	{
-		enet_host_destroy(server);
+		//enet_host_destroy(server);
+		enet_socket_destroy(sock);
 	}
 	
 	void Server::Frame(int elapsed)
 	{
+		ENetAddress address;
+		address.host = ENET_HOST_BROADCAST;
+		address.port = 1234;
+		ENetBuffer data;
+		data.data = (void*)"packet";
+		data.dataLength = sizeof("packet")+1;
+		enet_socket_send(sock, &address, &data, sizeof("packet")+1);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "sending packet...");
+		/*static char peerName[256];
 		ENetEvent event;
 		
 		while (enet_host_service (server, &event, 0) > 0)
@@ -70,10 +85,14 @@ namespace SORE_Network
 			switch (event.type)
 			{
 				case ENET_EVENT_TYPE_CONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
-					/* Store any relevant client information here. */
-					event.peer->data = const_cast<void*>((const void*)"Client information");
+				{
+					
+					enet_address_get_host_ip(&event.peer->address, peerName, 255);
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % peerName);
+					// Store any relevant client information here.
+					event.peer->data = peerName;
 					break;
+				}
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
 					std::string peer, channel;
@@ -86,7 +105,7 @@ namespace SORE_Network
 					else
 						channel = "0";
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
-					/* Clean up the packet now that we're done using it. */
+					// Clean up the packet now that we're done using it.
 					enet_packet_destroy (event.packet);
 					break;
 				}
@@ -97,15 +116,15 @@ namespace SORE_Network
 					else
 						peer = "unknown client";
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
-					/* Reset the peer's client information. */
+					// Reset the peer's client information.
 					event.peer->data = NULL;
 			}
-		}
+		}*/
 	}
 	
 	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
 	{
-		client = enet_host_create(NULL, 1, 0, 0);
+		/*client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occuring while creating client");
@@ -130,9 +149,9 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % port);
 			ENetPacket * packet = enet_packet_create ("packet", strlen ("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
 
-			/* Send the packet to the peer over channel id 0. */
-			/* One could also broadcast the packet by         */
-			/* enet_host_broadcast (host, 0, packet);         */
+			// Send the packet to the peer over channel id 0
+			// One could also broadcast the packet by
+			// enet_host_broadcast (host, 0, packet);
 			enet_peer_send (server, 0, packet);
 			enet_host_flush (client);
 
@@ -140,23 +159,31 @@ namespace SORE_Network
 		}
 		else
 		{
-			/* Either the 5 seconds are up or a disconnect event was */
-			/* received. Reset the peer in the event the 5 seconds   */
-			/* had run out without any significant event.            */
+			// Either the 5 seconds are up or a disconnect event was
+			// received. Reset the peer in the event the 5 seconds
+			// had run out without any significant event.
 			enet_peer_reset (server);
 
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % port);
-		}
+		}*/
+		ENetAddress address;
+		address.host = ENET_HOST_ANY;
+		address.port = 1234;
+		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
+		
+		//enet_socket_connect(sock, &address);
+		
 	}
 	
 	Client::~Client()
 	{
-		ENetEvent event;
+		enet_socket_destroy(sock);
+		/*ENetEvent event;
 		enet_peer_disconnect(server, 0);
 		
-		/* Allow up to 3 seconds for the disconnect to succeed
-		and drop any packets received packets.
-		*/
+		// Allow up to 3 seconds for the disconnect to succeed
+		//and drop any packets received packets.
+		
 		while (enet_host_service (client, &event, 3000) > 0)
 		{
 			switch (event.type)
@@ -170,15 +197,25 @@ namespace SORE_Network
 					return;
 			}
 		}
-		/* We've arrived here, so the disconnect attempt didn't */
-		/* succeed yet.  Force the connection down.             */
+		// We've arrived here, so the disconnect attempt didn't
+		// succeed yet.  Force the connection down
 		enet_peer_reset (server);
-		enet_host_destroy(client);
+		enet_host_destroy(client);*/
 	}
 	
 	void Client::Frame(int elapsed)
 	{
-		ENetEvent event;
+		char addr[64];
+		//addr.resize(64);
+		ENetAddress remote;
+		ENetBuffer buf;
+		ENetSocket remote_s = enet_socket_receive(sock, &remote, &buf, 64);
+		if(remote_s!=-1)
+		{
+			enet_address_get_host_ip(&remote, addr, 63);
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s") % addr);
+		}
+		/*ENetEvent event;
 		
 		while (enet_host_service (client, &event, 0) > 0)
 		{
@@ -186,7 +223,7 @@ namespace SORE_Network
 			{
 				case ENET_EVENT_TYPE_CONNECT:
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
-					/* Store any relevant client information here. */
+					// Store any relevant client information here.
 					event.peer->data = const_cast<void*>((const void*)"Client information");
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
@@ -201,7 +238,7 @@ namespace SORE_Network
 					else
 						channel = "0";
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
-					/* Clean up the packet now that we're done using it. */
+					// Clean up the packet now that we're done using it.
 					enet_packet_destroy (event.packet);
 					break;
 				}
@@ -212,9 +249,9 @@ namespace SORE_Network
 					else
 						peer = "unknown client";
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
-					/* Reset the peer's client information. */
+					// Reset the peer's client information.
 					event.peer->data = NULL;
 			}
-		}
+		}*/
 	}
 }
