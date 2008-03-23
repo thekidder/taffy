@@ -54,10 +54,8 @@ namespace SORE_Network
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "Created server");
 		}*/
-		ENetAddress address;
-		address.host = ENET_HOST_ANY;
-		address.port = 1234;
-		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, 0);
+		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, NULL);
+		enet_socket_set_option(sock, ENET_SOCKOPT_BROADCAST, 1);
 		
 	}
 	
@@ -70,14 +68,14 @@ namespace SORE_Network
 	void Server::Frame(int elapsed)
 	{
 		ENetAddress address;
-		//address.host = ENET_HOST_BROADCAST;
-		std::string serverName = sm.GetVariable("network", "server");
-		enet_address_set_host (&address, serverName.c_str());
+		address.host = ENET_HOST_BROADCAST;
+		//std::string serverName = sm.GetVariable("network", "server");
+		//enet_address_set_host (&address, serverName.c_str());
 		address.port = 1234;
 		ENetBuffer data;
 		data.data = (void*)"packet";
 		data.dataLength = sizeof("packet")+1;
-		enet_socket_send(sock, &address, &data, sizeof("packet")+1);
+		enet_socket_send(sock, &address, &data, 1);
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "sending packet...");
 		/*static char peerName[256];
 		ENetEvent event;
@@ -170,9 +168,10 @@ namespace SORE_Network
 		}*/
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
+		//enet_address_set_host (&address, "localhost");
 		address.port = 1234;
 		sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
-		
+		enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
 		//enet_socket_connect(sock, &address);
 		
 	}
@@ -208,14 +207,17 @@ namespace SORE_Network
 	void Client::Frame(int elapsed)
 	{
 		char addr[64];
+		char data[256];
 		//addr.resize(64);
 		ENetAddress remote;
 		ENetBuffer buf;
-		int remote_s = enet_socket_receive(sock, &remote, &buf, 64);
-		if(remote_s!=-1)
+		buf.data = data;
+		int remote_s = enet_socket_receive(sock, &remote, &buf, 1);
+		data[remote_s] = '\0';
+		if(remote_s>0)
 		{
 			enet_address_get_host_ip(&remote, addr, 63);
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s") % addr);
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\"") % addr % data);
 		}
 		/*ENetEvent event;
 		
