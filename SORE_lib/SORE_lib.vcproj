@@ -201,6 +201,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_network.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_renderer.cpp"
 				>
 			</File>
@@ -300,6 +304,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_math.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_network.h"
 				>
 			</File>
 			<File

@@ -211,7 +211,7 @@ namespace SORE_Network
 		//addr.resize(64);
 		ENetAddress remote;
 		ENetBuffer buf;
-		ENetSocket remote_s = enet_socket_receive(sock, &remote, &buf, 64);
+		int remote_s = enet_socket_receive(sock, &remote, &buf, 64);
 		if(remote_s!=-1)
 		{
 			enet_address_get_host_ip(&remote, addr, 63);
