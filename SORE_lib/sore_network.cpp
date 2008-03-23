@@ -68,9 +68,9 @@ namespace SORE_Network
 	void Server::Frame(int elapsed)
 	{
 		ENetAddress address;
-		address.host = ENET_HOST_BROADCAST;
-		//std::string serverName = sm.GetVariable("network", "server");
-		//enet_address_set_host (&address, serverName.c_str());
+		//address.host = ENET_HOST_BROADCAST;
+		std::string serverName = sm.GetVariable("network", "server");
+		enet_address_set_host (&address, serverName.c_str());
 		address.port = 1234;
 		ENetBuffer data;
 		data.data = (void*)"packet";
