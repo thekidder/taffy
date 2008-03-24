@@ -224,7 +224,6 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % port);
 		}*/
 		
-		ENetAddress address;
 		address.host = ENET_HOST_ANY;
 		address.port = (int)sm.GetVariable("network", "port");
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
@@ -276,12 +275,17 @@ namespace SORE_Network
 			enet_address_get_host_ip(&remote, addr,15);
 			int len = strlen(buffer);
 			int realLen = remote_len;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
-			delete[] buffer;
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
 			
+			
+			if(LAN.find(remote)==LAN.end())
+			{
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % ntohs(address.port) );
+			}
 			LAN[remote].first = 0;
 			LAN[remote].second.data = static_cast<char*>(buf.data);
 			LAN[remote].second.len = buf.dataLength;
+			delete[] buffer;
 		}
 		else if(remote_len==-1)
 		{
@@ -295,6 +299,8 @@ namespace SORE_Network
 			temp->second.first+= elapsed/10;
 			if(temp->second.first>3000) //three second timeout before server disappears
 			{
+				enet_address_get_host_ip(&temp->first, addr,15);
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Lost server at %s:%d") % addr % ntohs(address.port));
 				LAN.erase(temp);
 			}
 		}

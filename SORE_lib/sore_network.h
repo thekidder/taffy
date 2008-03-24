@@ -119,6 +119,7 @@ namespace SORE_Network
 			SORE_Utility::SettingsManager sm;
 			ENetSocket listener;
 			server_list LAN;
+			ENetAddress address;
 	};
 }
 
