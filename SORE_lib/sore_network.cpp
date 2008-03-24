@@ -230,7 +230,6 @@ namespace SORE_Network
 		address.port = (int)sm.GetVariable("network", "port");
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
 		int result = enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
-		int err = WSAGetLastError();
 	}
 	
 	Client::~Client()
