@@ -277,14 +277,14 @@ namespace SORE_Network
 			int realLen = remote_len;
 			ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
 			
-			
-			if(LAN.find(remote)==LAN.end())
+			unsigned int size = LAN.size();
+			if(LAN.find(remote.host)==LAN.end())
 			{
 				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % address.port );
 			}
-			LAN[remote].first = 0;
-			LAN[remote].second.data = static_cast<char*>(buf.data);
-			LAN[remote].second.len = buf.dataLength;
+			LAN[remote.host].first = 0;
+			LAN[remote.host].second.data = static_cast<char*>(buf.data);
+			LAN[remote.host].second.len = buf.dataLength;
 			delete[] buffer;
 		}
 		else if(remote_len==-1)
@@ -299,7 +299,10 @@ namespace SORE_Network
 			temp->second.first+= elapsed/10;
 			if(temp->second.first>3000) //three second timeout before server disappears
 			{
-				enet_address_get_host_ip(&temp->first, addr,15);
+				ENetAddress tempAddr;
+				tempAddr.host = temp->first;
+				tempAddr.port = address.port;
+				enet_address_get_host_ip(&tempAddr, addr,15);
 				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Lost server at %s:%d") % addr % address.port );
 				LAN.erase(temp);
 			}

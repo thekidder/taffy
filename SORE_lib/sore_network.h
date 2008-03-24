@@ -101,7 +101,7 @@ namespace SORE_Network
 			unsigned int numPlayers;
 	};
 	
-	typedef std::map<ENetAddress, std::pair<unsigned int, net_msg> > server_list;
+	typedef std::map<unsigned int, std::pair<unsigned int, net_msg> > server_list;
 	
 	class Client : public SORE_Kernel::Task
 	{
