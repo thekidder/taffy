@@ -275,7 +275,7 @@ namespace SORE_Network
 			enet_address_get_host_ip(&remote, addr,15);
 			int len = strlen(buffer);
 			int realLen = remote_len;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
 			
 			unsigned int size = LAN.size();
 			if(LAN.find(remote.host)==LAN.end())
@@ -283,7 +283,7 @@ namespace SORE_Network
 				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % address.port );
 			}
 			LAN[remote.host].first = 0;
-			LAN[remote.host].second.data = static_cast<char*>(buf.data);
+			//LAN[remote.host].second.data = static_cast<char*>(buf.data);
 			LAN[remote.host].second.len = buf.dataLength;
 			delete[] buffer;
 		}
