@@ -33,6 +33,9 @@
 #undef SORE_CONSOLE_LOG
 #endif
 
+#define SORE_FILE_LOG
+#undef  SORE_FILE_LOG
+
 #ifdef DEBUG
 #define FILE_LOG_LVL SHOW_ALL
 #else
@@ -42,12 +45,14 @@
 namespace SORE_Logging
 {
 	static std::map<int, const char*> lvlNames;
+#ifdef SORE_FILE_LOG
 	XMLLogger sore_file_logger(FILE_LOG_LVL, "logs/sore_log.xml", "SORE Engine Log");
+#endif
 #ifdef SORE_CONSOLE_LOG
 	ConsoleLogger sore_console_logger(SHOW_ALL);
 #endif
+
 	Logger sore_log("SORE Engine");
-	
 	void InitLogging();
 }
 
@@ -61,7 +66,9 @@ void SORE_Logging::InitLogging()
 	lvlNames[LVL_DEBUG1  ] = "Debug 1 ";
 	lvlNames[LVL_DEBUG2  ] = "Debug 2 ";
 	lvlNames[LVL_DEBUG3  ] = "Debug 3 ";
+#ifdef SORE_FILE_LOG
 	sore_log.AddBackend(&sore_file_logger);
+#endif
 #ifdef SORE_CONSOLE_LOG
 	sore_log.AddBackend(&sore_console_logger);
 #endif
@@ -287,10 +294,9 @@ SORE_Logging::Logger::Logger()
 	logName = "";
 }
 
-SORE_Logging::Logger::Logger(const char* name)
+SORE_Logging::Logger::Logger(const char* name) : logName(name)
 {
 	buffers.clear();
-	logName = name;
 	Log(LVL_INFO, boost::str(boost::format("%s log started") % logName));
 }
 
@@ -366,7 +372,8 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 
 void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* file, boost::format message, int module)
 {
-	Log(lvl, line, func, file, boost::str(message), module);
+	std::string msg = boost::str(message);
+	Log(lvl, line, func, file, msg, module);
 }
 
 void SORE_Logging::Logger::Flush()

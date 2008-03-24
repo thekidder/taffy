@@ -25,8 +25,8 @@ namespace SORE_FileIO
 	};
 	
 	void DeleteLinkedList(linked_list* curr);
-	void LinkedListCopy(void* dest, linked_list* src, unsigned int n); //copy n bytes from src to dest
-	void LinkedListEat(linked_list* src, unsigned int n); //shift the data in src n bytes toward the start
+	void LinkedListCopy(void* dest, linked_list* src, size_t n); //copy n bytes from src to dest
+	void LinkedListEat(linked_list* src, size_t n); //shift the data in src n bytes toward the start
 	
 	struct file_info
 	{
@@ -40,28 +40,28 @@ namespace SORE_FileIO
 		char               fullname[512];
 		char               package [512];
 	
-		unsigned int       pos;
-		unsigned int       size;
-		unsigned int       sizeRaw;
-		unsigned int       currPos;
-		unsigned int       currPosRaw;
-		z_stream*          strm;
-		linked_list        out_buf;
-		unsigned int       out_filled;
-		unsigned int       out_size;
+		size_t       pos;
+		size_t       size;
+		size_t       sizeRaw;
+		size_t       currPos;
+		size_t       currPosRaw;
+		z_stream*    strm;
+		linked_list  out_buf;
+		size_t       out_filled;
+		size_t       out_size;
 	};
 	
 	struct filesystem_file
 	{
 		FILE* fptr;
-		unsigned int filled;
+		size_t filled;
 		char buffer[2048];
 	};
 
 	typedef std::vector<file_info> file_list;
 	
 	file_list cachedFiles;
-	std::map<std::string, int> fileMap;
+	std::map<std::string, size_t> fileMap;
 	std::map<std::string, FILE*> openPackages;
 	std::map<unsigned int, filesystem_file> openFilesystemFiles;
 	std::map<std::string, unsigned int> openPackageCount;
@@ -154,7 +154,7 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 		else
 			tempInfo.compressed = false;
 		tempInfo.isOpen = false;
-		strcpy(tempInfo.package, package);
+		strncpy(tempInfo.package, package, 511);
 		if(cachedFiles.size()>=FILESYSTEM_START-1)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Too many cached files...aborting"); //marked as critical because this should never happen...unless you load LOTS of resources
@@ -179,7 +179,7 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 
 SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 {
-	std::map<std::string, int>::iterator it;
+	std::map<std::string, size_t>::iterator it;
 	FILE* temp = NULL;
 	temp = fopen(file, "rb");
 	if(temp && ferror(temp)==0)
@@ -272,7 +272,8 @@ bool SORE_FileIO::Eof(file_ref file)
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
 		if(openFilesystemFiles[file].filled>0) return false;
-		return feof(openFilesystemFiles[file].fptr);
+		if(feof(openFilesystemFiles[file].fptr)!=0) return true;
+		else return false;
 	}
 	return true;
 }
@@ -307,7 +308,7 @@ void SORE_FileIO::Close(file_ref file)
 	}
 }
 
-int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool ignoreBuffer)
+size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool ignoreBuffer)
 {
 	if(nmemb == 0 || size == 0)
 		return 0;
@@ -318,9 +319,9 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "File is not open");
 			return 0;
 		}
-		unsigned int bytesToRead = cachedFiles[file].size - cachedFiles[file].currPos; //how many bytes we need to read -adjusted from size*nmemb to make sure we don't go past the end of the file in our stream
-		unsigned int read; //how many we've read so far
-		fseek(openPackages[cachedFiles[file].package], cachedFiles[file].pos + cachedFiles[file].currPosRaw, SEEK_SET);
+		size_t bytesToRead = cachedFiles[file].size - cachedFiles[file].currPos; //how many bytes we need to read -adjusted from size*nmemb to make sure we don't go past the end of the file in our stream
+		size_t read; //how many we've read so far
+		fseek(openPackages[cachedFiles[file].package], static_cast<long>(cachedFiles[file].pos + cachedFiles[file].currPosRaw), SEEK_SET);
 		if(bytesToRead>=size*nmemb)
 		{
 			bytesToRead = nmemb;
@@ -331,7 +332,8 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 		}
 		if(cachedFiles[file].compressed)
 		{
-			int ret, size, have;
+			size_t size, ret;
+			int have;
 			unsigned char in_buf[CHUNK];
 			read = 0;
 			if(cachedFiles[file].out_filled > bytesToRead)
@@ -372,7 +374,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 				cachedFiles[file].strm->next_in = in_buf;
 				do
 				{
-					int i = 0;
+					size_t i = 0;
 					linked_list* curr = &cachedFiles[file].out_buf;
 					while(true)
 					{
@@ -449,13 +451,13 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 	}
 	else if(file>=FILESYSTEM_START && file<std::numeric_limits<unsigned long>::max())
 	{
-		int offset = 0;
-		int toRead = size*nmemb;
+		size_t offset = 0;
+		size_t toRead = size*nmemb;
 		if(!ignoreBuffer)
 		{
 			if(openFilesystemFiles[file].filled>0)
 			{
-				int amount = size*nmemb > openFilesystemFiles[file].filled ? openFilesystemFiles[file].filled : size*nmemb;
+				size_t amount = size*nmemb > openFilesystemFiles[file].filled ? openFilesystemFiles[file].filled : size*nmemb;
 				memcpy(ptr, openFilesystemFiles[file].buffer, amount);
 				offset = amount;
 				toRead -= amount;
@@ -463,7 +465,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 				openFilesystemFiles[file].buffer[0] = '\0';
 			}
 		}
-		int read = fread((char*)ptr+offset, 1, toRead, openFilesystemFiles[file].fptr);
+		size_t read = fread((char*)ptr+offset, 1, toRead, openFilesystemFiles[file].fptr);
 		if(read+offset != size*nmemb)
 		{
 			unsigned int errLvl = SORE_Logging::LVL_DEBUG2;
@@ -471,7 +473,7 @@ int SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool 
 			{
 				errLvl = SORE_Logging::LVL_ERROR;
 			}
-			ENGINE_LOG_M(errLvl, boost::format("Could not read all %d bytes: ") % (size*nmemb), MODULE_FILEIO);
+			ENGINE_LOG_M(errLvl, boost::format("Could not read all %u bytes: ") % (static_cast<unsigned int>(size*nmemb)), MODULE_FILEIO);
 			ENGINE_LOG_M(errLvl, boost::format("ferror: %s, feof: %s") % ferror(openFilesystemFiles[file].fptr) % feof(openFilesystemFiles[file].fptr), MODULE_FILEIO);
 		}
 		return read+offset;
@@ -493,18 +495,18 @@ int strpos(char* str, char* chars)
 	return -1;
 }
 
-int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
+size_t SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
 {
 	assert(num<=2048 && "Trying to read too many characters");
 	//static char data[64]="";
 	char* data = openFilesystemFiles[file].buffer;
-	int length = openFilesystemFiles[file].filled;
+	size_t length = openFilesystemFiles[file].filled;
 	//static int length = 0;
 	//if(length<0) length = 0;
 	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("3 %d %d %c")  % length % num % (*data));
 	if(*data=='\0')
 	{
-		int len = Read(data, sizeof(char), num, file,true);
+		size_t len = Read(data, sizeof(char), num, file,true);
 		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
@@ -530,7 +532,7 @@ int SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref fil
 	}
 	else
 	{
-		int len = Read(data+length, sizeof(char), num-length, file,true);
+		size_t len = Read(data+length, sizeof(char), num-length, file,true);
 		data[length+len] = '\0';
 		int stop = strpos((char*)data,(char*)separator);
 		if(stop==-1)
@@ -579,14 +581,14 @@ void SORE_FileIO::DeleteLinkedList(linked_list* curr)
 	delete curr;
 }
 
-void SORE_FileIO::LinkedListCopy(void* dest, linked_list* src, unsigned int n)//copy n bytes from src to dest
+void SORE_FileIO::LinkedListCopy(void* dest, linked_list* src, size_t n)//copy n bytes from src to dest
 {
-	unsigned int copied = 0;
+	size_t copied = 0;
 	linked_list* curr = src;
 	while(copied < n)
 	{
 		assert(curr != NULL);
-		unsigned int toCopy;
+		size_t toCopy;
 		if(n - copied > curr->size)
 			toCopy = curr->size;
 		else
@@ -597,7 +599,7 @@ void SORE_FileIO::LinkedListCopy(void* dest, linked_list* src, unsigned int n)//
 	}
 }
 
-void SORE_FileIO::LinkedListEat(linked_list* src, unsigned int n) //shift the data in src n bytes toward the start
+void SORE_FileIO::LinkedListEat(linked_list* src, size_t n) //shift the data in src n bytes toward the start
 {
 	linked_list* curr = src;
 	while(n > curr->size)
@@ -611,25 +613,25 @@ void SORE_FileIO::LinkedListEat(linked_list* src, unsigned int n) //shift the da
 		}
 	}
 
-	for(int i=0;i<curr->size-n;i++)
+	for(size_t i=0;i<curr->size-n;i++)
 	{
 		curr->data[i] = curr->data[i+n];
 	}
 	while(curr->next!=NULL)
 	{
-		for(int i=0;i<n;i++)
+		for(size_t i=0;i<n;i++)
 		{
 			curr->data[i + (curr->size - n)] = curr->next->data[i];
 		}
 		curr = curr->next;
-		for(int i=0;i<curr->size-n;i++)
+		for(size_t i=0;i<curr->size-n;i++)
 		{
 			curr->data[i] = curr->data[i+n];
 		}
 	}
 }
 
-unsigned int SORE_FileIO::Size(file_ref file)
+size_t SORE_FileIO::Size(file_ref file)
 {
 	if(file >= FILESYSTEM_START)
 	{
@@ -643,7 +645,7 @@ unsigned int SORE_FileIO::Size(file_ref file)
 		return cachedFiles[file].size;
 }
 
-unsigned int SORE_FileIO::CompressedSize(file_ref file)
+size_t SORE_FileIO::CompressedSize(file_ref file)
 {
 	if(file > FILESYSTEM_START || !cachedFiles[file].compressed)
 		return Size(file);
