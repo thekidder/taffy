@@ -106,6 +106,29 @@ namespace SORE_Math
 	};
 	
 	template<class T>
+			struct Rect2D
+	{
+		Point2D<T> topLeft, bottomRight;
+		Rect2D(Point2D<T> one, Point2D<T> two)
+		{
+			if(one.x<two.x)
+			{
+				topLeft = one;
+				bottomRight = two;
+			}
+			else
+			{
+				topLeft = two;
+				bottomRight = one;
+			}
+			assert(one.x!=two.x || one.y!=two.y);
+			assert(one.y<two.y);
+		}
+		Rect2D() : topLeft(static_cast<T>(0),static_cast<T>(0)), bottomRight(static_cast<T>(1),static_cast<T>(1))
+		{}
+	};
+	
+	template<class T>
 			class Vector3D
 	{
 		public:
