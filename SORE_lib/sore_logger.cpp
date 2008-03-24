@@ -261,7 +261,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 
 void SORE_Logging::XMLLogger::SanitizeXML(std::string& str)
 {
-	int pos = 0;
+	size_t pos = 0;
 	while((pos=str.find("&",pos))!=std::string::npos)
 	{
 		str.replace(pos, 1, "&amp;");
@@ -329,7 +329,7 @@ void SORE_Logging::Logger::Log(int lvl, std::string message)
 	temp.buffer = message;
 	for(it=logs.begin();it<logs.end();it++)
 	{
-		for(int i=0;i<buffers.size();i++)
+		for(size_t i=0;i<buffers.size();i++)
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
@@ -361,7 +361,7 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 	buffers.push_back(temp);
 	for(it=logs.begin();it!=logs.end();it++)
 	{
-		for(int i=0;i<buffers.size();i++)
+		for(size_t i=0;i<buffers.size();i++)
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
@@ -380,7 +380,7 @@ void SORE_Logging::Logger::Flush()
 {
 	for(it=logs.begin();it<logs.end();it++)
 	{
-		for(int i=0;i<buffers.size();i++)
+		for(size_t i=0;i<buffers.size();i++)
 			(*it)->Log(&buffers[i]);
 		(*it)->Flush();
 	}

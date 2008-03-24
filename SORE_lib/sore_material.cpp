@@ -25,7 +25,7 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), file(materialFile), useShader(false)
+	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), useShader(false), file(materialFile)
 	{
 		Load();
 	}
@@ -127,7 +127,7 @@ namespace SORE_Graphics
 			shader->Bind();
 		else
 			GLSLShader::UnbindShaders();
-		for(int i=0;i<textureOrder.size();i++)
+		for(size_t i=0;i<textureOrder.size();i++)
 		{
 			if(( (GLSLShader::ShadersSupported() && shader && useShader) || textureMap[textureOrder[i]].first!=-1) && textureMap[textureOrder[i]].second!=NULL)
 			{

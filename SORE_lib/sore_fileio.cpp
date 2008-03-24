@@ -14,7 +14,7 @@
 
 namespace SORE_FileIO
 {
-	const int CHUNK = 131072;
+	const size_t CHUNK = 131072;
 	const int RATIO = 4;
 	
 	struct linked_list
@@ -72,7 +72,6 @@ namespace SORE_FileIO
 
 	const int MAX_MAJOR = 0;
 	const int MAX_MINOR = 2;
-	
 }
 
 int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
@@ -391,8 +390,6 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 						out = cachedFiles[file].out_size-cachedFiles[file].out_filled;
 					else
 					{
-						unsigned int size = 0;
-						
 						curr->next = new linked_list;
 						curr->next->data = new unsigned char[CHUNK*RATIO];
 						curr->next->size = CHUNK * RATIO;
@@ -404,12 +401,12 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 					cachedFiles[file].strm->avail_out = out;
 					unsigned int currFilled = cachedFiles[file].out_filled % (CHUNK*RATIO);
 					cachedFiles[file].strm->next_out = (curr->data + currFilled);
-					ret = inflate(cachedFiles[file].strm, Z_NO_FLUSH);
-					assert(ret != Z_STREAM_ERROR);
-					switch (ret) 
+					int inflated = inflate(cachedFiles[file].strm, Z_NO_FLUSH);
+					assert(inflated != Z_STREAM_ERROR);
+					switch (inflated) 
 					{
 						case Z_NEED_DICT:
-							ret = Z_DATA_ERROR;     //and fall through
+							inflated = Z_DATA_ERROR;     //and fall through
 						case Z_DATA_ERROR:
 						case Z_MEM_ERROR:
 							inflateEnd(cachedFiles[file].strm);

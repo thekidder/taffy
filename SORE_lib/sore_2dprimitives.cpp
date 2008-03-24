@@ -23,7 +23,7 @@
 
 namespace SORE_Graphics
 {
-	Sprite2D::Sprite2D(SORE_Resource::ResourceManager* rm,std::string materialName, double _x, double _y, double _depth, double _width, double _height, color _c) : x(_x),y(_y),depth(_depth),width(_width),height(_height), c(_c), m(NULL)
+	Sprite2D::Sprite2D(SORE_Resource::ResourceManager* rm,std::string materialName, double _x, double _y, double _depth, double _width, double _height, color _c) : m(NULL),c(_c),x(_x),y(_y),width(_width),height(_height),depth(_depth)
 	{
 		if(rm)
 			m = rm->GetResource<Material>("data/Materials/"+materialName+".mat");

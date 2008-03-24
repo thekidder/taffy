@@ -19,7 +19,7 @@ double SORE_Utility::getRandomMinMax( double dMin, double dMax )
 int SORE_Utility::GetFileExt(const char* filename, char* ext)
 {
 	int len = strlen(filename);
-	int i;
+	size_t i;
 	for(i=len-1;i>=0;i--)
 	{
 		if(filename[i]=='.')
@@ -57,7 +57,6 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 	else
 	{
 		char dataStr[64];
-		unsigned int size = SORE_FileIO::Size(settingsFile);
 		len = SORE_FileIO::Read(dataStr, 63, "\n", settingsFile);
 		
 		std::string currSection;

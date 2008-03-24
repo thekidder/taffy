@@ -13,10 +13,10 @@
 
 #include "sore_input.h"
 
-SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
+/*SORE_Kernel::GlobalInputFunctor* SORE_Kernel::MakeFunctor(bool(*func)(Event*))
 {
 	return new GlobalInputFunctor(func);
-}
+}*/
 
 SORE_Kernel::InputTask::InputTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
@@ -83,7 +83,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 			default: //don't care about this event, so don't handle it!
 				return;
 		}
-		std::multimap<unsigned int, InputFunctor*>::iterator it;
+		std::multimap<unsigned int, boost::function<bool (Event*)> >::iterator it;
 		for(it=allListeners.begin();it!=allListeners.end();it++)
 		{
 			if(it->first & event.type)
@@ -91,17 +91,17 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				//InputFunctor* temp = (it->second);
 				//if((it->second)(&event))
 				//	break;
-				if((*it->second)(&event) && event.type!=RESIZE) //ALWAYS propagate resize events...can be used by more than one function
+				if((it->second)(&event) && event.type!=RESIZE) //ALWAYS propagate resize events...can be used by more than one function
 					break;
 			}
 		}
 	}
 }
 
-SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, InputFunctor* functor)
+SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, boost::function<bool (Event*)> functor)
 {
 	event_listener_ref size = allListeners.size();
-	allListeners.insert(std::pair<unsigned int, InputFunctor*>(eventType, functor));
+	allListeners.insert(std::pair<unsigned int, boost::function<bool (Event*)> >(eventType, functor));
 	return size;
 }
 

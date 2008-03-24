@@ -19,6 +19,10 @@ namespace SORE_Resource
 		SORE_FileIO::Notify(filename, callback );
 	}
 	
+	Resource::~Resource()
+	{
+	}
+	
 	void Resource::AddDependentFile(std::string file)
 	{
 		if(!IsDependent(file))

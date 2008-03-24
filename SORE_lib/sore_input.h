@@ -17,6 +17,7 @@
 #include "sore_kernel.h"
 #include <SDL/SDL_keysym.h>
 #include <SDL/SDL_events.h>
+#include <boost/function.hpp>
 #include <map>
 
 namespace SORE_Kernel
@@ -63,7 +64,7 @@ namespace SORE_Kernel
 	
 	typedef unsigned int event_listener_ref;
 	
-	class InputFunctor
+	/*class InputFunctor
 	{
 		public:
 			virtual bool operator()(Event*){return false;}
@@ -110,7 +111,7 @@ namespace SORE_Kernel
 	ClassInputFunctor<T>* MakeFunctor(T* obj, bool(T::*func)(Event*))
 	{
 		return new ClassInputFunctor<T>(obj, func);
-	}
+	}*/
 	
 	class InputTask : public Task
 	{
@@ -124,11 +125,11 @@ namespace SORE_Kernel
 			
 			const char* GetName() const {return "Input task";}
 			
-			event_listener_ref AddListener(unsigned int eventType, InputFunctor* functor);
+			event_listener_ref AddListener(unsigned int eventType, boost::function<bool (Event*)> functor);
 			void RemoveListener(event_listener_ref listener);
 		protected:
 			Event event;
-			std::multimap<unsigned int, InputFunctor*> allListeners;
+			std::multimap<unsigned int, boost::function<bool (Event*)> > allListeners;
 	};
 }
 

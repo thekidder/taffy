@@ -59,7 +59,7 @@ namespace SORE_Profiler
 	
 	int Sample::GetSampleByName(std::string name)
 	{
-		for(int i=0;i<MAX_SAMPLES;i++)
+		for(size_t i=0;i<MAX_SAMPLES;i++)
 		{
 			if(samples[i].name==name)
 			{

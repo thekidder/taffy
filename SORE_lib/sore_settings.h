@@ -80,6 +80,7 @@ namespace SORE_Utility
 	{
 		public:
 			ISettingsBackend();
+			virtual ~ISettingsBackend()=0;
 			virtual Datum Retrieve(std::string section, std::string name)=0;
 			virtual void       Store   (std::string section, std::string name, Datum datum)=0;
 			void               NotifyOnChange(SettingsManager* _sm);
@@ -91,6 +92,7 @@ namespace SORE_Utility
 	{
 		public:
 			IniSettingsBackend(std::string fileName);
+			virtual ~IniSettingsBackend();
 			Datum Retrieve(std::string section, std::string name);
 			void    Store(std::string section, std::string name, Datum datum);
 			void    OnChange(std::string name);
@@ -133,6 +135,6 @@ namespace SORE_Utility
 			std::string name, section;
 			datum_watch_id watch; 
 	};
-};
+}
 
 #endif /*__SORE_SETTINGS_H__*/

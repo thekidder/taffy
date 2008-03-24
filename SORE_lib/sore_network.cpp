@@ -77,7 +77,7 @@ namespace SORE_Network
 			//data.data = const_cast<void*>(static_cast<const void*>(bdata));
 			//data.dataLength = strlen(bdata) + 1;
 		}
-		int sent = enet_socket_send(broadcaster, &address, &data, 1);
+		enet_socket_send(broadcaster, &address, &data, 1);
 	}
 	
 	void UDPBroadcaster::SetServer(Server* s)
@@ -227,7 +227,7 @@ namespace SORE_Network
 		address.host = ENET_HOST_ANY;
 		address.port = (int)sm.GetVariable("network", "port");
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
-		int result = enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
+		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
 	}
 	
 	Client::~Client()
@@ -273,11 +273,10 @@ namespace SORE_Network
 			strncpy(buffer, (char*)buf.data, remote_len);
 			buffer[remote_len] = '\0';
 			enet_address_get_host_ip(&remote, addr,15);
-			int len = strlen(buffer);
-			int realLen = remote_len;
+			//int len = strlen(buffer);
+			//int realLen = remote_len;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
 			
-			unsigned int size = LAN.size();
 			if(LAN.find(remote.host)==LAN.end())
 			{
 				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % address.port );

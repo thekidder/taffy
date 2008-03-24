@@ -95,7 +95,7 @@ void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 		return;
 	}
 	
-	for(int i=0;i<dataSize;i+=(bpp/8))
+	for(size_t i=0;i<dataSize;i+=(bpp/8))
 	{
 		temp = imgData[i];
 		imgData[i] = imgData[i+2];

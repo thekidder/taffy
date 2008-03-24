@@ -194,7 +194,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	float modelview_matrix[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 	
-	for(int i=0;i<lines.size();i++)
+	for(size_t i=0;i<lines.size();i++)
 	{
 		glPushMatrix();
 		glLoadIdentity();
@@ -315,7 +315,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if(strlen(fontPath)==0) return INVALID_FONT_NAME;
 	
 	unsigned int size = SORE_FileIO::Size(fontObj);
-	int err;
+	size_t err;
 	
 	fontInfo = new FT_Byte[size];
 	
@@ -404,7 +404,7 @@ int SORE_Font::InitFontSystem()
 	strcat(fontPath, "\\Fonts\\");
 	fontPaths.push_back(fontPath);*/
 #else
-	while(dirName = (char*)FcStrListNext(fontDirs))
+	while((dirName = (char*)FcStrListNext(fontDirs)))
 	{
 		strcpy(fontPath, dirName);
 		strcat(fontPath, "/");
@@ -439,7 +439,7 @@ SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
 
 void SORE_Font::Cleanup()
 {
-	for(int i=0;i<fontStack.size();i++)
+	for(size_t i=0;i<fontStack.size();i++)
 	{
 		fontStack[i].Cleanup();
 	}

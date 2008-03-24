@@ -31,7 +31,7 @@ namespace SORE_Utility
 	using boost::lexical_cast;
 	using boost::bad_lexical_cast;
 
-	Datum::Datum(std::string _datum) : datum(_datum), changed(false)
+	Datum::Datum(std::string _datum) : changed(false), datum(_datum)
 	{
 	}
 	
@@ -135,6 +135,10 @@ namespace SORE_Utility
 		sm = NULL;
 	}
 	
+	IniSettingsBackend::~IniSettingsBackend()
+	{
+	}
+	
 	void ISettingsBackend::NotifyOnChange(SettingsManager* _sm)
 	{
 		sm = _sm;
@@ -145,6 +149,10 @@ namespace SORE_Utility
 		file = fileName;
 		ParseFile();
 		SORE_FileIO::Notify(file, std::bind1st(std::mem_fun(&IniSettingsBackend::OnChange), this));
+	}
+	
+	ISettingsBackend::~ISettingsBackend()
+	{
 	}
 	
 	void IniSettingsBackend::ParseFile()
@@ -247,7 +255,6 @@ namespace SORE_Utility
 	void SettingsManager::Changed(std::string section, std::string name) //notify all registered callbacks of name of a change
 	{
 		std::multimap<setting_identifier, DatumCallback>::iterator it;
-		int size = callbacks.size();
 		it = callbacks.find(setting_identifier(section,name));
 		if(it == callbacks.end()) return;
 		Datum var = GetVariable(section, name);
@@ -259,12 +266,12 @@ namespace SORE_Utility
 		}
 	}
 	
-	WatchedDatum::WatchedDatum(std::string _section, std::string _name, Datum& _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name), section(_section)
+	WatchedDatum::WatchedDatum(std::string _section, std::string _name, Datum& _datum, SettingsManager* _sm) : Datum(_datum), sm(_sm), name(_name), section(_section)
 	{
 		InitWatch();
 	}
 	
-	WatchedDatum::WatchedDatum(std::string _section, std::string _name, std::string _datum, SettingsManager* _sm) : sm(_sm), Datum(_datum), name(_name), section(_section)
+	WatchedDatum::WatchedDatum(std::string _section, std::string _name, std::string _datum, SettingsManager* _sm) : Datum(_datum), sm(_sm),name(_name),  section(_section)
 	{
 		InitWatch();
 	}

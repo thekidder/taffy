@@ -19,6 +19,7 @@ namespace SORE_Resource
 		public:
 			Resource(std::string file);
 			Resource() {filename="Not loaded from file";}
+			virtual ~Resource();
 			virtual const char* Type() const {return "generic resource";}
 			
 			std::string GetFile() const {return filename;}

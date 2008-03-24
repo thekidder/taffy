@@ -20,7 +20,7 @@
 #include <functional>
 #include "sore_allgl.h"
 
-SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), sm(_sm), resizeCallback(rc)
+SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), resizeCallback(rc), sm(_sm)
 {
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
 	renderer = NULL;
@@ -264,7 +264,7 @@ int SORE_Kernel::Screen::InitializeGL()
 	std::string extensions;
 	if(glExtensions==NULL) extensions = "";
 	else extensions = glExtensions;
-	int pos;
+	size_t pos;
 	while((pos=extensions.find(" "))!=std::string::npos)
 	{
 		extensions.replace(pos, 1, "\n");
