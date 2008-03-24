@@ -15,7 +15,8 @@
 #define  __SORE_INPUT_H__
 
 #include "sore_kernel.h"
-#include "sore_allgl.h"
+#include <SDL/SDL_keysym.h>
+#include <SDL/SDL_events.h>
 #include <map>
 
 namespace SORE_Kernel

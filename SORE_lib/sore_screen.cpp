@@ -18,6 +18,7 @@
 #include <cassert>
 #include <boost/format.hpp>
 #include <functional>
+#include "sore_allgl.h"
 
 SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), sm(_sm), resizeCallback(rc)
 {

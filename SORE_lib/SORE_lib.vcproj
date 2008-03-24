@@ -275,6 +275,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_gfxprimitives.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_graphics.h"
 				>
 			</File>

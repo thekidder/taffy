@@ -19,26 +19,27 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_2DPRIMITIVES__
-#define  __SORE_2DPRIMITIVES__
-
-#include "sore_gfxprimitives.h"
-
-#include "sore_resource.h"
-#include "sore_material.h"
+#ifndef  __SORE_GFXPRIMITIVES__
+#define  __SORE_GFXPRIMITIVES__
 
 namespace SORE_Graphics
 {
-	class Sprite2D
+	struct color
 	{
-		public:
-			Sprite2D() {}
-			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _depth, double _width, double _height, color _c);
-			void SetAlpha(double a) {c.a = a; }
-			Material* m;
-			color c;
-			double x,y,width,height,depth;
+		double r,g,b,a;
+		color operator+=(color& c)
+		{
+			r+=c.r;
+			g+=c.g;
+			b+=c.b;
+			return *this;
+		}
+	};
+	
+	struct viewport
+	{
+		double x,y,width,height;
 	};
 }
 
-#endif /*__SORE_2DPRIMITIVES__*/
+#endif /*__SORE_GFXPRIMITIVES__*/

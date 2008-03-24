@@ -10,12 +10,12 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <SDL/SDL.h>
 
-#ifdef WIN32
-	#include <SDL.h>
+#ifdef _WIN32
 	#include <GL/wglew.h>
 #else /* GLX */
-	#include <SDL/SDL.h>
+	
 #include <GL/glxew.h>
 	//Linux-specific to find system fonts
 	#include <fontconfig/fontconfig.h>

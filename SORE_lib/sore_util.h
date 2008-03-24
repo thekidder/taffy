@@ -3,8 +3,6 @@
 #ifndef  __SORE_UTIL_H__
 #define  __SORE_UTIL_H__
 
-#include "sore_allgl.h"
-#include "sore_defines.h"
 #include <cmath>
 #include <map>
 #include <string>
