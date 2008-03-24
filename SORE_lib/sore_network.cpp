@@ -280,7 +280,7 @@ namespace SORE_Network
 			
 			if(LAN.find(remote)==LAN.end())
 			{
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % ntohs(address.port) );
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % address.port );
 			}
 			LAN[remote].first = 0;
 			LAN[remote].second.data = static_cast<char*>(buf.data);
@@ -300,7 +300,7 @@ namespace SORE_Network
 			if(temp->second.first>3000) //three second timeout before server disappears
 			{
 				enet_address_get_host_ip(&temp->first, addr,15);
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Lost server at %s:%d") % addr % ntohs(address.port));
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Lost server at %s:%d") % addr % address.port );
 				LAN.erase(temp);
 			}
 		}
