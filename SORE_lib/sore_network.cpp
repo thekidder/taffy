@@ -226,10 +226,11 @@ namespace SORE_Network
 		
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
-		//enet_address_set_host (&address, "localhost");
+		//enet_address_set_host (&address, "127.0.0.1");
 		address.port = (int)sm.GetVariable("network", "port");
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
-		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
+		int result = enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
+		int err = WSAGetLastError();
 	}
 	
 	Client::~Client()
@@ -267,6 +268,7 @@ namespace SORE_Network
 		ENetAddress remote;
 		ENetBuffer buf;
 		buf.data = data;
+		buf.dataLength = 255;
 		int remote_len = enet_socket_receive(listener, &remote, &buf, 1);
 		if(remote_len>0)
 		{
