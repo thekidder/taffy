@@ -33,11 +33,11 @@ namespace SORE_Graphics
 	{
 		public:
 			Sprite2D() {}
-			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, double _x, double _y, double _depth, double _width, double _height, color _c);
-			void SetAlpha(double a) {c.a = a; }
+			Sprite2D(SORE_Resource::ResourceManager* rm, std::string materialName, GLfloat _x, GLfloat _y, GLfloat _depth, GLfloat _width, GLfloat _height, color _c);
+			void SetAlpha(float a) {c.a = a; }
 			Material* m;
 			color c;
-			double x,y,width,height,depth;
+			GLfloat x,y,width,height,depth;
 	};
 }
 

@@ -25,11 +25,11 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
 	renderer = NULL;
 	proj.type = SORE_Graphics::PERSPECTIVE;
-	proj.fov = 45.0;
-	proj.znear = 0.1;
-	proj.zfar  = 200.0;
+	proj.fov = 45.0f;
+	proj.znear = 0.1f;
+	proj.zfar  = 200.0f;
 	proj.useScreenRatio = true;
-	screen.ratio = (double)_screen.width / (double)_screen.height;
+	screen.ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
 	if(InitializeSDL(windowTitle)!=0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
@@ -63,7 +63,7 @@ void SORE_Kernel::Screen::SetResizeCallback(resize_callback callback)
 
 void SORE_Kernel::Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
-	double ratio = double(_screen.width)/double(_screen.height);
+	GLfloat ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
 	screen.ratio      = ratio;
 	screen.fullscreen = _screen.fullscreen;
 	screen.showCursor = _screen.showCursor;
@@ -155,7 +155,7 @@ void SORE_Kernel::Screen::Resize(int width, int height)
 		screen.width = width;
 		screen.height = height;
 	}
-	screen.ratio = (double)screen.width/(double)screen.height;
+	screen.ratio = static_cast<GLfloat>(screen.width) / static_cast<GLfloat>(screen.height);
 	if(renderer)
 	{
 		renderer->SetScreenInfo(&screen);
@@ -352,8 +352,8 @@ void SORE_Kernel::Screen::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
 			{
 				pi.top = 0;
 				pi.left = 0;
-				pi.bottom = screen.height;
-				pi.right = screen.width;
+				pi.bottom = static_cast<GLfloat>(screen.height);
+				pi.right = static_cast<GLfloat>(screen.width);
 				pi.ratio = screen.ratio;
 			}
 			else if(pi.useScreenRatio)

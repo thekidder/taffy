@@ -30,9 +30,9 @@ namespace SORE_Graphics
 	{
 		ProjectionInfo() {type = NONE; fov = ratio = znear = zfar = top = bottom = left = right = 0.0; useScreenCoords = useScreenRatio = false; }
 		ProjectionType type;
-		double fov,ratio;
-		double znear, zfar;
-		double top, bottom, left, right;
+		GLfloat fov,ratio;
+		GLfloat znear, zfar;
+		GLfloat top, bottom, left, right;
 		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
 		bool useScreenRatio; //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
 	};
@@ -40,7 +40,7 @@ namespace SORE_Graphics
 	struct ScreenInfo
 	{
 		int width, height;
-		double ratio; //set by SORE_Screen after screen is created
+		GLfloat ratio; //set by SORE_Screen after screen is created
 		bool showCursor;
 		bool fullscreen;
 		bool resizable;

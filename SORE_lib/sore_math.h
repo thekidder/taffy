@@ -250,7 +250,7 @@ namespace SORE_Math
 			Vector3D Normalize()
 			{
 				double mag = Magnitude();
-				Vector3D<T> temp(value[0]/mag,value[1]/mag,value[2]/mag);
+				Vector3D<T> temp(static_cast<T>(value[0]/mag),static_cast<T>(value[1]/mag),static_cast<T>(value[2]/mag));
 				return temp;
 			}
 				
@@ -509,6 +509,7 @@ namespace SORE_Math
 	float Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
 	float Distance2D(float x1, float y1, float x2, float y2);
 	float Distance2DS(float x1, float y1, float x2, float y2); //distance squared
+	double Distance2DS(double x1, double y1, double x2, double y2);
 	
 	template<class T>
 			double Distance2D(Point2D<T> one, Point2D<T> two)

@@ -70,18 +70,18 @@ int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint*
 	
 	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Face character: %c, top: %d, rows: %d", ch, face->glyph->bitmap_top, bitmap.rows);
 	
-	glTranslatef(face->glyph->bitmap_left,0.0f,0.0f);
-	glTranslatef(0.0f,face->glyph->bitmap_top-bitmap.rows, 0.0f);
-	float x=(float)bitmap.width / (float)width, y=(float)bitmap.rows / (float)height;
+	glTranslatef(static_cast<GLfloat>(face->glyph->bitmap_left),0.0f,0.0f);
+	glTranslatef(0.0f,static_cast<GLfloat>(face->glyph->bitmap_top-bitmap.rows), 0.0f);
+	GLfloat x=static_cast<GLfloat>(bitmap.width) / static_cast<GLfloat>(width), y=static_cast<GLfloat>(bitmap.rows) / static_cast<GLfloat>(height);
 	
 	glBegin(GL_QUADS);
-	glTexCoord2d(0,0); glVertex2f(0.0f,bitmap.rows);
+	glTexCoord2d(0,0); glVertex2f(0.0f,static_cast<GLfloat>(bitmap.rows));
 	glTexCoord2d(0,y); glVertex2f(0.0f,0.0f);
-	glTexCoord2d(x,y); glVertex2f(bitmap.width,0.0f);
-	glTexCoord2d(x,0); glVertex2f(bitmap.width,bitmap.rows);
+	glTexCoord2d(x,y); glVertex2f(static_cast<GLfloat>(bitmap.width),0.0f);
+	glTexCoord2d(x,0); glVertex2f(static_cast<GLfloat>(bitmap.width),static_cast<GLfloat>(bitmap.rows));
 	glEnd();
 	glPopMatrix();
-	glTranslatef(face->glyph->advance.x >> 6 ,0.0f,0.0f);
+	glTranslatef(static_cast<GLfloat>(face->glyph->advance.x >> 6) ,0.0f,0.0f);
 	glEndList();
 	return 0;
 }
@@ -198,9 +198,9 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	{
 		glPushMatrix();
 		glLoadIdentity();
-		glTranslatef(x,y-h*i,0);
+		glTranslatef(static_cast<GLfloat>(x),static_cast<GLfloat>(y-h*i),0);
 		glMultMatrixf(modelview_matrix);
-		glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
+		glCallLists(static_cast<GLsizei>(lines[i].length()), GL_UNSIGNED_BYTE, lines[i].c_str());
 		// float rpos[4];
 		// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
 		// float len=x-rpos[0]; //(Assuming No Rotations Have Happend)
@@ -233,7 +233,7 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glListBase(fontList);
-	int* listBase;
+	int* listBase = NULL;
 	glGetIntegerv(GL_LIST_BASE, listBase);
 	
 	float modelview_matrix[16];
@@ -242,7 +242,7 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 
 	glPushMatrix();
 	glLoadIdentity();
-	glTranslatef(x,y,0);
+	glTranslatef(static_cast<GLfloat>(x),static_cast<GLfloat>(y),0);
 	glMultMatrixf(modelview_matrix);
 	
 	glCallLists(1, GL_UNSIGNED_BYTE, &c);
@@ -271,7 +271,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 
 	FT_Face face;
 	
-	int length = strlen(fontName);
+	size_t length = strlen(fontName);
 	if(length>59) return INVALID_FONT_NAME;
 	if(fontPaths.size()==0) InitFontSystem();
 	
@@ -314,7 +314,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	}
 	if(strlen(fontPath)==0) return INVALID_FONT_NAME;
 	
-	unsigned int size = SORE_FileIO::Size(fontObj);
+	size_t size = SORE_FileIO::Size(fontObj);
 	size_t err;
 	
 	fontInfo = new FT_Byte[size];
@@ -327,7 +327,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		return FONT_LOAD_FAILED;
 	}
 	SORE_FileIO::Close(fontObj);
-	if ((err=FT_New_Memory_Face( library, fontInfo, size, 0, &face ))!=0) 
+	if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size), 0, &face ))!=0) 
 	{
 		delete[] fontPath;
 		FT_Done_FreeType(library);
@@ -394,16 +394,18 @@ int SORE_Font::InitFontSystem()
 	FcStrList* fontDirs = FcConfigGetFontDirs(config);
 #endif
 	
-	char fontPath[2048];
 	char* dirName = new char[2048];
 	
 #ifdef WIN32
-	/*char windows_path[MAX_PATH];
+	/*
+	char fontPath[2048];
+	char windows_path[MAX_PATH];
 	GetWindowsDirectory(windows_path, MAX_PATH);
 	strcpy(fontPath, windows_path);
 	strcat(fontPath, "\\Fonts\\");
 	fontPaths.push_back(fontPath);*/
 #else
+	char fontPath[2048];
 	while((dirName = (char*)FcStrListNext(fontDirs)))
 	{
 		strcpy(fontPath, dirName);
@@ -432,7 +434,7 @@ SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to load font: error code %d") % err);
 		return 0;
 	}
-	font_ref index = fontStack.size();
+	font_ref index = static_cast<font_ref>(fontStack.size());
 	fontStack.push_back(newFont);
 	return index;
 }

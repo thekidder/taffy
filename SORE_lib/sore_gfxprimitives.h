@@ -26,7 +26,7 @@ namespace SORE_Graphics
 {
 	struct color
 	{
-		double r,g,b,a;
+		float r,g,b,a;
 		color operator+=(color& c)
 		{
 			r+=c.r;
@@ -38,7 +38,7 @@ namespace SORE_Graphics
 	
 	struct viewport
 	{
-		double x,y,width,height;
+		float x,y,width,height;
 	};
 }
 

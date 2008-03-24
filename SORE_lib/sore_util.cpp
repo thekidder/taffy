@@ -18,7 +18,7 @@ double SORE_Utility::getRandomMinMax( double dMin, double dMax )
 
 int SORE_Utility::GetFileExt(const char* filename, char* ext)
 {
-	int len = strlen(filename);
+	size_t len = strlen(filename);
 	size_t i;
 	for(i=len-1;i>=0;i--)
 	{
@@ -48,7 +48,7 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 {
 	SORE_FileIO::file_ref settingsFile = SORE_FileIO::Open(file);
 	std::map<std::string, std::map<std::string, std::string> > list;
-	int len;
+	size_t len;
 	if(settingsFile == 0)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load INI file %s") % file);
@@ -67,7 +67,7 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 			std::string setting = dataStr;
 			if(setting.find("//")!=std::string::npos)
 				setting = setting.substr(0, setting.find("//")-1);
-			int eqPos=setting.find('=');
+			size_t eqPos=setting.find('=');
 			if(eqPos!=-1) //(name, value) pair
 			{
 				name=setting.substr(0,eqPos);

@@ -100,7 +100,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 
 SORE_Kernel::event_listener_ref SORE_Kernel::InputTask::AddListener(unsigned int eventType, boost::function<bool (Event*)> functor)
 {
-	event_listener_ref size = allListeners.size();
+	event_listener_ref size = static_cast<event_listener_ref>(allListeners.size());
 	allListeners.insert(std::pair<unsigned int, boost::function<bool (Event*)> >(eventType, functor));
 	return size;
 }

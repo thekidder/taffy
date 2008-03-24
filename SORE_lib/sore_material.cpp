@@ -132,13 +132,13 @@ namespace SORE_Graphics
 			if(( (GLSLShader::ShadersSupported() && shader && useShader) || textureMap[textureOrder[i]].first!=-1) && textureMap[textureOrder[i]].second!=NULL)
 			{
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture unit %d") % i);
-				glActiveTexture(GL_TEXTURE0 + i);
+				glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(i));
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("binding texture name %s, using file %s") % textureOrder[i] % textureMap[textureOrder[i]].second->GetFile());
 				textureMap[textureOrder[i]].second->Bind();
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture env %d") % textureMap[textureOrder[i]].first);
 				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, textureMap[textureOrder[i]].first);
 				if(GLSLShader::ShadersSupported() && shader  && useShader)
-					shader->SetUniform1i(textureOrder[i], i);
+					shader->SetUniform1i(textureOrder[i], static_cast<GLuint>(i));
 			}
 		}
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "-----end material-----");

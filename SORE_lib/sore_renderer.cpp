@@ -128,9 +128,9 @@ namespace SORE_Graphics
 		
 		currMaterial = NULL;
 		
-		SORE_Graphics::color c = {0.0,0.0,0.0,1.0};
+		SORE_Graphics::color c = {0.0f,0.0f,0.0f,1.0f};
 		
-		static Sprite2D glow(rm, "glow", 0.0, 0.0, -0.95, 0.0, 0.0, c);
+		static Sprite2D glow(rm, "glow", 0.0f, 0.0f, -0.95f, 0.0f, 0.0f, c);
 		
 		int width = screen->width;
 		int height = screen->height;
@@ -150,10 +150,10 @@ namespace SORE_Graphics
 		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
-			const static double relSize = 2.6;
-			const static double relAlpha = 0.8;
-			double offsetX = ( (*it)->width *relSize)/2.0 - (*it)->width /2.0;
-			double offsetY = ( (*it)->height*relSize)/2.0 - (*it)->height/2.0;
+			const static GLfloat relSize = 2.6f;
+			const static GLfloat relAlpha = 0.8f;
+			GLfloat offsetX = ( (*it)->width *relSize)/2.0f - (*it)->width /2.0f;
+			GLfloat offsetY = ( (*it)->height*relSize)/2.0f - (*it)->height/2.0f;
 			glow.x = (*it)->x-offsetX;
 			glow.y = (*it)->y-offsetY;
 			glow.c = (*it)->c;
@@ -192,17 +192,17 @@ namespace SORE_Graphics
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, img);
 		
-		glColor4f(1.0,1.0,1.0,1.0);
+		glColor4f(1.0f,1.0f,1.0f,1.0f);
 		glBegin(GL_QUADS);
 		{
-			glTexCoord2f(0.0, 0.0);
-			glVertex3f(proj->left, proj->top, -0.90);
-			glTexCoord2f(0.0, 1.0);
-			glVertex3f(proj->left, proj->bottom, -0.90);
-			glTexCoord2f(1.0, 1.0);
-			glVertex3f(proj->right, proj->bottom, -0.90);
-			glTexCoord2f(1.0, 0.0);
-			glVertex3f(proj->right, proj->top, -0.90);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex3f(proj->left, proj->top, -0.90f);
+			glTexCoord2f(0.0f, 1.0f);
+			glVertex3f(proj->left, proj->bottom, -0.90f);
+			glTexCoord2f(1.0f, 1.0f);
+			glVertex3f(proj->right, proj->bottom, -0.90f);
+			glTexCoord2f(1.0f, 0.0f);
+			glVertex3f(proj->right, proj->top, -0.90f);
 		}
 		glEnd();
 		

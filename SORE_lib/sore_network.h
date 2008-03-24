@@ -44,7 +44,7 @@ namespace SORE_Network
 	struct net_msg
 	{
 		char* data;
-		unsigned int len;
+		size_t len;
 	};
 	
 	/*class NetworkConnection : public SORE_Kernel::Task

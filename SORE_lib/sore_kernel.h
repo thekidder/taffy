@@ -56,7 +56,7 @@ namespace SORE_Kernel
 			//std::multimap<unsigned int, const_task> constTasks;
 			int lastTicks;
 			bool paused;
-			SORE_Utility::InterpolaterTask itask;
+			SORE_Utility::InterpolaterTask* itask;
 	};
 }
 

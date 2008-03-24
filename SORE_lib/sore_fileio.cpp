@@ -331,8 +331,7 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 		}
 		if(cachedFiles[file].compressed)
 		{
-			size_t size, ret;
-			int have;
+			size_t size, ret,have;
 			unsigned char in_buf[CHUNK];
 			read = 0;
 			if(cachedFiles[file].out_filled > bytesToRead)
@@ -368,8 +367,8 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("\tCurrent package position is %u. Current file position is %u bytes.") % ftell(openPackages[cachedFiles[file].package]) % cachedFiles[file].currPos);
 					return read;
 				}
-				cachedFiles[file].currPosRaw += ret;
-				cachedFiles[file].strm->avail_in = ret;
+				cachedFiles[file].currPosRaw += static_cast<uInt>(ret);
+				cachedFiles[file].strm->avail_in = static_cast<uInt>(ret);
 				cachedFiles[file].strm->next_in = in_buf;
 				do
 				{
@@ -383,7 +382,7 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 						assert(curr->next != NULL);
 						curr = curr->next;
 					}
-					int out;
+					size_t out;
 					if(cachedFiles[file].out_size - cachedFiles[file].out_filled >= CHUNK)
 						out = CHUNK;
 					else if(cachedFiles[file].out_size - cachedFiles[file].out_filled < CHUNK && cachedFiles[file].out_size - cachedFiles[file].out_filled > 0)
@@ -398,8 +397,8 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 						out = CHUNK;
 						curr = curr->next;
 					}
-					cachedFiles[file].strm->avail_out = out;
-					unsigned int currFilled = cachedFiles[file].out_filled % (CHUNK*RATIO);
+					cachedFiles[file].strm->avail_out = static_cast<uInt>(out);
+					size_t currFilled = cachedFiles[file].out_filled % (CHUNK*RATIO);
 					cachedFiles[file].strm->next_out = (curr->data + currFilled);
 					int inflated = inflate(cachedFiles[file].strm, Z_NO_FLUSH);
 					assert(inflated != Z_STREAM_ERROR);
@@ -412,7 +411,7 @@ size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bo
 							inflateEnd(cachedFiles[file].strm);
 							return read;
 					}
-					have = out - cachedFiles[file].strm->avail_out;
+					have = out - static_cast<size_t>(cachedFiles[file].strm->avail_out);
 					cachedFiles[file].out_filled += have;
 					
 				}while(cachedFiles[file].strm->avail_out == 0);

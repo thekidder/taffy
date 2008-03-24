@@ -279,7 +279,7 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load vertex shader program: %s") % vertex);
 			return -1;
 		}
-		unsigned int size = SORE_FileIO::Size(file);
+		size_t size = SORE_FileIO::Size(file);
 		src = new char[size+1];
 		SORE_FileIO::Read(src, sizeof(char), size, file);
 		src[size] = '\0';
@@ -307,7 +307,7 @@ namespace SORE_Graphics
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load fragment shader program: %s") % fragment);
 			return -1;
 		}
-		unsigned int size = SORE_FileIO::Size(file);
+		size_t size = SORE_FileIO::Size(file);
 		src = new char[size+1];
 		SORE_FileIO::Read(src, sizeof(char), size, file);
 		src[size] = '\0';

@@ -63,7 +63,7 @@ namespace SORE_Profiler
 		{
 			if(samples[i].name==name)
 			{
-				return i;
+				return static_cast<int>(i);
 			}
 		}
 		return -1;
