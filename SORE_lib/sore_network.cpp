@@ -268,18 +268,6 @@ namespace SORE_Network
 		ENetBuffer buf;
 		buf.data = data;
 		int remote_len = enet_socket_receive(listener, &remote, &buf, 1);
-		server_list::iterator temp;
-		for(server_list::iterator it=LAN.begin();it!=LAN.end();)
-		{
-			temp = it;
-			it++;
-			temp->second.first++;
-			if(temp->second.first>10)
-			{
-				LAN.erase(temp);
-			}
-				
-		}
 		if(remote_len>0)
 		{
 			char* buffer = new char[remote_len+1];
@@ -289,7 +277,6 @@ namespace SORE_Network
 			int len = strlen(buffer);
 			int realLen = remote_len;
 			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
-			//ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("receiving from %s: \"%s\"") % addr % ((char*)buf.data));
 			delete[] buffer;
 			
 			LAN[remote].first = 0;
@@ -299,6 +286,17 @@ namespace SORE_Network
 		else if(remote_len==-1)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Socket receive failure");
+		}
+		server_list::iterator temp;
+		for(server_list::iterator it=LAN.begin();it!=LAN.end();)
+		{
+			temp = it;
+			it++;
+			temp->second.first+= elapsed/10;
+			if(temp->second.first>3000) //three second timeout before server disappears
+			{
+				LAN.erase(temp);
+			}
 		}
 		/*ENetEvent event;
 		
