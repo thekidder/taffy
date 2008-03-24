@@ -34,7 +34,6 @@
 #endif
 
 #define SORE_FILE_LOG
-#undef  SORE_FILE_LOG
 
 #ifdef DEBUG
 #define FILE_LOG_LVL SHOW_ALL
