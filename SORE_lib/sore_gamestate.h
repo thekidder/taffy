@@ -25,6 +25,9 @@
 #include <vector>
 #include <string>
 #include <list>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <enet/enet.h>
 
 typedef unsigned char ubyte;
@@ -63,7 +66,7 @@ namespace SORE_Network
 	
 	struct player
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), id(0), player_ip(0) {player_ip_str[0]='\0';}
+		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0) {player_ip_str[0]='\0';}
 		std::string name;
 		ubyte playerState;
 		ubyte team; //implementation defined

@@ -169,6 +169,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_gamestate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_graphics.cpp"
 				>
 			</File>
@@ -272,6 +276,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_font.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_gamestate.h"
 				>
 			</File>
 			<File
