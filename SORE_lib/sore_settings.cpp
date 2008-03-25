@@ -50,6 +50,30 @@ namespace SORE_Utility
 		return datum==other.datum;
 	}
 	
+	Datum::operator short()
+	{
+		try
+		{
+			return lexical_cast<short>(datum);
+		}
+		catch(bad_lexical_cast e)
+		{
+			return 0;
+		}
+	}
+	
+	Datum::operator unsigned short()
+	{
+		try
+		{
+			return lexical_cast<unsigned short>(datum);
+		}
+		catch(bad_lexical_cast e)
+		{
+			return 0;
+		}
+	}
+	
 	Datum::operator int()
 	{
 		try
@@ -115,6 +139,18 @@ namespace SORE_Utility
 		catch(boost::bad_lexical_cast e)
 		{
 			return 0.0f;
+		}
+	}
+	
+	Datum::operator unsigned char()
+	{
+		try
+		{
+			return boost::lexical_cast<unsigned char>(datum);
+		}
+		catch(boost::bad_lexical_cast e)
+		{
+			return '0';
 		}
 	}
 	

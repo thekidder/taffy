@@ -25,6 +25,7 @@
 #include "sore_task.h"
 #include "sore_settings.h"
 #include "sore_defines.h"
+#include "sore_gamestate.h"
 #include <enet/enet.h>
 
 /*
@@ -41,11 +42,7 @@ namespace SORE_Network
 {
 	void InitNetwork();
 	
-	struct net_msg
-	{
-		char* data;
-		size_t len;
-	};
+	ENetBuffer GetEnetBuffer(net_buffer buf);
 	
 	/*class NetworkConnection : public SORE_Kernel::Task
 	{
@@ -90,18 +87,19 @@ namespace SORE_Network
 			
 			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
 			
-			unsigned int NumPlayers() const;
+			size_t NumPlayers() const;
 			
 			void Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
 		protected:
+			player_ref GetPlayerRef(ENetPeer* peer);
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
 			UDPBroadcaster broadcaster;
-			unsigned int numPlayers;
+			player_list playerList;
 	};
 	
-	typedef std::map<unsigned int, std::pair<unsigned int, net_msg> > server_list;
+	typedef std::map<unsigned int, std::pair<unsigned int, net_buffer> > server_list;
 	
 	class Client : public SORE_Kernel::Task
 	{
@@ -114,6 +112,7 @@ namespace SORE_Network
 			
 			const char* GetName() const {return "SORE Networking client task";}
 		protected:
+			void UpdateServers(int elapsed); //find broadcasting servers on LAN
 			ENetHost* client;
 			ENetPeer* server;
 			SORE_Utility::SettingsManager sm;

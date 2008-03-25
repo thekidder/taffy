@@ -39,11 +39,14 @@ namespace SORE_Utility
 			Datum(std::string _datum = "");
 			//Datum(Datum& _datum);
 			operator int();
+			operator short();
 			operator unsigned int();
+			operator unsigned short();
 			operator std::string();
 			operator double();
 			operator float();
 			operator char();
+			operator unsigned char();
 			operator bool();
 			bool operator==(Datum& other);
 			Datum operator=(Datum& _datum);

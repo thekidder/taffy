@@ -47,6 +47,15 @@ namespace SORE_Network
 		}
 	}
 	
+	ENetBuffer GetEnetBuffer(net_buffer buf)
+	{
+		ENetBuffer temp;
+		ubyte* begin = &buf[0];
+		temp.data = static_cast<void*>(begin);
+		temp.dataLength = buf.size();
+		return temp;
+	}
+	
 	UDPBroadcaster::UDPBroadcaster(SORE_Kernel::GameKernel* gk, ENetAddress broadcastAddress, boost::function<ENetBuffer (Server*)> c) : Task(gk), serv(NULL)
 	{
 		SetBroadcastAddress(broadcastAddress);
@@ -95,11 +104,11 @@ namespace SORE_Network
 		callback = c;
 	}
 	
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), numPlayers(0)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL)
 	{
-		/*ENetAddress address;
+		ENetAddress address;
 		address.host = ENET_HOST_ANY;
-		address.port = (unsigned int)sm.GetVariable("network", "port");
+		address.port = (unsigned int)sm.GetVariable("network", "server_port");
 		server = enet_host_create(&address, 32, 0, 0);
 		if(server == NULL)
 		{
@@ -108,9 +117,10 @@ namespace SORE_Network
 		else
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, "Created server");
-		}*/
+		}
+		
 		ENetAddress a;
-		a.port = (int)sm.GetVariable("network", "port");
+		a.port = (int)sm.GetVariable("network", "broadcast_port");
 		std::string broadcastAddress = sm.GetVariable("network", "broadcast");
 		enet_address_set_host(&a, broadcastAddress.c_str());
 		broadcaster.SetBroadcastAddress(a);
@@ -119,14 +129,18 @@ namespace SORE_Network
 	
 	Server::~Server()
 	{
-		//enet_host_destroy(server);
-		
+		enet_host_destroy(server);
+	}
+	
+	player_ref Server::GetPlayerRef(ENetPeer* peer)
+	{
+		player_ref* posptr = static_cast<player_ref*>(peer->data);
+		player_ref pos = *posptr;
+		return pos;
 	}
 	
 	void Server::Frame(int elapsed)
 	{
-		/*static char peerName[256];
-		
 		ENetEvent event;
 		
 		while (enet_host_service (server, &event, 0) > 0)
@@ -135,20 +149,22 @@ namespace SORE_Network
 			{
 				case ENET_EVENT_TYPE_CONNECT:
 				{
-					
-					enet_address_get_host_ip(&event.peer->address, peerName, 255);
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % peerName);
+					player newPlayer;
+					newPlayer.player_ip = event.peer->address.host;
+					enet_address_get_host_ip(&event.peer->address, newPlayer.player_ip_str, 15);
+					newPlayer.player_ip_str[16] = '\0';
+					player_ref pos = playerList.insert(playerList.end(), newPlayer);
+					pos->id = pos;
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
 					// Store any relevant client information here.
-					event.peer->data = peerName;
+					event.peer->data = static_cast<void*>(&pos->id);
 					break;
 				}
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
 					std::string peer, channel;
-					if(event.peer->data!=NULL)
-						peer = (char*)event.peer->data;
-					else
-						peer = "unknown client";
+					player_ref pos = GetPlayerRef(event.peer);
+					peer = pos->name;
 					if(event.channelID)
 						channel = event.channelID;
 					else
@@ -159,21 +175,23 @@ namespace SORE_Network
 					break;
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:
-					std::string peer;
-					if(event.peer->data!=NULL)
-						peer = (char*)event.peer->data;
-					else
-						peer = "unknown client";
+				{
+					player_ref pos = GetPlayerRef(event.peer);
+					std::string peer = pos->name;
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;
+					break;
+				}
+				case ENET_EVENT_TYPE_NONE:
+					break;
 			}
-		}*/
+		}
 	}
 	
-	unsigned int Server::NumPlayers() const
+	size_t Server::NumPlayers() const
 	{
-		return numPlayers;
+		return playerList.size();
 	}
 	
 	void Server::SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c)
@@ -183,7 +201,7 @@ namespace SORE_Network
 	
 	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
 	{
-		/*client = enet_host_create(NULL, 2, 0, 0);
+		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occuring while creating client");
@@ -191,7 +209,7 @@ namespace SORE_Network
 		ENetAddress address;
 		ENetEvent event;
 		std::string serverName = sm.GetVariable("network", "server");
-		unsigned int port = (unsigned int)sm.GetVariable("network", "port");
+		unsigned int port = static_cast<enet_uint16>(sm.GetVariable("network", "port"));
 		enet_address_set_host (&address, serverName.c_str());
 		address.port = port;
 		
@@ -222,10 +240,10 @@ namespace SORE_Network
 			enet_peer_reset (server);
 
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % port);
-		}*/
+		}
 		
 		address.host = ENET_HOST_ANY;
-		address.port = (int)sm.GetVariable("network", "port");
+		address.port = static_cast<enet_uint16>(sm.GetVariable("network", "discover_port"));
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
 		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
 	}
@@ -233,7 +251,7 @@ namespace SORE_Network
 	Client::~Client()
 	{
 		enet_socket_destroy(listener);
-		/*ENetEvent event;
+		ENetEvent event;
 		enet_peer_disconnect(server, 0);
 		
 		// Allow up to 3 seconds for the disconnect to succeed
@@ -243,6 +261,8 @@ namespace SORE_Network
 		{
 			switch (event.type)
 			{
+				case ENET_EVENT_TYPE_CONNECT:
+					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 					enet_packet_destroy (event.packet);
 					break;
@@ -250,15 +270,17 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_DISCONNECT:
 					ENGINE_LOG(SORE_Logging::LVL_INFO, "Disconnection succeeded.");
 					return;
+				case ENET_EVENT_TYPE_NONE:
+					break;
 			}
 		}
 		// We've arrived here, so the disconnect attempt didn't
 		// succeed yet.  Force the connection down
 		enet_peer_reset (server);
-		enet_host_destroy(client);*/
+		enet_host_destroy(client);
 	}
 	
-	void Client::Frame(int elapsed)
+	void Client::UpdateServers(int elapsed)
 	{
 		char addr[16];
 		char data[256];
@@ -269,9 +291,12 @@ namespace SORE_Network
 		int remote_len = enet_socket_receive(listener, &remote, &buf, 1);
 		if(remote_len>0)
 		{
-			char* buffer = new char[remote_len+1];
-			strncpy(buffer, (char*)buf.data, remote_len);
-			buffer[remote_len] = '\0';
+			net_buffer buffer;
+			buffer.resize(remote_len);
+			for(int i=0;i<remote_len;i++)
+			{
+				buffer[i] = data[i];
+			}
 			enet_address_get_host_ip(&remote, addr,15);
 			//int len = strlen(buffer);
 			//int realLen = remote_len;
@@ -279,12 +304,11 @@ namespace SORE_Network
 			
 			if(LAN.find(remote.host)==LAN.end())
 			{
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s:%d") % addr % address.port );
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Found new server at %s") % addr );
 			}
 			LAN[remote.host].first = 0;
-			//LAN[remote.host].second.data = static_cast<char*>(buf.data);
-			LAN[remote.host].second.len = buf.dataLength;
-			delete[] buffer;
+			LAN[remote.host].second = buffer;
+			//LAN[remote.host].second.size() = buf.dataLength;
 		}
 		else if(remote_len==-1)
 		{
@@ -306,7 +330,13 @@ namespace SORE_Network
 				LAN.erase(temp);
 			}
 		}
-		/*ENetEvent event;
+	}
+	
+	void Client::Frame(int elapsed)
+	{
+		UpdateServers(elapsed);
+		
+		ENetEvent event;
 		
 		while (enet_host_service (client, &event, 0) > 0)
 		{
@@ -334,6 +364,7 @@ namespace SORE_Network
 					break;
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:
+				{
 					std::string peer;
 					if(event.peer->data!=NULL)
 						peer = (char*)event.peer->data;
@@ -342,8 +373,12 @@ namespace SORE_Network
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;
+					break;
+				}
+				case ENET_EVENT_TYPE_NONE:
+					break;
 			}
-		}*/
+		}
 	}
 	
 	server_list Client::GetLANServers() const
