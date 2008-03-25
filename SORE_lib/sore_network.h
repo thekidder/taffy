@@ -40,9 +40,45 @@ bool operator<(ENetAddress a, ENetAddress b);
 
 namespace SORE_Network
 {
+	const ubyte DATATYPE_START = 1;
+	const ubyte DATATYPE_GAMESTATE_TRANSFER = DATATYPE_START;
+	const ubyte DATATYPE_GAMESTATE_DELTA    = DATATYPE_START + 1;
+	const ubyte DATATYPE_PLAYERCHAT         = DATATYPE_START + 2;
+	const ubyte DATATYPE_CHANGEHANDLE       = DATATYPE_START + 3;
+	const ubyte DATATYPE_JOINSERVER         = DATATYPE_START + 4;
+	const ubyte DATATYPE_QUITSERVER         = DATATYPE_START + 5;
+	const ubyte DATATYPE_STATUSOBSERVE      = DATATYPE_START + 6;
+	const ubyte DATATYPE_STATUSPLAY         = DATATYPE_START + 7;
+	const ubyte DATATYPE_CHANGETEAM         = DATATYPE_START + 8;
+	
 	void InitNetwork();
 	
 	ENetBuffer GetEnetBuffer(net_buffer buf);
+	
+	class NetworkBuffer
+	{
+		public:
+			NetworkBuffer(ENetPacket& packet);
+			
+			//primatives
+			ubyte  GetUByte();
+			 byte  GetByte();
+			ubyte2 GetUByte2();
+			 byte2 GetByte2();
+			ubyte4 GetUByte4();
+			 byte4 GetByte4();
+			 
+			 //conversions needed
+			std::string GetString(size_t len); //string with given length
+			std::string GetString1(); //string with one-byte (unsigned) preceding length
+			std::string GetString2(); //string with two-byte (unsigned) preceding length
+			
+			size_t Remaining() const;
+		protected:
+			ubyte* data;
+			size_t length;
+			size_t remaining;
+	};
 	
 	/*class NetworkConnection : public SORE_Kernel::Task
 	{
@@ -91,6 +127,7 @@ namespace SORE_Network
 			
 			void Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
+			void PrintPlayers(unsigned int lvl);
 		protected:
 			player_ref GetPlayerRef(ENetPeer* peer);
 			ENetHost* server;

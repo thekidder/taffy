@@ -30,12 +30,18 @@
 #endif
 #include <enet/enet.h>
 
-typedef unsigned char ubyte;
+typedef   signed char   byte;
+typedef unsigned char  ubyte;
+typedef   signed short  byte2;
+typedef unsigned short ubyte2;
+typedef   signed int    byte4;
+typedef unsigned int   ubyte4;
 
-const ubyte STATE_CONNECTING = 0;
-const ubyte STATE_CONNECTED  = 1;
-const ubyte STATE_OBSERVER   = 2;
-const ubyte STATE_PLAYER     = 3;
+const ubyte STATE_CONNECTING    = 0;
+const ubyte STATE_CONNECTED     = 1;
+const ubyte STATE_DISCONNECTING = 2;
+const ubyte STATE_OBSERVER      = 3;
+const ubyte STATE_PLAYER        = 4;
 
 namespace SORE_Network
 {

@@ -56,11 +56,88 @@ namespace SORE_Network
 		return temp;
 	}
 	
+	NetworkBuffer::NetworkBuffer(ENetPacket& packet)
+	{
+		data = static_cast<ubyte*>(packet.data);
+		length = static_cast<size_t>(packet.dataLength);
+		remaining = length;
+	}
+			
+	ubyte NetworkBuffer::GetUByte()
+	{
+		assert(remaining>=1);
+		remaining--;
+		ubyte temp = *data;
+		data++;
+		return temp;
+	}
+	
+	byte NetworkBuffer::GetByte()
+	{
+		assert(remaining>=1);
+		remaining--;
+		byte temp = static_cast<byte>(*data);
+		data++;
+		return temp;
+	}
+	
+	ubyte2 NetworkBuffer::GetUByte2()
+	{
+		assert(remaining>=2);
+		return 0;
+	}
+	
+	byte2 NetworkBuffer::GetByte2()
+	{
+		assert(remaining>=2);
+		return 0;
+	}
+	
+	ubyte4 NetworkBuffer::GetUByte4()
+	{
+		assert(remaining>=4);
+		return 0;
+	}
+	
+	byte4 NetworkBuffer::GetByte4()
+	{
+		assert(remaining>=4);
+		return 0;
+	}
+	
+	std::string NetworkBuffer::GetString(size_t len)
+	{
+		std::string str = "";
+		for(size_t i=0;i<len;i++)
+		{
+			str += static_cast<char>(GetByte());
+
+		}
+		return str;
+	}
+	
+	std::string NetworkBuffer::GetString1()
+	{
+		size_t len = static_cast<size_t>(GetUByte());
+		return GetString(len);
+	}
+	
+	std::string NetworkBuffer::GetString2()
+	{
+		size_t len = static_cast<size_t>(GetUByte2());
+		return GetString(len);
+	}
+			
+	size_t NetworkBuffer::Remaining() const
+	{
+		return remaining;
+	}
+	
 	UDPBroadcaster::UDPBroadcaster(SORE_Kernel::GameKernel* gk, ENetAddress broadcastAddress, boost::function<ENetBuffer (Server*)> c) : Task(gk), serv(NULL)
 	{
 		SetBroadcastAddress(broadcastAddress);
 		SetBroadcastCallback(c);
-		thisTask = gk->AddConstTask(11, 5000, this);
+		//thisTask = gk->AddConstTask(11, 5000, this);
 		broadcaster = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, NULL);
 		enet_socket_set_option(broadcaster, ENET_SOCKOPT_BROADCAST, 1);
 	}
@@ -139,6 +216,28 @@ namespace SORE_Network
 		return pos;
 	}
 	
+	void Server::PrintPlayers(unsigned int lvl)
+	{
+		std::string msg = "Printing all players:\n";
+		msg += "--------------------------------------------\n";
+		msg += "IP\t\tName\t\tState\tTeam\n";
+		for(player_ref i=playerList.begin();i!=playerList.end();i++)
+		{
+			msg += i->player_ip_str;
+			msg += "\t";
+			msg += i->name;
+			if(i->name.size()<8)
+				msg += "\t";
+			msg += "\t";
+			msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(i->playerState));
+			msg += "\t";
+			msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(i->team));
+			msg += "\n";
+		}
+		msg += "--------------------------------------------\n";
+		ENGINE_LOG(lvl, msg);
+	}
+	
 	void Server::Frame(int elapsed)
 	{
 		ENetEvent event;
@@ -158,19 +257,78 @@ namespace SORE_Network
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
 					// Store any relevant client information here.
 					event.peer->data = static_cast<void*>(&pos->id);
+					PrintPlayers(SORE_Logging::LVL_INFO);
 					break;
 				}
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
 					std::string peer, channel;
+					
 					player_ref pos = GetPlayerRef(event.peer);
+					if(pos->playerState == STATE_DISCONNECTING)
+						break;
 					peer = pos->name;
 					if(event.channelID)
 						channel = event.channelID;
 					else
 						channel = "0";
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
+					NetworkBuffer msg(*event.packet);
+					ubyte dataType = msg.GetUByte();
+					switch(dataType)
+					{
+						case DATATYPE_GAMESTATE_TRANSFER:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+							if(pos->playerState!=STATE_PLAYER)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
+								break;
+							}
+							break;
+						case DATATYPE_GAMESTATE_DELTA:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
+							if(pos->playerState!=STATE_PLAYER)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
+								break;
+							}
+							break;
+						case DATATYPE_PLAYERCHAT:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+							break;
+						case DATATYPE_CHANGEHANDLE:
+						{
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
+							pos->name = msg.GetString1();
+							PrintPlayers(SORE_Logging::LVL_INFO);
+							break;
+						}
+						case DATATYPE_JOINSERVER:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
+							if(pos->playerState==STATE_CONNECTING)
+								pos->playerState = STATE_CONNECTED;
+							PrintPlayers(SORE_Logging::LVL_INFO);
+							break;
+						case DATATYPE_QUITSERVER:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
+							enet_peer_disconnect(event.peer, 0);
+							pos->playerState  = STATE_DISCONNECTING;
+							break;
+						case DATATYPE_CHANGETEAM:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
+							break;
+						case DATATYPE_STATUSOBSERVE:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
+							break;
+						case DATATYPE_STATUSPLAY:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
+							break;
+						default:
+							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: unknown datatype %u)") % pos->player_ip_str % static_cast<unsigned int>(dataType));
+					}
+					//ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
 					// Clean up the packet now that we're done using it.
+					if(msg.Remaining())
+						ENGINE_LOG(SORE_Logging::LVL_WARNING, "Garbage remaining at end of packet");
 					enet_packet_destroy (event.packet);
 					break;
 				}
@@ -181,6 +339,8 @@ namespace SORE_Network
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;
+					playerList.erase(pos);
+					PrintPlayers(SORE_Logging::LVL_INFO);
 					break;
 				}
 				case ENET_EVENT_TYPE_NONE:
@@ -224,12 +384,32 @@ namespace SORE_Network
 					event.type == ENET_EVENT_TYPE_CONNECT)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % port);
-			ENetPacket * packet = enet_packet_create ("packet", strlen ("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
-
-			// Send the packet to the peer over channel id 0
-			// One could also broadcast the packet by
-			// enet_host_broadcast (host, 0, packet);
+			
+			net_buffer data;
+			data.push_back(DATATYPE_JOINSERVER);
+			void* vdata = static_cast<void*>(&data[0]);
+			ENetPacket * packet = enet_packet_create (vdata, data.size(), ENET_PACKET_FLAG_RELIABLE);
 			enet_peer_send (server, 0, packet);
+			
+			std::string name = sm.GetVariable("multiplayer", "name");
+			
+			data.clear();
+			data.push_back(DATATYPE_CHANGEHANDLE);
+			data.push_back(static_cast<ubyte>(name.size()));
+			for(size_t i=0;i<name.size();i++)
+			{
+				data.push_back(static_cast<ubyte>(name[i]));
+			}
+			vdata = static_cast<void*>(&data[0]);
+			packet = enet_packet_create (vdata, data.size(), ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send (server, 0, packet);
+			
+			/*data.clear();
+			data.push_back(DATATYPE_QUITSERVER);
+			vdata = static_cast<void*>(&data[0]);
+			packet = enet_packet_create (vdata, data.size(), ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send (server, 0, packet);*/
+			
 			enet_host_flush (client);
 		}
 		else
@@ -264,9 +444,55 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_CONNECT:
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
+				{
+					std::string peer, channel;
+					size_t dataLeft = event.packet->dataLength;
+					
+					//player_ref pos = GetPlayerRef(event.peer);
+					//peer = pos->name;
+					//if(event.channelID)
+					//	channel = event.channelID;
+					//else
+					//	channel = "0";
+					ubyte* data = static_cast<ubyte*>(event.packet->data);
+					ubyte dataType = data[0];
+					dataLeft--;
+					switch(dataType)
+					{
+						case DATATYPE_GAMESTATE_TRANSFER:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate transfer");
+							break;
+						case DATATYPE_GAMESTATE_DELTA:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate delta transfer");
+							break;
+						case DATATYPE_PLAYERCHAT:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: player chat");
+							break;
+						case DATATYPE_CHANGEHANDLE:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change handle");
+							break;
+						case DATATYPE_JOINSERVER:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: join server");
+							break;
+						case DATATYPE_QUITSERVER:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: quit server");
+							break;
+						case DATATYPE_CHANGETEAM:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change team");
+							break;
+						case DATATYPE_STATUSOBSERVE:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: status observe");
+							break;
+						case DATATYPE_STATUSPLAY:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: status play");
+							break;
+						default:
+							//ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: unknown datatype %u)") % pos->player_ip_str % static_cast<unsigned int>(dataType));
+							break;
+					}
 					enet_packet_destroy (event.packet);
 					break;
-
+				}
 				case ENET_EVENT_TYPE_DISCONNECT:
 					ENGINE_LOG(SORE_Logging::LVL_INFO, "Disconnection succeeded.");
 					return;
@@ -344,8 +570,6 @@ namespace SORE_Network
 			{
 				case ENET_EVENT_TYPE_CONNECT:
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
-					// Store any relevant client information here.
-					event.peer->data = const_cast<void*>((const void*)"Client information");
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
@@ -365,14 +589,7 @@ namespace SORE_Network
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
-					std::string peer;
-					if(event.peer->data!=NULL)
-						peer = (char*)event.peer->data;
-					else
-						peer = "unknown client";
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
-					// Reset the peer's client information.
-					event.peer->data = NULL;
+					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("disconected from server"));
 					break;
 				}
 				case ENET_EVENT_TYPE_NONE:
