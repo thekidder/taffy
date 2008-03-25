@@ -109,11 +109,11 @@ namespace SORE_Network
 		return temp;
 	}
 	
-	byte NetworkBuffer::GetByte()
+	sbyte NetworkBuffer::GetByte()
 	{
 		assert(remaining>=1);
 		remaining--;
-		byte temp = static_cast<byte>(*data);
+		byte temp = static_cast<sbyte>(*data);
 		data++;
 		return temp;
 	}
@@ -124,7 +124,7 @@ namespace SORE_Network
 		return 0;
 	}
 	
-	byte2 NetworkBuffer::GetByte2()
+	sbyte2 NetworkBuffer::GetByte2()
 	{
 		assert(remaining>=2);
 		return 0;
@@ -136,7 +136,7 @@ namespace SORE_Network
 		return 0;
 	}
 	
-	byte4 NetworkBuffer::GetByte4()
+	sbyte4 NetworkBuffer::GetByte4()
 	{
 		assert(remaining>=4);
 		return 0;

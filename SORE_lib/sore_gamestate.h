@@ -30,11 +30,11 @@
 #endif
 #include <enet/enet.h>
 
-typedef   signed char   byte;
+typedef   signed char  sbyte;
 typedef unsigned char  ubyte;
-typedef   signed short  byte2;
+typedef   signed short sbyte2;
 typedef unsigned short ubyte2;
-typedef   signed int    byte4;
+typedef   signed int   sbyte4;
 typedef unsigned int   ubyte4;
 
 //single and double precision floats

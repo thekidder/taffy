@@ -209,6 +209,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_network_client.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_network_server.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_renderer.cpp"
 				>
 			</File>

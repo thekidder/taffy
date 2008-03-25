@@ -215,7 +215,7 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: player chat");
 							break;
 						case DATATYPE_UPDATEPLAYER:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % msg.Remaining());
+							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % static_cast<unsigned int>(msg.Remaining()));
 							break;
 						case DATATYPE_CHANGEHANDLE:
 						{

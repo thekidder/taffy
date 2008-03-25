@@ -75,11 +75,11 @@ namespace SORE_Network
 			
 			//primatives
 			ubyte  GetUByte();
-			 byte  GetByte();
+			sbyte  GetByte();
 			ubyte2 GetUByte2();
-			 byte2 GetByte2();
+			sbyte2 GetByte2();
 			ubyte4 GetUByte4();
-			 byte4 GetByte4();
+			sbyte4 GetByte4();
 			 
 			 //conversions needed
 			std::string GetString(size_t len); //string with given length
