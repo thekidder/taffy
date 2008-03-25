@@ -37,6 +37,10 @@ typedef unsigned short ubyte2;
 typedef   signed int    byte4;
 typedef unsigned int   ubyte4;
 
+//single and double precision floats
+typedef float  float1;
+typedef double float2;
+
 const ubyte STATE_CONNECTING    = 0;
 const ubyte STATE_CONNECTED     = 1;
 const ubyte STATE_DISCONNECTING = 2;
@@ -47,24 +51,6 @@ namespace SORE_Network
 {
 	typedef std::vector<ubyte> net_buffer;
 	
-	/*class Buffer
-	{
-		public:
-			Buffer(size_t len);
-			Buffer(const Buffer& b);
-			~Buffer();
-			
-			char    operator[](size_t pos);
-			Buffer& operator=(const Buffer& b);
-			
-			char*   head();
-			size_t  size();
-			void    resize(size_t newLen);
-		protected:
-			size_t length;
-			char* buf;
-	};*/
-	
 	struct player;
 	
 	typedef std::list<player> player_list;
@@ -72,11 +58,12 @@ namespace SORE_Network
 	
 	struct player
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0) {player_ip_str[0]='\0';}
+		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), id(0), player_ip(0) {player_ip_str[0]='\0';}
 		std::string name;
 		ubyte playerState;
 		ubyte team; //implementation defined
-		player_ref id; //retrieved from server
+		player_ref id_iter; //retrieved from server
+		ubyte id;
 		
 		//network info
 		enet_uint32 player_ip;
