@@ -113,7 +113,7 @@ namespace SORE_Network
 	{
 		assert(remaining>=1);
 		remaining--;
-		byte temp = static_cast<sbyte>(*data);
+		sbyte temp = static_cast<sbyte>(*data);
 		data++;
 		return temp;
 	}
@@ -131,8 +131,8 @@ namespace SORE_Network
 	sbyte2 NetworkBuffer::GetByte2()
 	{
 		assert(remaining>=2);
-		byte2* pos = reinterpret_cast<byte2*>(data);
-		byte2 i = *pos;
+		sbyte2* pos = reinterpret_cast<sbyte2*>(data);
+		sbyte2 i = *pos;
 		remaining-=2;
 		data+=2;
 		return i;
@@ -151,8 +151,8 @@ namespace SORE_Network
 	sbyte4 NetworkBuffer::GetByte4()
 	{
 		assert(remaining>=4);
-		byte4* pos = reinterpret_cast<byte4*>(data);
-		byte4 i = *pos;
+		sbyte4* pos = reinterpret_cast<sbyte4*>(data);
+		sbyte4 i = *pos;
 		remaining-=4;
 		data+=4;
 		return i;
@@ -164,7 +164,6 @@ namespace SORE_Network
 		for(size_t i=0;i<len;i++)
 		{
 			str += static_cast<char>(GetByte());
-
 		}
 		return str;
 	}
