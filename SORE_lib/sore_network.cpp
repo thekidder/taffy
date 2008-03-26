@@ -286,7 +286,7 @@ namespace SORE_Network
 	{
 		SetBroadcastAddress(broadcastAddress);
 		SetBroadcastCallback(c);
-		//thisTask = gk->AddConstTask(11, 5000, this);
+		thisTask = gk->AddConstTask(11, 5000, this);
 		broadcaster = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, NULL);
 		enet_socket_set_option(broadcaster, ENET_SOCKOPT_BROADCAST, 1);
 	}
@@ -309,8 +309,6 @@ namespace SORE_Network
 		else
 		{
 			data = callback(serv);
-			//data.data = const_cast<void*>(static_cast<const void*>(bdata));
-			//data.dataLength = strlen(bdata) + 1;
 		}
 		enet_socket_send(broadcaster, &address, &data, 1);
 	}
