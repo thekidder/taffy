@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -70,8 +70,7 @@ namespace SORE_Network
 				{
 					player newPlayer;
 					newPlayer.player_ip = event.peer->address.host;
-					enet_address_get_host_ip(&event.peer->address, newPlayer.player_ip_str, 15);
-					newPlayer.player_ip_str[16] = '\0';
+					enet_address_get_host_ip(&event.peer->address, newPlayer.player_ip_str, 16);
 					ubyte newId;
 					if(unusedIDs.size()>0)
 					{
@@ -80,8 +79,9 @@ namespace SORE_Network
 					}
 					else
 					{
-						assert(playerList.size()<255);
-						newId = static_cast<ubyte>(playerList.size()+1);
+						assert(nextId!=255);
+						newId = nextId;
+						nextId++;
 					}
 					//newPlayer.id = newId;
 					assert(playerList.find(newId)==playerList.end());
@@ -96,10 +96,10 @@ namespace SORE_Network
 					send_id.push_back(newId);
 					ENetPacket* packet = GetENetPacket(send_id, ENET_PACKET_FLAG_RELIABLE);
 					enet_peer_send(event.peer, 0, packet);
-					/*for(player_ref i=playerList.begin();i!=playerList.end();i++)
+					for(player_ref i=playerList.begin();i!=playerList.end();i++)
 					{
 						if(i->first==pos->first) continue;
-						net_buffer playerUpdate;
+						/*net_buffer playerUpdate;
 						playerUpdate.push_back(DATATYPE_UPDATEPLAYER);
 						playerUpdate.push_back(i->first);
 						playerUpdate.push_back(i->second.playerState);
@@ -114,12 +114,20 @@ namespace SORE_Network
 						{
 							playerUpdate[size+5+j] = static_cast<ubyte>(i->second.name[j]);
 						}
-						//packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(event.peer, 0, packet);
-					}*/
-					void* data = (char*)"\12\001\001\000\300\030\000\004\011kiddar";
-					packet = enet_packet_create(data, 15, ENET_PACKET_FLAG_RELIABLE);
-							enet_peer_send(event.peer, 0, packet);
+						packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
+						enet_peer_send(event.peer, 0, packet);*/
+						SendBuffer playerUpdate;
+						playerUpdate.AddUByte(DATATYPE_UPDATEPLAYER);
+						playerUpdate.AddUByte(i->first);
+						playerUpdate.AddUByte(i->second.playerState);
+						playerUpdate.AddUByte(i->second.team);
+						playerUpdate.AddUByte4(i->second.player_ip);
+						playerUpdate.AddString1(i->second.name);
+						playerUpdate.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+					}
+					//void* data = (char*)"\12\001\001\000\300\030\000\004\006kiddar";
+					//packet = enet_packet_create(data, 15, ENET_PACKET_FLAG_RELIABLE);
+					//enet_peer_send(event.peer, 0, packet);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
 				}
@@ -135,7 +143,7 @@ namespace SORE_Network
 						channel = event.channelID;
 					else
 						channel = "0";
-					NetworkBuffer msg(*event.packet);
+					ReceiveBuffer msg(*event.packet);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
@@ -209,6 +217,7 @@ namespace SORE_Network
 				{
 					player_ref pos = GetPlayerRef(event.peer);
 					std::string peer = pos->second.name;
+					unusedIDs.push_back(pos->first);
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;

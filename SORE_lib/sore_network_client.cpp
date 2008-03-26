@@ -55,7 +55,6 @@ namespace SORE_Network
 			data.push_back(DATATYPE_JOINSERVER);
 			packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
 			enet_peer_send (server, 0, packet);
-			
 			std::string name = sm.GetVariable("multiplayer", "name");
 			
 			data.clear();
@@ -69,13 +68,13 @@ namespace SORE_Network
 			//packet = enet_packet_create (vdata, data.size(), ENET_PACKET_FLAG_RELIABLE);
 			packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
 			enet_peer_send (server, 0, packet);
-			
 			/*data.clear();
 			data.push_back(DATATYPE_QUITSERVER);
 			packet = GetENetPacket(data, ENET_PACK_FLAG_RELIABLE);
 			enet_peer_send (server, 0, packet);*/
 			
 			enet_host_flush (client);
+			enet_packet_destroy(packet);
 		}
 		else
 		{
@@ -201,7 +200,7 @@ namespace SORE_Network
 					//	channel = event.channelID;
 					//else
 					//	channel = "0";
-					NetworkBuffer msg(*event.packet);
+					ReceiveBuffer msg(*event.packet);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
@@ -223,9 +222,10 @@ namespace SORE_Network
 							otherPlayers[id].player_ip = msg.GetUByte4();
 							ENetAddress temp;
 							temp.host = otherPlayers[id].player_ip;
-							enet_address_get_host_ip(&temp, otherPlayers[id].player_ip_str, 15);
-							otherPlayers[id].player_ip_str[16] = '\0';
+							temp.port = sm.GetVariable("network", "port");
+							enet_address_get_host_ip(&temp, otherPlayers[id].player_ip_str, 16);
 							otherPlayers[id].name = msg.GetString1();
+							PrintPlayers(SORE_Logging::LVL_INFO, otherPlayers);
 							break;
 						}
 						case DATATYPE_CHANGEHANDLE:

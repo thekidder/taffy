@@ -93,72 +93,169 @@ namespace SORE_Network
 		ENGINE_LOG(lvl, msg);
 	}
 	
-	NetworkBuffer::NetworkBuffer(ENetPacket& packet)
+	SendBuffer::SendBuffer()
+	{
+	}
+			
+	void SendBuffer::AddUByte (ubyte b)
+	{
+		buf.push_back(b);
+	}
+	
+	void SendBuffer::AddByte  (sbyte b)
+	{
+		buf.push_back(static_cast<ubyte>(b));
+	}
+			
+	void SendBuffer::AddUByte2(ubyte2 b)
+	{
+		ubyte2 n = htons(b);
+		size_t len = buf.size();
+		buf.resize(len+2);
+		ubyte2* ptr = reinterpret_cast<ubyte2*>(&buf[len]);
+		*ptr = n;
+	}
+
+	void SendBuffer::AddByte2 (sbyte2 b)
+	{
+		AddUByte2(static_cast<ubyte2>(b));
+	}
+
+	void SendBuffer::AddUByte4(ubyte4 b)
+	{
+		ubyte4 n = htonl(b);
+		size_t len = buf.size();
+		buf.resize(len+4);
+		ubyte4* ptr = reinterpret_cast<ubyte4*>(&buf[len]);
+		*ptr = n;
+	}
+
+	void SendBuffer::AddByte4 (sbyte4 b)
+	{
+		AddUByte4(static_cast<ubyte4>(b));
+	}
+
+	void SendBuffer::AddString(std::string str)
+	{
+		assert(str.size()<65536);
+		if(str.size()<256) return AddString1(str);
+		else return AddString2(str);
+	}
+
+	void SendBuffer::AddString1(std::string str)
+	{
+		assert(str.size()<256);
+		AddUByte(static_cast<ubyte>(str.size()));
+		size_t len = buf.size();
+		buf.resize(len+str.size());
+		for(size_t i=0;i<str.size();i++)
+		{
+			buf[len+i] = static_cast<ubyte>(str[i]);
+		}
+	}
+
+	void SendBuffer::AddString2(std::string str)
+	{
+		assert(str.size()<65536);
+		AddUByte2(static_cast<ubyte2>(str.size()));
+		size_t len = buf.size();
+		buf.resize(len+str.size());
+		for(size_t i=0;i<str.size();i++)
+		{
+			buf[len+i] = static_cast<ubyte>(str[i]);
+		}
+	}
+
+	void SendBuffer::AddFloat1(float1 f)
+	{
+	}
+
+	void SendBuffer::AddFloat2(float2 f)
+	{
+	}
+
+			
+	ENetPacket* SendBuffer::GetPacket(enet_uint32 flags)
+	{
+		ENetPacket* temp;
+		ubyte* begin = &buf[0];
+		void* vdata = static_cast<void*>(begin);
+		temp = enet_packet_create(vdata, buf.size(), flags);
+		return temp;
+	}
+	
+	void SendBuffer::Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags)
+	{
+		ENetPacket* temp = GetPacket(flags);
+		enet_peer_send(peer, channelID, temp);
+	}
+	
+	void SendBuffer::Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags)
+	{
+		ENetPacket* temp = GetPacket(flags);
+		enet_host_broadcast(host, channelID, temp);
+	}
+	
+	ReceiveBuffer::ReceiveBuffer(ENetPacket& packet)
 	{
 		data = static_cast<ubyte*>(packet.data);
 		length = static_cast<size_t>(packet.dataLength);
 		remaining = length;
 	}
 			
-	ubyte NetworkBuffer::GetUByte()
+	ubyte ReceiveBuffer::GetUByte()
 	{
 		assert(remaining>=1);
+		ubyte temp = data[length-remaining];
 		remaining--;
-		ubyte temp = *data;
-		data++;
 		return temp;
 	}
 	
-	sbyte NetworkBuffer::GetByte()
+	sbyte ReceiveBuffer::GetByte()
 	{
 		assert(remaining>=1);
+		sbyte temp = static_cast<sbyte>(data[length-remaining]);
 		remaining--;
-		sbyte temp = static_cast<sbyte>(*data);
-		data++;
 		return temp;
 	}
 	
-	ubyte2 NetworkBuffer::GetUByte2()
+	ubyte2 ReceiveBuffer::GetUByte2()
 	{
 		assert(remaining>=2);
-		ubyte2* pos = reinterpret_cast<ubyte2*>(data);
+		ubyte2* pos = reinterpret_cast<ubyte2*>(&data[length-remaining]);
 		ubyte2 i = *pos;
 		remaining-=2;
-		data+=2;
-		return i;
+		return ntohs(i);
 	}
 	
-	sbyte2 NetworkBuffer::GetByte2()
+	sbyte2 ReceiveBuffer::GetByte2()
 	{
 		assert(remaining>=2);
-		sbyte2* pos = reinterpret_cast<sbyte2*>(data);
-		sbyte2 i = *pos;
+		ubyte2 u = GetUByte2();
+		sbyte2 i = static_cast<sbyte2>(u);
 		remaining-=2;
-		data+=2;
 		return i;
 	}
 	
-	ubyte4 NetworkBuffer::GetUByte4()
+	ubyte4 ReceiveBuffer::GetUByte4()
 	{
 		assert(remaining>=4);
-		ubyte4* pos = reinterpret_cast<ubyte4*>(data);
+		ubyte4* pos = reinterpret_cast<ubyte4*>(&data[length-remaining]);
 		ubyte4 i = *pos;
 		remaining-=4;
-		data+=4;
-		return i;
+		return ntohl(i);
 	}
 	
-	sbyte4 NetworkBuffer::GetByte4()
+	sbyte4 ReceiveBuffer::GetByte4()
 	{
 		assert(remaining>=4);
-		sbyte4* pos = reinterpret_cast<sbyte4*>(data);
-		sbyte4 i = *pos;
+		ubyte4 u = GetUByte4();
+		sbyte4 i = static_cast<sbyte4>(u);
 		remaining-=4;
-		data+=4;
 		return i;
 	}
 	
-	std::string NetworkBuffer::GetString(size_t len)
+	std::string ReceiveBuffer::GetString(size_t len)
 	{
 		std::string str = "";
 		for(size_t i=0;i<len;i++)
@@ -168,19 +265,19 @@ namespace SORE_Network
 		return str;
 	}
 	
-	std::string NetworkBuffer::GetString1()
+	std::string ReceiveBuffer::GetString1()
 	{
 		size_t len = static_cast<size_t>(GetUByte());
 		return GetString(len);
 	}
 	
-	std::string NetworkBuffer::GetString2()
+	std::string ReceiveBuffer::GetString2()
 	{
 		size_t len = static_cast<size_t>(GetUByte2());
 		return GetString(len);
 	}
 			
-	size_t NetworkBuffer::Remaining() const
+	size_t ReceiveBuffer::Remaining() const
 	{
 		return remaining;
 	}

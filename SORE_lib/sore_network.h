@@ -41,7 +41,6 @@ bool operator<(ENetAddress a, ENetAddress b);
 
 namespace SORE_Network
 {
-	
 	const ubyte DATATYPE_START              = 1;
 	
 	//messages that change the gamestate
@@ -63,17 +62,18 @@ namespace SORE_Network
 	
 	void InitNetwork();
 	
-	ENetPacket* GetENetPacket(net_buffer& buf, enet_uint32 flags);
 	std::string PrintPlayer(player_ref player);
 	std::string PrintPlayer(std::pair<ubyte, player> p);
 	void PrintPlayers(unsigned int lvl, player_list playerList);
 	
-	class NetworkBuffer
+	ENetPacket* GetENetPacket(net_buffer& buf, enet_uint32 flags);
+	
+	class ReceiveBuffer
 	{
 		public:
-			NetworkBuffer(ENetPacket& packet);
+			ReceiveBuffer(ENetPacket& packet);
 			
-			//primatives
+			//primitives
 			ubyte  GetUByte();
 			sbyte  GetByte();
 			ubyte2 GetUByte2();
@@ -94,6 +94,34 @@ namespace SORE_Network
 			ubyte* data;
 			size_t length;
 			size_t remaining;
+	};
+	
+	class SendBuffer
+	{
+		public:
+			SendBuffer();
+			
+			void AddUByte (ubyte b);
+			void AddByte  (sbyte b);
+			
+			void AddUByte2(ubyte2 b);
+			void AddByte2 (sbyte2 b);
+			
+			void AddUByte4(ubyte4 b);
+			void AddByte4 (sbyte4 b);
+			
+			void AddString(std::string str);
+			void AddString1(std::string str);
+			void AddString2(std::string str);
+			
+			void AddFloat1(float1 f);
+			void AddFloat2(float2 f);
+			
+			ENetPacket* GetPacket(enet_uint32 flags);
+			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
+			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
+		protected:
+			net_buffer buf;
 	};
 	
 	/*class NetworkConnection : public SORE_Kernel::Task
@@ -150,6 +178,7 @@ namespace SORE_Network
 			UDPBroadcaster broadcaster;
 			player_list playerList;
 			std::deque<ubyte> unusedIDs;
+			ubyte nextId;
 	};
 	
 	typedef std::map<unsigned int, std::pair<unsigned int, net_buffer> > server_list;
