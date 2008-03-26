@@ -293,4 +293,33 @@ namespace SORE_Network
 	{
 		broadcaster.SetBroadcastCallback(c);
 	}
+	
+	void Server::SendGamestate(player_ref p)
+	{
+		SendBuffer state = game->Serialize();
+		state.Send(p->second.peer, 1, 0);
+	}
+
+	void Server::SendGamestateDelta(player_ref p)
+	{
+		SendBuffer state = game->SerializeDelta();
+		state.Send(p->second.peer, 1, 0);
+	}
+
+	void Server::BroadcastGamestate()
+	{
+		SendBuffer state = game->Serialize();
+		state.Broadcast(server, 1, 0);
+	}
+
+	void Server::BroadcastGamestateDelta()
+	{
+		SendBuffer state = game->SerializeDelta();
+		state.Broadcast(server, 1, 0);
+	}
+
+	void Server::PushGamestate()
+	{
+		BroadcastGamestateDelta();
+	}
 }

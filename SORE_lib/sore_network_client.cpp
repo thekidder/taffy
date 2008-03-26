@@ -324,4 +324,10 @@ namespace SORE_Network
 	{
 		return LAN;
 	}
+	
+	void Client::PushGamestate()
+	{
+		SendBuffer state = game->SerializeDelta();
+		state.Send(server, 1, 0);
+	}
 }

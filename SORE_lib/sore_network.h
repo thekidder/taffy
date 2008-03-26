@@ -109,15 +109,23 @@ namespace SORE_Network
 			Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
 			~Server();
 			
-			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
-			void SetGamestate(Gamestate* g);
-			size_t NumPlayers() const;
+			void        SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
+			void        SetGamestate(Gamestate* g);
+			size_t      NumPlayers() const;
 			
-			void Frame(int elapsed);
+			//call this after gamestate is changed
+			void        PushGamestate(); //send out new gamestate: will determine to send full/deltas to each client 
+			
+			void        Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
 		protected:
 			player_ref GetPlayerRef(ENetPeer* peer);
-			void UpdatePlayer(player_ref toUpdate);
+			void       UpdatePlayer(player_ref toUpdate);
+			void       SendGamestate(player_ref p);
+			void       SendGamestateDelta(player_ref p);
+			
+			void       BroadcastGamestate();
+			void       BroadcastGamestateDelta();
 			
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
@@ -136,12 +144,15 @@ namespace SORE_Network
 			Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
 			~Client();
 			
-			void Frame(int elapsed);
+			
 			server_list GetLANServers() const;
+			void        SetGamestate(Gamestate* g);
 			
+			//call this after gamestate is changed
+			void        PushGamestate();
+			
+			void        Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking client task";}
-			
-			void SetGamestate(Gamestate* g);
 		protected:
 			void UpdateServers(int elapsed); //find broadcasting servers on LAN
 			ENetHost* client;
