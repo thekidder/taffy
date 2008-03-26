@@ -58,24 +58,24 @@ namespace SORE_Network
 	
 	std::string PrintPlayer(player_ref p)
 	{
-		player* i = &(*p);
+		std::pair<ubyte, player> i = *p;
 		return PrintPlayer(i);
 	}
 	
-	std::string PrintPlayer(player* p)
+	std::string PrintPlayer(std::pair<ubyte, player> p)
 	{
 		std::string msg;
-		msg += p->player_ip_str;
+		msg += p.second.player_ip_str;
 		msg += "\t";
-		msg += p->name;
-		if(p->name.size()<8)
+		msg += p.second.name;
+		if(p.second.name.size()<8)
 			msg += "\t";
 		msg += "\t";
-		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p->playerState));
+		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p.second.playerState));
 		msg += "\t";
-		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p->team));
+		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p.second.team));
 		msg += "\t";
-		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p->id));
+		msg += boost::lexical_cast<std::string>(static_cast<unsigned int>(p.first));
 		msg += "\n";
 		return msg;
 	}
@@ -121,25 +121,41 @@ namespace SORE_Network
 	ubyte2 NetworkBuffer::GetUByte2()
 	{
 		assert(remaining>=2);
-		return 0;
+		ubyte2* pos = reinterpret_cast<ubyte2*>(data);
+		ubyte2 i = *pos;
+		remaining-=2;
+		data+=2;
+		return i;
 	}
 	
 	sbyte2 NetworkBuffer::GetByte2()
 	{
 		assert(remaining>=2);
-		return 0;
+		byte2* pos = reinterpret_cast<byte2*>(data);
+		byte2 i = *pos;
+		remaining-=2;
+		data+=2;
+		return i;
 	}
 	
 	ubyte4 NetworkBuffer::GetUByte4()
 	{
 		assert(remaining>=4);
-		return 0;
+		ubyte4* pos = reinterpret_cast<ubyte4*>(data);
+		ubyte4 i = *pos;
+		remaining-=4;
+		data+=4;
+		return i;
 	}
 	
 	sbyte4 NetworkBuffer::GetByte4()
 	{
 		assert(remaining>=4);
-		return 0;
+		byte4* pos = reinterpret_cast<byte4*>(data);
+		byte4 i = *pos;
+		remaining-=4;
+		data+=4;
+		return i;
 	}
 	
 	std::string NetworkBuffer::GetString(size_t len)

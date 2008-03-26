@@ -83,12 +83,14 @@ namespace SORE_Network
 						assert(playerList.size()<255);
 						newId = static_cast<ubyte>(playerList.size()+1);
 					}
-					newPlayer.id = newId;
-					player_ref pos = playerList.insert(playerList.end(), newPlayer);
-					pos->id_iter = pos;
+					//newPlayer.id = newId;
+					assert(playerList.find(newId)==playerList.end());
+					std::pair<player_ref, bool> iter = playerList.insert(std::pair<ubyte, player>(newId, newPlayer) );
+					player_ref pos = iter.first;
+					pos->second.id_iter = pos;
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
 					// Store any relevant client information here.
-					event.peer->data = static_cast<void*>(&pos->id_iter);
+					event.peer->data = static_cast<void*>(&pos->second.id_iter);
 					net_buffer send_id;
 					send_id.push_back(DATATYPE_CHANGEID);
 					send_id.push_back(newId);
@@ -99,14 +101,18 @@ namespace SORE_Network
 						if(i==pos) continue;
 						net_buffer playerUpdate;
 						playerUpdate.push_back(DATATYPE_UPDATEPLAYER);
-						playerUpdate.push_back(i->id);
-						playerUpdate.push_back(i->playerState);
-						playerUpdate.push_back(i->team);
+						playerUpdate.push_back(i->first);
+						playerUpdate.push_back(i->second.playerState);
+						playerUpdate.push_back(i->second.team);
+						size_t size = playerUpdate.size();
+						playerUpdate.resize(size+4);
+						ubyte4* pos = reinterpret_cast<ubyte4*>(&playerUpdate[size-1]);
+						*pos = i->second.player_ip;
 						//playerUpdate.push_back(i->player_ip);
-						playerUpdate.push_back(static_cast<ubyte>(i->name.size()));
-						for(size_t j=0;j<i->name.size();j++)
+						playerUpdate.push_back(static_cast<ubyte>(i->second.name.size()));
+						for(size_t j=0;j<i->second.name.size();j++)
 						{
-							playerUpdate.push_back(static_cast<ubyte>(i->name[j]));
+							playerUpdate.push_back(static_cast<ubyte>(i->second.name[j]));
 						}
 						ENetPacket* packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
 						enet_peer_send(event.peer, 0, packet);
@@ -119,9 +125,9 @@ namespace SORE_Network
 					std::string peer, channel;
 					
 					player_ref pos = GetPlayerRef(event.peer);
-					if(pos->playerState == STATE_DISCONNECTING)
+					if(pos->second.playerState == STATE_DISCONNECTING)
 						break;
-					peer = pos->name;
+					peer = pos->second.name;
 					if(event.channelID)
 						channel = event.channelID;
 					else
@@ -132,7 +138,7 @@ namespace SORE_Network
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
-							if(pos->playerState!=STATE_PLAYER)
+							if(pos->second.playerState!=STATE_PLAYER)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
 								break;
@@ -140,7 +146,7 @@ namespace SORE_Network
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
-							if(pos->playerState!=STATE_PLAYER)
+							if(pos->second.playerState!=STATE_PLAYER)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
 								break;
@@ -152,15 +158,15 @@ namespace SORE_Network
 						case DATATYPE_CHANGEHANDLE:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
-							pos->name = msg.GetString1();
+							pos->second.name = msg.GetString1();
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							//send confirmation
 							net_buffer data;
 							data.push_back(DATATYPE_CHANGEHANDLE);
-							data.push_back(static_cast<ubyte>(pos->name.size()));
-							for(size_t i=0;i<pos->name.size();i++)
+							data.push_back(static_cast<ubyte>(pos->second.name.size()));
+							for(size_t i=0;i<pos->second.name.size();i++)
 							{
-								data.push_back(static_cast<ubyte>(pos->name[i]));
+								data.push_back(static_cast<ubyte>(pos->second.name[i]));
 							}
 							ENetPacket* packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
 							enet_peer_send(event.peer, 0, packet);
@@ -168,14 +174,14 @@ namespace SORE_Network
 						}
 						case DATATYPE_JOINSERVER:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
-							if(pos->playerState==STATE_CONNECTING)
-								pos->playerState = STATE_CONNECTED;
+							if(pos->second.playerState==STATE_CONNECTING)
+								pos->second.playerState = STATE_CONNECTED;
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_QUITSERVER:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
 							enet_peer_disconnect(event.peer, 0);
-							pos->playerState  = STATE_DISCONNECTING;
+							pos->second.playerState  = STATE_DISCONNECTING;
 							break;
 						case DATATYPE_CHANGETEAM:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
@@ -187,7 +193,7 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							break;
 						default:
-							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: unknown datatype %u)") % pos->player_ip_str % static_cast<unsigned int>(dataType));
+							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: unknown datatype %u)") % pos->second.player_ip_str % static_cast<unsigned int>(dataType));
 					}
 					//ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A packet of length %u containing %s was received from %s on channel %u") % event.packet->dataLength % (char*)event.packet->data % peer % channel);
 					// Clean up the packet now that we're done using it.
@@ -199,7 +205,7 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
 					player_ref pos = GetPlayerRef(event.peer);
-					std::string peer = pos->name;
+					std::string peer = pos->second.name;
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;

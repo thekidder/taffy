@@ -65,7 +65,7 @@ namespace SORE_Network
 	
 	ENetPacket* GetENetPacket(net_buffer& buf, enet_uint32 flags);
 	std::string PrintPlayer(player_ref player);
-	std::string PrintPlayer(player* player);
+	std::string PrintPlayer(std::pair<ubyte, player> p);
 	void PrintPlayers(unsigned int lvl, player_list playerList);
 	
 	class NetworkBuffer
@@ -173,6 +173,7 @@ namespace SORE_Network
 			server_list LAN;
 			ENetAddress address;
 			player me;
+			ubyte myID;
 			player_list otherPlayers;
 	};
 }

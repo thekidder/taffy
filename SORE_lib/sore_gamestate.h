@@ -24,7 +24,7 @@
 
 #include <vector>
 #include <string>
-#include <list>
+#include <map>
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -53,17 +53,17 @@ namespace SORE_Network
 	
 	struct player;
 	
-	typedef std::list<player> player_list;
+	typedef std::map<ubyte, player> player_list;
 	typedef player_list::iterator player_ref;
 	
 	struct player
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), id(0), player_ip(0) {player_ip_str[0]='\0';}
+		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0) {player_ip_str[0]='\0';}
 		std::string name;
 		ubyte playerState;
 		ubyte team; //implementation defined
 		player_ref id_iter; //retrieved from server
-		ubyte id;
+		//ubyte id;
 		
 		//network info
 		enet_uint32 player_ip;

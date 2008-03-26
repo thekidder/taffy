@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), myID(0)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -215,21 +215,36 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: player chat");
 							break;
 						case DATATYPE_UPDATEPLAYER:
+<<<<<<< .mine
+						{
+							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % msg.Remaining());
+=======
 							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % static_cast<unsigned int>(msg.Remaining()));
+>>>>>>> .r236
+							ubyte id = msg.GetUByte();
+							otherPlayers[id].playerState = msg.GetUByte();
+							otherPlayers[id].team = msg.GetUByte();
+							otherPlayers[id].player_ip = msg.GetUByte4();
+							ENetAddress temp;
+							temp.host = otherPlayers[id].player_ip;
+							enet_address_get_host_ip(&temp, otherPlayers[id].player_ip_str, 15);
+							otherPlayers[id].player_ip_str[16] = '\0';
+							otherPlayers[id].name = msg.GetString1();
 							break;
+						}
 						case DATATYPE_CHANGEHANDLE:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change handle");
 							me.name = msg.GetString1();
-							std::string msg = PrintPlayer(&me);
+							std::string msg = PrintPlayer(std::pair<ubyte, player>(myID, me));
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Player:\n" + msg);
 							break;
 						}
 						case DATATYPE_CHANGEID:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change ID");
-							me.id = msg.GetUByte();
-							std::string msg = PrintPlayer(&me);
+							myID = msg.GetUByte();
+							std::string msg = PrintPlayer(std::pair<ubyte, player>(myID, me));
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Player:\n" + msg);
 							break;
 						}
