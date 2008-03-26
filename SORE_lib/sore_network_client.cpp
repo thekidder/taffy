@@ -63,7 +63,7 @@ namespace SORE_Network
 			data.AddUByte(DATATYPE_PLAYERCHAT);
 			data.AddUByte(CHATMASK_ALL);
 			data.AddString2("Hello, world!");
-			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+			//data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			
 			enet_host_flush (client);
 		}
