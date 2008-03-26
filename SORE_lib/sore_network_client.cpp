@@ -49,24 +49,21 @@ namespace SORE_Network
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % port);
 			
-			ENetPacket* packet;
-			
-			net_buffer data;
-			data.push_back(DATATYPE_JOINSERVER);
-			packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
-			enet_peer_send (server, 0, packet);
+			SendBuffer data;
+			data.AddUByte(DATATYPE_JOINSERVER);
+			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			std::string name = sm.GetVariable("multiplayer", "name");
 			
-			data.clear();
-			data.push_back(DATATYPE_CHANGEHANDLE);
-			data.push_back(static_cast<ubyte>(name.size()));
-			for(size_t i=0;i<name.size();i++)
-			{
-				data.push_back(static_cast<ubyte>(name[i]));
-			}
-
-			packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
-			enet_peer_send (server, 0, packet);
+			data.Clear();
+			data.AddUByte(DATATYPE_CHANGEHANDLE);
+			data.AddString1(name);
+			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+			
+			data.Clear();
+			data.AddUByte(DATATYPE_PLAYERCHAT);
+			data.AddUByte(CHATMASK_ALL);
+			data.AddString2("Hello, world!");
+			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			
 			enet_host_flush (client);
 		}
@@ -195,8 +192,38 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate delta transfer");
 							break;
 						case DATATYPE_PLAYERCHAT:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: player chat");
+						{
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+							ubyte mask = msg.GetUByte();
+							ubyte sender = msg.GetUByte();
+							std::string chat = msg.GetString2();
+							std::string maskStr;
+							switch(mask)
+							{
+								case CHATMASK_ALL:
+									maskStr = "(All    )";
+									break;
+								case CHATMASK_TEAM:
+									maskStr = "(Team   )";
+									break;
+								case CHATMASK_WHISPER:
+									maskStr = "(Whisper)";
+									break;
+								default:
+									ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: invalid chatmask %u)") % static_cast<unsigned int>(mask));
+									maskStr = "(???????)";
+							}
+							std::string name;
+							if(sender == myID) name = me.name;
+							else if(otherPlayers.find(sender)==otherPlayers.end())
+							{
+								ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: invalid chat sender %u)") % static_cast<unsigned int>(sender));
+								name = "Unknown player";
+							}
+							else name = otherPlayers[sender].name;
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Chat: %s %s: %s") % maskStr % name % chat);
 							break;
+						}
 						case DATATYPE_UPDATEPLAYER:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update"));

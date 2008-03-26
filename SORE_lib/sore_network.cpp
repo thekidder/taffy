@@ -196,6 +196,11 @@ namespace SORE_Network
 		enet_host_broadcast(host, channelID, temp);
 	}
 	
+	void SendBuffer::Clear()
+	{
+		buf.clear();
+	}
+	
 	ReceiveBuffer::ReceiveBuffer(ENetPacket& packet)
 	{
 		data = static_cast<ubyte*>(packet.data);

@@ -47,6 +47,10 @@ const ubyte STATE_DISCONNECTING = 2;
 const ubyte STATE_OBSERVER      = 3;
 const ubyte STATE_PLAYER        = 4;
 
+const ubyte CHATMASK_ALL        = 0;
+const ubyte CHATMASK_TEAM       = 1;
+const ubyte CHATMASK_WHISPER    = 2;
+
 namespace SORE_Network
 {
 	typedef std::vector<ubyte> net_buffer;
@@ -58,12 +62,14 @@ namespace SORE_Network
 	
 	struct player
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0) {player_ip_str[0]='\0';}
+		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), peer(NULL), player_ip(0) {player_ip_str[0]='\0';}
 		std::string name;
 		ubyte playerState;
 		ubyte team; //implementation defined
+		
+		//only used on server
 		player_ref id_iter; //retrieved from server
-		//ubyte id;
+		ENetPeer* peer;
 		
 		//network info
 		enet_uint32 player_ip;

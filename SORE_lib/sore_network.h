@@ -122,6 +122,7 @@ namespace SORE_Network
 			ENetPacket* GetPacket(enet_uint32 flags);
 			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
 			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
+			void Clear();
 		protected:
 			net_buffer buf;
 	};

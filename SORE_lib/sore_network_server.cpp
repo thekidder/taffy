@@ -87,6 +87,7 @@ namespace SORE_Network
 					std::pair<player_ref, bool> iter = playerList.insert(std::pair<ubyte, player>(newId, newPlayer) );
 					player_ref pos = iter.first;
 					pos->second.id_iter = pos;
+					pos->second.peer = event.peer;
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
 					// Store any relevant client information here.
 					event.peer->data = static_cast<void*>(&pos->second.id_iter);
@@ -144,8 +145,55 @@ namespace SORE_Network
 							}
 							break;
 						case DATATYPE_PLAYERCHAT:
+						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+							ubyte mask = msg.GetUByte();
+							switch(mask)
+							{
+								case CHATMASK_ALL:
+								{
+									std::string chat = msg.GetString2();
+									SendBuffer sendChat;
+									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+									sendChat.AddUByte(CHATMASK_ALL);
+									sendChat.AddUByte(pos->first);
+									sendChat.AddString2(chat);
+									sendChat.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
+									break;
+								}
+								case CHATMASK_TEAM:
+								{
+									ubyte team = msg.GetUByte();
+									std::string chat = msg.GetString2();
+									SendBuffer sendChat;
+									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+									sendChat.AddUByte(CHATMASK_TEAM);
+									sendChat.AddUByte(pos->first);
+									sendChat.AddString2(chat);
+									for(player_ref i=playerList.begin();i!=playerList.end();i++)
+									{
+										if(i->second.team == team)
+											sendChat.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+									}
+									break;
+								}
+								case CHATMASK_WHISPER:
+								{
+									ubyte recipient = msg.GetUByte();
+									std::string chat = msg.GetString2();
+									SendBuffer sendChat;
+									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+									sendChat.AddUByte(CHATMASK_WHISPER);
+									sendChat.AddUByte(pos->first);
+									sendChat.AddString2(chat);
+									sendChat.Send(playerList[recipient].peer, 0, ENET_PACKET_FLAG_RELIABLE);
+									break;
+								}
+								default:
+									ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: invalid chatmask %u)") % pos->second.player_ip_str % static_cast<unsigned int>(mask));
+							}
 							break;
+						}
 						case DATATYPE_CHANGEHANDLE:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
