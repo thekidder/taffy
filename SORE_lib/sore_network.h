@@ -32,9 +32,10 @@
 /*
  * This subsystem is experimental. It provides a testing ground for networking
  * additions to the SORE library.
- * Currently SORE_Network provides Server and Client classes, which are used for
- * UDP/LAN connections and management. This is not permanent and may change at
- * any time.
+ * Current status: UDP broadcasting/listening works for discovering servers on LAN
+ * Clients can connect/disconnect to servers, and change their handles
+ * Code for packing/unpacking data into/from a network stream is present and should work
+ * 
  */
 
 bool operator<(ENetAddress a, ENetAddress b); 
@@ -59,6 +60,7 @@ namespace SORE_Network
 	//misc
 	const ubyte DATATYPE_PLAYERCHAT         = DATATYPE_START + 2;
 	const ubyte DATATYPE_UPDATEPLAYER       = DATATYPE_START + 9;
+	const ubyte DATATYPE_DELETEPLAYER       = DATATYPE_START + 11;
 	
 	void InitNetwork();
 	

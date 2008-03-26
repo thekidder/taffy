@@ -199,7 +199,7 @@ namespace SORE_Network
 							break;
 						case DATATYPE_UPDATEPLAYER:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % static_cast<unsigned int>(msg.Remaining()));
+							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update"));
 							ubyte id = msg.GetUByte();
 							otherPlayers[id].playerState = msg.GetUByte();
 							otherPlayers[id].team = msg.GetUByte();
@@ -209,6 +209,19 @@ namespace SORE_Network
 							temp.port = sm.GetVariable("network", "port");
 							enet_address_get_host_ip(&temp, otherPlayers[id].player_ip_str, 16);
 							otherPlayers[id].name = msg.GetString1();
+							PrintPlayers(SORE_Logging::LVL_INFO, otherPlayers);
+							break;
+						}
+						case DATATYPE_DELETEPLAYER:
+						{
+							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player delete"));
+							ubyte id = msg.GetUByte();
+							if(otherPlayers.find(id)==otherPlayers.end())
+							{
+								ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: invalid player to delete %u)") % static_cast<unsigned int>(id));
+								break;
+							}
+							otherPlayers.erase(id);
 							PrintPlayers(SORE_Logging::LVL_INFO, otherPlayers);
 							break;
 						}

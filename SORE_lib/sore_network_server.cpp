@@ -183,6 +183,10 @@ namespace SORE_Network
 						case DATATYPE_STATUSPLAY:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							break;
+						case DATATYPE_UPDATEPLAYER:
+						case DATATYPE_DELETEPLAYER:
+							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: invalid datatype %u)") % pos->second.player_ip_str % static_cast<unsigned int>(dataType));
+							break;
 						default:
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: unknown datatype %u)") % pos->second.player_ip_str % static_cast<unsigned int>(dataType));
 					}
@@ -201,6 +205,10 @@ namespace SORE_Network
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;
+					SendBuffer killPlayer;
+					killPlayer.AddUByte(DATATYPE_DELETEPLAYER);
+					killPlayer.AddUByte(pos->first);
+					killPlayer.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
 					playerList.erase(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
