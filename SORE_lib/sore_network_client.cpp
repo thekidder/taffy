@@ -74,7 +74,6 @@ namespace SORE_Network
 			enet_peer_send (server, 0, packet);*/
 			
 			enet_host_flush (client);
-			enet_packet_destroy(packet);
 		}
 		else
 		{
