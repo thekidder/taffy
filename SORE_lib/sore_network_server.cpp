@@ -96,27 +96,30 @@ namespace SORE_Network
 					send_id.push_back(newId);
 					ENetPacket* packet = GetENetPacket(send_id, ENET_PACKET_FLAG_RELIABLE);
 					enet_peer_send(event.peer, 0, packet);
-					for(player_ref i=playerList.begin();i!=playerList.end();i++)
+					/*for(player_ref i=playerList.begin();i!=playerList.end();i++)
 					{
-						if(i==pos) continue;
+						if(i->first==pos->first) continue;
 						net_buffer playerUpdate;
 						playerUpdate.push_back(DATATYPE_UPDATEPLAYER);
 						playerUpdate.push_back(i->first);
 						playerUpdate.push_back(i->second.playerState);
 						playerUpdate.push_back(i->second.team);
 						size_t size = playerUpdate.size();
-						playerUpdate.resize(size+4);
-						ubyte4* pos = reinterpret_cast<ubyte4*>(&playerUpdate[size-1]);
+						playerUpdate.resize(size+5+i->second.name.size());
+						ubyte4* pos = reinterpret_cast<ubyte4*>(&playerUpdate[size]);
 						*pos = i->second.player_ip;
 						//playerUpdate.push_back(i->player_ip);
-						playerUpdate.push_back(static_cast<ubyte>(i->second.name.size()));
+						playerUpdate[size+4] = static_cast<ubyte>(i->second.name.size());
 						for(size_t j=0;j<i->second.name.size();j++)
 						{
-							playerUpdate.push_back(static_cast<ubyte>(i->second.name[j]));
+							playerUpdate[size+5+j] = static_cast<ubyte>(i->second.name[j]);
 						}
-						ENetPacket* packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
+						//packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
 						enet_peer_send(event.peer, 0, packet);
-					}
+					}*/
+					void* data = (char*)"\12\001\001\000\300\030\000\004\011kiddar";
+					packet = enet_packet_create(data, 15, ENET_PACKET_FLAG_RELIABLE);
+							enet_peer_send(event.peer, 0, packet);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
 				}

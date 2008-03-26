@@ -263,6 +263,8 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: unknown datatype %u)") % static_cast<unsigned int>(dataType));
 							break;
 					}
+					if(msg.Remaining())
+						ENGINE_LOG(SORE_Logging::LVL_WARNING, "Garbage remaining at end of packet");
 					enet_packet_destroy (event.packet);
 					break;
 				}
