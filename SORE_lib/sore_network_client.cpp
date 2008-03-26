@@ -64,14 +64,9 @@ namespace SORE_Network
 			{
 				data.push_back(static_cast<ubyte>(name[i]));
 			}
-			//vdata = static_cast<void*>(&data[0]);
-			//packet = enet_packet_create (vdata, data.size(), ENET_PACKET_FLAG_RELIABLE);
+
 			packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
 			enet_peer_send (server, 0, packet);
-			/*data.clear();
-			data.push_back(DATATYPE_QUITSERVER);
-			packet = GetENetPacket(data, ENET_PACK_FLAG_RELIABLE);
-			enet_peer_send (server, 0, packet);*/
 			
 			enet_host_flush (client);
 		}
@@ -142,9 +137,6 @@ namespace SORE_Network
 				buffer[i] = data[i];
 			}
 			enet_address_get_host_ip(&remote, addr,15);
-			//int len = strlen(buffer);
-			//int realLen = remote_len;
-			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving from %s: \"%s\" (length: %d, displayed length: %d)") % addr % buffer % realLen % len);
 			
 			if(LAN.find(remote.host)==LAN.end())
 			{
@@ -152,7 +144,6 @@ namespace SORE_Network
 			}
 			LAN[remote.host].first = 0;
 			LAN[remote.host].second = buffer;
-			//LAN[remote.host].second.size() = buf.dataLength;
 		}
 		else if(remote_len==-1)
 		{
@@ -193,12 +184,6 @@ namespace SORE_Network
 				{
 					std::string peer, channel;
 										
-					//player_ref pos = GetPlayerRef(event.peer);
-					//peer = pos->name;
-					//if(event.channelID)
-					//	channel = event.channelID;
-					//else
-					//	channel = "0";
 					ReceiveBuffer msg(*event.packet);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)

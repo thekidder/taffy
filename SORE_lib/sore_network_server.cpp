@@ -83,7 +83,6 @@ namespace SORE_Network
 						newId = nextId;
 						nextId++;
 					}
-					//newPlayer.id = newId;
 					assert(playerList.find(newId)==playerList.end());
 					std::pair<player_ref, bool> iter = playerList.insert(std::pair<ubyte, player>(newId, newPlayer) );
 					player_ref pos = iter.first;
@@ -99,23 +98,7 @@ namespace SORE_Network
 					for(player_ref i=playerList.begin();i!=playerList.end();i++)
 					{
 						if(i->first==pos->first) continue;
-						/*net_buffer playerUpdate;
-						playerUpdate.push_back(DATATYPE_UPDATEPLAYER);
-						playerUpdate.push_back(i->first);
-						playerUpdate.push_back(i->second.playerState);
-						playerUpdate.push_back(i->second.team);
-						size_t size = playerUpdate.size();
-						playerUpdate.resize(size+5+i->second.name.size());
-						ubyte4* pos = reinterpret_cast<ubyte4*>(&playerUpdate[size]);
-						*pos = i->second.player_ip;
-						//playerUpdate.push_back(i->player_ip);
-						playerUpdate[size+4] = static_cast<ubyte>(i->second.name.size());
-						for(size_t j=0;j<i->second.name.size();j++)
-						{
-							playerUpdate[size+5+j] = static_cast<ubyte>(i->second.name[j]);
-						}
-						packet = GetENetPacket(playerUpdate, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(event.peer, 0, packet);*/
+						
 						SendBuffer playerUpdate;
 						playerUpdate.AddUByte(DATATYPE_UPDATEPLAYER);
 						playerUpdate.AddUByte(i->first);
@@ -125,9 +108,6 @@ namespace SORE_Network
 						playerUpdate.AddString1(i->second.name);
 						playerUpdate.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					}
-					//void* data = (char*)"\12\001\001\000\300\030\000\004\006kiddar";
-					//packet = enet_packet_create(data, 15, ENET_PACKET_FLAG_RELIABLE);
-					//enet_peer_send(event.peer, 0, packet);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
 				}
