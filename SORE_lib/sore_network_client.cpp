@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), myID(0)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), myID(0), game(NULL)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -116,6 +116,11 @@ namespace SORE_Network
 		enet_host_destroy(client);
 	}
 	
+	void Client::SetGamestate(Gamestate* g)
+	{
+		game = g;
+	}
+	
 	void Client::UpdateServers(int elapsed)
 	{
 		char addr[16];
@@ -187,9 +192,21 @@ namespace SORE_Network
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate transfer");
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+								break;
+							}
+							game->Deserialize(msg, 0);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate delta transfer");
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+								break;
+							}
+							game->DeserializeDelta(msg, 0);
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{

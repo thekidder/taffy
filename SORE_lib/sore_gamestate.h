@@ -76,15 +76,72 @@ namespace SORE_Network
 		char player_ip_str[16];
 	};
 	
+	class ReceiveBuffer
+	{
+		public:
+			ReceiveBuffer(ENetPacket& packet);
+			
+			//primitives
+			ubyte  GetUByte();
+			sbyte  GetByte();
+			ubyte2 GetUByte2();
+			sbyte2 GetByte2();
+			ubyte4 GetUByte4();
+			sbyte4 GetByte4();
+			 
+			 //conversions needed
+			std::string GetString(size_t len); //string with given length
+			std::string GetString1(); //string with one-byte (unsigned) preceding length
+			std::string GetString2(); //string with two-byte (unsigned) preceding length
+			
+			float1 GetFloat1();
+			float2 GetFloat2();
+			
+			size_t Remaining() const;
+		protected:
+			ubyte* data;
+			size_t length;
+			size_t remaining;
+	};
+	
+	class SendBuffer
+	{
+		public:
+			SendBuffer();
+			
+			void AddUByte (ubyte b);
+			void AddByte  (sbyte b);
+			
+			void AddUByte2(ubyte2 b);
+			void AddByte2 (sbyte2 b);
+			
+			void AddUByte4(ubyte4 b);
+			void AddByte4 (sbyte4 b);
+			
+			void AddString(std::string str);
+			void AddString1(std::string str);
+			void AddString2(std::string str);
+			
+			void AddFloat1(float1 f);
+			void AddFloat2(float2 f);
+			
+			ENetPacket* GetPacket(enet_uint32 flags);
+			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
+			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
+			void Clear();
+		protected:
+			net_buffer buf;
+	};
+	
 	class Gamestate
 	{
 		public:
 			virtual ~Gamestate() {}
 			
-			virtual net_buffer Serialize() = 0;
-			virtual net_buffer SerializeDelta() = 0;
-			virtual void   Deserialize(net_buffer& b) = 0;
-			virtual void   DeserializeDelta(net_buffer& b) = 0;
+			virtual SendBuffer Serialize() = 0;
+			virtual SendBuffer SerializeDelta() = 0;
+			virtual bool   Deserialize(ReceiveBuffer& b, ubyte fromPlayer) = 0; //if fromPlayer = 0, this is server -> client; returns true if deserialization succeeded
+			virtual bool   DeserializeDelta(ReceiveBuffer& b, ubyte fromPlayer) = 0; // same ^
 			
 		protected:
 	};

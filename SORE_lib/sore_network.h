@@ -68,65 +68,6 @@ namespace SORE_Network
 	std::string PrintPlayer(std::pair<ubyte, player> p);
 	void PrintPlayers(unsigned int lvl, player_list playerList);
 	
-	ENetPacket* GetENetPacket(net_buffer& buf, enet_uint32 flags);
-	
-	class ReceiveBuffer
-	{
-		public:
-			ReceiveBuffer(ENetPacket& packet);
-			
-			//primitives
-			ubyte  GetUByte();
-			sbyte  GetByte();
-			ubyte2 GetUByte2();
-			sbyte2 GetByte2();
-			ubyte4 GetUByte4();
-			sbyte4 GetByte4();
-			 
-			 //conversions needed
-			std::string GetString(size_t len); //string with given length
-			std::string GetString1(); //string with one-byte (unsigned) preceding length
-			std::string GetString2(); //string with two-byte (unsigned) preceding length
-			
-			float1 GetFloat1();
-			float2 GetFloat2();
-			
-			size_t Remaining() const;
-		protected:
-			ubyte* data;
-			size_t length;
-			size_t remaining;
-	};
-	
-	class SendBuffer
-	{
-		public:
-			SendBuffer();
-			
-			void AddUByte (ubyte b);
-			void AddByte  (sbyte b);
-			
-			void AddUByte2(ubyte2 b);
-			void AddByte2 (sbyte2 b);
-			
-			void AddUByte4(ubyte4 b);
-			void AddByte4 (sbyte4 b);
-			
-			void AddString(std::string str);
-			void AddString1(std::string str);
-			void AddString2(std::string str);
-			
-			void AddFloat1(float1 f);
-			void AddFloat2(float2 f);
-			
-			ENetPacket* GetPacket(enet_uint32 flags);
-			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
-			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
-			void Clear();
-		protected:
-			net_buffer buf;
-	};
-	
 	/*class NetworkConnection : public SORE_Kernel::Task
 	{
 		public:
@@ -169,19 +110,22 @@ namespace SORE_Network
 			~Server();
 			
 			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
-			
+			void SetGamestate(Gamestate* g);
 			size_t NumPlayers() const;
 			
 			void Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
 		protected:
 			player_ref GetPlayerRef(ENetPeer* peer);
+			void UpdatePlayer(player_ref toUpdate);
+			
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
 			UDPBroadcaster broadcaster;
 			player_list playerList;
 			std::deque<ubyte> unusedIDs;
 			ubyte nextId;
+			Gamestate* game;
 	};
 	
 	typedef std::map<unsigned int, std::pair<unsigned int, net_buffer> > server_list;
@@ -196,6 +140,8 @@ namespace SORE_Network
 			server_list GetLANServers() const;
 			
 			const char* GetName() const {return "SORE Networking client task";}
+			
+			void SetGamestate(Gamestate* g);
 		protected:
 			void UpdateServers(int elapsed); //find broadcasting servers on LAN
 			ENetHost* client;
@@ -207,6 +153,7 @@ namespace SORE_Network
 			player me;
 			ubyte myID;
 			player_list otherPlayers;
+			Gamestate* game;
 	};
 }
 

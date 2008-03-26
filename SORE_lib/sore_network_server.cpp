@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), game(NULL)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -58,6 +58,27 @@ namespace SORE_Network
 		return pos;
 	}
 	
+	void Server::UpdatePlayer(player_ref toUpdate)
+	{
+		SendBuffer playerUpdate;
+		playerUpdate.AddUByte(DATATYPE_UPDATEPLAYER);
+		playerUpdate.AddUByte(toUpdate->first);
+		playerUpdate.AddUByte(toUpdate->second.playerState);
+		playerUpdate.AddUByte(toUpdate->second.team);
+		playerUpdate.AddUByte4(toUpdate->second.player_ip);
+		playerUpdate.AddString1(toUpdate->second.name);
+		for(player_ref i=playerList.begin();i!=playerList.end();i++)
+		{
+			if(i->first==toUpdate->first) continue;
+			playerUpdate.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+		}
+	}
+	
+	void Server::SetGamestate(Gamestate* g)
+	{
+		game = g;
+	}
+	
 	void Server::Frame(int elapsed)
 	{
 		ENetEvent event;
@@ -88,27 +109,14 @@ namespace SORE_Network
 					player_ref pos = iter.first;
 					pos->second.id_iter = pos;
 					pos->second.peer = event.peer;
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("A new client connected from %s") % newPlayer.player_ip_str);
 					// Store any relevant client information here.
 					event.peer->data = static_cast<void*>(&pos->second.id_iter);
-					net_buffer send_id;
-					send_id.push_back(DATATYPE_CHANGEID);
-					send_id.push_back(newId);
-					ENetPacket* packet = GetENetPacket(send_id, ENET_PACKET_FLAG_RELIABLE);
-					enet_peer_send(event.peer, 0, packet);
-					for(player_ref i=playerList.begin();i!=playerList.end();i++)
-					{
-						if(i->first==pos->first) continue;
-						
-						SendBuffer playerUpdate;
-						playerUpdate.AddUByte(DATATYPE_UPDATEPLAYER);
-						playerUpdate.AddUByte(i->first);
-						playerUpdate.AddUByte(i->second.playerState);
-						playerUpdate.AddUByte(i->second.team);
-						playerUpdate.AddUByte4(i->second.player_ip);
-						playerUpdate.AddString1(i->second.name);
-						playerUpdate.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
-					}
+					SendBuffer send_id;
+					send_id.AddUByte(DATATYPE_CHANGEID);
+					send_id.AddUByte(newId);
+					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+					UpdatePlayer(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
 				}
@@ -135,6 +143,12 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
 								break;
 							}
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+								break;
+							}
+							game->Deserialize(msg, pos->first);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
@@ -143,6 +157,12 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
 								break;
 							}
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+								break;
+							}
+							game->DeserializeDelta(msg, pos->first);
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{
@@ -200,15 +220,12 @@ namespace SORE_Network
 							pos->second.name = msg.GetString1();
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							//send confirmation
-							net_buffer data;
-							data.push_back(DATATYPE_CHANGEHANDLE);
-							data.push_back(static_cast<ubyte>(pos->second.name.size()));
-							for(size_t i=0;i<pos->second.name.size();i++)
-							{
-								data.push_back(static_cast<ubyte>(pos->second.name[i]));
-							}
-							ENetPacket* packet = GetENetPacket(data, ENET_PACKET_FLAG_RELIABLE);
-							enet_peer_send(event.peer, 0, packet);
+							SendBuffer data;
+							data.AddUByte(DATATYPE_CHANGEHANDLE);
+							data.AddString1(pos->second.name);
+							data.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+							//update other players
+							UpdatePlayer(pos);
 							break;
 						}
 						case DATATYPE_JOINSERVER:

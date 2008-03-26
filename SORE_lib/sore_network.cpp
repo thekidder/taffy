@@ -47,15 +47,6 @@ namespace SORE_Network
 		}
 	}
 	
-	ENetPacket* GetENetPacket(net_buffer& buf, enet_uint32 flags)
-	{
-		ENetPacket* temp;
-		ubyte* begin = &buf[0];
-		void* vdata = static_cast<void*>(begin);
-		temp = enet_packet_create(vdata, buf.size(), flags);
-		return temp;
-	}
-	
 	std::string PrintPlayer(player_ref p)
 	{
 		std::pair<ubyte, player> i = *p;
