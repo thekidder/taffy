@@ -215,12 +215,8 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: player chat");
 							break;
 						case DATATYPE_UPDATEPLAYER:
-<<<<<<< .mine
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % msg.Remaining());
-=======
 							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update (%u bytes)") % static_cast<unsigned int>(msg.Remaining()));
->>>>>>> .r236
 							ubyte id = msg.GetUByte();
 							otherPlayers[id].playerState = msg.GetUByte();
 							otherPlayers[id].team = msg.GetUByte();
