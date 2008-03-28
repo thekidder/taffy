@@ -180,7 +180,9 @@ namespace SORE_Network
 			virtual bool   DeserializeDelta(ReceiveBuffer& b, ubyte fromPlayer) = 0; // same ^
 			virtual bool   DeserializeDeltaServer(ReceiveBuffer& b, ubyte fromPlayer) = 0;
 			
+			bool Update() const {return requestUpdate;}
 		protected:
+			bool requestUpdate;
 	};
 }
 

@@ -175,7 +175,7 @@ namespace SORE_Network
 		
 		ENetEvent event;
 		
-		if(game)
+		if(game && game->Update())
 			PushGamestate();
 		
 		while (enet_host_service (client, &event, 0) > 0)
