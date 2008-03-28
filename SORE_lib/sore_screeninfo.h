@@ -22,6 +22,8 @@
 #ifndef  __SORE_SCREENINFO__
 #define  __SORE_SCREENINFO__
 
+#include "sore_math.h"
+
 namespace SORE_Graphics
 {
 	enum ProjectionType {NONE, ORTHO, ORTHO2D, PERSPECTIVE};
@@ -30,9 +32,9 @@ namespace SORE_Graphics
 	{
 		ProjectionInfo() {type = NONE; fov = ratio = znear = zfar = top = bottom = left = right = 0.0; useScreenCoords = useScreenRatio = false; }
 		ProjectionType type;
-		GLfloat fov,ratio;
-		GLfloat znear, zfar;
-		GLfloat top, bottom, left, right;
+		float fov,ratio;
+		float znear, zfar;
+		float top, bottom, left, right;
 		bool useScreenCoords; //if this is true, and type of projection is ortho2d, use width/height for projection
 		bool useScreenRatio; //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
 	};
@@ -40,11 +42,14 @@ namespace SORE_Graphics
 	struct ScreenInfo
 	{
 		int width, height;
-		GLfloat ratio; //set by SORE_Screen after screen is created
+		float ratio; //set by SORE_Screen after screen is created
 		bool showCursor;
 		bool fullscreen;
 		bool resizable;
-	};	
+	};
+	
+	SORE_Math::Point2D<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<int> pos);
+	SORE_Math::Point2D<int>   ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<float> pos);
 }
 
 #endif /*__SORE_SCREENINFO__*/
