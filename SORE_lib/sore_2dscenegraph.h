@@ -46,6 +46,8 @@ namespace SORE_Graphics
 			void       RemoveSprite  (std::string name);
 			void       RemoveSprite  (sprite_ref id);
 			
+			void       Clear         ();
+			
 		protected:
 			std::map<std::string, Sprite2D> nodes;
 	};

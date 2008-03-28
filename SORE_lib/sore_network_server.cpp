@@ -31,7 +31,7 @@ namespace SORE_Network
 		server = enet_host_create(&address, 32, 0, 0);
 		if(server == NULL)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occuring while creating server");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occured while creating server");
 		}
 		else
 		{
@@ -83,6 +83,10 @@ namespace SORE_Network
 	{
 		ENetEvent event;
 		
+		if(server == NULL)
+		{
+			return;
+		}
 		while (enet_host_service (server, &event, 0) > 0)
 		{
 			switch (event.type)
@@ -282,6 +286,8 @@ namespace SORE_Network
 					break;
 			}
 		}
+		if(game)
+			BroadcastGamestateDelta();
 	}
 	
 	size_t Server::NumPlayers() const
@@ -296,26 +302,42 @@ namespace SORE_Network
 	
 	void Server::SendGamestate(player_ref p)
 	{
+		if(game==NULL) return;
+		SendBuffer header;
+		header.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
 		SendBuffer state = game->Serialize();
-		state.Send(p->second.peer, 1, 0);
+		header += state;
+		header.Send(p->second.peer, 1, 0);
 	}
 
 	void Server::SendGamestateDelta(player_ref p)
 	{
+		if(game==NULL) return;
+		SendBuffer header;
+		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		SendBuffer state = game->SerializeDelta();
-		state.Send(p->second.peer, 1, 0);
+		header += state;
+		header.Send(p->second.peer, 1, 0);
 	}
 
 	void Server::BroadcastGamestate()
 	{
+		if(game==NULL) return;
+		SendBuffer header;
+		header.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
 		SendBuffer state = game->Serialize();
-		state.Broadcast(server, 1, 0);
+		header += state;
+		header.Broadcast(server, 1, 0);
 	}
 
 	void Server::BroadcastGamestateDelta()
 	{
+		if(game==NULL) return;
+		SendBuffer header;
+		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		SendBuffer state = game->SerializeDelta();
-		state.Broadcast(server, 1, 0);
+		header += state;
+		header.Broadcast(server, 1, 0);
 	}
 
 	void Server::PushGamestate()

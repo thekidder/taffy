@@ -54,7 +54,7 @@ namespace SORE_Resource
 				}
 				else
 				{
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Retrieved resource: %s") % filename);
+					//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Retrieved resource: %s") % filename);
 					Resource* r = resources.find(filename)->second;
 					T* resource = dynamic_cast<T*>(r);
 					if(resource==NULL) ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not downcast resource for filename %s") % filename);

@@ -332,6 +332,7 @@ void SORE_Logging::Logger::Log(int lvl, std::string message)
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
+	if(lvl == LVL_ERROR) Flush();
 #ifdef FLUSH_MESSAGES
 	Flush();
 #endif
@@ -364,6 +365,7 @@ void SORE_Logging::Logger::Log(int lvl, int line, const char* func, const char* 
 			(*it)->Log(&buffers[i]);
 	}
 	if(logs.size()>0) buffers.clear();
+	if(lvl == LVL_ERROR) Flush();
 #ifdef FLUSH_MESSAGES
 	Flush();
 #endif

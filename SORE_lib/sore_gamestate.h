@@ -30,12 +30,20 @@
 #endif
 #include <enet/enet.h>
 
-typedef   signed char  sbyte;
-typedef unsigned char  ubyte;
-typedef   signed short sbyte2;
-typedef unsigned short ubyte2;
-typedef   signed int   sbyte4;
-typedef unsigned int   ubyte4;
+typedef   signed char     sbyte;
+typedef unsigned char     ubyte;
+typedef   signed short    sbyte2;
+typedef unsigned short    ubyte2;
+typedef   signed int      sbyte4;
+typedef unsigned int      ubyte4;
+
+#ifdef _WIN32
+typedef   signed __int64  sbyte8;
+typedef unsigned __int64  ubyte8;
+#else
+typedef           int64_t sbyte8;
+typedef          uint64_t ubyte8;
+#endif
 
 //single and double precision floats
 typedef float  float1;
@@ -76,6 +84,12 @@ namespace SORE_Network
 		char player_ip_str[16];
 	};
 	
+	ubyte8 pack754(long double f, unsigned bits, unsigned expbits);
+	long double unpack754(ubyte8 i, unsigned bits, unsigned expbits);
+	
+	ubyte8 htonll(ubyte8 h);
+	ubyte8 ntohll(ubyte8 n);
+	
 	class ReceiveBuffer
 	{
 		public:
@@ -88,14 +102,15 @@ namespace SORE_Network
 			sbyte2 GetByte2();
 			ubyte4 GetUByte4();
 			sbyte4 GetByte4();
+			ubyte8 GetUByte8();
+			sbyte8 GetByte8();
 			 
 			 //conversions needed
 			std::string GetString(size_t len); //string with given length
 			std::string GetString1(); //string with one-byte (unsigned) preceding length
 			std::string GetString2(); //string with two-byte (unsigned) preceding length
 			
-			float1 GetFloat1();
-			float2 GetFloat2();
+			double GetFloat(size_t numBytes);
 			
 			size_t Remaining() const;
 		protected:
@@ -118,17 +133,25 @@ namespace SORE_Network
 			void AddUByte4(ubyte4 b);
 			void AddByte4 (sbyte4 b);
 			
+			void AddUByte8(ubyte8 b);
+			void AddByte8 (sbyte8 b);
+			
 			void AddString(std::string str);
 			void AddString1(std::string str);
 			void AddString2(std::string str);
 			
-			void AddFloat1(float1 f);
-			void AddFloat2(float2 f);
+			void AddFloat(float1 f, size_t numBytes);
+			void AddFloat(float2 f, size_t numBytes);
+			
+			void AddFloat(float1 f); //default precision: 4 bytes
+			void AddFloat(float2 f); //default precision: 8 bytes
 			
 			ENetPacket* GetPacket(enet_uint32 flags);
 			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
 			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
 			void Clear();
+			
+			SendBuffer& operator+=(SendBuffer& b);
 		protected:
 			net_buffer buf;
 	};

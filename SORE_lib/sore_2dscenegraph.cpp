@@ -31,6 +31,11 @@ namespace SORE_Graphics
 	{
 	}
 	
+	void SceneGraph2D::Clear()
+	{
+		nodes.clear();
+	}
+	
 	std::vector<Sprite2D*> SceneGraph2D::GetRenderList()
 	{
 		std::vector<Sprite2D*> temp;

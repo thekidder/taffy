@@ -180,7 +180,7 @@ namespace SORE_Network
 			switch (event.type)
 			{
 				case ENET_EVENT_TYPE_CONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
+					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("A new client connected from %u:%u") % event.peer->address.host % event.peer->address.port);
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
@@ -191,7 +191,7 @@ namespace SORE_Network
 					switch(dataType)
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate transfer");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
@@ -200,7 +200,7 @@ namespace SORE_Network
 							game->Deserialize(msg, 0);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: gamestate delta transfer");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
@@ -243,7 +243,7 @@ namespace SORE_Network
 						}
 						case DATATYPE_UPDATEPLAYER:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player update"));
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Received packet: player update"));
 							ubyte id = msg.GetUByte();
 							otherPlayers[id].playerState = msg.GetUByte();
 							otherPlayers[id].team = msg.GetUByte();
@@ -253,12 +253,12 @@ namespace SORE_Network
 							temp.port = sm.GetVariable("network", "port");
 							enet_address_get_host_ip(&temp, otherPlayers[id].player_ip_str, 16);
 							otherPlayers[id].name = msg.GetString1();
-							PrintPlayers(SORE_Logging::LVL_INFO, otherPlayers);
+							PrintPlayers(SORE_Logging::LVL_DEBUG3, otherPlayers);
 							break;
 						}
 						case DATATYPE_DELETEPLAYER:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Received packet: player delete"));
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Received packet: player delete"));
 							ubyte id = msg.GetUByte();
 							if(otherPlayers.find(id)==otherPlayers.end())
 							{
@@ -266,39 +266,39 @@ namespace SORE_Network
 								break;
 							}
 							otherPlayers.erase(id);
-							PrintPlayers(SORE_Logging::LVL_INFO, otherPlayers);
+							PrintPlayers(SORE_Logging::LVL_DEBUG3, otherPlayers);
 							break;
 						}
 						case DATATYPE_CHANGEHANDLE:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change handle");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
 							me.name = msg.GetString1();
 							std::string msg = PrintPlayer(std::pair<ubyte, player>(myID, me));
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Player:\n" + msg);
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Player:\n" + msg);
 							break;
 						}
 						case DATATYPE_CHANGEID:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change ID");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change ID");
 							myID = msg.GetUByte();
 							std::string msg = PrintPlayer(std::pair<ubyte, player>(myID, me));
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Player:\n" + msg);
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Player:\n" + msg);
 							break;
 						}
 						case DATATYPE_JOINSERVER:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: join server");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
 							break;
 						case DATATYPE_QUITSERVER:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: quit server");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
 							break;
 						case DATATYPE_CHANGETEAM:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: change team");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
 							break;
 						case DATATYPE_STATUSOBSERVE:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: status observe");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
 							break;
 						case DATATYPE_STATUSPLAY:
-							ENGINE_LOG(SORE_Logging::LVL_INFO, "Received packet: status play");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							break;
 						default:
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: unknown datatype %u)") % static_cast<unsigned int>(dataType));

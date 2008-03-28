@@ -21,6 +21,8 @@
 
 #include "sore_network.h"
 
+#include <algorithm>
+
 bool operator<(ENetAddress a, ENetAddress b)
 {
 	if(a.host<b.host) return true;
@@ -34,6 +36,11 @@ namespace SORE_Network
 	
 	void InitNetwork()
 	{
+		assert(sizeof(ubyte )==1 && sizeof(sbyte )==1 && "Byte type is not of the correct size");
+		assert(sizeof(ubyte2)==2 && sizeof(sbyte2)==2 && "Byte2 type is not of the correct size");
+		assert(sizeof(ubyte4)==4 && sizeof(sbyte4)==4 && "Byte4 type is not of the correct size");
+		assert(sizeof(ubyte8)==8 && sizeof(sbyte8)==8 && "Byte8 type is not of the correct size");
+		
 		if (enet_initialize () != 0)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occured while initializing SORE_Network");
@@ -84,6 +91,82 @@ namespace SORE_Network
 		ENGINE_LOG(lvl, msg);
 	}
 	
+	ubyte8 htonll(ubyte8 h)
+	{
+		ubyte8 n;
+		ubyte* ptr = reinterpret_cast<ubyte*>(&n);
+		*ptr++ = h>>56;
+		*ptr++ = h>>48;
+		*ptr++ = h>>40;
+		*ptr++ = h>>32;
+		*ptr++ = h>>24;
+		*ptr++ = h>>16;
+		*ptr++ = h>>8;
+		*ptr++ = h;
+		return n;
+	}
+	
+	ubyte8 ntohll(ubyte8 n)
+	{
+		ubyte* ptr = reinterpret_cast<ubyte*>(&n);
+		return (static_cast<ubyte8>(ptr[0])<<56) | (static_cast<ubyte8>(ptr[1])<<48) | (static_cast<ubyte8>(ptr[2])<<40) | (static_cast<ubyte8>(ptr[3])<<32) | (static_cast<ubyte8>(ptr[4])<<24) | (static_cast<ubyte8>(ptr[5])<<16) | (static_cast<ubyte8>(ptr[6])<<8) | (static_cast<ubyte8>(ptr[7]));
+	}
+	
+	ubyte8 pack754(long double f, unsigned bits, unsigned expbits)
+	{
+		long double fnorm;
+		int shift;
+		ubyte8 sign, exp, significand;
+		unsigned significandbits = bits - expbits - 1; // -1 for sign bit
+
+		if (f == 0.0) return 0; // get this special case out of the way
+
+    // check sign and begin normalization
+		if (f < 0) { sign = 1; fnorm = -f; }
+		else { sign = 0; fnorm = f; }
+
+    // get the normalized form of f and track the exponent
+		shift = 0;
+		while(fnorm >= 2.0) { fnorm /= 2.0; shift++; }
+		while(fnorm < 1.0) { fnorm *= 2.0; shift--; }
+		fnorm = fnorm - 1.0;
+
+    // calculate the binary form (non-float) of the significand data
+		significand = static_cast<ubyte8>(fnorm * ((1LL<<significandbits) + 0.5f));
+
+    // get the biased exponent
+		exp = shift + ((1<<(expbits-1)) - 1); // shift + bias
+
+    // return the final answer
+		return (sign<<(bits-1)) | (exp<<(bits-expbits-1)) | significand;
+	}
+
+	long double unpack754(ubyte8 i, unsigned bits, unsigned expbits)
+	{
+		long double result;
+		ubyte8 shift;
+		unsigned bias;
+		unsigned significandbits = bits - expbits - 1; // -1 for sign bit
+
+		if (i == 0) return 0.0;
+
+    // pull the significand
+		result = (i&((static_cast<ubyte8>(1LL)<<significandbits)-1)); // mask
+		result /= (static_cast<ubyte8>(1LL)<<significandbits); // convert back to float
+		result += 1.0f; // add the one back on
+
+    // deal with the exponent
+		bias = (1<<(expbits-1)) - 1;
+		shift = ((i>>significandbits)&((static_cast<ubyte8>(1LL)<<expbits)-1)) - bias;
+		while(shift > 0) { result *= 2.0; shift--; }
+		while(shift < 0) { result /= 2.0; shift++; }
+
+    // sign it
+		result *= (i>>(bits-1))&1? -1.0: 1.0;
+
+		return result;
+	}
+	
 	SendBuffer::SendBuffer()
 	{
 	}
@@ -125,6 +208,20 @@ namespace SORE_Network
 	{
 		AddUByte4(static_cast<ubyte4>(b));
 	}
+	
+	void SendBuffer::AddUByte8(ubyte8 b)
+	{
+		ubyte8 n = htonll(b);
+		size_t len = buf.size();
+		buf.resize(len+8);
+		ubyte8* ptr = reinterpret_cast<ubyte8*>(&buf[len]);
+		*ptr = n;
+	}
+
+	void SendBuffer::AddByte8 (sbyte8 b)
+	{
+		AddUByte8(static_cast<ubyte8>(b));
+	}
 
 	void SendBuffer::AddString(std::string str)
 	{
@@ -157,14 +254,63 @@ namespace SORE_Network
 		}
 	}
 
-	void SendBuffer::AddFloat1(float1 f)
+	void SendBuffer::AddFloat(float1 f, size_t numBytes)
 	{
+		return AddFloat(static_cast<float2>(f), numBytes);
 	}
 
-	void SendBuffer::AddFloat2(float2 f)
+	void SendBuffer::AddFloat(float2 f, size_t numBytes)
 	{
+		unsigned int bits, expbits;
+		switch(numBytes)
+		{
+			case 1:
+			{
+				bits = 8;
+				expbits = 2;
+				ubyte packed = pack754(f, bits, expbits);
+				AddUByte2(packed);
+				break;
+			}
+			case 2:
+			{
+				bits = 16;
+				expbits = 4;
+				ubyte2 packed = pack754(f, bits, expbits);
+				AddUByte2(packed);
+				break;
+			}
+			case 4:
+			{
+				bits = 32;
+				expbits = 8;
+				ubyte4 packed = pack754(f, bits, expbits);
+				AddUByte4(packed);
+				break;
+			}
+			case 8:
+			{
+				bits = 64;
+				expbits = 11;
+				ubyte8 packed = pack754(f, bits, expbits);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("adding encoded double: 0x%016llX") % packed);
+				AddUByte8(packed);
+				break;
+			}
+			default:
+				ENGINE_LOG(SORE_Logging::LVL_WARNING, "Unsupported double size");
+		}
+		
 	}
 
+	SendBuffer& SendBuffer::operator+=(SendBuffer& b)
+	{
+		//net_buffer::iterator it = buf.end();
+		//buf.resize(buf.size() + b.buf.size());
+		//std::copy(b.buf.begin(), b.buf.end(), it);
+		buf.insert(buf.end(), b.buf.begin(), b.buf.end());
+		return *this;
+	}
 			
 	ENetPacket* SendBuffer::GetPacket(enet_uint32 flags)
 	{
@@ -229,7 +375,6 @@ namespace SORE_Network
 		assert(remaining>=2);
 		ubyte2 u = GetUByte2();
 		sbyte2 i = static_cast<sbyte2>(u);
-		remaining-=2;
 		return i;
 	}
 	
@@ -247,7 +392,23 @@ namespace SORE_Network
 		assert(remaining>=4);
 		ubyte4 u = GetUByte4();
 		sbyte4 i = static_cast<sbyte4>(u);
-		remaining-=4;
+		return i;
+	}
+	
+	ubyte8 ReceiveBuffer::GetUByte8()
+	{
+		assert(remaining>=8);
+		ubyte8* pos = reinterpret_cast<ubyte8*>(&data[length-remaining]);
+		ubyte8 i = *pos;
+		remaining-=8;
+		return ntohll(i);
+	}
+	
+	sbyte8 ReceiveBuffer::GetByte8()
+	{
+		assert(remaining>=8);
+		ubyte8 u = GetUByte8();
+		sbyte8 i = static_cast<sbyte8>(u);
 		return i;
 	}
 	
@@ -272,7 +433,41 @@ namespace SORE_Network
 		size_t len = static_cast<size_t>(GetUByte2());
 		return GetString(len);
 	}
-			
+	
+	double ReceiveBuffer::GetFloat(size_t numBytes)
+	{
+		assert(numBytes==1 || numBytes==2 || numBytes==4 || numBytes==8);
+		ubyte8 num;
+		unsigned int bits, expbits;
+		switch(numBytes)
+		{
+			case 1:
+				num = static_cast<ubyte8>(GetUByte());
+				bits = 8;
+				expbits = 2;
+				break;
+			case 2:
+				num = static_cast<ubyte8>(GetUByte2());
+				bits = 16;
+				expbits = 4;
+				break;
+			case 4:
+				num = static_cast<ubyte8>(GetUByte4());
+				bits = 32;
+				expbits = 8;
+				break;
+			case 8:
+				num = static_cast<ubyte8>(GetUByte8());
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("receiving encoded double: 0x%016llX") % num);
+				bits = 64;
+				expbits = 11;
+				break;
+			default:
+				ENGINE_LOG(SORE_Logging::LVL_WARNING, "Unsupported double size");
+		}
+		return static_cast<double>(unpack754(num, bits, expbits));
+	}
+	
 	size_t ReceiveBuffer::Remaining() const
 	{
 		return remaining;

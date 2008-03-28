@@ -128,7 +128,7 @@ namespace SORE_Graphics
 		
 		currMaterial = NULL;
 		
-		SORE_Graphics::color c = {0.0f,0.0f,0.0f,1.0f};
+		SORE_Graphics::color c(0.0f,0.0f,0.0f,1.0f);
 		
 		static Sprite2D glow(rm, "glow", 0.0f, 0.0f, -0.95f, 0.0f, 0.0f, c);
 		
