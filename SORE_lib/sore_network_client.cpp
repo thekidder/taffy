@@ -60,10 +60,10 @@ namespace SORE_Network
 			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			
 			data.Clear();
-			data.AddUByte(DATATYPE_PLAYERCHAT);
-			data.AddUByte(CHATMASK_ALL);
-			data.AddString2("Hello, world!");
-			//data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+			data.AddUByte(DATATYPE_STATUSPLAY);
+			//data.AddUByte(CHATMASK_ALL);
+			//data.AddString2("Hello, world!");
+			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			
 			enet_host_flush (client);
 		}
@@ -174,6 +174,9 @@ namespace SORE_Network
 		UpdateServers(elapsed);
 		
 		ENetEvent event;
+		
+		if(game)
+			PushGamestate();
 		
 		while (enet_host_service (client, &event, 0) > 0)
 		{
@@ -318,6 +321,7 @@ namespace SORE_Network
 					break;
 			}
 		}
+		
 	}
 	
 	server_list Client::GetLANServers() const
@@ -327,7 +331,11 @@ namespace SORE_Network
 	
 	void Client::PushGamestate()
 	{
+		if(game==NULL) return;
+		SendBuffer header;
+		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		SendBuffer state = game->SerializeDelta();
-		state.Send(server, 1, 0);
+		header+=state;
+		header.Send(server, 1, 0);
 	}
 }

@@ -248,9 +248,13 @@ namespace SORE_Network
 							break;
 						case DATATYPE_STATUSOBSERVE:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
+							pos->second.playerState = STATE_OBSERVER;
+							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_STATUSPLAY:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
+							pos->second.playerState = STATE_PLAYER;
+							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_UPDATEPLAYER:
 						case DATATYPE_DELETEPLAYER:
