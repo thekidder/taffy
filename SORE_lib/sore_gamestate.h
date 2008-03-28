@@ -156,6 +156,19 @@ namespace SORE_Network
 			net_buffer buf;
 	};
 	
+	/*template<class T> //T must be copyable
+			class SyncedData
+	{
+		public:
+			SyncedData(T initial);
+			
+			T* GetRequested();
+			T* GetData();
+		protected:
+			T data;
+			T requested;
+	};*/
+	
 	class Gamestate
 	{
 		public:
@@ -165,6 +178,7 @@ namespace SORE_Network
 			virtual SendBuffer SerializeDelta() = 0;
 			virtual bool   Deserialize(ReceiveBuffer& b, ubyte fromPlayer) = 0; //if fromPlayer = 0, this is server -> client; returns true if deserialization succeeded
 			virtual bool   DeserializeDelta(ReceiveBuffer& b, ubyte fromPlayer) = 0; // same ^
+			virtual bool   DeserializeDeltaServer(ReceiveBuffer& b, ubyte fromPlayer) = 0;
 			
 		protected:
 	};
