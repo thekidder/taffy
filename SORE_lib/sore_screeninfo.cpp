@@ -31,4 +31,8 @@ SORE_Math::Point2D<float> SORE_Graphics::ScreenToProjection(ScreenInfo screen, P
 
 SORE_Math::Point2D<int> SORE_Graphics::ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<float> pos)
 {
+	SORE_Math::Point2D<int> screenPos;
+	screenPos.x = static_cast<int>((screen.width )*(pos.x/(proj.right-proj.left)));
+	screenPos.y = static_cast<int>((screen.height)*(pos.y/(proj.top-proj.bottom)));
+	return screenPos;
 }

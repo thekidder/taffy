@@ -141,7 +141,7 @@ namespace SORE_Network
 					switch(dataType)
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
 							if(pos->second.playerState!=STATE_PLAYER)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
@@ -155,7 +155,7 @@ namespace SORE_Network
 							game->Deserialize(msg, pos->first);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
 							if(pos->second.playerState!=STATE_PLAYER)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
@@ -170,7 +170,7 @@ namespace SORE_Network
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
 							ubyte mask = msg.GetUByte();
 							switch(mask)
 							{
@@ -220,7 +220,7 @@ namespace SORE_Network
 						}
 						case DATATYPE_CHANGEHANDLE:
 						{
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
 							pos->second.name = msg.GetString1();
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							//send confirmation
@@ -233,13 +233,13 @@ namespace SORE_Network
 							break;
 						}
 						case DATATYPE_JOINSERVER:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
 							if(pos->second.playerState==STATE_CONNECTING)
 								pos->second.playerState = STATE_CONNECTED;
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_QUITSERVER:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
 							enet_peer_disconnect(event.peer, 0);
 							pos->second.playerState  = STATE_DISCONNECTING;
 							break;
@@ -247,12 +247,12 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
 							break;
 						case DATATYPE_STATUSOBSERVE:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
 							pos->second.playerState = STATE_OBSERVER;
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_STATUSPLAY:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							pos->second.playerState = STATE_PLAYER;
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
