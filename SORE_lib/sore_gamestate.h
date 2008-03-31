@@ -30,37 +30,38 @@
 #endif
 #include <enet/enet.h>
 
-typedef   signed char     sbyte;
-typedef unsigned char     ubyte;
-typedef   signed short    sbyte2;
-typedef unsigned short    ubyte2;
-typedef   signed int      sbyte4;
-typedef unsigned int      ubyte4;
+//Type definitions for network transmission
+typedef   signed char     sbyte;  //signed 8bit value
+typedef unsigned char     ubyte;  //unsigned 8bit value
+typedef   signed short    sbyte2; //signed 16bit value
+typedef unsigned short    ubyte2; //unsigned 16bit value
+typedef   signed int      sbyte4; //signed 32bit value
+typedef unsigned int      ubyte4; //unsigned 32bit value
 
 #ifdef _WIN32
-typedef   signed __int64  sbyte8;
-typedef unsigned __int64  ubyte8;
+typedef   signed __int64  sbyte8; //signed 64bit value
+typedef unsigned __int64  ubyte8; //unsigned 64bit value
 #else
-typedef           int64_t sbyte8;
-typedef          uint64_t ubyte8;
+typedef           int64_t sbyte8; //signed 64bit value
+typedef          uint64_t ubyte8; //unsigned 64bit value
 #endif
 
 //single and double precision floats
-typedef float  float1;
-typedef double float2;
-
-const ubyte STATE_CONNECTING    = 0;
-const ubyte STATE_CONNECTED     = 1;
-const ubyte STATE_DISCONNECTING = 2;
-const ubyte STATE_OBSERVER      = 3;
-const ubyte STATE_PLAYER        = 4;
-
-const ubyte CHATMASK_ALL        = 0;
-const ubyte CHATMASK_TEAM       = 1;
-const ubyte CHATMASK_WHISPER    = 2;
+typedef            float  float1;
+typedef            double float2;
 
 namespace SORE_Network
 {
+	const ubyte STATE_CONNECTING    = 0;
+	const ubyte STATE_CONNECTED     = 1;
+	const ubyte STATE_DISCONNECTING = 2;
+	const ubyte STATE_OBSERVER      = 3;
+	const ubyte STATE_PLAYER        = 4;
+	
+	const ubyte CHATMASK_ALL        = 0;
+	const ubyte CHATMASK_TEAM       = 1;
+	const ubyte CHATMASK_WHISPER    = 2;
+
 	typedef std::vector<ubyte> net_buffer;
 	
 	struct player;

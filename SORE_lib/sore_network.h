@@ -38,7 +38,7 @@
  * 
  */
 
-bool operator<(ENetAddress a, ENetAddress b); 
+//bool operator<(ENetAddress a, ENetAddress b); 
 
 namespace SORE_Network
 {

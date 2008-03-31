@@ -23,12 +23,12 @@
 
 #include <algorithm>
 
-bool operator<(ENetAddress a, ENetAddress b)
+/*bool operator<(ENetAddress a, ENetAddress b)
 {
 	if(a.host<b.host) return true;
 	if(a.port<b.port) return true;
 	return false;
-}
+}*/
 
 namespace SORE_Network
 {

@@ -244,16 +244,23 @@ namespace SORE_Network
 							pos->second.playerState  = STATE_DISCONNECTING;
 							break;
 						case DATATYPE_CHANGETEAM:
+						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
+							ubyte teamId = msg.GetUByte();
+							pos->second.team = teamId;
+							UpdatePlayer(pos);
 							break;
+						}
 						case DATATYPE_STATUSOBSERVE:
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
 							pos->second.playerState = STATE_OBSERVER;
+							UpdatePlayer(pos);
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_STATUSPLAY:
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							pos->second.playerState = STATE_PLAYER;
+							UpdatePlayer(pos);
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
 						case DATATYPE_UPDATEPLAYER:

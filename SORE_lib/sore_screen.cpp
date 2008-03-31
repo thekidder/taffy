@@ -20,6 +20,12 @@
 #include <functional>
 #include "sore_allgl.h"
 
+#include <CEGUI/RendererModules/OpenGLGUIRenderer/openglrenderer.h>
+#include <CEGUI/CEGUISystem.h>
+#include <CEGUI/CEGUIFontManager.h>
+#include <CEGUI/CEGUISchemeManager.h>
+#include <CEGUI/CEGUIExceptions.h>
+
 SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), resizeCallback(rc), sm(_sm)
 {
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
@@ -35,6 +41,8 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
 		gk->quitFlag = true;
 	}
+	SDL_EnableUNICODE(1);
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	if(sm!=NULL)
 	{
 		screen.width      = sm->WatchVariable("screen", "width",      boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
@@ -53,6 +61,30 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 	{
 		proj = resizeCallback(screen);
 		ChangeProjectionMatrix(proj);
+	}
+	
+	try
+	{
+		CEGUI::OpenGLRenderer* myRenderer = new CEGUI::OpenGLRenderer( 0 );
+		new CEGUI::System( myRenderer );
+		
+		//CEGUI::System::getSingleton().getResourceProvider()->setDefaultResourceGroup("datafiles/");
+		
+		// load in the scheme file, which auto-loads the TaharezLook imageset
+		CEGUI::SchemeManager::getSingleton().loadScheme( "TaharezLook.scheme" );
+	
+	// load in a font.  The first font loaded automatically becomes the default font.
+		if(! CEGUI::FontManager::getSingleton().isFontPresent( "Commonwealth-10" ) )
+			CEGUI::FontManager::getSingleton().createFont( "Commonwealth-10.font" );
+		
+		CEGUI::System::getSingleton().setDefaultMouseCursor( "TaharezLook", "MouseArrow" );
+		
+		//CEGUI::System::getSingleton().setDefaultToolTip( "TaharezLook/Tooltip" );
+	}
+	catch (CEGUI::Exception& e)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("CEGUI Exception occured: %s") % e.getMessage().c_str());
+	// you could quit here
 	}
 }
 
@@ -111,6 +143,7 @@ void SORE_Kernel::Screen::Frame(int elapsedTime)
 	SORE_Profiler::Sample graphics("graphics");
 	if(renderer)
 		renderer->Render();
+	CEGUI::System::getSingleton().renderGUI();
 	SDL_GL_SwapBuffers();
 }
 

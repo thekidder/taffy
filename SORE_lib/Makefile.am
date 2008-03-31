@@ -1,4 +1,4 @@
-INCLUDES = -I/usr/include/freetype2/
+INCLUDES = -I/usr/include/CEGUI -I/usr/include/freetype2/
 METASOURCES = AUTO
 lib_LIBRARIES = libsore.a
 libsore_a_SOURCES = inotify-cxx.cpp sore_2dprimitives.cpp sore_2dscenegraph.cpp \
