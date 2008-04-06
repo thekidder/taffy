@@ -175,9 +175,9 @@ SORE_Logging::XMLLogger::XMLLogger(int lvl, std::string filename, std::string lo
 	filePtr = fopen(file.c_str(), "w");
 	if(filePtr==NULL || ferror(filePtr)!=0)
 	{
-		//we'll log this in case there is another error stream that is ok
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to open log file for writing");
+		//don't log this failure - as XMLLogger hasn't been instantiated, the Logger probably hasn't been either
 		ok = false;
+		//ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to open log file for writing");
 	}
 	else
 		ok = true;
@@ -199,8 +199,10 @@ SORE_Logging::XMLLogger::~XMLLogger()
 
 	const char end[] = "</log>\n";
 	if(ok)
+	{
 		fwrite(end, sizeof(char), strlen(end), filePtr);
-	fclose(filePtr);
+		fclose(filePtr);
+	}
 }
 
 void SORE_Logging::XMLLogger::Write(log_message* log)

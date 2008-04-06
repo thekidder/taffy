@@ -136,7 +136,7 @@ namespace SORE_Network
 			Gamestate* game;
 	};
 	
-	typedef std::map<unsigned int, std::pair<unsigned int, net_buffer> > server_list;
+	typedef std::map<ubyte4, std::pair<unsigned int, net_buffer> > server_list; //(host, (last seen, message) )
 	
 	class Client : public SORE_Kernel::Task
 	{
@@ -148,6 +148,12 @@ namespace SORE_Network
 			server_list GetLANServers() const;
 			void        SetGamestate(Gamestate* g);
 			
+			//Connection Functions
+			void        Connect(server_list::iterator it);
+			void        Connect(ENetAddress address);
+			void        Connect(ubyte4 host, ubyte2 port);
+			void        ConnectDefaultHost(); //connect to host specified in settings manager
+			
 			//call this after gamestate is changed
 			void        PushGamestate();
 			
@@ -157,7 +163,7 @@ namespace SORE_Network
 			void UpdateServers(int elapsed); //find broadcasting servers on LAN
 			ENetHost* client;
 			ENetPeer* server;
-			SORE_Utility::SettingsManager sm;
+			SORE_Utility::SettingsManager& sm;
 			ENetSocket listener;
 			server_list LAN;
 			ENetAddress address;

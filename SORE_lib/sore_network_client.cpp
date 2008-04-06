@@ -23,19 +23,42 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), myID(0), game(NULL)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occuring while creating client");
 		}
+		
+		
+		
+		
+		address.host = ENET_HOST_ANY;
+		address.port = static_cast<enet_uint16>(sm.GetVariable("network", "discover_port"));
+		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
+		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
+	}
+
+	void Client::ConnectDefaultHost()
+	{
 		ENetAddress address;
-		ENetEvent event;
 		std::string serverName = sm.GetVariable("network", "server");
-		unsigned int port = static_cast<enet_uint16>(sm.GetVariable("network", "port"));
-		enet_address_set_host (&address, serverName.c_str());
+		ubyte2 port = static_cast<enet_uint16>(sm.GetVariable("network", "port"));
 		address.port = port;
+		enet_address_set_host (&address, serverName.c_str());
+		
+		Connect(address);
+	}
+	
+	void Client::Connect(ENetAddress address)
+	{
+		ENetEvent event;
+		
+		std::string serverName;
+		serverName.resize(16);
+		
+		enet_address_get_host_ip(&address, &serverName[0], 16);
 		
 		server = enet_host_connect (client, &address, 2);
 		if(server == NULL)
@@ -43,11 +66,11 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "No available peers for initiating a connection");
 			return;
 		}
-		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Waiting five seconds for connection to %s:%d...") % serverName % port);
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Waiting five seconds for connection to %s:%d...") % serverName % address.port);
 		if (enet_host_service (client, &event, 5000) > 0 &&
-					event.type == ENET_EVENT_TYPE_CONNECT)
+			event.type == ENET_EVENT_TYPE_CONNECT)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % port);
+			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % address.port);
 			
 			SendBuffer data;
 			data.AddUByte(DATATYPE_JOINSERVER);
@@ -73,47 +96,65 @@ namespace SORE_Network
 			// received. Reset the peer in the event the 5 seconds
 			// had run out without any significant event.
 			enet_peer_reset (server);
-
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % port);
+			
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Connection to %s:%d failed") % serverName % address.port);
 		}
+	}
+	
+	void Client::Connect(server_list::iterator it)
+	{
+		ENetAddress address;
+		address.host = it->first;
+		address.port = static_cast<enet_uint16>(sm.GetVariable("network", "port"));
 		
-		address.host = ENET_HOST_ANY;
-		address.port = static_cast<enet_uint16>(sm.GetVariable("network", "discover_port"));
-		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
-		enet_socket_set_option(listener, ENET_SOCKOPT_NONBLOCK, 1);
+		Connect(address);
+	}
+	
+	void Client::Connect(ubyte4 host, ubyte2 port)
+	{
+		ENetAddress address;
+		address.host = host;
+		address.port = port;
+		
+		Connect(address);
 	}
 	
 	Client::~Client()
 	{
 		enet_socket_destroy(listener);
-		ENetEvent event;
-		enet_peer_disconnect(server, 0);
-		
-		// Allow up to 3 seconds for the disconnect to succeed
-		//and drop any packets received packets.
-		
-		while (enet_host_service (client, &event, 3000) > 0)
+		if(client)
 		{
-			switch (event.type)
+			if(server)
 			{
-				case ENET_EVENT_TYPE_CONNECT:
-					break;
-				case ENET_EVENT_TYPE_RECEIVE:
+				enet_peer_disconnect(server, 0);
+				
+				// Allow up to 3 seconds for the disconnect to succeed
+				//and drop any packets received packets.
+				ENetEvent event;
+				while (enet_host_service (client, &event, 3000) > 0)
 				{
-					enet_packet_destroy (event.packet);
-					break;
+					switch (event.type)
+					{
+						case ENET_EVENT_TYPE_CONNECT:
+							break;
+						case ENET_EVENT_TYPE_RECEIVE:
+						{
+							enet_packet_destroy (event.packet);
+							break;
+						}
+						case ENET_EVENT_TYPE_DISCONNECT:
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Disconnection succeeded.");
+							return;
+						case ENET_EVENT_TYPE_NONE:
+							break;
+					}
 				}
-				case ENET_EVENT_TYPE_DISCONNECT:
-					ENGINE_LOG(SORE_Logging::LVL_INFO, "Disconnection succeeded.");
-					return;
-				case ENET_EVENT_TYPE_NONE:
-					break;
+				// We've arrived here, so the disconnect attempt didn't
+				// succeed yet.  Force the connection down
+				enet_peer_reset (server);
 			}
+			enet_host_destroy(client);
 		}
-		// We've arrived here, so the disconnect attempt didn't
-		// succeed yet.  Force the connection down
-		enet_peer_reset (server);
-		enet_host_destroy(client);
 	}
 	
 	void Client::SetGamestate(Gamestate* g)

@@ -68,7 +68,7 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 			if(setting.find("//")!=std::string::npos)
 				setting = setting.substr(0, setting.find("//")-1);
 			size_t eqPos=setting.find('=');
-			if(eqPos!=-1) //(name, value) pair
+			if(eqPos!=std::string::npos) //(name, value) pair
 			{
 				name=setting.substr(0,eqPos);
 				value=setting.substr(eqPos+1);

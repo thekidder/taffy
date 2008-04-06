@@ -104,6 +104,7 @@ namespace SORE_FileIO
 			catch(InotifyException e)
 			{
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Watch path: %s") % ptr->GetPath());
 			}
 		}
 		callbacks.insert(std::pair<std::string, file_callback >(filename, callback));

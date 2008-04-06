@@ -11,6 +11,13 @@
 // $Id$
 
 
+#include <GL/glew.h>
+
+#include <CEGUI/RendererModules/OpenGLGUIRenderer/openglrenderer.h>
+#include "CEGUI.h"
+#include "CEGUIDefaultResourceProvider.h"
+#include <CEGUI/XMLParserModules/XercesParser/CEGUIXercesParser.h>
+
 #include "sore_screen.h"
 #include "sore_profiler.h"
 #include "sore_util.h"
@@ -20,13 +27,9 @@
 #include <functional>
 #include "sore_allgl.h"
 
-#include <CEGUI/RendererModules/OpenGLGUIRenderer/openglrenderer.h>
-#include <CEGUI/CEGUISystem.h>
-#include <CEGUI/CEGUIFontManager.h>
-#include <CEGUI/CEGUISchemeManager.h>
-#include <CEGUI/CEGUIExceptions.h>
+using namespace CEGUI;
 
-SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), resizeCallback(rc), sm(_sm)
+SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), resizeCallback(rc), screen(_screen), sm(_sm)
 {
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
 	renderer = NULL;
@@ -68,16 +71,38 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		CEGUI::OpenGLRenderer* myRenderer = new CEGUI::OpenGLRenderer( 0 );
 		new CEGUI::System( myRenderer );
 		
-		//CEGUI::System::getSingleton().getResourceProvider()->setDefaultResourceGroup("datafiles/");
+		CEGUI::Imageset::setDefaultResourceGroup("imagesets");
+		CEGUI::Font::setDefaultResourceGroup("fonts");
+		CEGUI::Scheme::setDefaultResourceGroup("schemes");
+		CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeels");
+		CEGUI::WindowManager::setDefaultResourceGroup("layouts");
+		CEGUI::ScriptModule::setDefaultResourceGroup("lua_scripts");
+#ifdef CEGUI_WITH_XERCES
+		CEGUI::XercesParser::setSchemaDefaultResourceGroup("schemas");
+#endif
+		
+		// initialise the required dirs for the DefaultResourceProvider
+		CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>
+				(CEGUI::System::getSingleton().getResourceProvider());
+		
+		rp->setResourceGroupDirectory("schemes", "data/schemes/");
+		rp->setResourceGroupDirectory("imagesets", "data/imagesets/");
+		rp->setResourceGroupDirectory("fonts", "data/fonts/");
+		rp->setResourceGroupDirectory("layouts", "data/layouts/");
+		rp->setResourceGroupDirectory("looknfeels", "data/looknfeel/");
+		rp->setResourceGroupDirectory("lua_scripts", "data/lua_scripts/");
+#if defined(CEGUI_WITH_XERCES) && (CEGUI_DEFAULT_XMLPARSER == XercesParser)
+		rp->setResourceGroupDirectory("schemas", "data/XMLRefSchema/");
+#endif
 		
 		// load in the scheme file, which auto-loads the TaharezLook imageset
-		CEGUI::SchemeManager::getSingleton().loadScheme( "TaharezLook.scheme" );
+		CEGUI::SchemeManager::getSingleton().loadScheme( "WindowsLook.scheme" );
 	
 	// load in a font.  The first font loaded automatically becomes the default font.
 		if(! CEGUI::FontManager::getSingleton().isFontPresent( "Commonwealth-10" ) )
 			CEGUI::FontManager::getSingleton().createFont( "Commonwealth-10.font" );
 		
-		CEGUI::System::getSingleton().setDefaultMouseCursor( "TaharezLook", "MouseArrow" );
+		CEGUI::System::getSingleton().setDefaultMouseCursor( "WindowsLook", "MouseArrow" );
 		
 		//CEGUI::System::getSingleton().setDefaultToolTip( "TaharezLook/Tooltip" );
 	}
@@ -141,6 +166,7 @@ SORE_Kernel::Screen::~Screen()
 void SORE_Kernel::Screen::Frame(int elapsedTime)
 {
 	SORE_Profiler::Sample graphics("graphics");
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if(renderer)
 		renderer->Render();
 	CEGUI::System::getSingleton().renderGUI();
