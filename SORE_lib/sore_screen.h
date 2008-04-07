@@ -30,6 +30,7 @@ namespace SORE_Kernel
 			const char* GetName() const {return "Screen";}
 			
 			void SetRenderer(SORE_Graphics::IRenderer* _renderer);
+			void SetUIDataPath(std::string path); //sets path to look in for CEGUI resources 
 			
 			//both of the following change the projection matrix - the difference is that SetProjection saves it as the default
 			//(this means when screen is resized, the default will be applied)
@@ -73,6 +74,7 @@ namespace SORE_Kernel
 			
 			GLint viewport[4];
 			
+			std::string uiDataPath;
 	};
 }
 
