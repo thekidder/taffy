@@ -4,6 +4,8 @@
 #include "sore_logger.h"
 #include "sore_fileio.h"
 
+#include <boost/tokenizer.hpp>
+
 float SORE_Utility::getRandomMinMax( float fMin, float fMax )
 {
 	float fRandNum = (float)rand () / RAND_MAX;
@@ -119,4 +121,17 @@ std::string SORE_Utility::TrimString(std::string toTrim)
 		trimmed.erase(pos,1);
 	}
 	return trimmed;
+}
+
+std::vector<std::string> SORE_Utility::ParseList(std::string list)
+{
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	std::vector<std::string> result;
+	boost::char_separator<char> sep(",{}");
+	tokenizer separator(list, sep);
+	for(tokenizer::iterator it=separator.begin();it!=separator.end(); ++it)
+	{
+		result.push_back(*it);
+	}
+	return result;
 }
