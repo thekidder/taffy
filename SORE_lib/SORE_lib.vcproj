@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\DEVEL\include"
+				AdditionalIncludeDirectories="C:\DEVEL\include;C:\DEVEL\include\CEGUI"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT = 0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -104,7 +104,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\DEVEL\include"
+				AdditionalIncludeDirectories="C:\DEVEL\include;C:\DEVEL\include\CEGUI"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT = 0x0500"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -169,10 +169,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sore_gamestate.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\sore_graphics.cpp"
 				>
 			</File>
@@ -226,6 +222,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_screen.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sore_screeninfo.cpp"
 				>
 			</File>
 			<File

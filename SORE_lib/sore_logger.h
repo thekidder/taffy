@@ -117,6 +117,8 @@ namespace SORE_Logging
 			void Log(int lvl, int line, const char* func, const char* file, std::string message, int module=MODULE_NONE);
 			void Log(int lvl, int line, const char* func, const char* file, boost::format message, int module=MODULE_NONE);
 			void Flush();
+
+			void SetLevel(int lvl); //set level of all backends
 			
 			void IgnoreModule(int module, int level);
 			

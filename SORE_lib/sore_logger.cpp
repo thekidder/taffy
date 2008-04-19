@@ -390,6 +390,14 @@ void SORE_Logging::Logger::Flush()
 	if(logs.size()>0) buffers.clear();
 }
 
+void SORE_Logging::Logger::SetLevel(int lvl)
+{
+	for(it=logs.begin();it<logs.end();it++)
+	{
+		(*it)->SetLevel(lvl);
+	}
+}
+
 void SORE_Logging::Logger::IgnoreModule(int module, int level)
 {
 	ignoredModules.push_back(std::pair<int,int>(module,level));
