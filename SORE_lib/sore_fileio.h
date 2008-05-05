@@ -36,8 +36,12 @@ namespace SORE_FileIO
 	bool         Eof(file_ref file);
 	
 	void         Notify(std::string filename, file_callback callback); //only implemented on local files now (no packages)
-	
 	bool         InitFileNotify(SORE_Kernel::GameKernel* gk); //called by InitFileIO, no need to ever call this yourself
+	
+	void         ClearDirectory(const char* dir); //delete all files in a directory
+	void         CreateDirectory(const char* dir);
+	bool         PathExists(const char* path);
+	bool         DirectoryExists(const char* dir); //returns true if dir exists and is a directory
 }
 
 #endif /*__SORE_FILEIO__*/

@@ -74,12 +74,12 @@ namespace SORE_Math
 			x = T(0);
 			y = T(0);
 		}
-		Point2D(Vector2D<T>& v)
+		Point2D(const Vector2D<T>& v)
 		{
 			x = v[0];
 			y = v[1];
 		}
-		Point2D<T> operator=(Vector2D<T>& v)
+		Point2D<T> operator=(const Vector2D<T>& v)
 		{
 			/*Point2D<T> temp;
 			temp.x = v[0];
@@ -88,7 +88,7 @@ namespace SORE_Math
 			x = v[0];
 			y = v[1];
 		}
-		Point2D<T> operator+(Point2D<T>& t)
+		Point2D<T> operator+(const Point2D<T>& t)
 		{
 			Point2D<T> temp;
 			temp.x = x + t.x;
