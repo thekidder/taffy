@@ -52,6 +52,7 @@ namespace SORE_Kernel
 		protected:
 			int  InitializeSDL(std::string windowTitle);
 			int  InitializeGL();
+			void InitializeCEGUI();
 			void InitExtensions();
 			
 			int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection); //returns 0 on success

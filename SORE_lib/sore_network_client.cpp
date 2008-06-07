@@ -31,9 +31,6 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "An error occuring while creating client");
 		}
 		
-		
-		
-		
 		address.host = ENET_HOST_ANY;
 		address.port = static_cast<enet_uint16>(sm.GetVariable("network", "discover_port"));
 		listener = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM, &address);
@@ -55,10 +52,9 @@ namespace SORE_Network
 	{
 		ENetEvent event;
 		
-		std::string serverName;
-		serverName.resize(16);
+		char serverName[64];
 		
-		enet_address_get_host_ip(&address, &serverName[0], 16);
+		enet_address_get_host_ip(&address, serverName, 64);
 		
 		server = enet_host_connect (client, &address, 2);
 		if(server == NULL)
@@ -216,7 +212,7 @@ namespace SORE_Network
 		
 		ENetEvent event;
 		
-		if(game && game->Update())
+		if(game)
 			PushGamestate();
 		
 		while (enet_host_service (client, &event, 0) > 0)
@@ -229,7 +225,6 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
 					std::string peer, channel;
-										
 					ReceiveBuffer msg(*event.packet);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
@@ -272,7 +267,7 @@ namespace SORE_Network
 									break;
 								default:
 									ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: invalid chatmask %u)") % static_cast<unsigned int>(mask));
-									maskStr = "(???????)";
+									maskStr = "(       )";
 							}
 							std::string name;
 							if(sender == myID) name = me.name;

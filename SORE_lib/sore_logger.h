@@ -111,6 +111,7 @@ namespace SORE_Logging
 			~Logger();
 		
 			void AddBackend(LoggerBackend* newLog);
+			void RemoveAllBackends();
 			//void Log(int lvl, const char* format, ...);
 			void Log(int lvl, std::string message);
 			//void Log(int lvl, int line, const char* func, const char* file, const char* format, ...);

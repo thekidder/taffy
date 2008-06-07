@@ -26,11 +26,12 @@
 #include <cstdlib>
 
 #define FLUSH_MESSAGES
-
-#ifdef DEBUG
 #define SORE_CONSOLE_LOG
-#else
+
+#ifndef DEBUG
+#ifdef _WIN32
 #undef SORE_CONSOLE_LOG
+#endif
 #endif
 
 #define SORE_FILE_LOG
@@ -313,6 +314,11 @@ SORE_Logging::Logger::~Logger()
 void SORE_Logging::Logger::AddBackend(LoggerBackend* newLog)
 {
 	logs.push_back(newLog);
+}
+
+void SORE_Logging::Logger::RemoveAllBackends()
+{
+	logs.clear();
 }
 
 void SORE_Logging::Logger::Log(int lvl, std::string message)

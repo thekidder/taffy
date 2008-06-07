@@ -10,7 +10,7 @@
 #include <zlib.h>
 #include <cassert>
 
-#include <boost/filesystem/operations.hpp>
+//#include <boost/filesystem/operations.hpp>
 
 #define MODULE_FILEIO 1
 
@@ -650,7 +650,7 @@ size_t SORE_FileIO::CompressedSize(file_ref file)
 	return cachedFiles[file].sizeRaw;
 }
 
-void SORE_FileIO::ClearDirectory(const char* dir)
+/*void SORE_FileIO::ClearDirectory(const char* dir)
 {
 	boost::filesystem::remove_all(dir);
 	CreateDirectory(dir);
@@ -669,6 +669,6 @@ bool SORE_FileIO::PathExists(const char* path)
 bool SORE_FileIO::DirectoryExists(const char* dir)
 {
 	return PathExists(dir) && boost::filesystem::is_directory(dir);
-}
+}*/
 
 #undef MODULE_FILEIO

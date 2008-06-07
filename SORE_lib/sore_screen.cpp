@@ -66,6 +66,11 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		ChangeProjectionMatrix(proj);
 	}
 	
+	InitializeCEGUI();
+}
+
+void SORE_Kernel::Screen::InitializeCEGUI()
+{
 	try
 	{
 		CEGUI::OpenGLRenderer* myRenderer = new CEGUI::OpenGLRenderer( 0 );
@@ -96,13 +101,13 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 #endif
 		
 		// load in the scheme file, which auto-loads the TaharezLook imageset
-		CEGUI::SchemeManager::getSingleton().loadScheme( "WindowsLook.scheme" );
+		CEGUI::SchemeManager::getSingleton().loadScheme( "VanillaSkin.scheme" );
 	
 	// load in a font.  The first font loaded automatically becomes the default font.
 		if(! CEGUI::FontManager::getSingleton().isFontPresent( "Commonwealth-10" ) )
 			CEGUI::FontManager::getSingleton().createFont( "Commonwealth-10.font" );
 		
-		CEGUI::System::getSingleton().setDefaultMouseCursor( "WindowsLook", "MouseArrow" );
+		CEGUI::System::getSingleton().setDefaultMouseCursor( "Vanilla", "MouseArrow" );
 		
 		//CEGUI::System::getSingleton().setDefaultToolTip( "TaharezLook/Tooltip" );
 	}

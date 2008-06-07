@@ -546,4 +546,86 @@ namespace SORE_Network
 	{
 		callback = c;
 	}
+	
+	/*SyncedDataBase::SyncedDataBase(SyncedDataCollection& collection)
+	{
+		collection.Add(this);
+	}
+
+	bool SyncedDataBase::Changed()
+	{
+		return changed;
+	}
+	
+	void SyncedDataCollection::Add(SyncedDataBase* datum)
+	{
+		data.push_back(datum);
+	}
+	
+	void SyncedDataCollection::ReceiveCallback(ReceiveBuffer& receive)
+	{
+		size_t numItems = data.size();
+		//first we read the number of items to update
+		unsigned int num;
+		if(numItems<256)
+			num = static_cast<unsigned int>(receive.GetUByte());
+		else if(numItems<65535)
+			num = static_cast<unsigned int>(receive.GetUByte2());
+		else
+			num = static_cast<unsigned int>(receive.GetUByte4());
+		
+		for(int i=0;i<num;++i)
+		{
+			//get index of item to update
+			size_t index;
+			if(numItems<256)
+				index = static_cast<size_t>(receive.GetUByte());
+			else if(numItems<65535)
+				index = static_cast<size_t>(receive.GetUByte2());
+			else
+				index = static_cast<size_t>(receive.GetUByte4());
+			
+			//Deserialize(data[index]->get(), receive);
+			data[index]->Receive(receive);
+		}
+	}
+	
+	void SyncedDataCollection::Send(SendBuffer& send)
+	{
+		size_t numItems = data.size();
+		unsigned int toUpdate = 0;
+		for(std::vector<SyncedDataBase*>::iterator it=data.begin();it!=data.end();++it)
+		{
+			if((*it)->Changed()) ++toUpdate;
+		}
+		if(numItems<256)
+			send.AddUByte(static_cast<ubyte>(toUpdate));
+		else if(numItems<65535)
+			send.AddUByte2(static_cast<ubyte2>(toUpdate));
+		else
+			send.AddUByte4(static_cast<ubyte4>(toUpdate));
+		
+		for(size_t i=0;i<data.size();++i)
+		{
+			if(data[i]->Changed())
+			{
+				if(numItems<256)
+					send.AddUByte(static_cast<ubyte>(i));
+				else if(numItems<65535)
+					send.AddUByte2(static_cast<ubyte2>(i));
+				else
+					send.AddUByte4(static_cast<ubyte4>(i));
+				data[i]->Send(send);
+			}
+		}
+	}
+	
+	bool SyncedDataCollection::Updated() const
+	{
+		for(std::vector<SyncedDataBase*>::const_iterator it=data.begin();it!=data.end();++it)
+		{
+			if((*it)->Changed()) return true;
+		}
+		return false;
+	}*/
 }

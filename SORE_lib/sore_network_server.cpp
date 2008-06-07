@@ -166,7 +166,7 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 								break;
 							}
-							game->DeserializeDeltaServer(msg, pos->first);
+							game->DeserializeDelta(msg, pos->first);
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{
@@ -297,8 +297,10 @@ namespace SORE_Network
 					break;
 			}
 		}
-		if(game)
-			BroadcastGamestateDelta();
+		//if(game)
+			//BroadcastGamestateDelta();
+		//if(game->Updated())
+		//	BroadcastGamestateDelta();
 	}
 	
 	size_t Server::NumPlayers() const
