@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), game(NULL)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -76,7 +76,7 @@ namespace SORE_Network
 	
 	void Server::SetGamestate(Gamestate* g)
 	{
-		game = g;
+		current = g;
 	}
 	
 	void Server::Frame(int elapsed)
@@ -141,81 +141,13 @@ namespace SORE_Network
 					switch(dataType)
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
-							if(pos->second.playerState!=STATE_PLAYER)
-							{
-								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
-								break;
-							}
-							if(game==NULL)
-							{
-								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
-								break;
-							}
-							game->Deserialize(msg, pos->first);
+						{
+							HandleGamestateTransfer(msg, pos);
 							break;
-						case DATATYPE_GAMESTATE_DELTA:
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
-							if(pos->second.playerState!=STATE_PLAYER)
-							{
-								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
-								break;
-							}
-							if(game==NULL)
-							{
-								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
-								break;
-							}
-							game->DeserializeDelta(msg, pos->first);
-							break;
+						}
 						case DATATYPE_PLAYERCHAT:
 						{
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
-							ubyte mask = msg.GetUByte();
-							switch(mask)
-							{
-								case CHATMASK_ALL:
-								{
-									std::string chat = msg.GetString2();
-									SendBuffer sendChat;
-									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
-									sendChat.AddUByte(CHATMASK_ALL);
-									sendChat.AddUByte(pos->first);
-									sendChat.AddString2(chat);
-									sendChat.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
-									break;
-								}
-								case CHATMASK_TEAM:
-								{
-									ubyte team = msg.GetUByte();
-									std::string chat = msg.GetString2();
-									SendBuffer sendChat;
-									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
-									sendChat.AddUByte(CHATMASK_TEAM);
-									sendChat.AddUByte(pos->first);
-									sendChat.AddString2(chat);
-									for(player_ref i=playerList.begin();i!=playerList.end();i++)
-									{
-										if(i->second.team == team)
-											sendChat.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
-									}
-									break;
-								}
-								case CHATMASK_WHISPER:
-								{
-									ubyte recipient = msg.GetUByte();
-									std::string chat = msg.GetString2();
-									SendBuffer sendChat;
-									sendChat.AddUByte(DATATYPE_PLAYERCHAT);
-									sendChat.AddUByte(CHATMASK_WHISPER);
-									sendChat.AddUByte(pos->first);
-									sendChat.AddString2(chat);
-									sendChat.Send(playerList[recipient].peer, 0, ENET_PACKET_FLAG_RELIABLE);
-									break;
-								}
-								default:
-									ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: invalid chatmask %u)") % pos->second.player_ip_str % static_cast<unsigned int>(mask));
-							}
+							HandlePlayerChat(msg, pos);
 							break;
 						}
 						case DATATYPE_CHANGEHANDLE:
@@ -313,48 +245,105 @@ namespace SORE_Network
 		broadcaster.SetBroadcastCallback(c);
 	}
 	
+	void Server::PrepareGamestateUpdate(SendBuffer& send)
+	{
+		if(current==NULL) return;
+		send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
+		current->Serialize(send);
+	}
+	
 	void Server::SendGamestate(player_ref p)
 	{
-		if(game==NULL) return;
-		SendBuffer header;
-		header.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
-		SendBuffer state = game->Serialize();
-		header += state;
-		header.Send(p->second.peer, 1, 0);
+		SendBuffer send;
+		PrepareGamestateUpdate(send);
+		send.Send(p->second.peer, 1, 0);
 	}
 
-	void Server::SendGamestateDelta(player_ref p)
+	void Server::SendGamestateDelta(GameInput* newInput, player_ref p)
 	{
-		if(game==NULL) return;
-		SendBuffer header;
-		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		SendBuffer state = game->SerializeDelta();
-		header += state;
-		header.Send(p->second.peer, 1, 0);
+		if(current==NULL) return;
+		Gamestate* client;
+		//TODO: logic to update client with current client info here
+		SendBuffer send;
+		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
+		current->Delta(client, send);
+		send.Send(p->second.peer, 1, 0);
 	}
 
 	void Server::BroadcastGamestate()
 	{
-		if(game==NULL) return;
-		SendBuffer header;
-		header.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
-		SendBuffer state = game->Serialize();
-		header += state;
-		header.Broadcast(server, 1, 0);
+		SendBuffer send;
+		PrepareGamestateUpdate(send);
+		send.Broadcast(server, 1, 0);
 	}
-
-	void Server::BroadcastGamestateDelta()
+	
+	void Server::HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer)
 	{
-		if(game==NULL) return;
-		SendBuffer header;
-		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		SendBuffer state = game->SerializeDelta();
-		header += state;
-		header.Broadcast(server, 1, 0);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+		ubyte mask = msg.GetUByte();
+		switch(mask)
+		{
+			case CHATMASK_ALL:
+			{
+				std::string chat = msg.GetString2();
+				SendBuffer sendChat;
+				sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+				sendChat.AddUByte(CHATMASK_ALL);
+				sendChat.AddUByte(peer->first);
+				sendChat.AddString2(chat);
+				sendChat.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
+				break;
+			}
+			case CHATMASK_TEAM:
+			{
+				ubyte team = msg.GetUByte();
+				std::string chat = msg.GetString2();
+				SendBuffer sendChat;
+				sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+				sendChat.AddUByte(CHATMASK_TEAM);
+				sendChat.AddUByte(peer->first);
+				sendChat.AddString2(chat);
+				for(player_ref i=playerList.begin();i!=playerList.end();i++)
+				{
+					if(i->second.team == team)
+						sendChat.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+				}
+				break;
+			}
+			case CHATMASK_WHISPER:
+			{
+				ubyte recipient = msg.GetUByte();
+				std::string chat = msg.GetString2();
+				SendBuffer sendChat;
+				sendChat.AddUByte(DATATYPE_PLAYERCHAT);
+				sendChat.AddUByte(CHATMASK_WHISPER);
+				sendChat.AddUByte(peer->first);
+				sendChat.AddString2(chat);
+				sendChat.Send(playerList[recipient].peer, 0, ENET_PACKET_FLAG_RELIABLE);
+				break;
+			}
+			default:
+				ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: invalid chatmask %u)") % peer->second.player_ip_str % static_cast<unsigned int>(mask));
+		}
 	}
-
-	void Server::PushGamestate()
+	
+	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
 	{
-		BroadcastGamestateDelta();
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+		if(peer->second.playerState!=STATE_PLAYER)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
+			return;
+		}
+		if(current==NULL)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+			return;
+		}
+		GameInput* input;
+		//TODO: logic to deserialize and assign gameinput here
+		current->Simulate(input);
+		//TODO: logic to find differences between server changes and client changes here
+		//TODO: logic to send delta back to client if results differ 
 	}
 }

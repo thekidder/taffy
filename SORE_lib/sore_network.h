@@ -119,13 +119,19 @@ namespace SORE_Network
 			void        Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
 		protected:
+			//player methods
 			player_ref GetPlayerRef(ENetPeer* peer);
 			void       UpdatePlayer(player_ref toUpdate);
-			void       SendGamestate(player_ref p);
-			void       SendGamestateDelta(player_ref p);
 			
+			//gamestate update methods
+			void       PrepareGamestateUpdate(SendBuffer& send);
+			void       SendGamestate(player_ref p);
+			void       SendGamestateDelta(GameInput* newInput, player_ref p);
 			void       BroadcastGamestate();
-			void       BroadcastGamestateDelta();
+			
+			//functions responsible for handling network messages
+			void       HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer);
+			void       HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer);
 			
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
@@ -133,7 +139,7 @@ namespace SORE_Network
 			player_list playerList;
 			std::deque<ubyte> unusedIDs;
 			ubyte nextId;
-			Gamestate* game;
+			Gamestate* current, * last;
 	};
 	
 	typedef std::map<ubyte4, std::pair<unsigned int, net_buffer> > server_list; //(host, (last seen, message) )
@@ -155,7 +161,7 @@ namespace SORE_Network
 			void        ConnectDefaultHost(); //connect to host specified in settings manager
 			
 			//call this after gamestate is changed
-			void        PushGamestate();
+			void        SendUpdate();
 			
 			void        Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking client task";}

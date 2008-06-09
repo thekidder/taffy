@@ -36,6 +36,8 @@ namespace SORE_Kernel
 	const unsigned int MOUSE_BUTTON2   = 0x02;
 	const unsigned int MOUSE_BUTTON3   = 0x04;
 	
+	const unsigned int INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK;
+	
 	struct MouseInfo
 	{
 		unsigned int x,y;
@@ -63,55 +65,6 @@ namespace SORE_Kernel
 	};
 	
 	typedef unsigned int event_listener_ref;
-	
-	/*class InputFunctor
-	{
-		public:
-			virtual bool operator()(Event*){return false;}
-	};
-	
-	class GlobalInputFunctor : public InputFunctor
-	{
-		protected:
-			typedef bool (*EVENT_LISTENER)(Event*);
-			EVENT_LISTENER func;
-		public:
-			GlobalInputFunctor(EVENT_LISTENER _func)
-			{
-				func = _func;
-			}
-			bool operator()(Event* event)
-			{
-				return func(event);
-			}
-	};
-	
-	template<class T>
-	class ClassInputFunctor : public InputFunctor
-	{
-		protected:
-			typedef bool (T::*EVENT_LISTENER)(Event*);
-			EVENT_LISTENER func;
-			T* obj;
-		public:
-			ClassInputFunctor(T* _obj, EVENT_LISTENER _func)
-			{
-				obj = _obj;
-				func = _func;
-			}
-			bool operator()(Event* event)
-			{
-				return (obj->*func)(event);
-			}
-	};
-		
-	GlobalInputFunctor* MakeFunctor(bool(*func)(Event*));
-	
-	template<class T>
-	ClassInputFunctor<T>* MakeFunctor(T* obj, bool(T::*func)(Event*))
-	{
-		return new ClassInputFunctor<T>(obj, func);
-	}*/
 	
 	class InputTask : public Task
 	{

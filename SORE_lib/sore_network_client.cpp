@@ -212,9 +212,6 @@ namespace SORE_Network
 		
 		ENetEvent event;
 		
-		if(game)
-			PushGamestate();
-		
 		while (enet_host_service (client, &event, 0) > 0)
 		{
 			switch (event.type)
@@ -236,16 +233,6 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 								break;
 							}
-							game->Deserialize(msg, 0);
-							break;
-						case DATATYPE_GAMESTATE_DELTA:
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta transfer");
-							if(game==NULL)
-							{
-								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
-								break;
-							}
-							game->DeserializeDelta(msg, 0);
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{
@@ -365,13 +352,10 @@ namespace SORE_Network
 		return LAN;
 	}
 	
-	void Client::PushGamestate()
+	void Client::SendUpdate()
 	{
 		if(game==NULL) return;
-		SendBuffer header;
-		header.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		SendBuffer state = game->SerializeDelta();
-		header+=state;
-		header.Send(server, 1, 0);
+		SendBuffer send;
+		//TODO: logic to serialize input & state delta goes here
 	}
 }

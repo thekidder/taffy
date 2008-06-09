@@ -157,160 +157,38 @@ namespace SORE_Network
 			net_buffer buf;
 	};
 	
-	/*class SyncedDataCollection;
-	
-	class SyncedDataBase
+	class GameInput
 	{
 		public:
-			SyncedDataBase(SyncedDataCollection& collection);
-			virtual void Send(SendBuffer& send) = 0;
-			virtual void Receive(ReceiveBuffer& receive) = 0;
+			GameInput(ReceiveBuffer& receive)
+			{
+				Deserialize(receive);
+			}
+			virtual ~GameInput() {}
 			
-			bool Changed();
-		protected:
-			bool changed;
-	};
-	
-	template<class T> //requirements: void Serialize(const T&, SendBuffer&) and void Deserialize(T&, ReceiveBuffer&) must be defined
-			class SyncedData : public SyncedDataBase
-	{
-		public:
-			SyncedData(SyncedDataCollection& collection) : SyncedDataBase(collection)
-			{
-				changed = false;
-			}
-			
-			SyncedData(SyncedDataCollection& collection, T initial) : SyncedDataBase(collection), data(initial)
-			{
-				predicted = data;
-				changed = true;
-			}
-			
-			virtual const T& get() //use when you are not modifying value...
-			{
-				return predicted;
-			}
-			virtual T& value()
-			{
-				changed = true;
-				return predicted;
-			}
-			
-			virtual void Send(SendBuffer& send)
-			{
-				changed = false;
-				Serialize(data, send);
-			}
-			
-			virtual void Receive(ReceiveBuffer& receive)
-			{
-				Deserialize(data, receive);
-				predicted = data;
-			}
+			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
 			
 		protected:
-			T data;
-			T predicted;
+			virtual void Deserialize(ReceiveBuffer& receive) = 0; //deserializes into this
 	};
 	
-	template<class T>
-			struct NetData
-	{
-		NetData() : changed(false) {}
-		NetData(T initial) : changed(false)
-		{
-			data = initial;
-			predicted = data;
-		}
-		T data;
-		T predicted;
-		bool changed;
-	}; 
+	typedef unsigned int gamestate_diff;
 	
-	template<class T>
-			class SyncedDataList : public SyncedDataBase
-	{
-		public:
-			SyncedDataList(SyncedDataCollection& collection) : SyncedDataBase(collection)
-			{
-			}
-			
-			SyncedDataList(SyncedDataCollection& collection, ubyte index, T initial) : SyncedDataBase(collection)
-			{
-				NetData<T> first(initial);
-				data.insert(std::pair<ubyte, NetData<T> >(index, first) );
-			}
-			
-			virtual const T& get(ubyte key) //use when you are not modifying value...
-			{
-				return data[key].predicted;
-			}
-			virtual T& value(ubyte key)
-			{
-				data[key].changed = true;
-				return data[key].data;
-			}
-			
-			void Send(SendBuffer& send)
-			{
-				ubyte size = 0;
-				std::vector<T>::iterator it;
-				for(it=data.begin();it!=data.end();++it)
-				{
-					if(it->second.changed)
-						size++;
-				}
-				
-				send.AddUByte(size);
-				
-				for(it=data.begin();it!=data.end();++it)
-				{
-					send.AddUByte(it->first);
-					it->second.changed = false;
-					Serialize(it->second.data, send);
-				}
-			}
-			
-			virtual void Receive(ReceiveBuffer& receive)
-			{
-				ubyte size = receive.GetUByte();
-				for(ubyte i=0;i<size;++i)
-				{
-					ubyte key = receive.GetUByte();
-					Deserialize(data[key].data, receive);
-					data[key].predicted = data[key].data;
-				}
-			}
-			
-		protected:
-			std::map<ubyte, NetData<T> > data;
-	};
-	
-	class SyncedDataCollection
-	{
-		public:
-			void Add(SyncedDataBase* datum);
-			void ReceiveCallback(ReceiveBuffer& receive);
-			void Send(SendBuffer& send);
-			bool Updated() const; //return true if any data is updated
-		private:
-			std::vector<SyncedDataBase*> data;
-	};*/
+	const gamestate_diff NO_DIFFERENCE        = 0;
+	const gamestate_diff DEVIATION_DIFFERENCE = 1;
+	const gamestate_diff SEVERE_DIFFERENCE    = 2;
 	
 	class Gamestate
 	{
 		public:
 			virtual ~Gamestate() {}
 			
-			virtual SendBuffer Serialize() = 0;
-			virtual SendBuffer SerializeDelta() = 0;
-			virtual bool   Deserialize(ReceiveBuffer& b, ubyte fromPlayer) = 0; //if fromPlayer = 0, this is server -> client; returns true if deserialization succeeded
-			virtual bool   DeserializeDelta(ReceiveBuffer& b, ubyte fromPlayer) = 0; // same ^
-			//virtual bool   DeserializeDeltaServer(ReceiveBuffer& b, ubyte fromPlayer) = 0;
+			virtual void Simulate(GameInput* input) = 0;
 			
-			//bool Updated() const {return collection.Updated();}
-		protected:
-			//SyncedDataCollection collection;
+			virtual void Delta(Gamestate* old, SendBuffer& send) = 0;
+			virtual void Serialize(SendBuffer& send) = 0;
+			
+			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEIVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
 	};
 }
 
