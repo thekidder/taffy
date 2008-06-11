@@ -366,6 +366,7 @@ namespace SORE_Network
 		}
 		if(input->RequestUpdate())
 			SendUpdate();
+		game->SimulateTime(elapsed);
 	}
 	
 	server_list Client::GetLANServers() const
@@ -383,7 +384,7 @@ namespace SORE_Network
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		Gamestate* last = factory->CreateGamestate(game);
-		game->Simulate(input);
+		game->SimulateInput(input);
 		input->Serialize(send);
 		game->Delta(last, send);
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");

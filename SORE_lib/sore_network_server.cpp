@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL), lastTicks(0)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -240,10 +240,7 @@ namespace SORE_Network
 					break;
 			}
 		}
-		//if(game)
-			//BroadcastGamestateDelta();
-		//if(game->Updated())
-		//	BroadcastGamestateDelta();
+		current->SimulateTime(elapsed);
 	}
 	
 	size_t Server::NumPlayers() const
@@ -274,7 +271,7 @@ namespace SORE_Network
 	{
 		if(current==NULL) return;
 		Gamestate* currentCopy = factory->CreateGamestate(current);
-		currentCopy->Simulate(newInput);
+		currentCopy->SimulateInput(newInput);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		current->Delta(currentCopy, send);
@@ -373,7 +370,7 @@ namespace SORE_Network
 		}
 		Gamestate* currentCopy = factory->CreateGamestate(current);
 		GameInput* input = factory->CreateGameInput(msg);
-		current->Simulate(input);
+		current->SimulateInput(input);
 		BroadcastGamestateDelta(currentCopy, peer);
 		currentCopy->Deserialize(msg);
 		gamestate_diff difference = current->Difference(currentCopy);

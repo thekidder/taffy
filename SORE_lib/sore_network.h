@@ -133,6 +133,7 @@ namespace SORE_Network
 			ubyte nextId;
 			Gamestate* current;//, * last;
 			GamestateFactory* factory;
+			unsigned int lastTicks;
 	};
 	
 	typedef std::map<ubyte4, std::pair<unsigned int, net_buffer> > server_list; //(host, (last seen, message) )
