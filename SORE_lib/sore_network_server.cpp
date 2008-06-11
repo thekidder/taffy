@@ -20,10 +20,11 @@
 // $Id$ 
 
 #include "sore_network.h"
+#include <cstdio>
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL), lastTicks(0)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL), lastTicks(0), seed(0)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -72,6 +73,13 @@ namespace SORE_Network
 			if(i->first==toUpdate->first) continue;
 			playerUpdate.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 		}
+	}
+	
+	void SORE_Network::Server::SeedRNG(unsigned int s)
+	{
+		seed = static_cast<ubyte4>(s);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Seeding RNG with seed %u") % seed);
+		srand(static_cast<unsigned int>(seed));
 	}
 	
 	void Server::SetGamestate(Gamestate* g)
@@ -128,6 +136,10 @@ namespace SORE_Network
 					UpdatePlayer(pos);
 					SendGamestate(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
+					send_id.Clear();
+					send_id.AddUByte(DATATYPE_CHANGESEED);
+					send_id.AddUByte4(seed);
+					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					break;
 				}
 				case ENET_EVENT_TYPE_RECEIVE:

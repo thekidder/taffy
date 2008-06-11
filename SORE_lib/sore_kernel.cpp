@@ -26,18 +26,18 @@ SORE_Kernel::Task::Task(GameKernel* _gk)
 
 SORE_Kernel::GameKernel::GameKernel()
 {
-	itask = new SORE_Utility::InterpolaterTask(this);
+	//itask = new SORE_Utility::InterpolaterTask(this);
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Kernel initialized");
 	lastTicks = SORE_Timing::GetGlobalTicks();
 	quitFlag = false;
 	lastTicks = 0;
 	paused = false;
-	AddConstTask(1, 200, itask);
+	//AddConstTask(1, 200, itask);
 }
 
 SORE_Kernel::GameKernel::~GameKernel()
 {
-	delete itask;
+	//delete itask;
 	ENGINE_LOG(SORE_Logging::LVL_INFO, "Kernel destroyed");
 }
 
@@ -174,7 +174,7 @@ void SORE_Kernel::GameKernel::RemoveAllTasks()
 	tasks.clear();
 }
 
-SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i)
+/*SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i)
 {
 	return itask->AddInterpolater(i);
 }
@@ -182,4 +182,4 @@ SORE_Utility::interpolater_iterator SORE_Kernel::GameKernel::AddInterpolater(boo
 void SORE_Kernel::GameKernel::RemoveInterpolater(SORE_Utility::interpolater_iterator i)
 {
 	itask->RemoveInterpolater(i);
-}
+}*/

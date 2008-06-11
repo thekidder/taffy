@@ -31,6 +31,7 @@ namespace SORE_Graphics
 		if(_rm)
 		{
 			fboshad = rm->GetResource<SORE_Graphics::GLSLShader>("data/Shaders/warp_fbo.shad");
+			warp = NULL;
 		}
 		else
 		{

@@ -49,14 +49,14 @@ namespace SORE_Kernel
 			
 			bool     quitFlag;
 			
-			SORE_Utility::interpolater_iterator AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i);
-			void RemoveInterpolater(SORE_Utility::interpolater_iterator i);
+			//SORE_Utility::interpolater_iterator AddInterpolater(boost::shared_ptr<SORE_Utility::IInterpolater> i);
+			//void RemoveInterpolater(SORE_Utility::interpolater_iterator i);
 		protected:
 			task_list tasks;
 			//std::multimap<unsigned int, const_task> constTasks;
 			int lastTicks;
 			bool paused;
-			SORE_Utility::InterpolaterTask* itask;
+			//SORE_Utility::InterpolaterTask* itask;
 	};
 }
 

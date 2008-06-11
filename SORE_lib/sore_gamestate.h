@@ -159,6 +159,8 @@ namespace SORE_Network
 			net_buffer buf;
 	};
 	
+	class Gamestate;
+	
 	class GameInput
 	{
 		//TODO: Add some sort of method to transform real input -> GameInput. Should be flexible enough to allow for different settings, etc
@@ -168,7 +170,7 @@ namespace SORE_Network
 			virtual ~GameInput() {}
 			
 			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
-			
+			virtual void SetGamestate(Gamestate* game) = 0;
 			virtual bool RequestUpdate() = 0;
 			
 		protected:

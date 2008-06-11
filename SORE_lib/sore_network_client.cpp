@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), input(NULL), factory(NULL)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), input(NULL), factory(NULL), seed(0)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -153,11 +153,6 @@ namespace SORE_Network
 		}
 	}
 	
-	void Client::SetGamestate(Gamestate* g)
-	{
-		game = g;
-	}
-	
 	void Client::SetGameInput(GameInput* i)
 	{
 		input = i;
@@ -167,6 +162,11 @@ namespace SORE_Network
 	{
 		factory = gf;
 	}
+	
+	/*const Gamestate * Client::GetGamestate() const
+	{
+		return game;
+	}*/
 	
 	void Client::UpdateServers(int elapsed)
 	{
@@ -346,6 +346,13 @@ namespace SORE_Network
 						case DATATYPE_STATUSPLAY:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
 							break;
+						case DATATYPE_CHANGESEED:
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change RNG seed");
+							seed = msg.GetUByte4();
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("New seed: %u") % seed);
+							srand(static_cast<unsigned int>(seed));
+							Initialize();
+							break;
 						default:
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: unknown datatype %u)") % static_cast<unsigned int>(dataType));
 							break;
@@ -366,7 +373,8 @@ namespace SORE_Network
 		}
 		if(input->RequestUpdate())
 			SendUpdate();
-		game->SimulateTime(elapsed);
+		if(game)
+			game->SimulateTime(elapsed);
 	}
 	
 	server_list Client::GetLANServers() const
@@ -390,5 +398,17 @@ namespace SORE_Network
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
 		delete last;
+	}
+	
+	void Client::Initialize()
+	{
+		game = factory->CreateGamestate();
+		input->SetGamestate(game);
+		callback(game);
+	}
+	
+	void Client::SetGamestateCallback(boost::function< void ( Gamestate * ) > f)
+	{
+		callback = f;
 	}
 }
