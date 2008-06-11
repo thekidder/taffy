@@ -126,6 +126,7 @@ namespace SORE_Network
 					send_id.AddUByte(newId);
 					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					UpdatePlayer(pos);
+					SendGamestate(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
 				}
