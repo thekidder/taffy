@@ -186,6 +186,7 @@ namespace SORE_Network
 		public:
 			virtual ~Gamestate() {}
 			
+			//TODO: Gatestate needs a time signal - contained in GameInput, or separately to Simulate? also, non-player-influenced actions should be dealt with somehow... 
 			virtual void Simulate(GameInput* input) = 0;
 			
 			virtual void Delta(Gamestate* old, SendBuffer& send) = 0;
