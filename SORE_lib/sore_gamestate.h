@@ -169,6 +169,8 @@ namespace SORE_Network
 			
 			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
 			
+			virtual bool RequestUpdate() = 0;
+			
 		protected:
 			virtual void Deserialize(ReceiveBuffer& receive) = 0; //deserializes into this
 	};

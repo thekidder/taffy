@@ -364,7 +364,8 @@ namespace SORE_Network
 					break;
 			}
 		}
-		SendUpdate();
+		if(input->RequestUpdate())
+			SendUpdate();
 	}
 	
 	server_list Client::GetLANServers() const
@@ -385,6 +386,7 @@ namespace SORE_Network
 		game->Simulate(input);
 		input->Serialize(send);
 		game->Delta(last, send);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
 		delete last;
 	}

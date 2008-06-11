@@ -288,6 +288,20 @@ namespace SORE_Network
 		send.Broadcast(server, 1, 0);
 	}
 	
+	void SORE_Network::Server::BroadcastGamestateDelta(Gamestate* old, player_ref toExclude)
+	{
+		SendBuffer send;
+		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
+		current->Delta(old, send);
+		for(player_ref it=playerList.begin();it!=playerList.end();++it)
+		{
+			if(it == toExclude)
+				continue;
+			send.Send(it->second.peer, 1, 0);
+		}
+	}
+
+	
 	void Server::HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer)
 	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
@@ -359,6 +373,7 @@ namespace SORE_Network
 		Gamestate* currentCopy = factory->CreateGamestate(current);
 		GameInput* input = factory->CreateGameInput(msg);
 		current->Simulate(input);
+		BroadcastGamestateDelta(currentCopy, peer);
 		currentCopy->Deserialize(msg);
 		gamestate_diff difference = current->Difference(currentCopy);
 		switch(difference)

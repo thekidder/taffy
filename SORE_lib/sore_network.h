@@ -115,6 +115,7 @@ namespace SORE_Network
 			void       PrepareGamestateUpdate(SendBuffer& send);
 			void       SendGamestate(player_ref p);
 			void       SendGamestateDelta(GameInput* newInput, player_ref p);
+			void       BroadcastGamestateDelta(Gamestate* old, player_ref toExclude);
 			void       BroadcastGamestate();
 			
 			//functions responsible for handling network messages
