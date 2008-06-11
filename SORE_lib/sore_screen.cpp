@@ -13,10 +13,10 @@
 
 #include <GL/glew.h>
 
-#include <CEGUI/RendererModules/OpenGLGUIRenderer/openglrenderer.h>
+/*#include <CEGUI/RendererModules/OpenGLGUIRenderer/openglrenderer.h>
 #include "CEGUI.h"
 #include "CEGUIDefaultResourceProvider.h"
-#include <CEGUI/XMLParserModules/XercesParser/CEGUIXercesParser.h>
+#include <CEGUI/XMLParserModules/XercesParser/CEGUIXercesParser.h>*/
 
 #include "sore_screen.h"
 #include "sore_profiler.h"
@@ -27,7 +27,7 @@
 #include <functional>
 #include "sore_allgl.h"
 
-using namespace CEGUI;
+//using namespace CEGUI;
 
 SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenInfo& _screen, std::string windowTitle, resize_callback rc, SORE_Utility::SettingsManager* _sm) : Task(gk), resizeCallback(rc), screen(_screen), sm(_sm)
 {
@@ -66,10 +66,10 @@ SORE_Kernel::Screen::Screen(SORE_Kernel::GameKernel* gk, SORE_Graphics::ScreenIn
 		ChangeProjectionMatrix(proj);
 	}
 	
-	InitializeCEGUI();
+	//InitializeCEGUI();
 }
 
-void SORE_Kernel::Screen::InitializeCEGUI()
+/*void SORE_Kernel::Screen::InitializeCEGUI()
 {
 	try
 	{
@@ -116,7 +116,7 @@ void SORE_Kernel::Screen::InitializeCEGUI()
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("CEGUI Exception occured: %s") % e.getMessage().c_str());
 	// you could quit here
 	}
-}
+}*/
 
 void SORE_Kernel::Screen::SetResizeCallback(resize_callback callback)
 {
@@ -174,7 +174,7 @@ void SORE_Kernel::Screen::Frame(int elapsedTime)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if(renderer)
 		renderer->Render();
-	CEGUI::System::getSingleton().renderGUI();
+	//CEGUI::System::getSingleton().renderGUI();
 	SDL_GL_SwapBuffers();
 }
 

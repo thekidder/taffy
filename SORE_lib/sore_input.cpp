@@ -13,7 +13,7 @@
 
 #include "sore_input.h"
 
-#include <CEGUI/CEGUISystem.h>
+//#include <CEGUI/CEGUISystem.h>
 
 SORE_Kernel::InputTask::InputTask(SORE_Kernel::GameKernel* gk) : Task(gk)
 {
@@ -27,7 +27,7 @@ SORE_Kernel::InputTask::~InputTask()
 void SORE_Kernel::InputTask::Frame(int elapsedTime)
 {
 	SDL_Event sdl_event;
-	CEGUI::System::getSingleton().injectTimePulse(elapsedTime*0.0001);
+	//CEGUI::System::getSingleton().injectTimePulse(elapsedTime*0.0001);
 	while(SDL_PollEvent(&sdl_event))
 	{
 		switch(sdl_event.type)
@@ -43,7 +43,7 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.mouse.y = sdl_event.motion.y;
 				event.mouse.xmove = sdl_event.motion.xrel;
 				event.mouse.ymove = sdl_event.motion.yrel;
-				CEGUI::System::getSingleton().injectMousePosition(static_cast<float>(sdl_event.motion.x),static_cast<float>(sdl_event.motion.y));
+				//CEGUI::System::getSingleton().injectMousePosition(static_cast<float>(sdl_event.motion.x),static_cast<float>(sdl_event.motion.y));
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Button down: buttonState: %u, button: %u", sdl_event.motion.state, sdl_event.button.button);
@@ -67,22 +67,22 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				{
 					case SDL_BUTTON_LEFT:
 						event.mouse.buttonState |= MOUSE_BUTTON1;
-						CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::LeftButton);
+						//CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::LeftButton);
 						break;
 					case SDL_BUTTON_MIDDLE:
 						event.mouse.buttonState |= MOUSE_BUTTON3;
-						CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::MiddleButton);
+						//CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::MiddleButton);
 						break;
 					case SDL_BUTTON_RIGHT:
 						event.mouse.buttonState |= MOUSE_BUTTON2;
-						CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::RightButton);
+						//CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::RightButton);
 						break;
 		
 					case SDL_BUTTON_WHEELDOWN:
-						CEGUI::System::getSingleton().injectMouseWheelChange( -1 );
+						//CEGUI::System::getSingleton().injectMouseWheelChange( -1 );
 						break;
 					case SDL_BUTTON_WHEELUP:
-						CEGUI::System::getSingleton().injectMouseWheelChange( +1 );
+						//CEGUI::System::getSingleton().injectMouseWheelChange( +1 );
 						break;
 				}
 				//event.mouse.buttonState = sdl_event.button.button;
@@ -102,17 +102,17 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				{
 					{
 						case SDL_BUTTON_LEFT:
-							CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::LeftButton);
+							//CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::LeftButton);
 							if(event.mouse.buttonState & MOUSE_BUTTON1)
 								event.mouse.buttonState ^= MOUSE_BUTTON1;
 							break;
 						case SDL_BUTTON_MIDDLE:
-							CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::MiddleButton);
+							//CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::MiddleButton);
 							if(event.mouse.buttonState & MOUSE_BUTTON3)
 								event.mouse.buttonState ^= MOUSE_BUTTON3;
 							break;
 						case SDL_BUTTON_RIGHT:
-							CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::RightButton);
+							//CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::RightButton);
 							if(event.mouse.buttonState & MOUSE_BUTTON2)
 								event.mouse.buttonState ^= MOUSE_BUTTON2;
 							break;
@@ -123,17 +123,17 @@ void SORE_Kernel::InputTask::Frame(int elapsedTime)
 				event.type = KEYDOWN;
 				event.key.keySym = sdl_event.key.keysym.sym;
 				event.key.modState = sdl_event.key.keysym.mod;
-				CEGUI::System::getSingleton().injectKeyDown(sdl_event.key.keysym.scancode);
+				//CEGUI::System::getSingleton().injectKeyDown(sdl_event.key.keysym.scancode);
 
 				if (sdl_event.key.keysym.unicode != 0)
 				{
-					CEGUI::System::getSingleton().injectChar(sdl_event.key.keysym.unicode);
+					//CEGUI::System::getSingleton().injectChar(sdl_event.key.keysym.unicode);
 				}
 				break;
 			case SDL_KEYUP:
 				event.type = KEYUP;
 				event.key.keySym = sdl_event.key.keysym.sym;
-				CEGUI::System::getSingleton().injectKeyUp(sdl_event.key.keysym.scancode);
+				//CEGUI::System::getSingleton().injectKeyUp(sdl_event.key.keysym.scancode);
 				break;
 			case SDL_VIDEORESIZE:
 				event.type = RESIZE;
