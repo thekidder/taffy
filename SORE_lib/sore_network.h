@@ -98,6 +98,7 @@ namespace SORE_Network
 			
 			void        SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
 			void        SetGamestate(Gamestate* g);
+			void        SetFactory(GamestateFactory* gf);
 			size_t      NumPlayers() const;
 			
 			//call this after gamestate is changed

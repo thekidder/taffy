@@ -243,6 +243,16 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 								break;
 							}
+							game->Deserialize(msg);
+							break;
+						case DATATYPE_GAMESTATE_DELTA:
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+								break;
+							}
+							game->Deserialize(msg);
 							break;
 						case DATATYPE_PLAYERCHAT:
 						{
@@ -370,6 +380,7 @@ namespace SORE_Network
 			return;
 		}
 		SendBuffer send;
+		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		Gamestate* last = factory->CreateGamestate(game);
 		game->Simulate(input);
 		input->Serialize(send);

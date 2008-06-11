@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL)
+	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -77,6 +77,11 @@ namespace SORE_Network
 	void Server::SetGamestate(Gamestate* g)
 	{
 		current = g;
+	}
+	
+	void SORE_Network::Server::SetFactory(GamestateFactory * gf)
+	{
+		factory = gf;
 	}
 	
 	void Server::Frame(int elapsed)
@@ -346,9 +351,9 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
 			return;
 		}
-		if(current==NULL)
+		if(current==NULL || factory==NULL)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to use nonexistent gamestate or factory");
 			return;
 		}
 		Gamestate* currentCopy = factory->CreateGamestate(current);
@@ -361,14 +366,16 @@ namespace SORE_Network
 			case NO_DIFFERENCE:
 				break;
 			case DEVIATION_DIFFERENCE:
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sent correction packet");
 				SendGamestateDelta(input, peer);
 				break;
 			case SEVERE_DIFFERENCE:
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sent replacement packet");
 				SendGamestate(peer);
 				break;
 			default:
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
 		}
-		delete currentCopy;
+		//delete currentCopy;
 	}
 }
