@@ -68,19 +68,6 @@ namespace SORE_Network
 	std::string PrintPlayer(std::pair<ubyte, player> p);
 	void PrintPlayers(unsigned int lvl, player_list playerList);
 	
-	/*class NetworkConnection : public SORE_Kernel::Task
-	{
-		public:
-			NetworkConnection(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
-			~NetworkConnection();
-			
-			void Frame(int elapsed);
-			const char* GetName() const {return "SORE Networking connection task";}
-		protected:
-			ENetHost* host;
-			SORE_Utility::SettingsManager sm;
-	};*/
-	
 	class Server;
 	
 	class UDPBroadcaster : public SORE_Kernel::Task
@@ -132,6 +119,9 @@ namespace SORE_Network
 			//functions responsible for handling network messages
 			void       HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer);
 			void       HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer);
+			void       HandleGamestateDelta(ReceiveBuffer& msg, player_ref& peer);
+			
+			void       SetGamestateFactory(GamestateFactory* gf);
 			
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
@@ -139,7 +129,8 @@ namespace SORE_Network
 			player_list playerList;
 			std::deque<ubyte> unusedIDs;
 			ubyte nextId;
-			Gamestate* current, * last;
+			Gamestate* current;//, * last;
+			GamestateFactory* factory;
 	};
 	
 	typedef std::map<ubyte4, std::pair<unsigned int, net_buffer> > server_list; //(host, (last seen, message) )
@@ -150,9 +141,12 @@ namespace SORE_Network
 			Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
 			~Client();
 			
-			
 			server_list GetLANServers() const;
+			
+			//these should all be instantiated before Client is used
 			void        SetGamestate(Gamestate* g);
+			void        SetGameInput(GameInput* i);
+			void        SetFactory(GamestateFactory* gf);
 			
 			//Connection Functions
 			void        Connect(server_list::iterator it);
@@ -177,6 +171,8 @@ namespace SORE_Network
 			ubyte myID;
 			player_list otherPlayers;
 			Gamestate* game;
+			GameInput* input;
+			GamestateFactory* factory;
 	};
 }
 

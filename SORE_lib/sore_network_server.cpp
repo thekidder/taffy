@@ -145,6 +145,11 @@ namespace SORE_Network
 							HandleGamestateTransfer(msg, pos);
 							break;
 						}
+						case DATATYPE_GAMESTATE_DELTA:
+						{
+							HandleGamestateDelta(msg, pos);
+							break;
+						}
 						case DATATYPE_PLAYERCHAT:
 						{
 							HandlePlayerChat(msg, pos);
@@ -262,12 +267,13 @@ namespace SORE_Network
 	void Server::SendGamestateDelta(GameInput* newInput, player_ref p)
 	{
 		if(current==NULL) return;
-		Gamestate* client;
-		//TODO: logic to update client with current client info here
+		Gamestate* currentCopy = factory->CreateGamestate(current);
+		currentCopy->Simulate(newInput);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		current->Delta(client, send);
+		current->Delta(currentCopy, send);
 		send.Send(p->second.peer, 1, 0);
+		delete currentCopy;
 	}
 
 	void Server::BroadcastGamestate()
@@ -327,9 +333,14 @@ namespace SORE_Network
 		}
 	}
 	
+	void Server::HandleGamestateDelta(ReceiveBuffer& msg, player_ref& peer)
+	{
+		HandleGamestateTransfer(msg, peer);
+	}
+	
 	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
 	{
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
 		if(peer->second.playerState!=STATE_PLAYER)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
@@ -340,10 +351,24 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 			return;
 		}
-		GameInput* input;
-		//TODO: logic to deserialize and assign gameinput here
+		Gamestate* currentCopy = factory->CreateGamestate(current);
+		GameInput* input = factory->CreateGameInput(msg);
 		current->Simulate(input);
-		//TODO: logic to find differences between server changes and client changes here
-		//TODO: logic to send delta back to client if results differ 
+		currentCopy->Deserialize(msg);
+		gamestate_diff difference = current->Difference(currentCopy);
+		switch(difference)
+		{
+			case NO_DIFFERENCE:
+				break;
+			case DEVIATION_DIFFERENCE:
+				SendGamestateDelta(input, peer);
+				break;
+			case SEVERE_DIFFERENCE:
+				SendGamestate(peer);
+				break;
+			default:
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
+		}
+		delete currentCopy;
 	}
 }

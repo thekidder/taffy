@@ -30,6 +30,8 @@
 #endif
 #include <enet/enet.h>
 
+#include "sore_input.h"
+
 //Type definitions for network transmission
 typedef   signed char     sbyte;  //signed 8bit value
 typedef unsigned char     ubyte;  //unsigned 8bit value
@@ -159,11 +161,10 @@ namespace SORE_Network
 	
 	class GameInput
 	{
+		//TODO: Add some sort of method to transform real input -> GameInput. Should be flexible enough to allow for different settings, etc
 		public:
-			GameInput(ReceiveBuffer& receive)
-			{
-				Deserialize(receive);
-			}
+			GameInput() {}
+					
 			virtual ~GameInput() {}
 			
 			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
@@ -187,8 +188,20 @@ namespace SORE_Network
 			
 			virtual void Delta(Gamestate* old, SendBuffer& send) = 0;
 			virtual void Serialize(SendBuffer& send) = 0;
+			virtual void Deserialize(ReceiveBuffer& receive) = 0; //capable of deserializing deltas/full transfers
 			
 			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEIVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
+	};
+	
+	class GamestateFactory
+	{
+		public:
+			virtual ~GamestateFactory() {}
+			
+			virtual Gamestate* CreateGamestate() = 0;
+			virtual Gamestate* CreateGamestate(Gamestate* copy) = 0; //copy constructor
+			virtual GameInput* CreateGameInput() = 0;
+			virtual GameInput* CreateGameInput(ReceiveBuffer& receive) = 0;
 	};
 }
 

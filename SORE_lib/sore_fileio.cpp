@@ -194,8 +194,7 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 		}
 			
 		unsigned int cur = nOpenFilesystemFiles;
-			/*TODO:
-		Currently, the approach below doesnt completely "free" file_ref's to be used when a file is closed - so theoretically, after opening files a couple billion times, we may be unable to open any more. This should be made more elegant sometime in the future.
+			/*TODO: Currently, the approach below doesnt completely "free" file_ref's to be used when a file is closed - so theoretically, after opening files a couple billion times, we may be unable to open any more. This should be made more elegant sometime in the future.
 			*/
 		while(openFilesystemFiles.find(FILESYSTEM_START+cur)!=openFilesystemFiles.end())
 			cur++;

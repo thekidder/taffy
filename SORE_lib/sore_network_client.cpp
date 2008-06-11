@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), input(NULL), factory(NULL)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -156,6 +156,16 @@ namespace SORE_Network
 	void Client::SetGamestate(Gamestate* g)
 	{
 		game = g;
+	}
+	
+	void Client::SetGameInput(GameInput* i)
+	{
+		input = i;
+	}
+	
+	void Client::SetFactory(GamestateFactory* gf)
+	{
+		factory = gf;
 	}
 	
 	void Client::UpdateServers(int elapsed)
@@ -344,7 +354,7 @@ namespace SORE_Network
 					break;
 			}
 		}
-		
+		SendUpdate();
 	}
 	
 	server_list Client::GetLANServers() const
@@ -354,8 +364,17 @@ namespace SORE_Network
 	
 	void Client::SendUpdate()
 	{
-		if(game==NULL) return;
+		if(game==NULL || factory==NULL || input==NULL) 
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Gamestate, input, or factory is null");
+			return;
+		}
 		SendBuffer send;
-		//TODO: logic to serialize input & state delta goes here
+		Gamestate* last = factory->CreateGamestate(game);
+		game->Simulate(input);
+		input->Serialize(send);
+		game->Delta(last, send);
+		send.Send(server, 1, 0);
+		delete last;
 	}
 }
