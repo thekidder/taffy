@@ -64,7 +64,8 @@ namespace SORE_Utility
 	interpolater_iterator InterpolaterTask::AddInterpolater(boost::shared_ptr<IInterpolater> i)
 	{
 		interpolaters.push_back(i);
-		interpolater_iterator it = --interpolaters.end();
+		interpolater_iterator it = interpolaters.end();
+		it--;
 		return it;
 	}
 	

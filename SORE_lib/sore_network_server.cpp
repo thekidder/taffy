@@ -188,16 +188,26 @@ namespace SORE_Network
 							break;
 						}
 						case DATATYPE_JOINSERVER:
+						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
+							ubyte oldState = pos->second.playerState;
 							if(pos->second.playerState==STATE_CONNECTING)
+							{
 								pos->second.playerState = STATE_CONNECTED;
+								current->OnPlayerStateChange(pos, oldState);
+							}
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
+						}
 						case DATATYPE_QUITSERVER:
+						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
 							enet_peer_disconnect(event.peer, 0);
+							ubyte oldState = pos->second.playerState;
 							pos->second.playerState  = STATE_DISCONNECTING;
+							current->OnPlayerStateChange(pos, oldState);
 							break;
+						}
 						case DATATYPE_CHANGETEAM:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
@@ -207,17 +217,25 @@ namespace SORE_Network
 							break;
 						}
 						case DATATYPE_STATUSOBSERVE:
+						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
+							ubyte oldState = pos->second.playerState;
 							pos->second.playerState = STATE_OBSERVER;
+							current->OnPlayerStateChange(pos, oldState);
 							UpdatePlayer(pos);
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
+						}
 						case DATATYPE_STATUSPLAY:
+						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
+							ubyte oldState = pos->second.playerState;
 							pos->second.playerState = STATE_PLAYER;
+							current->OnPlayerStateChange(pos, oldState);
 							UpdatePlayer(pos);
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
+						}
 						case DATATYPE_UPDATEPLAYER:
 						case DATATYPE_DELETEPLAYER:
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet from ip %s. (error: invalid datatype %u)") % pos->second.player_ip_str % static_cast<unsigned int>(dataType));

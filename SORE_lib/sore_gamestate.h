@@ -197,7 +197,10 @@ namespace SORE_Network
 			virtual void Serialize(SendBuffer& send) = 0;
 			virtual void Deserialize(ReceiveBuffer& receive) = 0; //capable of deserializing deltas/full transfers
 			
-			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEIVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
+			//server notification functions
+			virtual void OnPlayerStateChange(player_ref player, ubyte oldState) {}
+			
+			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
 	};
 	
 	class GamestateFactory

@@ -371,7 +371,7 @@ namespace SORE_Network
 					break;
 			}
 		}
-		if(input->RequestUpdate())
+		//if(input->RequestUpdate())
 			SendUpdate();
 		if(game)
 			game->SimulateTime(elapsed);
