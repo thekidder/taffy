@@ -136,6 +136,7 @@ namespace SORE_Network
 			std::deque<ubyte> unusedIDs;
 			ubyte nextId;
 			Gamestate* current;//, * last;
+			std::map<ubyte, Gamestate*> clientStates;
 			GamestateFactory* factory;
 			unsigned int lastTicks;
 			ubyte4 seed;
@@ -181,7 +182,7 @@ namespace SORE_Network
 			player me;
 			ubyte myID;
 			player_list otherPlayers;
-			Gamestate* game;
+			Gamestate* game, *last;
 			GameInput* input;
 			GamestateFactory* factory;
 			ubyte4 seed;

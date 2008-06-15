@@ -50,6 +50,10 @@ namespace SORE_Network
 	Server::~Server()
 	{
 		enet_host_destroy(server);
+		for(std::map<ubyte, Gamestate*>::iterator it=clientStates.begin();it!=clientStates.end();++it)
+		{
+			delete it->second;
+		}
 	}
 	
 	player_ref Server::GetPlayerRef(ENetPeer* peer)
@@ -391,11 +395,6 @@ namespace SORE_Network
 	
 	void Server::HandleGamestateDelta(ReceiveBuffer& msg, player_ref& peer)
 	{
-		HandleGamestateTransfer(msg, peer);
-	}
-	
-	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
-	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
 		if(peer->second.playerState!=STATE_PLAYER)
 		{
@@ -407,24 +406,31 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to use nonexistent gamestate or factory");
 			return;
 		}
-		Gamestate* currentCopy = factory->CreateGamestate(current);
+		//Gamestate* currentCopy = factory->CreateGamestate(current);
+		if(clientStates.find(peer->first)==clientStates.end())
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "cannot find client state!");
+			return;
+		}
+		Gamestate* client = clientStates[peer->first];
 		GameInput* input = factory->CreateGameInput(msg);
 		current->SimulateInput(peer->first, input);
-		BroadcastGamestateDelta(currentCopy, peer);
-		currentCopy->Deserialize(msg);
-		gamestate_diff difference = current->Difference(currentCopy);
-		//if(current->ForceCompleteUpdate())
+		//BroadcastGamestateDelta(currentCopy, peer);
+		client->Deserialize(msg);
+		gamestate_diff difference = current->Difference(client);
+		if(current->ForceCompleteUpdate())
 		{
 			SendGamestate(peer);
+			//BroadcastGamestate();
 		}
-		/*else
+		else
 		{
 			switch(difference)
 			{
 				case NO_DIFFERENCE:
 					break;
 				case DEVIATION_DIFFERENCE:
-					SendGamestateDelta(currentCopy, peer);
+					SendGamestateDelta(client, peer);
 					break;
 				case SEVERE_DIFFERENCE:
 					SendGamestate(peer);
@@ -432,8 +438,17 @@ namespace SORE_Network
 				default:
 					ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
 			}
-		}*/
-		delete currentCopy;
+		}
+		//delete currentCopy;
 		delete input;
+	}
+	
+	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
+	{
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Now setting up client state...");
+		Gamestate* client = factory->CreateGamestate();
+		client->Deserialize(msg);
+		clientStates.insert(std::make_pair(peer->first, client));
 	}
 }

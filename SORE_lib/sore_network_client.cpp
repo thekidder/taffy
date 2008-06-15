@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), input(NULL), factory(NULL), seed(0)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), last(NULL), input(NULL), factory(NULL), seed(0)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -243,6 +243,8 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 								break;
 							}
+							if(!last)
+								last = factory->CreateGamestate(game);
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
@@ -252,6 +254,8 @@ namespace SORE_Network
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
 								break;
 							}
+							if(!last)
+								last = factory->CreateGamestate(game);
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_PLAYERCHAT:
@@ -391,12 +395,14 @@ namespace SORE_Network
 		}
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		Gamestate* last = factory->CreateGamestate(game);
+		if(!last)
+			last = factory->CreateGamestate(game);
 		game->SimulateInput(myID, input);
 		input->Serialize(send);
 		//game->Serialize(send);
 		game->Delta(last, send);
 		delete last;
+		last = NULL;
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
 	}
@@ -406,6 +412,10 @@ namespace SORE_Network
 		game = factory->CreateGamestate();
 		input->SetGamestate(game);
 		callback(game);
+		SendBuffer send;
+		send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
+		game->Serialize(send);
+		send.Send(server, 1, 0);
 	}
 	
 	void Client::SetGamestateCallback(boost::function< void ( Gamestate * ) > f)
