@@ -237,7 +237,7 @@ namespace SORE_Network
 					switch(dataType)
 					{
 						case DATATYPE_GAMESTATE_TRANSFER:
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
@@ -248,7 +248,7 @@ namespace SORE_Network
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
-							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
