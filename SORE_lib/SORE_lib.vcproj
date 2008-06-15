@@ -245,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sore_timing_windows.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_util.cpp"
 				>
 			</File>
