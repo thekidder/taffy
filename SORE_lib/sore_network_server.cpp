@@ -292,25 +292,27 @@ namespace SORE_Network
 	
 	void Server::SendGamestate(player_ref p)
 	{
+		unsigned int id =  p->first;
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Send(p->second.peer, 1, 0);
 	}
 
-	void Server::SendGamestateDelta(GameInput* newInput, player_ref p)
+	void Server::SendGamestateDelta(Gamestate* old, player_ref p)
 	{
 		if(current==NULL) return;
-		Gamestate* currentCopy = factory->CreateGamestate(current);
-		currentCopy->SimulateInput(newInput);
+		unsigned int id =  p->first;
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		current->Delta(currentCopy, send);
+		current->Delta(old, send);
 		send.Send(p->second.peer, 1, 0);
-		delete currentCopy;
 	}
 
 	void Server::BroadcastGamestate()
 	{
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Broadcast(server, 1, 0);
@@ -325,6 +327,8 @@ namespace SORE_Network
 		{
 			if(it == toExclude)
 				continue;
+			unsigned int id =  it->first;
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
 			send.Send(it->second.peer, 1, 0);
 		}
 	}
@@ -400,25 +404,27 @@ namespace SORE_Network
 		}
 		Gamestate* currentCopy = factory->CreateGamestate(current);
 		GameInput* input = factory->CreateGameInput(msg);
-		current->SimulateInput(input);
+		current->SimulateInput(peer->first, input);
 		BroadcastGamestateDelta(currentCopy, peer);
 		currentCopy->Deserialize(msg);
 		gamestate_diff difference = current->Difference(currentCopy);
 		switch(difference)
 		{
 			case NO_DIFFERENCE:
+				
 				break;
 			case DEVIATION_DIFFERENCE:
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sent correction packet");
-				SendGamestateDelta(input, peer);
+				
+				SendGamestateDelta(currentCopy, peer);
 				break;
 			case SEVERE_DIFFERENCE:
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sent replacement packet");
+				
 				SendGamestate(peer);
 				break;
 			default:
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
 		}
-		//delete currentCopy;
+		delete currentCopy;
+		delete input;
 	}
 }

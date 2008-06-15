@@ -391,13 +391,14 @@ namespace SORE_Network
 		}
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		Gamestate* last = factory->CreateGamestate(game);
-		game->SimulateInput(input);
+		//Gamestate* last = factory->CreateGamestate(game);
+		game->SimulateInput(myID, input);
 		input->Serialize(send);
-		game->Delta(last, send);
+		game->Serialize(send);
+		//game->Delta(last, send);
+		//delete last;
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
-		delete last;
 	}
 	
 	void Client::Initialize()

@@ -118,7 +118,7 @@ namespace SORE_Network
 			//gamestate update methods
 			void       PrepareGamestateUpdate(SendBuffer& send);
 			void       SendGamestate(player_ref p);
-			void       SendGamestateDelta(GameInput* newInput, player_ref p);
+			void       SendGamestateDelta(Gamestate* old, player_ref p);
 			void       BroadcastGamestateDelta(Gamestate* old, player_ref toExclude);
 			void       BroadcastGamestate();
 			
