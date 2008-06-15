@@ -253,6 +253,11 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
 					player_ref pos = GetPlayerRef(event.peer);
+					
+					ubyte oldState = pos->second.playerState;
+					pos->second.playerState = STATE_DISCONNECTING;
+					current->OnPlayerStateChange(pos, oldState);
+					
 					std::string peer = pos->second.name;
 					unusedIDs.push_back(pos->first);
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
@@ -293,7 +298,7 @@ namespace SORE_Network
 	void Server::SendGamestate(player_ref p)
 	{
 		unsigned int id =  p->first;
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Send(p->second.peer, 1, 0);
@@ -328,7 +333,7 @@ namespace SORE_Network
 			if(it == toExclude)
 				continue;
 			unsigned int id =  it->first;
-			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
 			send.Send(it->second.peer, 1, 0);
 		}
 	}
@@ -408,11 +413,11 @@ namespace SORE_Network
 		BroadcastGamestateDelta(currentCopy, peer);
 		currentCopy->Deserialize(msg);
 		gamestate_diff difference = current->Difference(currentCopy);
-		if(current->ForceCompleteUpdate())
+		//if(current->ForceCompleteUpdate())
 		{
 			SendGamestate(peer);
 		}
-		else
+		/*else
 		{
 			switch(difference)
 			{
@@ -427,7 +432,7 @@ namespace SORE_Network
 				default:
 					ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
 			}
-		}
+		}*/
 		delete currentCopy;
 		delete input;
 	}
