@@ -196,6 +196,7 @@ namespace SORE_Network
 			virtual void Delta(Gamestate* old, SendBuffer& send) = 0;
 			virtual void Serialize(SendBuffer& send) = 0;
 			virtual void Deserialize(ReceiveBuffer& receive) = 0; //capable of deserializing deltas/full transfers
+			virtual bool ForceCompleteUpdate() = 0;
 			
 			//server notification functions
 			virtual void OnPlayerStateChange(player_ref player, ubyte oldState) {}

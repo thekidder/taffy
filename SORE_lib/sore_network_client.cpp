@@ -384,19 +384,19 @@ namespace SORE_Network
 	
 	void Client::SendUpdate()
 	{
-		if(game==NULL || factory==NULL || input==NULL) 
+		if(game==NULL || factory==NULL || input==NULL)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Gamestate, input, or factory is null");
 			return;
 		}
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
-		//Gamestate* last = factory->CreateGamestate(game);
+		Gamestate* last = factory->CreateGamestate(game);
 		game->SimulateInput(myID, input);
 		input->Serialize(send);
-		game->Serialize(send);
-		//game->Delta(last, send);
-		//delete last;
+		//game->Serialize(send);
+		game->Delta(last, send);
+		delete last;
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
 	}
