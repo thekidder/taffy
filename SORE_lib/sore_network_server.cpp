@@ -302,7 +302,7 @@ namespace SORE_Network
 	void Server::SendGamestate(player_ref p)
 	{
 		unsigned int id =  p->first;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Send(p->second.peer, 1, 0);
@@ -312,7 +312,7 @@ namespace SORE_Network
 	{
 		if(current==NULL) return;
 		unsigned int id =  p->first;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		current->Delta(old, send);
@@ -321,7 +321,7 @@ namespace SORE_Network
 
 	void Server::BroadcastGamestate()
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Broadcast(server, 1, 0);
@@ -337,7 +337,7 @@ namespace SORE_Network
 			if(it == toExclude)
 				continue;
 			unsigned int id =  it->first;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
 			send.Send(it->second.peer, 1, 0);
 		}
 	}
