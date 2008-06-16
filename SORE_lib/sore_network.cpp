@@ -162,6 +162,18 @@ namespace SORE_Network
 		return result;
 	}
 	
+	unsigned int SendBuffer::totalBytesSent = 0;
+	
+	/*static unsigned int SendBuffer::GetTotalBytes()
+	{
+		return totalBytesSent;
+	}
+	
+	static void SendBuffer::ResetTotalBytes()
+	{
+		totalBytesSent = 0;
+	}*/
+	
 	SendBuffer::SendBuffer()
 	{
 	}
@@ -329,6 +341,7 @@ namespace SORE_Network
 	{
 		ENetPacket* temp = GetPacket(flags);
 		enet_peer_send(peer, channelID, temp);
+		totalBytesSent += buf.size();
 	}
 	
 	void SendBuffer::Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags)

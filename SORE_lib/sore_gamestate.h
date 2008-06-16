@@ -73,18 +73,19 @@ namespace SORE_Network
 	
 	struct player
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), peer(NULL), player_ip(0) {player_ip_str[0]='\0';}
+		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0), peer(NULL), ticksToKick(0) {player_ip_str[0]='\0';}
 		std::string name;
 		ubyte playerState;
 		ubyte team; //implementation defined
 		
-		//only used on server
-		player_ref id_iter; //retrieved from server
-		ENetPeer* peer;
-		
 		//network info
 		enet_uint32 player_ip;
 		char player_ip_str[16];
+		
+		//only used on server
+		player_ref id_iter; //retrieved from server
+		ENetPeer* peer;
+		unsigned int ticksToKick;
 	};
 	
 	ubyte8 pack754(long double f, unsigned bits, unsigned expbits);
@@ -154,9 +155,14 @@ namespace SORE_Network
 			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
 			void Clear();
 			
+			static unsigned int GetTotalBytes() { return totalBytesSent;}
+			static void         ResetTotalBytes() { totalBytesSent = 0.0; }
+			
 			SendBuffer& operator+=(SendBuffer& b);
 		protected:
 			net_buffer buf;
+			
+			static unsigned int totalBytesSent;
 	};
 	
 	class Gamestate;
@@ -202,6 +208,8 @@ namespace SORE_Network
 			virtual void OnPlayerStateChange(player_ref player, ubyte oldState) {}
 			
 			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
+			
+			virtual std::string NetworkVersion() = 0;
 	};
 	
 	class GamestateFactory

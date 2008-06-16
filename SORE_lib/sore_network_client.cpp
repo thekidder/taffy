@@ -23,7 +23,7 @@
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), last(NULL), input(NULL), factory(NULL), seed(0)
+	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), last(NULL), input(NULL), factory(NULL), seed(0), bytesPerSec(0.0)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -67,23 +67,7 @@ namespace SORE_Network
 			event.type == ENET_EVENT_TYPE_CONNECT)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Connection to %s:%d succeeded") % serverName % address.port);
-			
-			SendBuffer data;
-			data.AddUByte(DATATYPE_JOINSERVER);
-			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
-			std::string name = sm.GetVariable("multiplayer", "name");
-			
-			data.Clear();
-			data.AddUByte(DATATYPE_CHANGEHANDLE);
-			data.AddString1(name);
-			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
-			
-			data.Clear();
-			data.AddUByte(DATATYPE_STATUSPLAY);
-			//data.AddUByte(CHATMASK_ALL);
-			//data.AddString2("Hello, world!");
-			data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
-			
+
 			enet_host_flush (client);
 		}
 		else
@@ -218,10 +202,15 @@ namespace SORE_Network
 	
 	void Client::Frame(int elapsed)
 	{
+		static unsigned int elapsedTotal = 0;
+		static unsigned int recv = 0;
+		static unsigned int sent = 0;
+		if(!server)
+			return;
 		UpdateServers(elapsed);
 		
 		ENetEvent event;
-		
+				
 		while (enet_host_service (client, &event, 0) > 0)
 		{
 			switch (event.type)
@@ -233,11 +222,24 @@ namespace SORE_Network
 				{
 					std::string peer, channel;
 					ReceiveBuffer msg(*event.packet);
+					recv += msg.Remaining();
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
+						case DATATYPE_NETWORKVERSION:
+						{
+							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: version verification");
+							//server has requested client send net version
+							if(game==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to get version of nonexistent gamestate");
+								break;
+							}
+							SendNetworkVersions();
+							break;
+						}
 						case DATATYPE_GAMESTATE_TRANSFER:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
@@ -248,7 +250,7 @@ namespace SORE_Network
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
-							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
+							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
 							if(game==NULL)
 							{
 								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to change nonexistent gamestate");
@@ -335,12 +337,35 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Player:\n" + msg);
 							break;
 						}
-						case DATATYPE_JOINSERVER:
+						case DATATYPE_STATUSCONNECTED:
+						{
+							std::string name = sm.GetVariable("multiplayer", "name");
+							SendBuffer data;
+							data.AddUByte(DATATYPE_CHANGEHANDLE);
+							data.AddString1(name);
+							data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+			
+							data.Clear();
+							data.AddUByte(DATATYPE_STATUSPLAY);
+							data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+							
+							SendBuffer send;
+							send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
+							game->Serialize(send);
+							send.Send(server, 1, 0);
+							break;
+						}
+						/*case DATATYPE_JOINSERVER: //deprecated
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
-							break;
+							break;*/
 						case DATATYPE_QUITSERVER:
+						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
+							std::string reason = msg.GetString1();
+							ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Server has kicked for reason: %s") % reason);
+							enet_peer_disconnect(event.peer, 0);
 							break;
+						}
 						case DATATYPE_CHANGETEAM:
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
 							break;
@@ -356,6 +381,8 @@ namespace SORE_Network
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("New seed: %u") % seed);
 							srand(static_cast<unsigned int>(seed));
 							Initialize();
+							
+							SendNetworkVersions();
 							break;
 						default:
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Received corrupt packet. (error: unknown datatype %u)") % static_cast<unsigned int>(dataType));
@@ -369,6 +396,9 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("disconected from server"));
+					disconnectCallback("");
+					server = NULL;
+					return;
 					break;
 				}
 				case ENET_EVENT_TYPE_NONE:
@@ -379,6 +409,18 @@ namespace SORE_Network
 			SendUpdate();
 		if(game)
 			game->SimulateTime(elapsed);
+		
+		sent += SendBuffer::GetTotalBytes();
+		SendBuffer::ResetTotalBytes();
+		elapsedTotal += elapsed;
+		if(elapsedTotal > 1000)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("send bytes/sec: %f") % (sent * 10000.0 / elapsedTotal));
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("recv bytes/sec: %f") % (recv * 10000.0 / elapsedTotal));
+			sent = recv = elapsedTotal = 0;
+		}
+		
+		
 	}
 	
 	server_list Client::GetLANServers() const
@@ -403,7 +445,7 @@ namespace SORE_Network
 		game->Delta(last, send);
 		delete last;
 		last = NULL;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
 		send.Send(server, 1, 0);
 	}
 	
@@ -412,14 +454,24 @@ namespace SORE_Network
 		game = factory->CreateGamestate();
 		input->SetGamestate(game);
 		callback(game);
-		SendBuffer send;
-		send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
-		game->Serialize(send);
-		send.Send(server, 1, 0);
+	}
+	
+	void Client::SendNetworkVersions()
+	{
+		SendBuffer versionStr;
+		versionStr.AddUByte(DATATYPE_NETWORKVERSION);
+		versionStr.AddString1(game->NetworkVersion());
+		versionStr.AddString1(SORE_Network::netVersion);
+		versionStr.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 	}
 	
 	void Client::SetGamestateCallback(boost::function< void ( Gamestate * ) > f)
 	{
 		callback = f;
+	}
+	
+	void Client::SetDisconnectCallback(boost::function<void (std::string)> f)
+	{
+		disconnectCallback = f;
 	}
 }

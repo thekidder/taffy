@@ -19,6 +19,7 @@
  ***************************************************************************/
 // $Id$ 
 
+#include "sore_timing.h"
 #include "sore_network.h"
 #include <cstdio>
 
@@ -104,6 +105,9 @@ namespace SORE_Network
 		{
 			return;
 		}
+		
+		UpdateDisconnects();
+		
 		while (enet_host_service (server, &event, 0) > 0)
 		{
 			switch (event.type)
@@ -162,6 +166,49 @@ namespace SORE_Network
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
+						case DATATYPE_NETWORKVERSION:
+						{
+							//client is sending network version...
+							if(current==NULL)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to verify version of nonexistent gamestate");
+								break;
+							}
+							std::string remoteVersion = msg.GetString1();
+							std::string serverVersion = current->NetworkVersion();
+							
+							std::string soreVersion = msg.GetString1();
+							if(!VersionMatch(pos, "game", remoteVersion, serverVersion))
+							{
+								std::string mismatch = "(server: " + serverVersion + ", client: " + remoteVersion + ")";
+								Disconnect(pos, "Incorrect game version " + mismatch, 5000);
+								break;
+							}
+							
+							serverVersion = SORE_Network::netVersion;
+							if(!VersionMatch(pos, "SORE_Net", soreVersion, serverVersion))
+							{
+								std::string mismatch = "(server: " + serverVersion + ", client: " + soreVersion + ")";
+								Disconnect(pos, "Incorrect SORE_Net version " + mismatch, 5000);
+								break;
+							}
+							
+							ENGINE_LOG(SORE_Logging::LVL_INFO, "Verified game/SORE_Net versions of player " + pos->second.name);
+							
+							ubyte oldState = pos->second.playerState;
+							if(pos->second.playerState==STATE_CONNECTING)
+							{
+								pos->second.playerState = STATE_CONNECTED;
+								current->OnPlayerStateChange(pos, oldState);
+							}
+							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
+							SendBuffer status;
+							status.AddUByte(DATATYPE_STATUSCONNECTED);
+							status.Send(pos->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+							UpdatePlayer(pos);
+							
+							break;
+						}
 						case DATATYPE_GAMESTATE_TRANSFER:
 						{
 							HandleGamestateTransfer(msg, pos);
@@ -180,6 +227,11 @@ namespace SORE_Network
 						case DATATYPE_CHANGEHANDLE:
 						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change handle");
+							if(pos->second.playerState == STATE_CONNECTING)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_INFO, "Cannot change handle until fully connected");
+								break;
+							}
 							pos->second.name = msg.GetString1();
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							//send confirmation
@@ -191,7 +243,7 @@ namespace SORE_Network
 							UpdatePlayer(pos);
 							break;
 						}
-						case DATATYPE_JOINSERVER:
+						/*case DATATYPE_JOINSERVER: //deprecated - what's the point of this, really?
 						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: join server");
 							ubyte oldState = pos->second.playerState;
@@ -202,7 +254,7 @@ namespace SORE_Network
 							}
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							break;
-						}
+						}*/
 						case DATATYPE_QUITSERVER:
 						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: quit server");
@@ -215,6 +267,11 @@ namespace SORE_Network
 						case DATATYPE_CHANGETEAM:
 						{
 							ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: change team");
+							if(pos->second.playerState == STATE_CONNECTING)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_INFO, "Cannot change handle until fully connected");
+								break;
+							}
 							ubyte teamId = msg.GetUByte();
 							pos->second.team = teamId;
 							UpdatePlayer(pos);
@@ -223,6 +280,11 @@ namespace SORE_Network
 						case DATATYPE_STATUSOBSERVE:
 						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status observe");
+							if(pos->second.playerState == STATE_CONNECTING)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_INFO, "Cannot change status until fully connected");
+								break;
+							}
 							ubyte oldState = pos->second.playerState;
 							pos->second.playerState = STATE_OBSERVER;
 							current->OnPlayerStateChange(pos, oldState);
@@ -233,6 +295,11 @@ namespace SORE_Network
 						case DATATYPE_STATUSPLAY:
 						{
 							//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: status play");
+							if(pos->second.playerState == STATE_CONNECTING)
+							{
+								ENGINE_LOG(SORE_Logging::LVL_INFO, "Cannot change status until fully connected");
+								break;
+							}
 							ubyte oldState = pos->second.playerState;
 							pos->second.playerState = STATE_PLAYER;
 							current->OnPlayerStateChange(pos, oldState);
@@ -257,10 +324,6 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
 					player_ref pos = GetPlayerRef(event.peer);
-					
-					ubyte oldState = pos->second.playerState;
-					pos->second.playerState = STATE_DISCONNECTING;
-					current->OnPlayerStateChange(pos, oldState);
 					
 					std::string peer = pos->second.name;
 					unusedIDs.push_back(pos->first);
@@ -292,6 +355,45 @@ namespace SORE_Network
 		broadcaster.SetBroadcastCallback(c);
 	}
 	
+	bool Server::VersionMatch(player_ref pos, std::string type, std::string client, std::string server)
+	{
+		if(client != server)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Client %s has a mismatched %s version") % pos->second.name % type);
+			return false;
+		}
+		else
+		{
+			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Verified %s version of player %s (%s)") % type % pos->second.name % server);
+			return true;
+		}
+	}
+	
+	void Server::UpdateDisconnects()
+	{
+		for(player_ref it=playerList.begin();it!=playerList.end();++it)
+		{
+			unsigned int ticks = SORE_Timing::GetGlobalTicks();
+			if(it->second.playerState == STATE_DISCONNECTING && ticks > it->second.ticksToKick)
+				enet_peer_reset (it->second.peer);
+		}
+	}
+	
+	void Server::Disconnect(player_ref player, std::string reason, unsigned int timeout)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Disconnecting player %s for: \"%s\"") % player->second.name % reason);
+		
+		ubyte oldState = player->second.playerState;
+		player->second.playerState = STATE_DISCONNECTING;
+		current->OnPlayerStateChange(player, oldState);
+		player->second.ticksToKick = SORE_Timing::GetGlobalTicks() + timeout*10;
+		
+		SendBuffer kickPacket;
+		kickPacket.AddUByte(DATATYPE_QUITSERVER);
+		kickPacket.AddString1(reason);
+		kickPacket.Send(player->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+	}
+	
 	void Server::PrepareGamestateUpdate(SendBuffer& send)
 	{
 		if(current==NULL) return;
@@ -301,8 +403,7 @@ namespace SORE_Network
 	
 	void Server::SendGamestate(player_ref p)
 	{
-		unsigned int id =  p->first;
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %d") % id);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %s") % p->second.name);
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Send(p->second.peer, 1, 0);
@@ -311,8 +412,7 @@ namespace SORE_Network
 	void Server::SendGamestateDelta(Gamestate* old, player_ref p)
 	{
 		if(current==NULL) return;
-		unsigned int id =  p->first;
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %s") % p->second.name);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		current->Delta(old, send);
@@ -321,7 +421,7 @@ namespace SORE_Network
 
 	void Server::BroadcastGamestate()
 	{
-		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
 		SendBuffer send;
 		PrepareGamestateUpdate(send);
 		send.Broadcast(server, 1, 0);
@@ -336,8 +436,8 @@ namespace SORE_Network
 		{
 			if(it == toExclude)
 				continue;
-			unsigned int id =  it->first;
-			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %d") % id);
+			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("broadcast correction packet to %s") % it->second.name);
+
 			send.Send(it->second.peer, 1, 0);
 		}
 	}
@@ -346,6 +446,11 @@ namespace SORE_Network
 	void Server::HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer)
 	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: player chat");
+		if(peer->second.playerState == STATE_CONNECTING)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_INFO, "Cannot chat until fully connected");
+			return;
+		}
 		ubyte mask = msg.GetUByte();
 		switch(mask)
 		{
@@ -446,6 +551,16 @@ namespace SORE_Network
 	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
 	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
+		if(peer->second.playerState!=STATE_PLAYER)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_WARNING, "Cannot change gamestate if not playing");
+			return;
+		}
+		if(current==NULL || factory==NULL)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to use nonexistent gamestate or factory");
+			return;
+		}
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Now setting up client state...");
 		Gamestate* client = factory->CreateGamestate();
 		client->Deserialize(msg);

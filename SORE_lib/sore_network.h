@@ -38,10 +38,11 @@
  * 
  */
 
-//bool operator<(ENetAddress a, ENetAddress b); 
 
 namespace SORE_Network
 {
+	const std::string netVersion = "SORE_Net 0.2.1";
+	
 	const ubyte DATATYPE_START              = 1;
 	
 	//messages that change the gamestate
@@ -50,19 +51,22 @@ namespace SORE_Network
 	
 	//messages that affect current player
 	const ubyte DATATYPE_CHANGEHANDLE       = DATATYPE_START + 2;
-	const ubyte DATATYPE_JOINSERVER         = DATATYPE_START + 3;
+	//const ubyte DATATYPE_JOINSERVER         = DATATYPE_START + 3; //deprecated
+	const ubyte DATATYPE_STATUSCONNECTED    = DATATYPE_START + 3;
 	const ubyte DATATYPE_QUITSERVER         = DATATYPE_START + 4;
 	const ubyte DATATYPE_STATUSOBSERVE      = DATATYPE_START + 5;
 	const ubyte DATATYPE_STATUSPLAY         = DATATYPE_START + 6;
 	const ubyte DATATYPE_CHANGETEAM         = DATATYPE_START + 7;
 	const ubyte DATATYPE_CHANGEID           = DATATYPE_START + 8;
 	
-	//misc
+	//player updates
 	const ubyte DATATYPE_PLAYERCHAT         = DATATYPE_START + 9;
 	const ubyte DATATYPE_UPDATEPLAYER       = DATATYPE_START + 10;
 	const ubyte DATATYPE_DELETEPLAYER       = DATATYPE_START + 11;
 	
+	//server msic 
 	const ubyte DATATYPE_CHANGESEED         = DATATYPE_START + 12;
+	const ubyte DATATYPE_NETWORKVERSION     = DATATYPE_START + 13;
 	
 	void InitNetwork();
 	
@@ -114,6 +118,10 @@ namespace SORE_Network
 			//player methods
 			player_ref GetPlayerRef(ENetPeer* peer);
 			void       UpdatePlayer(player_ref toUpdate);
+			void       UpdateDisconnects();
+			
+			bool       VersionMatch(player_ref pos, std::string type, std::string client, std::string server);
+			void       Disconnect(player_ref player, std::string reason, unsigned int timeout); //timeout in ms
 			
 			//gamestate update methods
 			void       PrepareGamestateUpdate(SendBuffer& send);
@@ -157,6 +165,7 @@ namespace SORE_Network
 			void        SetFactory(GamestateFactory* gf);
 			
 			void        SetGamestateCallback(boost::function<void (Gamestate*)> f);
+			void        SetDisconnectCallback(boost::function<void (std::string)> f);
 			
 			//Connection Functions
 			void        Connect(server_list::iterator it);
@@ -173,6 +182,7 @@ namespace SORE_Network
 		protected:
 			void UpdateServers(int elapsed); //find broadcasting servers on LAN
 			void Initialize(); //called after connecting and establishing a seed
+			void SendNetworkVersions();
 			ENetHost* client;
 			ENetPeer* server;
 			SORE_Utility::SettingsManager& sm;
@@ -186,7 +196,11 @@ namespace SORE_Network
 			GameInput* input;
 			GamestateFactory* factory;
 			ubyte4 seed;
+			
 			boost::function<void (Gamestate*)> callback;
+			boost::function<void (std::string)> disconnectCallback;
+			
+			double bytesPerSec;
 	};
 }
 
