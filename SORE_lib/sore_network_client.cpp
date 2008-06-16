@@ -142,12 +142,12 @@ namespace SORE_Network
 		input = i;
 	}
 	
-	void Client::SetFactory(GamestateFactory* gf)
+	void Client::SetFactory(GameFactory* gf)
 	{
 		factory = gf;
 	}
 	
-	/*const Gamestate * Client::GetGamestate() const
+	/*const Game * Client::GetGame() const
 	{
 		return game;
 	}*/
@@ -246,7 +246,7 @@ namespace SORE_Network
 								break;
 							}
 							if(!last)
-								last = factory->CreateGamestate(game);
+								last = factory->CreateGame(game);
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_GAMESTATE_DELTA:
@@ -257,7 +257,7 @@ namespace SORE_Network
 								break;
 							}
 							if(!last)
-								last = factory->CreateGamestate(game);
+								last = factory->CreateGame(game);
 							game->Deserialize(msg);
 							break;
 						case DATATYPE_PLAYERCHAT:
@@ -406,9 +406,10 @@ namespace SORE_Network
 			}
 		}
 		//if(input->RequestUpdate())
-			SendUpdate();
 		if(game)
 			game->SimulateTime(elapsed);
+		
+		SendUpdate();
 		
 		sent += SendBuffer::GetTotalBytes();
 		SendBuffer::ResetTotalBytes();
@@ -432,13 +433,13 @@ namespace SORE_Network
 	{
 		if(game==NULL || factory==NULL || input==NULL)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Gamestate, input, or factory is null");
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Game, input, or factory is null");
 			return;
 		}
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		if(!last)
-			last = factory->CreateGamestate(game);
+			last = factory->CreateGame(game);
 		game->SimulateInput(myID, input);
 		input->Serialize(send);
 		//game->Serialize(send);
@@ -451,8 +452,8 @@ namespace SORE_Network
 	
 	void Client::Initialize()
 	{
-		game = factory->CreateGamestate();
-		input->SetGamestate(game);
+		game = factory->CreateGame();
+		input->SetGame(game);
 		callback(game);
 	}
 	
@@ -465,7 +466,7 @@ namespace SORE_Network
 		versionStr.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 	}
 	
-	void Client::SetGamestateCallback(boost::function< void ( Gamestate * ) > f)
+	void Client::SetGameCallback(boost::function< void ( Game * ) > f)
 	{
 		callback = f;
 	}

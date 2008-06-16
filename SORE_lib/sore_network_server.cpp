@@ -51,7 +51,7 @@ namespace SORE_Network
 	Server::~Server()
 	{
 		enet_host_destroy(server);
-		for(std::map<ubyte, Gamestate*>::iterator it=clientStates.begin();it!=clientStates.end();++it)
+		for(std::map<ubyte, Game*>::iterator it=clientStates.begin();it!=clientStates.end();++it)
 		{
 			delete it->second;
 		}
@@ -87,12 +87,12 @@ namespace SORE_Network
 		srand(static_cast<unsigned int>(seed));
 	}
 	
-	void Server::SetGamestate(Gamestate* g)
+	void Server::SetGame(Game* g)
 	{
 		current = g;
 	}
 	
-	void SORE_Network::Server::SetFactory(GamestateFactory * gf)
+	void SORE_Network::Server::SetFactory(GameFactory * gf)
 	{
 		factory = gf;
 	}
@@ -142,7 +142,7 @@ namespace SORE_Network
 					send_id.AddUByte(newId);
 					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					UpdatePlayer(pos);
-					SendGamestate(pos);
+					SendGame(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					send_id.Clear();
 					send_id.AddUByte(DATATYPE_CHANGESEED);
@@ -211,12 +211,12 @@ namespace SORE_Network
 						}
 						case DATATYPE_GAMESTATE_TRANSFER:
 						{
-							HandleGamestateTransfer(msg, pos);
+							HandleGameTransfer(msg, pos);
 							break;
 						}
 						case DATATYPE_GAMESTATE_DELTA:
 						{
-							HandleGamestateDelta(msg, pos);
+							HandleGameDelta(msg, pos);
 							break;
 						}
 						case DATATYPE_PLAYERCHAT:
@@ -327,6 +327,12 @@ namespace SORE_Network
 					
 					std::string peer = pos->second.name;
 					unusedIDs.push_back(pos->first);
+					if(pos->second.playerState != STATE_DISCONNECTING)
+					{
+						ubyte old = pos->second.playerState;
+						pos->second.playerState = STATE_DISCONNECTING;
+						current->OnPlayerStateChange(pos, old);
+					}
 					ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("%s disconected") % peer);
 					// Reset the peer's client information.
 					event.peer->data = NULL;
@@ -394,40 +400,40 @@ namespace SORE_Network
 		kickPacket.Send(player->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 	}
 	
-	void Server::PrepareGamestateUpdate(SendBuffer& send)
+	void Server::PrepareGameUpdate(SendBuffer& send)
 	{
 		if(current==NULL) return;
 		send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
 		current->Serialize(send);
 	}
 	
-	void Server::SendGamestate(player_ref p)
+	void Server::SendGame(player_ref p)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %s") % p->second.name);
 		SendBuffer send;
-		PrepareGamestateUpdate(send);
+		PrepareGameUpdate(send);
 		send.Send(p->second.peer, 1, 0);
 	}
 
-	void Server::SendGamestateDelta(Gamestate* old, player_ref p)
+	void Server::SendGameDelta(Game* old, player_ref p)
 	{
 		if(current==NULL) return;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %s") % p->second.name);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent correction packet to %s") % p->second.name);
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		current->Delta(old, send);
 		send.Send(p->second.peer, 1, 0);
 	}
 
-	void Server::BroadcastGamestate()
+	void Server::BroadcastGame()
 	{
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
 		SendBuffer send;
-		PrepareGamestateUpdate(send);
+		PrepareGameUpdate(send);
 		send.Broadcast(server, 1, 0);
 	}
 	
-	void SORE_Network::Server::BroadcastGamestateDelta(Gamestate* old, player_ref toExclude)
+	void SORE_Network::Server::BroadcastGameDelta(Game* old, player_ref toExclude)
 	{
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
@@ -436,7 +442,7 @@ namespace SORE_Network
 		{
 			if(it == toExclude)
 				continue;
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("broadcast correction packet to %s") % it->second.name);
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("broadcast correction packet to %s") % it->second.name);
 
 			send.Send(it->second.peer, 1, 0);
 		}
@@ -498,7 +504,7 @@ namespace SORE_Network
 		}
 	}
 	
-	void Server::HandleGamestateDelta(ReceiveBuffer& msg, player_ref& peer)
+	void Server::HandleGameDelta(ReceiveBuffer& msg, player_ref& peer)
 	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate delta");
 		if(peer->second.playerState!=STATE_PLAYER)
@@ -511,22 +517,22 @@ namespace SORE_Network
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempting to use nonexistent gamestate or factory");
 			return;
 		}
-		//Gamestate* currentCopy = factory->CreateGamestate(current);
+		//Game* currentCopy = factory->CreateGame(current);
 		if(clientStates.find(peer->first)==clientStates.end())
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "cannot find client state!");
 			return;
 		}
-		Gamestate* client = clientStates[peer->first];
+		Game* client = clientStates[peer->first];
 		GameInput* input = factory->CreateGameInput(msg);
 		current->SimulateInput(peer->first, input);
-		//BroadcastGamestateDelta(currentCopy, peer);
+		//BroadcastGameDelta(currentCopy, peer);
 		client->Deserialize(msg);
 		gamestate_diff difference = current->Difference(client);
 		if(current->ForceCompleteUpdate())
 		{
-			SendGamestate(peer);
-			//BroadcastGamestate();
+			SendGame(peer);
+			//BroadcastGame();
 		}
 		else
 		{
@@ -535,10 +541,10 @@ namespace SORE_Network
 				case NO_DIFFERENCE:
 					break;
 				case DEVIATION_DIFFERENCE:
-					SendGamestateDelta(client, peer);
+					SendGameDelta(client, peer);
 					break;
 				case SEVERE_DIFFERENCE:
-					SendGamestate(peer);
+					SendGame(peer);
 					break;
 				default:
 					ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Received unknown difference: %d") % difference);
@@ -548,7 +554,7 @@ namespace SORE_Network
 		delete input;
 	}
 	
-	void Server::HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer)
+	void Server::HandleGameTransfer(ReceiveBuffer& msg, player_ref& peer)
 	{
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Received packet: gamestate transfer");
 		if(peer->second.playerState!=STATE_PLAYER)
@@ -562,7 +568,7 @@ namespace SORE_Network
 			return;
 		}
 		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, "Now setting up client state...");
-		Gamestate* client = factory->CreateGamestate();
+		Game* client = factory->CreateGame();
 		client->Deserialize(msg);
 		clientStates.insert(std::make_pair(peer->first, client));
 	}

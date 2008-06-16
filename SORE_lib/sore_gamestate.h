@@ -165,7 +165,7 @@ namespace SORE_Network
 			static unsigned int totalBytesSent;
 	};
 	
-	class Gamestate;
+	class Game;
 	
 	class GameInput
 	{
@@ -176,7 +176,7 @@ namespace SORE_Network
 			virtual ~GameInput() {}
 			
 			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
-			virtual void SetGamestate(Gamestate* game) = 0;
+			virtual void SetGame(Game* game) = 0;
 			virtual bool RequestUpdate() = 0;
 			
 		protected:
@@ -189,17 +189,17 @@ namespace SORE_Network
 	const gamestate_diff DEVIATION_DIFFERENCE = 1;
 	const gamestate_diff SEVERE_DIFFERENCE    = 2;
 	
-	class Gamestate
+	class Game
 	{
 		public:
-			virtual ~Gamestate() {}
+			virtual ~Game() {}
 			
 			//TODO: Gatestate needs a time signal - contained in GameInput, or separately to Simulate? also, non-player-influenced actions should be dealt with somehow...
 			
 			virtual void SimulateInput(ubyte player, GameInput* input) = 0;
 			virtual void SimulateTime(unsigned int ticks) = 0; //tick = 1/10000 sec
 			
-			virtual void Delta(Gamestate* old, SendBuffer& send) = 0;
+			virtual void Delta(Game* old, SendBuffer& send) = 0;
 			virtual void Serialize(SendBuffer& send) = 0;
 			virtual void Deserialize(ReceiveBuffer& receive) = 0; //capable of deserializing deltas/full transfers
 			virtual bool ForceCompleteUpdate() = 0;
@@ -207,18 +207,18 @@ namespace SORE_Network
 			//server notification functions
 			virtual void OnPlayerStateChange(player_ref player, ubyte oldState) {}
 			
-			virtual gamestate_diff Difference(Gamestate* old) = 0; //returns DEVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
+			virtual gamestate_diff Difference(Game* old) = 0; //returns DEVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
 			
 			virtual std::string NetworkVersion() = 0;
 	};
 	
-	class GamestateFactory
+	class GameFactory
 	{
 		public:
-			virtual ~GamestateFactory() {}
+			virtual ~GameFactory() {}
 			
-			virtual Gamestate* CreateGamestate() = 0;
-			virtual Gamestate* CreateGamestate(Gamestate* copy) = 0; //copy constructor
+			virtual Game* CreateGame() = 0;
+			virtual Game* CreateGame(Game* copy) = 0; //copy constructor
 			virtual GameInput* CreateGameInput() = 0;
 			virtual GameInput* CreateGameInput(ReceiveBuffer& receive) = 0;
 	};

@@ -105,12 +105,12 @@ namespace SORE_Network
 			void        SeedRNG(unsigned int s);
 			
 			void        SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
-			void        SetGamestate(Gamestate* g);
-			void        SetFactory(GamestateFactory* gf);
+			void        SetGame(Game* g);
+			void        SetFactory(GameFactory* gf);
 			size_t      NumPlayers() const;
 			
 			//call this after gamestate is changed
-			void        PushGamestate(); //send out new gamestate: will determine to send full/deltas to each client 
+			void        PushGame(); //send out new gamestate: will determine to send full/deltas to each client 
 			
 			void        Frame(int elapsed);
 			const char* GetName() const {return "SORE Networking server task";}
@@ -124,18 +124,18 @@ namespace SORE_Network
 			void       Disconnect(player_ref player, std::string reason, unsigned int timeout); //timeout in ms
 			
 			//gamestate update methods
-			void       PrepareGamestateUpdate(SendBuffer& send);
-			void       SendGamestate(player_ref p);
-			void       SendGamestateDelta(Gamestate* old, player_ref p);
-			void       BroadcastGamestateDelta(Gamestate* old, player_ref toExclude);
-			void       BroadcastGamestate();
+			void       PrepareGameUpdate(SendBuffer& send);
+			void       SendGame(player_ref p);
+			void       SendGameDelta(Game* old, player_ref p);
+			void       BroadcastGameDelta(Game* old, player_ref toExclude);
+			void       BroadcastGame();
 			
 			//functions responsible for handling network messages
 			void       HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer);
-			void       HandleGamestateTransfer(ReceiveBuffer& msg, player_ref& peer);
-			void       HandleGamestateDelta(ReceiveBuffer& msg, player_ref& peer);
+			void       HandleGameTransfer(ReceiveBuffer& msg, player_ref& peer);
+			void       HandleGameDelta(ReceiveBuffer& msg, player_ref& peer);
 			
-			void       SetGamestateFactory(GamestateFactory* gf);
+			void       SetGameFactory(GameFactory* gf);
 			
 			ENetHost* server;
 			SORE_Utility::SettingsManager sm;
@@ -143,9 +143,9 @@ namespace SORE_Network
 			player_list playerList;
 			std::deque<ubyte> unusedIDs;
 			ubyte nextId;
-			Gamestate* current;//, * last;
-			std::map<ubyte, Gamestate*> clientStates;
-			GamestateFactory* factory;
+			Game* current;//, * last;
+			std::map<ubyte, Game*> clientStates;
+			GameFactory* factory;
 			unsigned int lastTicks;
 			ubyte4 seed;
 	};
@@ -162,9 +162,9 @@ namespace SORE_Network
 			
 			//these should all be instantiated before Client is used
 			void        SetGameInput(GameInput* i);
-			void        SetFactory(GamestateFactory* gf);
+			void        SetFactory(GameFactory* gf);
 			
-			void        SetGamestateCallback(boost::function<void (Gamestate*)> f);
+			void        SetGameCallback(boost::function<void (Game*)> f);
 			void        SetDisconnectCallback(boost::function<void (std::string)> f);
 			
 			//Connection Functions
@@ -192,12 +192,12 @@ namespace SORE_Network
 			player me;
 			ubyte myID;
 			player_list otherPlayers;
-			Gamestate* game, *last;
+			Game* game, *last;
 			GameInput* input;
-			GamestateFactory* factory;
+			GameFactory* factory;
 			ubyte4 seed;
 			
-			boost::function<void (Gamestate*)> callback;
+			boost::function<void (Game*)> callback;
 			boost::function<void (std::string)> disconnectCallback;
 			
 			double bytesPerSec;
