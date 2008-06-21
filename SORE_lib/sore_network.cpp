@@ -22,9 +22,12 @@
 #include "sore_network.h"
 
 #include <algorithm>
+#include <zlib.h>
 
 namespace SORE_Network
 {
+	static const unsigned int CHUNK = 16384;
+	
 	bool network_ok = false;
 	
 	void InitNetwork()
@@ -327,7 +330,60 @@ namespace SORE_Network
 		buf.insert(buf.end(), b.buf.begin(), b.buf.end());
 		return *this;
 	}
-			
+	
+	unsigned int SendBuffer::size() const
+	{
+		return buf.size();
+	}
+	
+	void SendBuffer::Compress(SendBuffer& compressed)
+	{
+		ubyte out[CHUNK];
+		z_stream strm;
+		strm.zalloc   = Z_NULL;
+		strm.zfree    = Z_NULL;
+		strm.opaque   = Z_NULL;
+		int ret = deflateInit(&strm, Z_DEFAULT_COMPRESSION);
+		if(ret != Z_OK)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Compressing failed - could not init zlib");
+			return;
+		}
+		
+		unsigned int read = 0, have;
+		unsigned int written = 0;
+		int flush;
+		
+		do
+		{
+			if(size() - read < CHUNK)
+				strm.avail_in = size() - read;
+			else
+				strm.avail_in = CHUNK;
+			flush = size() - read == 0 ? Z_FINISH : Z_NO_FLUSH;
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Compressing - starting at %u") % static_cast<unsigned int>(buf[read]));
+			strm.next_in = &(buf[read]);
+			read += strm.avail_in;
+			do
+			{
+				strm.avail_out = CHUNK;
+				strm.next_out = out;
+				ret = deflate(&strm, flush);
+				assert(ret != Z_STREAM_ERROR);
+				have = CHUNK - strm.avail_out;
+				written += have;
+				for(unsigned int i=0;i<have;++i)
+				{
+					compressed.AddUByte(out[i]);
+				}
+			} while (strm.avail_out == 0);
+			assert(strm.avail_in == 0);
+		} while(flush != Z_FINISH);
+		assert(ret == Z_STREAM_END);
+		deflateEnd(&strm);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Compressed %d bytes to %d bytes") % read % written);
+	}
+	
 	ENetPacket* SendBuffer::GetPacket(enet_uint32 flags)
 	{
 		ENetPacket* temp;
@@ -361,7 +417,80 @@ namespace SORE_Network
 		length = static_cast<size_t>(packet.dataLength);
 		remaining = length;
 	}
+	
+	ReceiveBuffer::ReceiveBuffer(ReceiveBuffer& b, bool compressed)
+	{
+		if(compressed)
+		{
+			ubyte out[CHUNK];
+			unsigned int written = 0;
+			unsigned int read    = 0;
 			
+			z_stream strm;
+			strm.zalloc   = Z_NULL;
+			strm.zfree    = Z_NULL;
+			strm.opaque   = Z_NULL;
+			strm.avail_in = 0;
+			strm.next_in  = Z_NULL;
+			unsigned int ret = inflateInit(&strm);
+			if (ret != Z_OK)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, "Decompressing failed - could not init zlib");
+				return;
+			}
+			do
+			{
+				if(b.remaining > CHUNK)
+					strm.avail_in = CHUNK;
+				else
+					strm.avail_in = b.remaining;
+				read += strm.avail_in;
+				strm.next_in = (b.data + (b.length - b.remaining) );
+				b.remaining -= strm.avail_in;
+				
+				do
+				{
+					strm.avail_out = CHUNK;
+					strm.next_out  = out;
+					ret = inflate(&strm, Z_NO_FLUSH);
+					assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
+					switch (ret)
+					{
+						case Z_NEED_DICT:
+							ret = Z_DATA_ERROR;     /* and fall through */
+						case Z_DATA_ERROR:
+						case Z_MEM_ERROR:
+							inflateEnd(&strm);
+							return;
+					}
+					unsigned int have = CHUNK - strm.avail_out;
+					for(unsigned int i = 0; i < have; ++i)
+					{
+						//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("out[%d] = %u") % i % static_cast<unsigned int>(out[i]));
+						ownData.push_back(out[i]);
+					}
+					written += have;
+				} while(strm.avail_out == 0);
+			} while(ret != Z_STREAM_END);
+			data = &(ownData[0]);
+			length = written;
+			remaining = length;
+			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Decompressed %d bytes to %d bytes") % read % written);
+		}
+		else
+		{
+			data = b.data;
+			length = b.length;
+			remaining = b.remaining;
+		}
+	}
+	
+	ReceiveBuffer::~ReceiveBuffer()
+	{
+		/*if(ownData && data)
+			delete[] data;*/
+	}
+
 	ubyte ReceiveBuffer::GetUByte()
 	{
 		assert(remaining>=1);

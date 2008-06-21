@@ -221,8 +221,10 @@ namespace SORE_Network
 				case ENET_EVENT_TYPE_RECEIVE:
 				{
 					std::string peer, channel;
-					ReceiveBuffer msg(*event.packet);
-					recv += msg.Remaining();
+					ReceiveBuffer raw(*event.packet);
+					recv += raw.Remaining();
+					ubyte dataHead = raw.GetUByte();
+					ReceiveBuffer msg(raw, dataHead);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
@@ -343,16 +345,25 @@ namespace SORE_Network
 							SendBuffer data;
 							data.AddUByte(DATATYPE_CHANGEHANDLE);
 							data.AddString1(name);
-							data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+							SendBuffer header;
+							header.AddUByte(COMPRESSED);
+							data.Compress(header);
+							header.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 			
 							data.Clear();
+							header.Clear();
 							data.AddUByte(DATATYPE_STATUSPLAY);
-							data.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+							header.AddUByte(COMPRESSED);
+							data.Compress(header);
+							header.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 							
 							SendBuffer send;
+							header.Clear();
 							send.AddUByte(DATATYPE_GAMESTATE_TRANSFER);
 							game->Serialize(send);
-							send.Send(server, 1, 0);
+							header.AddUByte(COMPRESSED);
+							data.Compress(header);
+							header.Send(server, 1, 0);
 							break;
 						}
 						/*case DATATYPE_JOINSERVER: //deprecated
@@ -447,7 +458,10 @@ namespace SORE_Network
 		delete last;
 		last = NULL;
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Sending update");
-		send.Send(server, 1, 0);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		send.Compress(header);
+		header.Send(server, 1, 0);
 	}
 	
 	void Client::Initialize()
@@ -463,7 +477,10 @@ namespace SORE_Network
 		versionStr.AddUByte(DATATYPE_NETWORKVERSION);
 		versionStr.AddString1(game->NetworkVersion());
 		versionStr.AddString1(SORE_Network::netVersion);
-		versionStr.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		versionStr.Compress(header);
+		header.Send(server, 0, ENET_PACKET_FLAG_RELIABLE);
 	}
 	
 	void Client::SetGameCallback(boost::function< void ( Game * ) > f)

@@ -73,10 +73,13 @@ namespace SORE_Network
 		playerUpdate.AddUByte(toUpdate->second.team);
 		playerUpdate.AddUByte4(toUpdate->second.player_ip);
 		playerUpdate.AddString1(toUpdate->second.name);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		playerUpdate.Compress(header);
 		for(player_ref i=playerList.begin();i!=playerList.end();i++)
 		{
 			if(i->first==toUpdate->first) continue;
-			playerUpdate.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+			header.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 		}
 	}
 	
@@ -140,14 +143,20 @@ namespace SORE_Network
 					SendBuffer send_id;
 					send_id.AddUByte(DATATYPE_CHANGEID);
 					send_id.AddUByte(newId);
-					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+					SendBuffer header;
+					header.AddUByte(COMPRESSED);
+					send_id.Compress(header);
+					header.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					UpdatePlayer(pos);
 					SendGame(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					send_id.Clear();
+					header.Clear();
 					send_id.AddUByte(DATATYPE_CHANGESEED);
 					send_id.AddUByte4(seed);
-					send_id.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+					header.AddUByte(COMPRESSED);
+					send_id.Compress(header);
+					header.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 					break;
 				}
 				case ENET_EVENT_TYPE_RECEIVE:
@@ -162,7 +171,9 @@ namespace SORE_Network
 						channel = event.channelID;
 					else
 						channel = "0";
-					ReceiveBuffer msg(*event.packet);
+					ReceiveBuffer raw(*event.packet);
+					ubyte dataHead = raw.GetUByte();
+					ReceiveBuffer msg(raw, dataHead);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
@@ -204,7 +215,10 @@ namespace SORE_Network
 							PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 							SendBuffer status;
 							status.AddUByte(DATATYPE_STATUSCONNECTED);
-							status.Send(pos->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+							SendBuffer header;
+							header.AddUByte(COMPRESSED);
+							status.Compress(header);
+							header.Send(pos->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 							UpdatePlayer(pos);
 							
 							break;
@@ -238,7 +252,10 @@ namespace SORE_Network
 							SendBuffer data;
 							data.AddUByte(DATATYPE_CHANGEHANDLE);
 							data.AddString1(pos->second.name);
-							data.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+							SendBuffer header;
+							header.AddUByte(COMPRESSED);
+							data.Compress(header);
+							header.Send(event.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 							//update other players
 							UpdatePlayer(pos);
 							break;
@@ -339,7 +356,10 @@ namespace SORE_Network
 					SendBuffer killPlayer;
 					killPlayer.AddUByte(DATATYPE_DELETEPLAYER);
 					killPlayer.AddUByte(pos->first);
-					killPlayer.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
+					SendBuffer header;
+					header.AddUByte(COMPRESSED);
+					killPlayer.Compress(header);
+					header.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
 					playerList.erase(pos);
 					PrintPlayers(SORE_Logging::LVL_INFO, playerList);
 					break;
@@ -397,7 +417,10 @@ namespace SORE_Network
 		SendBuffer kickPacket;
 		kickPacket.AddUByte(DATATYPE_QUITSERVER);
 		kickPacket.AddString1(reason);
-		kickPacket.Send(player->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		kickPacket.Compress(header);
+		header.Send(player->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 	}
 	
 	void Server::PrepareGameUpdate(SendBuffer& send)
@@ -409,10 +432,13 @@ namespace SORE_Network
 	
 	void Server::SendGame(player_ref p)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %s") % p->second.name);
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("sent replacement packet to %s") % p->second.name);
 		SendBuffer send;
 		PrepareGameUpdate(send);
-		send.Send(p->second.peer, 1, 0);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		send.Compress(header);
+		header.Send(p->second.peer, 1, 0);
 	}
 
 	void Server::SendGameDelta(Game* old, player_ref p)
@@ -422,15 +448,21 @@ namespace SORE_Network
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);
 		current->Delta(old, send);
-		send.Send(p->second.peer, 1, 0);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		send.Compress(header);
+		header.Send(p->second.peer, 1, 0);
 	}
 
 	void Server::BroadcastGame()
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "broadcast replacement packet");
 		SendBuffer send;
 		PrepareGameUpdate(send);
-		send.Broadcast(server, 1, 0);
+		SendBuffer header;
+		header.AddUByte(COMPRESSED);
+		send.Compress(header);
+		header.Broadcast(server, 1, 0);
 	}
 	
 	void SORE_Network::Server::BroadcastGameDelta(Game* old, player_ref toExclude)
@@ -444,7 +476,10 @@ namespace SORE_Network
 				continue;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("broadcast correction packet to %s") % it->second.name);
 
-			send.Send(it->second.peer, 1, 0);
+			SendBuffer header;
+			header.AddUByte(COMPRESSED);
+			send.Compress(header);
+			header.Send(it->second.peer, 1, 0);
 		}
 	}
 
@@ -468,7 +503,10 @@ namespace SORE_Network
 				sendChat.AddUByte(CHATMASK_ALL);
 				sendChat.AddUByte(peer->first);
 				sendChat.AddString2(chat);
-				sendChat.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
+				SendBuffer header;
+				header.AddUByte(COMPRESSED);
+				sendChat.Compress(header);
+				header.Broadcast(server, 0, ENET_PACKET_FLAG_RELIABLE);
 				break;
 			}
 			case CHATMASK_TEAM:
@@ -480,10 +518,13 @@ namespace SORE_Network
 				sendChat.AddUByte(CHATMASK_TEAM);
 				sendChat.AddUByte(peer->first);
 				sendChat.AddString2(chat);
+				SendBuffer header;
+				header.AddUByte(COMPRESSED);
+				sendChat.Compress(header);
 				for(player_ref i=playerList.begin();i!=playerList.end();i++)
 				{
 					if(i->second.team == team)
-						sendChat.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
+						header.Send(i->second.peer, 0, ENET_PACKET_FLAG_RELIABLE);
 				}
 				break;
 			}
@@ -496,7 +537,10 @@ namespace SORE_Network
 				sendChat.AddUByte(CHATMASK_WHISPER);
 				sendChat.AddUByte(peer->first);
 				sendChat.AddString2(chat);
-				sendChat.Send(playerList[recipient].peer, 0, ENET_PACKET_FLAG_RELIABLE);
+				SendBuffer header;
+				header.AddUByte(COMPRESSED);
+				sendChat.Compress(header);
+				header.Send(playerList[recipient].peer, 0, ENET_PACKET_FLAG_RELIABLE);
 				break;
 			}
 			default:

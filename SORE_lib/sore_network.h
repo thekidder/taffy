@@ -41,7 +41,7 @@
 
 namespace SORE_Network
 {
-	const std::string netVersion = "SORE_Net 0.2.1";
+	const std::string netVersion = "SORE_Net 0.2.2";
 	
 	const ubyte DATATYPE_START              = 1;
 	
@@ -73,6 +73,8 @@ namespace SORE_Network
 	std::string PrintPlayer(player_ref player);
 	std::string PrintPlayer(std::pair<ubyte, player> p);
 	void PrintPlayers(unsigned int lvl, player_list playerList);
+	
+	const ubyte COMPRESSED = 1;
 	
 	class Server;
 	

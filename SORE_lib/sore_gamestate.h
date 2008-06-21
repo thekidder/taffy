@@ -98,6 +98,8 @@ namespace SORE_Network
 	{
 		public:
 			ReceiveBuffer(ENetPacket& packet);
+			ReceiveBuffer(ReceiveBuffer& b, bool compressed = false);
+			~ReceiveBuffer();
 			
 			//primitives
 			ubyte  GetUByte();
@@ -117,8 +119,10 @@ namespace SORE_Network
 			double GetFloat(size_t numBytes);
 			
 			size_t Remaining() const;
-		protected:
+			
+		private:
 			ubyte* data;
+			std::vector<ubyte> ownData;
 			size_t length;
 			size_t remaining;
 	};
@@ -151,6 +155,7 @@ namespace SORE_Network
 			void AddFloat(float2 f); //default precision: 8 bytes
 			
 			ENetPacket* GetPacket(enet_uint32 flags);
+			unsigned int size() const;
 			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
 			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
 			void Clear();
@@ -159,6 +164,8 @@ namespace SORE_Network
 			static void         ResetTotalBytes() { totalBytesSent = 0.0; }
 			
 			SendBuffer& operator+=(SendBuffer& b);
+			
+			void Compress(SendBuffer& compressed); //compresses into argument
 		protected:
 			net_buffer buf;
 			
