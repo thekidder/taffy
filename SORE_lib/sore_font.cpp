@@ -335,7 +335,7 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Font load failed: Freetype error code %d") % err);
 #ifdef DEBUG
 		//std::cout << ft_errors[err] << std::endl;
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Freetype error: %s") % ft_errors[err]);
+		//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Freetype error: %s") % ft_errors[err]);
 #endif
 		return FONT_LOAD_FAILED;
 	}
