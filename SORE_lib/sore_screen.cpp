@@ -171,7 +171,6 @@ SORE_Kernel::Screen::~Screen()
 void SORE_Kernel::Screen::Frame(int elapsedTime)
 {
 	SORE_Profiler::Sample graphics("graphics");
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if(renderer)
 		renderer->Render();
 	//CEGUI::System::getSingleton().renderGUI();
@@ -247,8 +246,12 @@ int SORE_Kernel::Screen::ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& p
 			//TODO: finish ortho projection
 			break;
 		case SORE_Graphics::PERSPECTIVE:
+		{
+			if(projection.useScreenRatio)
+				projection.ratio = static_cast<double>(screen.width) / static_cast<double>(screen.height);
 			gluPerspective(projection.fov, projection.ratio, projection.znear, projection.zfar );
 			break;
+		}
 		default:
 			returnCode = -1;
 			break;

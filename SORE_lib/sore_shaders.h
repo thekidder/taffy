@@ -49,9 +49,12 @@ namespace SORE_Graphics
 			const char* Type() const {return "GLSL shader";}
 			
 			//Uniform operators
-			void SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 			void SetUniform1i(std::string name, GLuint i0);
 			void SetUniform1f(std::string name, GLfloat f0);
+			void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
+			void SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+			
+			GLint GetAttributeLocation(std::string name);
 			
 		protected:
 			void Load(); //load from *.shad file
@@ -62,6 +65,7 @@ namespace SORE_Graphics
 			GLuint program;
 			bool ok,linked;
 			std::map<std::string,GLint> uniforms;
+			std::map<std::string,GLint> attributes;
 			static bool initCalled;
 			static bool supported;
 	};

@@ -344,10 +344,29 @@ namespace SORE_Graphics
 			location = glGetUniformLocationARB(program, name.c_str());
 			if(location==-1)
 			{
-				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL variable '%s'. Variable name probably does not exist") % name);
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL uniform '%s'. Variable name probably does not exist") % name);
 				return -1; //don't insert into uniforms database
 			}
 			uniforms.insert(std::pair<std::string,GLint>(name,location));
+		}
+		else
+			location = it->second;
+		return location;
+	}
+	
+	GLint GLSLShader::GetAttributeLocation(std::string name)
+	{
+		std::map<std::string, GLint>::iterator it;
+		GLint location;
+		if((it=attributes.find(name))==attributes.end())
+		{
+			location = glGetAttribLocationARB(program, name.c_str());
+			if(location==-1)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL attribute '%s'. Variable name probably does not exist") % name);
+				return -1; //don't insert into uniforms database
+			}
+			attributes.insert(std::pair<std::string,GLint>(name,location));
 		}
 		else
 			location = it->second;
@@ -390,4 +409,15 @@ namespace SORE_Graphics
 			glUniform1fARB(location,f0);
 	}
 
+	void GLSLShader::SetUniform2f(std::string name, GLfloat v0, GLfloat v1)
+	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform2fARB(location,v0,v1);
+	}
 } //end of namespace SORE_Graphics

@@ -76,7 +76,7 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 				value=setting.substr(eqPos+1);
 				name = TrimString(name);
 				value = TrimString(value);
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
 				list[currSection].insert(std::pair<std::string, std::string>(name, value));
 			}
 			else
@@ -86,13 +86,13 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 				{
 					currSection = TrimString(setting.substr(1, setting.find(']')-1));
 					list.insert(std::pair<std::string, std::map<std::string, std::string> >(currSection, std::map<std::string, std::string>() ));
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Setting section: '%s'") % currSection);
+					//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Setting section: '%s'") % currSection);
 				}
 				else if(!TrimString(setting).empty()) //treat this as a valueless setting
 				{
 					name = TrimString(setting);
 					value = "";
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
+					//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Parsed setting: '%s:%s:%s'") % currSection % name % value);
 					list[currSection].insert(std::pair<std::string, std::string>(name, value));
 				}
 			}
