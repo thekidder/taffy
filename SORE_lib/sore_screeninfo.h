@@ -48,8 +48,8 @@ namespace SORE_Graphics
 		bool resizable;
 	};
 	
-	SORE_Math::Point2D<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<int> pos);
-	SORE_Math::Point2D<int>   ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<float> pos);
+	SORE_Math::Vector2<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos);
+	SORE_Math::Vector2<int>   ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos);
 }
 
 #endif /*__SORE_SCREENINFO__*/

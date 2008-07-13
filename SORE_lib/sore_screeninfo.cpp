@@ -21,18 +21,18 @@
 
 #include "sore_screeninfo.h"
 
-SORE_Math::Point2D<float> SORE_Graphics::ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<int> pos)
+SORE_Math::Vector2<float> SORE_Graphics::ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
 {
-	SORE_Math::Point2D<float> projected;
-	projected.x = proj.left + (proj.right-proj.left)*(double(pos.x)/double(screen.width));
-	projected.y = proj.bottom + (proj.top-proj.bottom)*(double(pos.y)/double(screen.height));
+	SORE_Math::Vector2<float> projected;
+	projected[0] = proj.left + (proj.right-proj.left)*(double(pos[0])/double(screen.width));
+	projected[1] = proj.bottom + (proj.top-proj.bottom)*(double(pos[1])/double(screen.height));
 	return projected;
 }
 
-SORE_Math::Point2D<int> SORE_Graphics::ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Point2D<float> pos)
+SORE_Math::Vector2<int> SORE_Graphics::ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos)
 {
-	SORE_Math::Point2D<int> screenPos;
-	screenPos.x = static_cast<int>((screen.width )*(pos.x/(proj.right-proj.left)));
-	screenPos.y = static_cast<int>((screen.height)*(pos.y/(proj.top-proj.bottom)));
+	SORE_Math::Vector2<int> screenPos;
+	screenPos[0] = static_cast<int>((screen.width )*(pos[0]/(proj.right-proj.left)));
+	screenPos[1] = static_cast<int>((screen.height)*(pos[1]/(proj.top-proj.bottom)));
 	return screenPos;
 }
