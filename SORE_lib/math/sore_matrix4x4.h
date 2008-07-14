@@ -32,9 +32,8 @@ namespace SORE_Math
 			
 			void Scale(T x, T y, T z)
 			{
-				value[0 ] += x;
-				value[5 ] += y;
-				value[10] += z;
+				Matrix4<T> scale = Matrix4<T>::ProduceScaleMatrix(x, y, z);
+				*this *= scale;
 			}
 			
 			void SetIdentity()
@@ -101,6 +100,15 @@ namespace SORE_Math
 				temp.value[12] = x;
 				temp.value[13] = y;
 				temp.value[14] = z;
+				return temp;
+			}
+			
+			static Matrix4<T> ProduceScaleMatrix(T x, T y, T z)
+			{
+				Matrix4<T> temp;
+				temp.value[0 ] = x;
+				temp.value[5 ] = y;
+				temp.value[10] = z;
 				return temp;
 			}
 			
