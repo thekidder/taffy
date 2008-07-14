@@ -78,12 +78,22 @@ namespace SORE_Graphics
 						try
 						{
 							if(value == "true") useShader = true;
-							else if(value == "false") useShader = false;
+							else if(value == "false") 
+							{
+								ENGINE_LOG(SORE_Logging::LVL_WARNING, "Not using shader: dropping back to incomplete FFP pipeline");
+								useShader = false;
+							}
 							else useShader = boost::lexical_cast<bool>(value);
 						}
 						catch(boost::bad_lexical_cast)
 						{
 							useShader = true;
+						}
+						if(useShader && !GLSLShader::ShadersSupported())
+						{
+							ENGINE_LOG(SORE_Logging::LVL_WARNING, "GLSL Shaders not supported");
+							ENGINE_LOG(SORE_Logging::LVL_WARNING, "Not using shader: dropping back to incomplete FFP pipeline");
+							useShader == false;
 						}
 					}
 				}
@@ -137,7 +147,7 @@ namespace SORE_Graphics
 				textureMap[textureOrder[i]].second->Bind();
 				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("setting texture env %d") % textureMap[textureOrder[i]].first);
 				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, textureMap[textureOrder[i]].first);
-				if(GLSLShader::ShadersSupported() && shader  && useShader)
+				if(shader && useShader)
 					shader->SetUniform1i(textureOrder[i], static_cast<GLuint>(i));
 			}
 		}
