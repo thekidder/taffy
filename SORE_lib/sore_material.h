@@ -38,6 +38,10 @@ namespace SORE_Graphics
 			~Material();
 			
 			void Bind();
+			
+			std::vector<std::string> GetFlags();
+			void                     AddFlag(std::string flag);
+			bool                     HasFlag(std::string flag);
 		protected:
 			void Load();
 			GLSLShader* shader;
@@ -47,6 +51,7 @@ namespace SORE_Graphics
 			std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> > textureMap;
 			//std::vector<std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> >::iterator> textureOrder;
 			std::vector<std::string> textureOrder;
+			std::vector<std::string> flags;
 	};
 }
 

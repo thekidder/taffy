@@ -52,6 +52,11 @@ namespace SORE_Graphics
 				std::string name = i2->first;
 				std::string value = i2->second;
 				
+				if(section == "Flags")
+				{
+					flags.push_back(name);
+				}
+				
 				if(section=="Textures")
 				{
 					SORE_Resource::Texture2D* tex = rm->GetResource<SORE_Resource::Texture2D>(value);
@@ -152,5 +157,21 @@ namespace SORE_Graphics
 			}
 		}
 		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "-----end material-----");
+	}
+
+	std::vector< std::string > SORE_Graphics::Material::GetFlags()
+	{
+		return flags;
+	}
+	
+	void SORE_Graphics::Material::AddFlag(std::string flag)
+	{
+		flags.push_back(flag);
+	}
+
+	bool SORE_Graphics::Material::HasFlag(std::string flag)
+	{
+		if(find(flags.begin(), flags.end(), flag)==flags.end()) return false;
+		return true;
 	}
 }
