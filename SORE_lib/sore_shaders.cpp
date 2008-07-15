@@ -372,6 +372,18 @@ namespace SORE_Graphics
 			location = it->second;
 		return location;
 	}
+
+	void GLSLShader::SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2)
+	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform3fARB(location,v0,v1,v2);
+	}
 	
 	void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 	{

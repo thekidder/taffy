@@ -295,6 +295,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\math\sore_geometry.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sore_gfxprimitives.h"
 				>
 			</File>
@@ -328,6 +332,10 @@
 			</File>
 			<File
 				RelativePath=".\sore_math.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\sore_matrix4x4.h"
 				>
 			</File>
 			<File
@@ -384,6 +392,14 @@
 			</File>
 			<File
 				RelativePath=".\sore_util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\sore_vector2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\sore_vector3.h"
 				>
 			</File>
 		</Filter>
