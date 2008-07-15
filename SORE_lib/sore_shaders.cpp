@@ -420,4 +420,16 @@ namespace SORE_Graphics
 		if(location!=-1)
 			glUniform2fARB(location,v0,v1);
 	}
+	
+	void GLSLShader::SetUniform1fv(std::string name, unsigned int count, GLfloat * values)
+	{
+		if(!ShadersSupported() || program==0)
+		{
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		if(location!=-1)
+			glUniform4fvARB(location,count,values);
+	}
 } //end of namespace SORE_Graphics
