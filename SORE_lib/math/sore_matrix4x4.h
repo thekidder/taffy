@@ -3,6 +3,8 @@
 #ifndef _SORE_MATRIX4X4_H_
 #define _SORE_MATRIX4X4_H_
 
+#include <cmath>
+
 namespace SORE_Math
 {
 	const unsigned int AXIS_X = 0;
