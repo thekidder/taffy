@@ -126,6 +126,8 @@ void SORE_Kernel::Screen::SetResizeCallback(resize_callback callback)
 void SORE_Kernel::Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 {
 	GLfloat ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
+	screen.width      = _screen.width;
+	screen.height     = _screen.height;
 	screen.ratio      = ratio;
 	screen.fullscreen = _screen.fullscreen;
 	screen.showCursor = _screen.showCursor;
@@ -142,13 +144,15 @@ void SORE_Kernel::Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
 		videoFlags |= SDL_RESIZABLE;
 	else
 		if(videoFlags & SDL_RESIZABLE) videoFlags ^= SDL_RESIZABLE;
-	Resize(_screen.width, _screen.height);
+	Resize(screen.width, screen.height);
 }
 
 void SORE_Kernel::Screen::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
 {
 	SDL_FreeSurface(drawContext);
 	SDLScreenChange(_screen);
+	if(renderer)
+		renderer->SetScreenInfo(screen);
 	
 	glViewport( 0, 0, ( GLsizei )screen.width, ( GLsizei )screen.height );
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -188,8 +192,8 @@ void SORE_Kernel::Screen::Resume()
 void SORE_Kernel::Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
 {
 	renderer = _renderer;
-	renderer->SetScreenInfo(&screen);
-	renderer->SetProjectionInfo(&proj);
+	renderer->SetScreenInfo(screen);
+	renderer->SetProjectionInfo(proj);
 }
 
 bool SORE_Kernel::Screen::OnResize(Event* event)
@@ -221,7 +225,7 @@ void SORE_Kernel::Screen::Resize(int width, int height)
 	screen.ratio = static_cast<GLfloat>(screen.width) / static_cast<GLfloat>(screen.height);
 	if(renderer)
 	{
-		renderer->SetScreenInfo(&screen);
+		renderer->SetScreenInfo(screen);
 	}
 	drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
 }
@@ -355,7 +359,8 @@ void SORE_Kernel::Screen::SetProjection(SORE_Graphics::ProjectionInfo& info)
 	proj = info;
 	//OnResize();
 	ChangeProjectionMatrix(proj);
-	renderer->SetProjectionInfo(&proj);
+	if(renderer)
+		renderer->SetProjectionInfo(proj);
 	info.top = proj.top;
 	info.bottom = proj.bottom;
 	info.ratio = proj.ratio;

@@ -40,13 +40,13 @@ namespace SORE_Graphics
 			virtual ~IRenderer() {}
 			
 			virtual void Render() = 0;
-			void SetScreenInfo(ScreenInfo* _screen);
-			void SetProjectionInfo(ProjectionInfo* _proj);
+			void SetScreenInfo(ScreenInfo _screen);
+			void SetProjectionInfo(ProjectionInfo _proj);
 		protected:
 			virtual void OnScreenChange() {}
 			virtual void OnProjectionChange() {}
-			ScreenInfo* screen;
-			ProjectionInfo* proj;
+			ScreenInfo screen;
+			ProjectionInfo proj;
 	};
 	
 	class Renderer2D : public IRenderer

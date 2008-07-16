@@ -47,8 +47,8 @@ namespace SORE_Graphics
 	
 	void Renderer2D::SetupFBO()
 	{
-		int width = screen->width;
-		int height = screen->height;
+		int width = screen.width;
+		int height = screen.height;
 		//int width = 512;
 		//int height = 512;
 		
@@ -101,15 +101,16 @@ namespace SORE_Graphics
 		SetupFBO();
 	}
 	
-	void IRenderer::SetScreenInfo(ScreenInfo* _screen)
+	void IRenderer::SetScreenInfo(ScreenInfo _screen)
 	{
 		screen = _screen;
 		OnScreenChange();
 	}
 	
-	void IRenderer::SetProjectionInfo(ProjectionInfo* _proj)
+	void IRenderer::SetProjectionInfo(ProjectionInfo _proj)
 	{
 		proj = _proj;
+		OnProjectionChange();
 	}
 	
 	void Renderer2D::SetSpriteList(std::vector<Sprite2D*> s)
@@ -132,8 +133,8 @@ namespace SORE_Graphics
 		
 		static Sprite2D glow(rm, "glow", 0.0f, 0.0f, -0.95f, 0.0f, 0.0f, c);
 		
-		int width = screen->width;
-		int height = screen->height;
+		int width = screen.width;
+		int height = screen.height;
 		
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 		glPushAttrib(GL_VIEWPORT_BIT);
@@ -196,13 +197,13 @@ namespace SORE_Graphics
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(proj->left, proj->top, -0.90f);
+			glVertex3f(proj.left, proj.top, -0.90f);
 			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(proj->left, proj->bottom, -0.90f);
+			glVertex3f(proj.left, proj.bottom, -0.90f);
 			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(proj->right, proj->bottom, -0.90f);
+			glVertex3f(proj.right, proj.bottom, -0.90f);
 			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(proj->right, proj->top, -0.90f);
+			glVertex3f(proj.right, proj.top, -0.90f);
 		}
 		glEnd();
 		
