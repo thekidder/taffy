@@ -122,6 +122,14 @@ namespace SORE_Math
 		protected:
 			T value[16];
 	};
+	
+	template<class T>
+			Matrix4<T> operator*(Matrix4<T> m1, Matrix4<T> m2)
+	{
+		Matrix4<T> temp = m1;
+		m1 *= m2;
+		return m1;
+	}
 }
 
 #endif
