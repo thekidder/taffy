@@ -22,6 +22,7 @@
 
 #include "math/sore_vector2.h"
 #include "math/sore_vector3.h"
+#include "math/sore_vector4.h"
 #include "math/sore_matrix4x4.h"
 
 namespace SORE_Math

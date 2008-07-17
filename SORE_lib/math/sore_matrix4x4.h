@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+#include "math/sore_vector4.h"
+
 namespace SORE_Math
 {
 	const unsigned int AXIS_X = 0;
@@ -129,6 +131,17 @@ namespace SORE_Math
 		Matrix4<T> temp = m1;
 		m1 *= m2;
 		return m1;
+	}
+	
+	template<class T>
+			Vector4<T> operator*(Matrix4<T> m1, Vector4<T> v1)
+	{
+		Vector4<T> temp;
+		temp[0] = m1.GetData()[ 0]*v1[0] + m1.GetData()[ 1]*v1[1] + m1.GetData()[ 2]*v1[2] + m1.GetData()[ 3]*v1[3];
+		temp[1] = m1.GetData()[ 4]*v1[0] + m1.GetData()[ 5]*v1[1] + m1.GetData()[ 6]*v1[2] + m1.GetData()[ 7]*v1[3];
+		temp[2] = m1.GetData()[ 8]*v1[0] + m1.GetData()[ 9]*v1[1] + m1.GetData()[10]*v1[2] + m1.GetData()[11]*v1[3];
+		temp[3] = m1.GetData()[12]*v1[0] + m1.GetData()[13]*v1[1] + m1.GetData()[14]*v1[2] + m1.GetData()[15]*v1[3];
+		return temp;
 	}
 }
 
