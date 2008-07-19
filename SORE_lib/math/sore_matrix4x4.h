@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-#include "math/sore_vector4.h"
+#include "sore_vector4.h"
 
 namespace SORE_Math
 {
@@ -24,19 +24,19 @@ namespace SORE_Math
 			
 			void Rotate(T rads, unsigned int axis)
 			{
-				Matrix4<T> rotation = Matrix4<T>::ProduceRotationMatrix(rads, axis);
+				Matrix4<T> rotation = Matrix4<T>::GetRotation(rads, axis);
 				*this *= rotation;
 			}
 			
 			void Translate(T x, T y, T z)
 			{
-				Matrix4<T> translate = Matrix4<T>::ProduceTranslationMatrix(x, y, z);
+				Matrix4<T> translate = Matrix4<T>::GetTranslation(x, y, z);
 				*this *= translate;
 			}
 			
 			void Scale(T x, T y, T z)
 			{
-				Matrix4<T> scale = Matrix4<T>::ProduceScaleMatrix(x, y, z);
+				Matrix4<T> scale = Matrix4<T>::GetScale(x, y, z);
 				*this *= scale;
 			}
 			
@@ -69,7 +69,7 @@ namespace SORE_Math
 				return *this;
 			}
 			
-			static Matrix4<T> ProduceRotationMatrix(T rads, unsigned int axis)
+			static Matrix4<T> GetRotation(T rads, unsigned int axis)
 			{
 				Matrix4<T> temp;
 				switch(axis)
@@ -98,7 +98,7 @@ namespace SORE_Math
 				return temp;
 			}
 			
-			static Matrix4<T> ProduceTranslationMatrix(T x, T y, T z)
+			static Matrix4<T> GetTranslation(T x, T y, T z)
 			{
 				Matrix4<T> temp;
 				temp.value[12] = x;
@@ -107,7 +107,7 @@ namespace SORE_Math
 				return temp;
 			}
 			
-			static Matrix4<T> ProduceScaleMatrix(T x, T y, T z)
+			static Matrix4<T> GetScale(T x, T y, T z)
 			{
 				Matrix4<T> temp;
 				temp.value[0 ] = x;
@@ -137,10 +137,10 @@ namespace SORE_Math
 			Vector4<T> operator*(Matrix4<T> m1, Vector4<T> v1)
 	{
 		Vector4<T> temp;
-		temp[0] = m1.GetData()[ 0]*v1[0] + m1.GetData()[ 1]*v1[1] + m1.GetData()[ 2]*v1[2] + m1.GetData()[ 3]*v1[3];
-		temp[1] = m1.GetData()[ 4]*v1[0] + m1.GetData()[ 5]*v1[1] + m1.GetData()[ 6]*v1[2] + m1.GetData()[ 7]*v1[3];
-		temp[2] = m1.GetData()[ 8]*v1[0] + m1.GetData()[ 9]*v1[1] + m1.GetData()[10]*v1[2] + m1.GetData()[11]*v1[3];
-		temp[3] = m1.GetData()[12]*v1[0] + m1.GetData()[13]*v1[1] + m1.GetData()[14]*v1[2] + m1.GetData()[15]*v1[3];
+		temp[0] = m1.GetData()[ 0]*v1[0] + m1.GetData()[ 4]*v1[1] + m1.GetData()[ 8]*v1[2] + m1.GetData()[12]*v1[3];
+		temp[1] = m1.GetData()[ 1]*v1[0] + m1.GetData()[ 5]*v1[1] + m1.GetData()[ 9]*v1[2] + m1.GetData()[13]*v1[3];
+		temp[2] = m1.GetData()[ 2]*v1[0] + m1.GetData()[ 6]*v1[1] + m1.GetData()[10]*v1[2] + m1.GetData()[14]*v1[3];
+		temp[3] = m1.GetData()[ 3]*v1[0] + m1.GetData()[ 7]*v1[1] + m1.GetData()[11]*v1[2] + m1.GetData()[15]*v1[3];
 		return temp;
 	}
 }

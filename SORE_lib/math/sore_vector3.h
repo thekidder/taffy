@@ -123,13 +123,27 @@ namespace SORE_Math
 				return sqrt(pow(value[0],2)+pow(value[1],2)+pow(value[2],2));
 			}
 			
-			Vector3 Normalize()
+			Vector3<T> Normalize()
 			{
 				double mag = Magnitude();
 				Vector3<T> temp(static_cast<T>(value[0]/mag),static_cast<T>(value[1]/mag),static_cast<T>(value[2]/mag));
 				return temp;
 			}
-				
+			
+			static Vector3<T> GetXUnitVector()
+			{
+				return Vector3<T>(static_cast<T>(1.0), static_cast<T>(0.0), static_cast<T>(0.0));
+			}
+			
+			static Vector3<T> GetYUnitVector()
+			{
+				return Vector3<T>(static_cast<T>(0.0), static_cast<T>(1.0), static_cast<T>(0.0));
+			}
+			
+			static Vector3<T> GetZUnitVector()
+			{
+				return Vector3<T>(static_cast<T>(0.0), static_cast<T>(0.0), static_cast<T>(1.0));
+			}
 		protected:
 			T value[3];
 	};
@@ -164,7 +178,7 @@ namespace SORE_Math
 	}
 	
 	template<class T>
-			Vector3<T> operator/(Vector3<T> v1, T& num)
+			Vector3<T> operator/(Vector3<T> v1, T num)
 	{
 		Vector3<T> r = v1;
 		r /= num;
