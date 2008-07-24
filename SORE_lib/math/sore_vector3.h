@@ -110,6 +110,13 @@ namespace SORE_Math
 				return *this;
 			}
 			
+			bool operator==(Vector3<T>& v)
+			{
+				if(value[0]==v.value[0] && value[1]==v.value[1] && value[2]==v.value[2])
+					return true;
+				return false;
+			}
+			
 			Vector3<T> cross(Vector3<T>& v)
 			{
 				Vector3<T> temp;
@@ -130,17 +137,17 @@ namespace SORE_Math
 				return temp;
 			}
 			
-			static Vector3<T> GetXUnitVector()
+			static Vector3<T> XUnitVector()
 			{
 				return Vector3<T>(static_cast<T>(1.0), static_cast<T>(0.0), static_cast<T>(0.0));
 			}
 			
-			static Vector3<T> GetYUnitVector()
+			static Vector3<T> YUnitVector()
 			{
 				return Vector3<T>(static_cast<T>(0.0), static_cast<T>(1.0), static_cast<T>(0.0));
 			}
 			
-			static Vector3<T> GetZUnitVector()
+			static Vector3<T> ZUnitVector()
 			{
 				return Vector3<T>(static_cast<T>(0.0), static_cast<T>(0.0), static_cast<T>(1.0));
 			}

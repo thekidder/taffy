@@ -5,6 +5,7 @@
 
 #include <cmath>
 
+#include "sore_vector3.h"
 #include "sore_vector4.h"
 
 namespace SORE_Math
@@ -22,7 +23,19 @@ namespace SORE_Math
 				SetIdentity();
 			}
 			
+			Matrix4(T* v)
+			{
+				for(unsigned int i=0;i<16;++i)
+					value[i] = v[i];
+			}
+			
 			void Rotate(T rads, unsigned int axis)
+			{
+				Matrix4<T> rotation = Matrix4<T>::GetRotation(rads, axis);
+				*this *= rotation;
+			}
+			
+			void Rotate(T rads, SORE_Math::Vector3<T> axis)
 			{
 				Matrix4<T> rotation = Matrix4<T>::GetRotation(rads, axis);
 				*this *= rotation;
@@ -51,7 +64,7 @@ namespace SORE_Math
 				}
 			}
 			
-			Matrix4<T>& operator*=(Matrix4<T>& m)
+			Matrix4<T>& operator*=(Matrix4<T> m)
 			{
 				T newValues[16];
 				for(unsigned int c=0;c<4;++c)
@@ -67,6 +80,46 @@ namespace SORE_Math
 					value[i] = newValues[i];
 				}
 				return *this;
+			}
+			
+			Matrix4<T> Transpose()
+			{
+				T newValues[16];
+				for(unsigned int c=0;c<4;++c)
+				{
+					for(unsigned int r=0;r<4;++r)
+					{
+						newValues[c + r*4] = value[r + c*4];
+					}
+				}
+				return Matrix4<T>(newValues);
+			}
+			
+			bool Normalized()
+			{
+				float curr = 0.0;
+				for(unsigned int c=0;c<4;++c)
+				{
+					for(unsigned int r=0;r<4;++r)
+					{
+						curr += value[c + r*4]*value[c + r*4];
+					}
+					if(fabs(curr-1.0) > 0.001)
+						return false;
+					curr = 0.0;
+				}
+				
+				for(unsigned int r=0;r<4;++r)
+				{
+					for(unsigned int c=0;c<4;++c)
+					{
+						curr += value[c + r*4]*value[c + r*4];
+					}
+					if(fabs(curr-1.0) > 0.001)
+						return false;
+					curr = 0.0;
+				}
+				return true;
 			}
 			
 			static Matrix4<T> GetRotation(T rads, unsigned int axis)
@@ -95,6 +148,32 @@ namespace SORE_Math
 					default:
 						break;
 				}
+				return temp;
+			}
+			
+			static Matrix4<T> GetRotation(T rads, SORE_Math::Vector3<T> axis)
+			{
+				axis = axis.Normalize();
+				T c = cos(rads);
+				T s = sin(rads);
+				T raw[16];
+				raw[ 0] = axis[0]*axis[0]*(1-c)+c;
+				raw[ 1] = axis[1]*axis[0]*(1-c)+axis[2]*s;
+				raw[ 2] = axis[0]*axis[2]*(1-c)-axis[1]*s;
+				raw[ 3] = 0.0;
+				raw[ 4] = axis[0]*axis[1]*(1-c)-axis[2]*s;
+				raw[ 5] = axis[1]*axis[1]*(1-c)+c;
+				raw[ 6] = axis[1]*axis[2]*(1-c)+axis[0]*s;
+				raw[ 7] = 0.0;
+				raw[ 8] = axis[0]*axis[2]*(1-c)+axis[1]*s;
+				raw[ 9] = axis[1]*axis[2]*(1-c)-axis[0]*s;
+				raw[10] = axis[2]*axis[2]*(1-c)+c;
+				raw[11] = 0.0;
+				raw[12] = 0.0;
+				raw[13] = 0.0;
+				raw[14] = 0.0;
+				raw[15] = 1.0;
+				Matrix4<T> temp(raw);
 				return temp;
 			}
 			
@@ -142,6 +221,16 @@ namespace SORE_Math
 		temp[2] = m1.GetData()[ 2]*v1[0] + m1.GetData()[ 6]*v1[1] + m1.GetData()[10]*v1[2] + m1.GetData()[14]*v1[3];
 		temp[3] = m1.GetData()[ 3]*v1[0] + m1.GetData()[ 7]*v1[1] + m1.GetData()[11]*v1[2] + m1.GetData()[15]*v1[3];
 		return temp;
+	}
+	
+	template<class T>
+			Vector3<T> operator*(Matrix4<T> m1, Vector3<T> v1) //multiplies v1 by the top-left 3x3 matrix of m1
+	{
+		Vector3<T> result;
+		result[0] = m1.GetData()[ 0]*v1[0] + m1.GetData()[ 4]*v1[1] + m1.GetData()[ 8]*v1[2];
+		result[1] = m1.GetData()[ 1]*v1[0] + m1.GetData()[ 5]*v1[1] + m1.GetData()[ 9]*v1[2];
+		result[2] = m1.GetData()[ 2]*v1[0] + m1.GetData()[ 6]*v1[1] + m1.GetData()[10]*v1[2];
+		return result;
 	}
 }
 
