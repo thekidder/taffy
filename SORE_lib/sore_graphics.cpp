@@ -109,3 +109,28 @@ void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const cha
 		SORE_Font::Print(font, real[0], real[1], text);
 	}
 }
+
+void SORE_Graphics::ScreenAlignedQuad()
+{
+	glMatrixMode (GL_MODELVIEW); 
+	glPushMatrix (); 
+	glLoadIdentity (); 
+	glMatrixMode (GL_PROJECTION); 
+	glPushMatrix (); 
+	glLoadIdentity ();
+	glBegin(GL_QUADS);
+	{
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3i(-1, -1, -1);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3i(-1, 1, -1);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3i(1, 1, -1);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3i(1, -1, -1);
+	}
+	glEnd();
+	glPopMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix ();
+}
