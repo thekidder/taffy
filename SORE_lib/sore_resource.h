@@ -12,7 +12,7 @@
 
 namespace SORE_Resource
 {
-	class ResourceManager;
+	class ResourcePool;
 	
 	class Resource
 	{
@@ -24,7 +24,7 @@ namespace SORE_Resource
 			
 			std::string GetFile() const {return filename;}
 			
-			static void SetRM(ResourceManager* _rm) {rm = _rm;}
+			static void SetRM(ResourcePool* _rm) {rm = _rm;}
 			
 			virtual void Reload() {Load();}
 		protected:
@@ -34,14 +34,14 @@ namespace SORE_Resource
 			bool IsDependent(std::string file);
 			std::string filename;
 			std::vector<std::string> dependentFiles;
-			static ResourceManager* rm;
+			static ResourcePool* rm;
 	};
 	
-	class ResourceManager
+	class ResourcePool
 	{
 		public:
-			ResourceManager();
-			~ResourceManager();
+			ResourcePool();
+			~ResourcePool();
 			
 			template<class T>
 					T* GetResource(std::string filename)

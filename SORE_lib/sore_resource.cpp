@@ -10,7 +10,7 @@
 
 namespace SORE_Resource
 {
-	ResourceManager* Resource::rm = NULL;
+	ResourcePool* Resource::rm = NULL;
 	
 	Resource::Resource(std::string file)
 	{
@@ -43,7 +43,7 @@ namespace SORE_Resource
 		return false;
 	}
 	
-	ResourceManager::ResourceManager()
+	ResourcePool::ResourcePool()
 	{
 	}
 	
@@ -53,7 +53,7 @@ namespace SORE_Resource
 		Load();
 	}
 	
-	ResourceManager::~ResourceManager()
+	ResourcePool::~ResourcePool()
 	{
 		std::map<std::string, Resource*>::iterator it;
 		
@@ -63,7 +63,7 @@ namespace SORE_Resource
 		}
 	}
 	
-	void ResourceManager::for_each(boost::function<void (Resource*)> func)
+	void ResourcePool::for_each(boost::function<void (Resource*)> func)
 	{
 		//std::for_each(resources.begin(), resources.end(), boost::bind(func));
 		for(std::map<std::string, Resource*>::iterator it=resources.begin();it!=resources.end();it++)

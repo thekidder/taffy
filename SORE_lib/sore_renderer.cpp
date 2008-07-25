@@ -24,7 +24,7 @@
 
 namespace SORE_Graphics
 {
-	Renderer2D::Renderer2D(SORE_Resource::ResourceManager* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
+	Renderer2D::Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
 	{
 		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 		fbo = img = depthbuffer = 0;

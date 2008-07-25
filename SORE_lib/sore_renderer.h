@@ -52,7 +52,7 @@ namespace SORE_Graphics
 	class Renderer2D : public IRenderer
 	{
 		public:
-			Renderer2D(SORE_Resource::ResourceManager* _rm, SceneGraph2D* _scene);
+			Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene);
 			~Renderer2D();
 			
 			//gc_id AddRenderable(IRenderable gc);
@@ -73,7 +73,7 @@ namespace SORE_Graphics
 			std::vector<Sprite2D*> sprites;
 			SceneGraph2D* scene;
 			Material* currMaterial;
-			SORE_Resource::ResourceManager* rm;
+			SORE_Resource::ResourcePool* rm;
 			
 			GLuint fbo;
 			GLuint depthbuffer;
