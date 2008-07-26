@@ -56,8 +56,7 @@ namespace SORE_Graphics
 				{
 					flags.push_back(name);
 				}
-				
-				if(section=="Textures")
+				else if(section=="Textures")
 				{
 					SORE_Resource::Texture2D* tex = rm->GetResource<SORE_Resource::Texture2D>(value);
 					if(tex!=NULL)
@@ -98,7 +97,7 @@ namespace SORE_Graphics
 						{
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, "GLSL Shaders not supported");
 							ENGINE_LOG(SORE_Logging::LVL_WARNING, "Not using shader: dropping back to incomplete FFP pipeline");
-							useShader == false;
+							useShader = false;
 						}
 					}
 				}
