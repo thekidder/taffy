@@ -68,7 +68,7 @@ SORE_Utility::settings_map SORE_Utility::ParseIniFile(const char* file)
 			std::string name, value, oldValue;
 			std::string setting = dataStr;
 			if(setting.find("#")!=std::string::npos)
-				setting = setting.substr(0, setting.find("#")-1);
+				setting = setting.substr(0, setting.find("#"));
 			size_t eqPos=setting.find('=');
 			if(eqPos!=std::string::npos) //(name, value) pair
 			{
