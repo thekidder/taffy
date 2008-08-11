@@ -9,19 +9,10 @@
 #include <string.h>
 #include <cstdlib>
 
-using std::vector;
-using std::string;
-
-#ifdef WIN32
-#define PATH_SEP "\\"
-#else
-#define PATH_SEP "/"
-#endif
-
 namespace SORE_Font
 {
-	static vector<string> fontPaths;
-	static vector<FontInfo> fontStack;
+	static std::vector<std::string> fontPaths;
+	static std::vector<FontInfo> fontStack;
 }
 
 inline int next_p2 (int a )
@@ -141,7 +132,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	}
 	
 	const char* start_line=text;
-	vector<string> lines;
+	std::vector<std::string> lines;
 	
 	const char* c = text;
 	
@@ -149,7 +140,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	{
 		if(*c=='\n') 
 		{
-			string line;
+			std::string line;
 			for(const char *n=start_line;n<c;n++) line.append(1,*n);
 			lines.push_back(line);
 			start_line=c+1;
@@ -157,7 +148,7 @@ int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
 	}
 	if(start_line) 
 	{
-		string line = start_line;
+		std::string line = start_line;
 		lines.push_back(line);
 	}
 	
