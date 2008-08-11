@@ -43,19 +43,19 @@ namespace SORE_Resource
 		return false;
 	}
 	
-	ResourcePool::ResourcePool()
-	{
-	}
-	
 	void Resource::OnNotify(std::string file)
 	{
 		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Reloading resource file %s") % file);
 		Load();
 	}
 	
+	ResourcePool::ResourcePool()
+	{
+	}
+	
 	ResourcePool::~ResourcePool()
 	{
-		std::map<std::string, Resource*>::iterator it;
+		std::map<std::size_t, Resource*>::iterator it;
 		
 		for(it=resources.begin();it!=resources.end();it++)
 		{
@@ -66,7 +66,7 @@ namespace SORE_Resource
 	void ResourcePool::for_each(boost::function<void (Resource*)> func)
 	{
 		//std::for_each(resources.begin(), resources.end(), boost::bind(func));
-		for(std::map<std::string, Resource*>::iterator it=resources.begin();it!=resources.end();it++)
+		for(std::map<std::size_t, Resource*>::iterator it=resources.begin();it!=resources.end();it++)
 		{
 			Resource* r = it->second;
 			func(r);

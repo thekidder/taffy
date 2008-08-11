@@ -9,105 +9,13 @@
 #include <string.h>
 #include <cstdlib>
 
-namespace SORE_Font
-{
-	static std::vector<std::string> fontPaths;
-	static std::vector<FontInfo> fontStack;
-}
+#include <boost/lexical_cast.hpp>
 
 inline int next_p2 (int a )
 {
 	int rval=1;
 	while(rval<a) rval<<=1;
 	return rval;
-}
-
-int SORE_Font::MakeDisplayList( FT_Face face, char ch, GLuint list_base, GLuint* tex_base)
-{
-	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
-		return GLYPH_LOAD_FAILED;
-
-	FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-	FT_Bitmap& bitmap=face->glyph->bitmap;
-	
-	int width = next_p2( bitmap.width );
-	int height = next_p2( bitmap.rows );
-
-	GLubyte* expanded_data = new GLubyte[ 2 * width * height];
-	
-	for(int j=0; j<height;j++)
-	{
-		for(int i=0; i < width; i++)
-		{
-			expanded_data[2*(i+j*width)] = expanded_data[2*(i+j*width)+1] = 
-					(i>=bitmap.width || j>=bitmap.rows) ?
-					0 : bitmap.buffer[i + bitmap.width*j];
-		}
-	}
-	//glActiveTexture(GL_TEXTURE0);
-	glBindTexture( GL_TEXTURE_2D, tex_base[ch]);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_INTENSITY, width, height, 0,
-				  GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, expanded_data );
-	delete [] expanded_data;
-	
-	glNewList(list_base+ch, GL_COMPILE);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex_base[ch]);
-	glPushMatrix();
-	
-	//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Face character: %c, top: %d, rows: %d", ch, face->glyph->bitmap_top, bitmap.rows);
-	
-	glTranslatef(static_cast<GLfloat>(face->glyph->bitmap_left),0.0f,0.0f);
-	glTranslatef(0.0f,static_cast<GLfloat>(face->glyph->bitmap_top-bitmap.rows), 0.0f);
-	GLfloat x=static_cast<GLfloat>(bitmap.width) / static_cast<GLfloat>(width), y=static_cast<GLfloat>(bitmap.rows) / static_cast<GLfloat>(height);
-	
-	glBegin(GL_QUADS);
-	glTexCoord2d(0,0); glVertex2f(0.0f,static_cast<GLfloat>(bitmap.rows));
-	glTexCoord2d(0,y); glVertex2f(0.0f,0.0f);
-	glTexCoord2d(x,y); glVertex2f(static_cast<GLfloat>(bitmap.width),0.0f);
-	glTexCoord2d(x,0); glVertex2f(static_cast<GLfloat>(bitmap.width),static_cast<GLfloat>(bitmap.rows));
-	glEnd();
-	glPopMatrix();
-	glTranslatef(static_cast<GLfloat>(face->glyph->advance.x >> 6) ,0.0f,0.0f);
-	glEndList();
-	return 0;
-}
-
-int SORE_Font::FontInfo::Init()
-{	
-	height=0;
-	
-	return 0;
-}
-
-int SORE_Font::FontInfo::Init(const char* fontName, unsigned int h)
-{	
-	height = h;
-	return LoadFont(fontName);
-}
-
-void SORE_Font::FontInfo::Cleanup()
-{
-	glDeleteLists(listBase,128);
-	glDeleteTextures(128,textures);
-	if(textures)
-		delete [] textures;
-	if(fontInfo)
-		delete [] fontInfo;
-}
-
-int SORE_Font::FontHeight(font_ref font)
-{
-	if(font >= 0)
-	{
-		FontInfo* fontObj = &fontStack[font];
-		return fontObj->height;
-	}
-	else
-		return -1;
 }
 
 int SORE_Font::Print(font_ref fontIndex, int x, int y, const char* fmt, ...)
@@ -249,10 +157,19 @@ float SORE_Font::Print(font_ref fontIndex, int x, int y, char c)
 	return len;
 }
 
-int SORE_Font::FontInfo::LoadFont(const char* fontName)
+SORE_Font::Font::Font(std::string filename, std::string fHeight) : Resource(filename, fHeight)
+{
+	height = boost::lexical_cast<unsigned int>(fHeight);
+	Load();
+}
+
+SORE_Font::Font::~ Font()
+{
+}
+
+void SORE_Font::Font::Load()
 {
 	if(height<=0) return INVALID_FONT_HEIGHT;
-	//if(textures) delete[] textures;
 	textures = new GLuint[128];
 
 	FT_Library library;
@@ -265,53 +182,31 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	if(length>59) return INVALID_FONT_NAME;
 	if(fontPaths.size()==0) InitFontSystem();
 	
-	char* dirName = new char[512];
-	char*  fontPath = new char[2048];
-	char  fileName[64];
+	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(fileName.c_str());
 	
-	strcpy(fileName, fontName);
-	
-	if(!strcmp((fontName+length-3), ".ttf"))
-	{
-		strcat(fileName, ".ttf");
-	}
-	
-	//FILE* fontObj;
-	
-	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(fileName);
-	
-
-	//fontObj = fopen(fileName, "r");
 	if(fontObj==0)
 	{
 		std::vector<std::string>::iterator it;
 		for(it=fontPaths.begin();it<fontPaths.end();it++)
 		{
-			strcpy(fontPath, it->c_str());
-			strcat(fontPath, fileName);
-			fontObj = SORE_FileIO::Open(fontPath);
+			std::string path = *it;
+			path += filename;
+			fontObj = SORE_FileIO::Open(path.c_str());
 			if(fontObj!=0)
 			{
 				break;
 			}
-			strcpy(fontPath, "");
 			fontObj = 0;
 		}
 	}
-	else
-	{
-		strcpy(fontPath, fileName);
-	}
-	if(strlen(fontPath)==0) return INVALID_FONT_NAME;
-	
+		
 	size_t size = SORE_FileIO::Size(fontObj);
 	size_t err;
 	
-	fontInfo = new FT_Byte[size];
+	FT_Byte* fontInfo = new FT_Byte[size];
 	
 	if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
 	{
-		//std::cerr << "Font load failed: Could not read font from disk (expected " << size << " bytes, read " << err << " bytes)\n";
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Font load failed: Could not read font from disk (expected %d bytes, read %d bytes)") % size % err);
 		SORE_FileIO::Close(fontObj);
 		return FONT_LOAD_FAILED;
@@ -319,15 +214,8 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 	SORE_FileIO::Close(fontObj);
 	if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size), 0, &face ))!=0) 
 	{
-		delete[] fontPath;
 		FT_Done_FreeType(library);
-		delete[] dirName;
-		//std::cerr << "Font load failed: Freetype error code " << err << std::endl;
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Font load failed: Freetype error code %d") % err);
-#ifdef DEBUG
-		//std::cout << ft_errors[err] << std::endl;
-		//ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Freetype error: %s") % ft_errors[err]);
-#endif
 		return FONT_LOAD_FAILED;
 	}
 	
@@ -341,98 +229,77 @@ int SORE_Font::FontInfo::LoadFont(const char* fontName)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("GL Error: %d") % error);
 		} while((error=glGetError())!=GL_NO_ERROR);
-		delete[] fontPath;
 	
 		FT_Done_Face(face);
 		FT_Done_FreeType(library);
 	
-		delete[] dirName;
 		return FONT_LOAD_FAILED;
 	}
 		
 	glGenTextures( 128, textures );
-	
-	//std::cout << fontPath << "\n";
-	
+		
 	for(unsigned char i=0;i<128;i++)
 		MakeDisplayList(face,i,listBase,textures);
 	
-	delete[] fontPath;
 	
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
 	
-	delete[] dirName;
 	return 0;
 }
 
-int SORE_Font::FontInfo::SetHeight(unsigned int h)
+void SORE_Font::Font::MakeDisplayList(FT_Face& face, char ch, )
 {
-	height = h;
-	return 0;
+	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
+		return GLYPH_LOAD_FAILED;
+
+	FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+	FT_Bitmap& bitmap=face->glyph->bitmap;
+	
+	int width = next_p2( bitmap.width );
+	int height = next_p2( bitmap.rows );
+
+	GLubyte* expanded_data = new GLubyte[ 2 * width * height];
+	
+	for(int j=0; j<height;j++)
+	{
+		for(int i=0; i < width; i++)
+		{
+			expanded_data[2*(i+j*width)] = expanded_data[2*(i+j*width)+1] = 
+					(i>=bitmap.width || j>=bitmap.rows) ?
+					0 : bitmap.buffer[i + bitmap.width*j];
+		}
+	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture( GL_TEXTURE_2D, textures[ch]);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_INTENSITY, width, height, 0,
+								GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, expanded_data );
+	delete [] expanded_data;
+	
+	glNewList(list_base+ch, GL_COMPILE);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textures[ch]);
+	glPushMatrix();
+		
+	glTranslatef(static_cast<GLfloat>(face->glyph->bitmap_left),0.0f,0.0f);
+	glTranslatef(0.0f,static_cast<GLfloat>(face->glyph->bitmap_top-bitmap.rows), 0.0f);
+	GLfloat x=static_cast<GLfloat>(bitmap.width) / static_cast<GLfloat>(width), y=static_cast<GLfloat>(bitmap.rows) / static_cast<GLfloat>(height);
+	
+	glBegin(GL_QUADS);
+	glTexCoord2d(0,0); glVertex2f(0.0f,static_cast<GLfloat>(bitmap.rows));
+	glTexCoord2d(0,y); glVertex2f(0.0f,0.0f);
+	glTexCoord2d(x,y); glVertex2f(static_cast<GLfloat>(bitmap.width),0.0f);
+	glTexCoord2d(x,0); glVertex2f(static_cast<GLfloat>(bitmap.width),static_cast<GLfloat>(bitmap.rows));
+	glEnd();
+	glPopMatrix();
+	glTranslatef(static_cast<GLfloat>(face->glyph->advance.x >> 6) ,0.0f,0.0f);
+	glEndList();
 }
 
-int SORE_Font::InitFontSystem()
+unsigned int SORE_Font::Font::Height() const
 {
-	SORE_Font::fontPaths.clear();
-#ifndef WIN32
-	if(!FcInit())
-	{
-		return LIBRARY_LOAD_FAILED;
-	}
-	FcConfig* config = FcConfigGetCurrent();
-	FcStrList* fontDirs = FcConfigGetFontDirs(config);
-#endif
-	
-	char* dirName = new char[2048];
-	
-#ifdef WIN32
-	
-	char fontPath[2048];
-	char windows_path[MAX_PATH];
-	GetWindowsDirectory(windows_path, MAX_PATH);
-	strcpy(fontPath, windows_path);
-	strcat(fontPath, "\\Fonts\\");
-	fontPaths.push_back(fontPath);
-#else
-	char fontPath[2048];
-	while((dirName = (char*)FcStrListNext(fontDirs)))
-	{
-		strcpy(fontPath, dirName);
-		strcat(fontPath, "/");
-		fontPaths.push_back(fontPath);
-	}
-#endif
-#ifndef WIN32
-	FcStrListDone(fontDirs);
-#endif
-	delete[] dirName;
-	
-	FontInfo null;
-	fontStack.push_back(null);
-	return 0;
-}
-
-SORE_Font::font_ref SORE_Font::LoadFont(const char* font, unsigned int h)
-{
-	int err;
-	FontInfo newFont;
-	newFont.SetHeight(h);
-	if((err=newFont.LoadFont(font))!=0)
-	{
-		//std::cerr << "Failed to load font; error code " << err << std::endl;
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to load font: error code %d") % err);
-		return 0;
-	}
-	font_ref index = static_cast<font_ref>(fontStack.size());
-	fontStack.push_back(newFont);
-	return index;
-}
-
-void SORE_Font::Cleanup()
-{
-	for(size_t i=0;i<fontStack.size();i++)
-	{
-		fontStack[i].Cleanup();
-	}
+	return height;
 }

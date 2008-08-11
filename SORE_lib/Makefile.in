@@ -58,18 +58,18 @@ libsore_a_LIBADD =
 am_libsore_a_OBJECTS = inotify-cxx.$(OBJEXT) \
 	sore_2dprimitives.$(OBJEXT) sore_2dscenegraph.$(OBJEXT) \
 	sore_fileio.$(OBJEXT) sore_fileio_linux.$(OBJEXT) \
-	sore_font.$(OBJEXT) sore_graphics.$(OBJEXT) \
-	sore_input.$(OBJEXT) sore_interpolater.$(OBJEXT) \
-	sore_kernel.$(OBJEXT) sore_logger.$(OBJEXT) \
-	sore_logginginit.$(OBJEXT) sore_material.$(OBJEXT) \
-	sore_math.$(OBJEXT) sore_network.$(OBJEXT) \
-	sore_network_client.$(OBJEXT) sore_network_server.$(OBJEXT) \
-	sore_profiler.$(OBJEXT) sore_renderer.$(OBJEXT) \
-	sore_resource.$(OBJEXT) sore_screen.$(OBJEXT) \
-	sore_screeninfo.$(OBJEXT) sore_settings.$(OBJEXT) \
-	sore_shaders.$(OBJEXT) sore_texture.$(OBJEXT) \
-	sore_timing.$(OBJEXT) sore_timing_linux.$(OBJEXT) \
-	sore_util.$(OBJEXT)
+	sore_font.$(OBJEXT) sore_font_linux.$(OBJEXT) \
+	sore_graphics.$(OBJEXT) sore_input.$(OBJEXT) \
+	sore_interpolater.$(OBJEXT) sore_kernel.$(OBJEXT) \
+	sore_logger.$(OBJEXT) sore_logginginit.$(OBJEXT) \
+	sore_material.$(OBJEXT) sore_math.$(OBJEXT) \
+	sore_network.$(OBJEXT) sore_network_client.$(OBJEXT) \
+	sore_network_server.$(OBJEXT) sore_profiler.$(OBJEXT) \
+	sore_renderer.$(OBJEXT) sore_resource.$(OBJEXT) \
+	sore_screen.$(OBJEXT) sore_screeninfo.$(OBJEXT) \
+	sore_settings.$(OBJEXT) sore_shaders.$(OBJEXT) \
+	sore_texture.$(OBJEXT) sore_timing.$(OBJEXT) \
+	sore_timing_linux.$(OBJEXT) sore_util.$(OBJEXT)
 libsore_a_OBJECTS = $(am_libsore_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -203,12 +203,12 @@ INCLUDES = -I/usr/local/include/_boost-1_35 -I/usr/include/freetype2/ \
 METASOURCES = AUTO
 lib_LIBRARIES = libsore.a
 libsore_a_SOURCES = inotify-cxx.cpp sore_2dprimitives.cpp sore_2dscenegraph.cpp \
-	sore_fileio.cpp sore_fileio_linux.cpp sore_font.cpp sore_graphics.cpp sore_input.cpp \
-	sore_interpolater.cpp sore_kernel.cpp sore_logger.cpp sore_logginginit.cpp sore_material.cpp \
-	sore_math.cpp sore_network.cpp sore_network_client.cpp sore_network_server.cpp \
-	sore_profiler.cpp sore_renderer.cpp sore_resource.cpp sore_screen.cpp sore_screeninfo.cpp \
-	sore_settings.cpp sore_shaders.cpp sore_texture.cpp sore_timing.cpp sore_timing_linux.cpp \
-	sore_util.cpp
+	sore_fileio.cpp sore_fileio_linux.cpp sore_font.cpp sore_font_linux.cpp \
+	sore_graphics.cpp sore_input.cpp sore_interpolater.cpp sore_kernel.cpp sore_logger.cpp \
+	sore_logginginit.cpp sore_material.cpp sore_math.cpp sore_network.cpp \
+	sore_network_client.cpp sore_network_server.cpp sore_profiler.cpp sore_renderer.cpp \
+	sore_resource.cpp sore_screen.cpp sore_screeninfo.cpp sore_settings.cpp sore_shaders.cpp \
+	sore_texture.cpp sore_timing.cpp sore_timing_linux.cpp sore_util.cpp
 
 noinst_HEADERS = inotify-cxx.h sore.h sore_2dprimitives.h sore_2dscenegraph.h \
 	sore_allgl.h sore_defines.h sore_fileio.h sore_font.h sore_gamestate.h \
@@ -299,6 +299,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_fileio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_fileio_linux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_font.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_font_linux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_graphics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sore_interpolater.Po@am__quote@

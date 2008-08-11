@@ -4,25 +4,11 @@
 #define  __FONT_H__
 
 #include "sore_allgl.h"
+#include "sore_resource.h"
 
 //freetype
 #include <ft2build.h>
 #include FT_FREETYPE_H
-
-#ifdef DEBUG
-/*
-#undef __FTERRORS_H__
-#define FT_ERRORDEF( e, v, s )  { e, s },
-#define FT_ERROR_START_LIST     {
-#define FT_ERROR_END_LIST       { 0, 0 } };
-const struct
-{
-	int          err_code;
-	const char*  err_msg
-} ft_errors[] =
-#include FT_ERRORS_H
-*/
-#endif
 
 namespace SORE_Font
 {
@@ -36,36 +22,31 @@ namespace SORE_Font
 	const int INVALID_FONT_OBJ       = 7;
 	const int INVALID_FONT_HEIGHT    = 8;
 	
-	class FontInfo
+	class Font : public SORE_Resource::Resource
 	{
 		public:
-			//Font(int iflags) : ResourceHandle(iflags) {}
-			//Font(int iflags, const char* filename) : ResourceHandle(iflags, filename) {}
-			int     Init(const char* fontName, unsigned int h);
-			int     Init();
-			int     LoadFont(const char* fontName);
-			int     SetHeight(unsigned int h);
-			void    Cleanup();
-			int      height;
+			//pass height in pixels as a string
+			Font(std::string filename, std::string fHeight);
+			~Font();
+			
+			const char* Type() {return "Font";}
+			unsigned int Height() const;
+		protected:
+			void Load();
+		private:
+			void MakeDisplayList(FT_Face& face, char ch, );
+			
+			static void InitPaths();
+			static std::vector<std::string> fontPaths;
+			
+			unsigned int height;
+			
 			GLuint*  textures;
 			GLuint   listBase;
-			FT_Byte* fontInfo;
 	};
-	
-	typedef unsigned int font_ref;
-	
-	
-	int         InitFontSystem();
-	font_ref    LoadFont(const char* font, unsigned int h);
-	int         FontHeight(font_ref font);
-	
-	int         MakeDisplayList(FT_Face face, char ch, GLuint list_base, GLuint* tex_base);
-	//inline void PushScreenCoordMatrix();
-	//inline void PopProjectionMatrix();
-	
+
 	int         Print(font_ref fontIndex, int x, int y, const char* fmt, ...);
 	float       Print(font_ref fontIndex, int x, int y, char c);
-	void        Cleanup();
 
 }
 

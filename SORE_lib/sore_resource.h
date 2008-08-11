@@ -8,6 +8,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/functional/hash.hpp>
 #include "sore_logger.h"
 
 namespace SORE_Resource
@@ -44,18 +45,19 @@ namespace SORE_Resource
 			~ResourcePool();
 			
 			template<class T>
-					T* GetResource(std::string filename)
+					T* GetResource(std::string filename, std::string additionalInfo="")
 			{
-				if(resources.find(filename)==resources.end())
+				std::size_t hash = string_hash(filename+additionalInfo);
+				if(resources.find(hash)==resources.end())
 				{
 					T* temp = new T(filename);
-					resources.insert(std::pair<std::string, Resource*>(filename, temp) );
+					resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
 					return temp;
 				}
 				else
 				{
 					//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Retrieved resource: %s") % filename);
-					Resource* r = resources.find(filename)->second;
+					Resource* r = resources.find(hash)->second;
 					T* resource = dynamic_cast<T*>(r);
 					if(resource==NULL) ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not downcast resource for filename %s") % filename);
 					return resource;
@@ -64,7 +66,9 @@ namespace SORE_Resource
 			
 			void for_each(boost::function<void (Resource*)> func);
 		protected:
-			std::map<std::string, Resource*> resources;
+			std::map<std::size_t, Resource*> resources;
+		private:
+			boost::hash<std::string> string_hash;
 	};
 }
 
