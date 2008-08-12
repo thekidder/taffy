@@ -142,7 +142,7 @@ void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 	}
 }
 
-SORE_Resource::Texture2D::Texture2D(std::string filename) : Resource(filename)
+SORE_Resource::Texture2D::Texture2D(std::string filename, std::string additionalInfo) : Resource(filename, additionalInfo)
 {
 	handle = 0;
 	Load();

@@ -12,7 +12,6 @@ namespace SORE_Graphics
 {
 	void SetScreen(SORE_Kernel::Screen* _r);
 	
-	void DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...);
 	void ScreenAlignedQuad();
 	
 	void PushProjection(SORE_Graphics::ProjectionInfo& info);

@@ -18,7 +18,7 @@ namespace SORE_Resource
 	class Resource
 	{
 		public:
-			Resource(std::string file);
+			Resource(std::string file, std::string info="");
 			Resource() {filename="Not loaded from file";}
 			virtual ~Resource();
 			virtual const char* Type() const {return "generic resource";}
@@ -34,6 +34,7 @@ namespace SORE_Resource
 			void AddDependentFile(std::string file); //used for file notification - for example, a shader is made up of multiple files, we want to reload it if the shader files are changed
 			bool IsDependent(std::string file);
 			std::string filename;
+			std::string additionalInfo;
 			std::vector<std::string> dependentFiles;
 			static ResourcePool* rm;
 	};
@@ -50,7 +51,7 @@ namespace SORE_Resource
 				std::size_t hash = string_hash(filename+additionalInfo);
 				if(resources.find(hash)==resources.end())
 				{
-					T* temp = new T(filename);
+					T* temp = new T(filename, additionalInfo);
 					resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
 					return temp;
 				}

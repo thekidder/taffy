@@ -10,6 +10,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <boost/format.hpp>
+
 namespace SORE_Font
 {
 	//let's define some nice error constants
@@ -31,10 +33,13 @@ namespace SORE_Font
 			
 			const char* Type() {return "Font";}
 			unsigned int Height() const;
+			
+			float Print(int x, int y, std::string str);
+			float Print(int x, int y, boost::format str);
 		protected:
 			void Load();
 		private:
-			void MakeDisplayList(FT_Face& face, char ch, );
+			void MakeDisplayList(FT_Face& face, char ch);
 			
 			static void InitPaths();
 			static std::vector<std::string> fontPaths;
@@ -45,8 +50,8 @@ namespace SORE_Font
 			GLuint   listBase;
 	};
 
-	int         Print(font_ref fontIndex, int x, int y, const char* fmt, ...);
-	float       Print(font_ref fontIndex, int x, int y, char c);
+	/*int         Print(font_ref fontIndex, int x, int y, const char* fmt, ...);
+	float       Print(font_ref fontIndex, int x, int y, char c);*/
 
 }
 

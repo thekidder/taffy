@@ -34,7 +34,7 @@ namespace SORE_Graphics
 	class Material : public SORE_Resource::Resource
 	{
 		public:
-			Material(std::string materialFile);
+			Material(std::string materialFile, std::string additionalInfo);
 			~Material();
 			
 			void Bind();

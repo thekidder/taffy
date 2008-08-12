@@ -32,7 +32,7 @@ namespace SORE_Graphics
 			static bool ShadersSupported();
 			
 			GLSLShader(const char* vertex, const char* fragment);
-			GLSLShader(std::string shaderFile); //loads shader as a INI file specifying vertex/shader files
+			GLSLShader(std::string shaderFile, std::string additionalInfo); //loads shader as a INI file specifying vertex/shader files
 			~GLSLShader();
 			
 			int  AddVertexFile(const char* vertex);

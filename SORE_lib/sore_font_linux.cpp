@@ -1,27 +1,27 @@
 // $Id$
 
 #include "sore_font.h"
-#include <fontconfig.h>
 
 void SORE_Font::Font::InitPaths()
 {
-	SORE_Font::fontPaths.clear();
+	fontPaths.clear();
 	if(!FcInit())
 	{
-		return LIBRARY_LOAD_FAILED;
+		return;
 	}
 	FcConfig* config = FcConfigGetCurrent();
 	FcStrList* fontDirs = FcConfigGetFontDirs(config);
 	
-	char dirName[2048];
-
-	char fontPath[2048];
-	while((dirName = (char*)FcStrListNext(fontDirs)))
+	char* dir;
+	
+	std::string path;
+	
+	while((dir = (char*)FcStrListNext(fontDirs)))
 	{
-		strcpy(fontPath, dirName);
-		strcat(fontPath, "/");
-		fontPaths.push_back(fontPath);
+		path = dir;
+		path += "/";
+		fontPaths.push_back(path);
 	}
 	FcStrListDone(fontDirs);
-		return 0;
+		return;
 }

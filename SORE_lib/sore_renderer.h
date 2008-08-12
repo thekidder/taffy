@@ -69,7 +69,6 @@ namespace SORE_Graphics
 			void SetupFBO();
 			//std::map<gc_id, IRenderable> geometry;
 			//std::list<gc_id> unusedIds;
-			SORE_Font::font_ref font;
 			std::vector<Sprite2D*> sprites;
 			SceneGraph2D* scene;
 			Material* currMaterial;

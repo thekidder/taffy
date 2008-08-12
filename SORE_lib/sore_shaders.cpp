@@ -82,7 +82,7 @@ namespace SORE_Graphics
 		ok = true;
 	}
 	
-	GLSLShader::GLSLShader(std::string shaderFile) : Resource(shaderFile)
+	GLSLShader::GLSLShader(std::string shaderFile, std::string additionalInfo) : Resource(shaderFile, additionalInfo)
 	{
 		Load();
 	}

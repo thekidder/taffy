@@ -11,7 +11,7 @@ namespace SORE_Resource
 	class Texture2D : public Resource
 	{
 		public:
-			Texture2D(std::string filename);
+			Texture2D(std::string filename, std::string additionalInfo);
 			GLuint GetHandle() const;
 			void Bind() const;
 			const char* Type() const {return "2D texture";}

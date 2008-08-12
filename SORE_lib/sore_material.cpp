@@ -25,7 +25,7 @@
 
 namespace SORE_Graphics
 {
-	Material::Material(std::string materialFile) : Resource(materialFile), shader(NULL), useShader(false), file(materialFile)
+	Material::Material(std::string materialFile, std::string additionalInfo) : Resource(materialFile, additionalInfo), shader(NULL), useShader(false), file(materialFile)
 	{
 		Load();
 	}

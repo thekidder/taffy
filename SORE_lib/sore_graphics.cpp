@@ -84,32 +84,6 @@ void SORE_Graphics::WindowToReal(int* window, int* real)
 	real[1] = viewport[3]-window[1];
 }
 
-void SORE_Graphics::DrawString(SORE_Font::font_ref font, int x, int y, const char* fmt, ...)
-{
-	int window[2];
-	int real[2];
-	window[0] = x;
-	window[1] = y;
-	real[0] = 0;
-	real[1] = 0;
-
-	SORE_Graphics::WindowToReal(window, real);
-	
-	int h = SORE_Font::FontHeight(font);
-	real[1] -= h;
-	assert(real[1]>=0);
-	char text[256];
-		
-	if(fmt!=NULL)
-	{
-		va_list ap;
-		va_start(ap, fmt);
-		vsprintf(text, fmt, ap);
-		va_end(ap);
-		SORE_Font::Print(font, real[0], real[1], text);
-	}
-}
-
 void SORE_Graphics::ScreenAlignedQuad()
 {
 	glMatrixMode (GL_MODELVIEW); 

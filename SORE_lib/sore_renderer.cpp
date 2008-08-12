@@ -26,7 +26,6 @@ namespace SORE_Graphics
 {
 	Renderer2D::Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
 	{
-		font = SORE_Font::LoadFont("data/Fonts/liberationmono.ttf", 24);
 		fbo = img = depthbuffer = 0;
 		if(_rm)
 		{
@@ -224,11 +223,7 @@ namespace SORE_Graphics
 
 		SORE_Graphics::PushOverlay();
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-140, 0,  "FPS: %4.0f", fps);
-		//SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-360, SORE_Graphics::GetHeight()-30, "Speed: x%3.1f   Combo: x%3.0d", (snakes->begin())->speed()/MOVESPEED, (snakes->begin())->multiplier());
-		//SORE_Graphics::DrawString(font, 0, 0, "Score: %d", int((snakes->begin())->score()));
-		//if((int)(snakes->begin())->highscore()>1.0)
-		//	SORE_Graphics::DrawString(font, 0, SORE_Graphics::GetHeight()-30, "high score: %d", (int)(snakes->begin())->highscore());
+		//SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-140, 0,  "FPS: %4.0f", fps);
 		SORE_Graphics::PopOverlay();
 		
 		GLenum error;
