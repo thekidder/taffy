@@ -22,82 +22,25 @@
 #include "sore_renderer.h"
 #include "sore_graphics.h"
 
+#include <boost/format.hpp>
+
 namespace SORE_Graphics
 {
 	Renderer2D::Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene) : scene(_scene), rm(_rm)
 	{
-		fbo = img = depthbuffer = 0;
-		if(_rm)
+		if(rm)
 		{
-			fboshad = rm->GetResource<SORE_Graphics::GLSLShader>("data/Shaders/warp_fbo.shad");
-			warp = NULL;
-		}
-		else
-		{
-			fboshad = NULL;
-			warp = NULL;
+			std::string path = SORE_Font::FontPaths::GetFontPath("arial.ttf");
+			printFPS = rm->GetResource<SORE_Font::Font>(path, "32");
 		}
 	}
 	
 	Renderer2D::~Renderer2D()
 	{
-		CleanupFBO();
-	}
-	
-	void Renderer2D::SetupFBO()
-	{
-		int width = screen.width;
-		int height = screen.height;
-		//int width = 512;
-		//int height = 512;
-		
-		glGenFramebuffersEXT(1, &fbo);
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-		
-		glGenRenderbuffersEXT(1, &depthbuffer);
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthbuffer);
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
-		
-		glGenTextures(1, &img);
-		glBindTexture(GL_TEXTURE_2D, img);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,  width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-		//  The following 3 lines enable mipmap filtering and generate the mipmap data so rendering works
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		//glGenerateMipmapEXT(GL_TEXTURE_2D);
-
-		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthbuffer);
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, img, 0);
-		
-		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-		if(status!=GL_FRAMEBUFFER_COMPLETE_EXT)
-		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create FBO");
-		}
-		else
-		{
-			ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "FBO created successfully");
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-		}
-	}
-	
-	void Renderer2D::CleanupFBO()
-	{
-		glDeleteFramebuffersEXT(1, &fbo);
-		glDeleteTextures(1, &img);
-		glDeleteRenderbuffersEXT(1, &depthbuffer);
-		fbo = img = depthbuffer = 0;
 	}
 	
 	void Renderer2D::OnScreenChange()
 	{
-		CleanupFBO();
-		SetupFBO();
 	}
 	
 	void IRenderer::SetScreenInfo(ScreenInfo _screen)
@@ -129,17 +72,9 @@ namespace SORE_Graphics
 		currMaterial = NULL;
 		
 		SORE_Graphics::color c(0.0f,0.0f,0.0f,1.0f);
-		
-		static Sprite2D glow(rm, "glow", 0.0f, 0.0f, -0.95f, 0.0f, 0.0f, c);
-		
+				
 		int width = screen.width;
 		int height = screen.height;
-		
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-		glPushAttrib(GL_VIEWPORT_BIT);
-		glViewport(0,0,width,height);
-
-		glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 		
 		glClearColor(0.0,0.0,0.0,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -150,61 +85,8 @@ namespace SORE_Graphics
 		
 		for(it=sprites.begin();it!=sprites.end();it++)
 		{
-			const static GLfloat relSize = 2.6f;
-			const static GLfloat relAlpha = 0.8f;
-			GLfloat offsetX = ( (*it)->width *relSize)/2.0f - (*it)->width /2.0f;
-			GLfloat offsetY = ( (*it)->height*relSize)/2.0f - (*it)->height/2.0f;
-			glow.x = (*it)->x-offsetX;
-			glow.y = (*it)->y-offsetY;
-			glow.c = (*it)->c;
-			glow.c.a *= relAlpha;
-			glow.width = (*it)->width*relSize;
-			glow.height = (*it)->height*relSize;
-			RenderSprite(&glow);
-		}
-		
-		for(it=sprites.begin();it!=sprites.end();it++)
-		{
 			RenderSprite(*it);
 		}
-
-		glPopAttrib();
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		//if(SORE_Graphics::GLSLShader::ShadersSupported())
-		//	SORE_Graphics::GLSLShader::UnbindShaders();
-		
-		if(SORE_Graphics::GLSLShader::ShadersSupported() && fboshad && warp)
-		{
-			fboshad->Bind();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, img);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, warp->GetHandle());
-			fboshad->SetUniform1i("fbo_img", 0);
-			//fboshad->SetUniform1i("warp", 1);
-		}
-		
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, img);
-		
-		glColor4f(1.0f,1.0f,1.0f,1.0f);
-		glBegin(GL_QUADS);
-		{
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(proj.left, proj.top, -0.90f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(proj.left, proj.bottom, -0.90f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(proj.right, proj.bottom, -0.90f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(proj.right, proj.top, -0.90f);
-		}
-		glEnd();
 		
 		frames++;
 		{
@@ -223,7 +105,8 @@ namespace SORE_Graphics
 
 		SORE_Graphics::PushOverlay();
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		//SORE_Graphics::DrawString(font, SORE_Graphics::GetWidth()-140, 0,  "FPS: %4.0f", fps);
+		//printFPS->Print(0, 0,  boost::format("FPS: %4.0f") % fps);
+		printFPS->Print(0, 0,  boost::format("this is a very very very very very\nlong line of text that is separated by a newline."));
 		SORE_Graphics::PopOverlay();
 		
 		GLenum error;

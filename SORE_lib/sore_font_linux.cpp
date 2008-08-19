@@ -2,7 +2,7 @@
 
 #include "sore_font.h"
 
-void SORE_Font::Font::InitPaths()
+void SORE_Font::FontPaths::InitPaths()
 {
 	fontPaths.clear();
 	if(!FcInit())

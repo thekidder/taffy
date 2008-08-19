@@ -65,8 +65,8 @@ namespace SORE_Graphics
 			void RenderSprite(Sprite2D* s);
 			void OnScreenChange();
 			
-			void CleanupFBO();
-			void SetupFBO();
+			//void CleanupFBO();
+			//void SetupFBO();
 			//std::map<gc_id, IRenderable> geometry;
 			//std::list<gc_id> unusedIds;
 			std::vector<Sprite2D*> sprites;
@@ -74,11 +74,7 @@ namespace SORE_Graphics
 			Material* currMaterial;
 			SORE_Resource::ResourcePool* rm;
 			
-			GLuint fbo;
-			GLuint depthbuffer;
-			GLuint img;
-			SORE_Graphics::GLSLShader* fboshad;
-			SORE_Resource::Texture2D* warp;
+			SORE_Font::Font* printFPS;
 	};
 }
 

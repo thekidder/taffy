@@ -21,3 +21,5 @@ _SOURCES = sore_geometry.h
 _SOURCES = sore_geometry.h sore_vector3.h
 _SOURCES = sore_geometry.h sore_vector2.h sore_vector3.h
 _SOURCES = sore_geometry.h sore_matrix4x4.h sore_vector2.h sore_vector3.h
+_SOURCES = sore_guirenderer.h
+_SOURCES = sore_guirenderer.h sore_guiwindow.h

@@ -24,6 +24,15 @@ namespace SORE_Font
 	const int INVALID_FONT_OBJ       = 7;
 	const int INVALID_FONT_HEIGHT    = 8;
 	
+	class FontPaths
+	{
+		public:
+			static void InitPaths();
+			static std::string GetFontPath(std::string name);
+		private:
+			static std::vector<std::string> fontPaths;
+	};
+	
 	class Font : public SORE_Resource::Resource
 	{
 		public:
@@ -41,8 +50,7 @@ namespace SORE_Font
 		private:
 			void MakeDisplayList(FT_Face& face, char ch);
 			
-			static void InitPaths();
-			static std::vector<std::string> fontPaths;
+			
 			
 			unsigned int height;
 			

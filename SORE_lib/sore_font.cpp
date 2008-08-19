@@ -18,12 +18,11 @@ inline int next_p2 (int a )
 	return rval;
 }
 
-std::vector<std::string> SORE_Font::Font::fontPaths;
+std::vector<std::string> SORE_Font::FontPaths::fontPaths;
 
 SORE_Font::Font::Font(std::string filename, std::string fHeight) : Resource(filename)
 {
 	height = boost::lexical_cast<unsigned int>(fHeight);
-	if(fontPaths.size()==0) InitPaths();
 	Load();
 }
 
@@ -46,22 +45,6 @@ void SORE_Font::Font::Load()
 	if(length>59) return;
 	
 	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(filename.c_str());
-	
-	if(fontObj==0)
-	{
-		std::vector<std::string>::iterator it;
-		for(it=fontPaths.begin();it<fontPaths.end();it++)
-		{
-			std::string path = *it;
-			path += filename;
-			fontObj = SORE_FileIO::Open(path.c_str());
-			if(fontObj!=0)
-			{
-				break;
-			}
-			fontObj = 0;
-		}
-	}
 		
 	size_t size = SORE_FileIO::Size(fontObj);
 	size_t err;
@@ -138,7 +121,7 @@ void SORE_Font::Font::MakeDisplayList(FT_Face& face, char ch)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_INTENSITY, width, height, 0,
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0,
 								GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, expanded_data );
 	delete [] expanded_data;
 	
@@ -173,21 +156,14 @@ float SORE_Font::Font::Print(int x, int y, std::string str)
 
 	std::vector<std::string> lines;
 	
-	const char* c = str.c_str();
-	unsigned int start = 0;
-	
-	for(;*c;c++) 
+	unsigned int start = 0, curr = 0;	
+	while( (curr = str.find('\n', start+1))!=std::string::npos)
 	{
-		if(*c=='\n') 
-		{
-			std::string line;
-			line = str.substr(start, c-str.c_str());
-			//for(const char *n=start_line;n<c;n++) line.append(1,*n);
-			lines.push_back(line);
-			start=c-str.c_str();
-		}
+		lines.push_back(str.substr(start, curr-start));
+		start = curr;
 	}
 	if(start == 0) lines.push_back(str);
+	else lines.push_back(str.substr(start+1));
 
 	
 	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT); 
@@ -221,16 +197,8 @@ float SORE_Font::Font::Print(int x, int y, std::string str)
 	
 	for(size_t i=0;i<lines.size();i++)
 	{
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(static_cast<GLfloat>(x),static_cast<GLfloat>(y-h*i),0);
-		glMultMatrixf(modelview_matrix);
+		glTranslatef(0.0f,static_cast<GLfloat>(-height*i),0.0f);
 		glCallLists(static_cast<GLsizei>(lines[i].length()), GL_UNSIGNED_BYTE, lines[i].c_str());
-		// float rpos[4];
-		// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
-		// float len=x-rpos[0]; //(Assuming No Rotations Have Happend)
-
-		glPopMatrix();
 	}
 	glPopAttrib();
 	return 0.0;
@@ -239,4 +207,30 @@ float SORE_Font::Font::Print(int x, int y, std::string str)
 float SORE_Font::Font::Print(int x, int y, boost::format str)
 {
 	return Print(x, y, boost::str(str));
+}
+
+std::string SORE_Font::FontPaths::GetFontPath(std::string name)
+{
+	if(fontPaths.size()==0) InitPaths();
+	
+	std::string full = name;
+	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(full.c_str());
+	
+	if(fontObj==0)
+	{
+		std::vector<std::string>::iterator it;
+		for(it=fontPaths.begin();it<fontPaths.end();it++)
+		{
+			full = *it;
+			full += name;
+			fontObj = SORE_FileIO::Open(full.c_str());
+			if(fontObj!=0)
+			{
+				break;
+			}
+			fontObj = 0;
+		}
+	}
+	SORE_FileIO::Close(fontObj);
+	return full;
 }
