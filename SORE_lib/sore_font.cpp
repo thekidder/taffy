@@ -44,7 +44,8 @@ void SORE_Font::Font::Load()
 	size_t length = filename.size();
 	if(length>59) return;
 	
-	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(filename.c_str());
+	std::string path = FontPaths::GetFontPath(filename);
+	SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(path.c_str());
 		
 	size_t size = SORE_FileIO::Size(fontObj);
 	size_t err;
