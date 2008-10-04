@@ -1,0 +1,89 @@
+//
+// C++ Interface: sore_input
+//
+// Description: 
+//
+//
+// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+// $Id$
+
+
+#ifndef  __SORE_INPUT_H__
+#define  __SORE_INPUT_H__
+
+#include "sore_kernel.h"
+#include <SDL/SDL_keysym.h>
+#include <SDL/SDL_events.h>
+#include <boost/function.hpp>
+#include <map>
+
+namespace SORE_Kernel
+{
+	const unsigned int MOUSEMOVE       = 0x01;
+	const unsigned int MOUSEBUTTONDOWN = 0x02;
+	const unsigned int MOUSEBUTTONUP   = 0x04;
+	const unsigned int MOUSECLICK      = 0x08;
+	const unsigned int KEYDOWN         = 0x10;
+	const unsigned int KEYUP           = 0x20;
+	const unsigned int KEYCLICK        = 0x40;
+	
+	const unsigned int RESIZE          = 0x80;
+	
+	const unsigned int MOUSE_BUTTON1   = 0x01;
+	const unsigned int MOUSE_BUTTON2   = 0x02;
+	const unsigned int MOUSE_BUTTON3   = 0x04;
+	
+	const unsigned int INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK;
+	
+	struct MouseInfo
+	{
+		unsigned int x,y;
+		int          xmove,ymove;
+		unsigned int buttonState;
+	};
+	
+	struct KeyInfo
+	{
+		unsigned int keySym;
+		unsigned int modState;
+	};
+	
+	struct ResizeInfo
+	{
+		int w,h;
+	};
+	
+	struct Event
+	{
+		unsigned int type;
+		KeyInfo key;
+		MouseInfo mouse;
+		ResizeInfo resize;
+	};
+	
+	typedef unsigned int event_listener_ref;
+	
+	class InputTask : public Task
+	{
+		public:
+			InputTask(SORE_Kernel::GameKernel* gk);
+			~InputTask();
+			
+			void Frame(int elapsedTime);
+			void Pause();
+			void Resume();
+			
+			const char* GetName() const {return "Input task";}
+			
+			event_listener_ref AddListener(unsigned int eventType, boost::function<bool (Event*)> functor);
+			void RemoveListener(event_listener_ref listener);
+		protected:
+			Event event;
+			std::multimap<unsigned int, boost::function<bool (Event*)> > allListeners;
+	};
+}
+
+#endif /*__SORE_INPUT_H__*/
