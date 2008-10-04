@@ -1,3 +1,3 @@
 #!/bin/bash
-./svnrev -osore_svnrev.h
-./svnrev -osore_svnrev.h sore_*.cpp sore_*.h
+./svnrev -o../src/sore_svnrev.h
+./svnrev -o../src/sore_svnrev.h ../src/sore_*.cpp ../src/sore_*.h
