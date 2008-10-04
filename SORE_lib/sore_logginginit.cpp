@@ -30,10 +30,10 @@ namespace SORE_Logging
 {
 	void LoggingStartMessages()
 	{
-		//ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE);
-		//if(SVN_MODIFIED)
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE);
+		if(SVN_MODIFIED)
 		{
-			//ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified since last commit (version number will be inaccurate)");
+			ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified since last commit (version number will be inaccurate)");
 		}
 	}
 }
