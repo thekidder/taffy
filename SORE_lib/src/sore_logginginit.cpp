@@ -23,14 +23,16 @@
 #include "sore_logger.h"
 #include "sore_logginginit.h"
 
-#define MAJOR 0
-#define MINOR 1
+const unsigned int MAJOR = 0;
+const unsigned int MINOR = 2;
+
+const char*        BRANCH = "trunk"; //ex tag 1.2.1, branch 1.2, trunk, etc
 
 namespace SORE_Logging
 {
 	void LoggingStartMessages()
 	{
-		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE);
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s, %s)") % MAJOR % MINOR % SVN_REVSTR % SVN_REVDATE % BRANCH);
 		if(SVN_MODIFIED)
 		{
 			ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified since last commit (version number will be inaccurate)");

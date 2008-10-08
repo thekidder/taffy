@@ -11,10 +11,10 @@ void SORE_Resource::Texture2D::Load()
 	if(handle!=0)
 		glDeleteTextures(1, &handle);
 	char ext[10];
-	SORE_Utility::GetFileExt(filename.c_str(), ext);
+	SORE_Utility::GetFileExt(GetFilename().c_str(), ext);
 	if(strcmp(ext, "tga")==0)
 	{
-		LoadTGA(filename.c_str());
+	  LoadTGA(GetFilename().c_str());
 	}
 	else
 	{

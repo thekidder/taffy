@@ -96,7 +96,7 @@ namespace SORE_Graphics
 		if(!ShadersSupported())
 			return;
 		Init();
-		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(filename.c_str());
+		std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(GetFilename().c_str());
 		
 		std::map<std::string, std::map<std::string, std::string> >::iterator i;
 		std::map<std::string, std::string>::iterator i2;
