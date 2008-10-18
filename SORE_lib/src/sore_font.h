@@ -46,11 +46,10 @@ namespace SORE_Font
       float Print(int x, int y, std::string str);
       float Print(int x, int y, boost::format str);
     protected:
+      std::string ProcessFilename(std::string file);
       void Load();
     private:
       void MakeDisplayList(FT_Face& face, char ch);
-      
-      
       
       unsigned int height;
       

@@ -20,14 +20,22 @@ inline int next_p2 (int a )
 
 std::vector<std::string> SORE_Font::FontPaths::fontPaths;
 
-SORE_Font::Font::Font(std::string filename, std::string fHeight) : Resource(filename)
+SORE_Font::Font::Font(std::string filename, std::string fHeight) : Resource(filename, "", true)
 {
+  std::string path = FontPaths::GetFontPath(filename);
+  SetFilename(path);
+
   height = boost::lexical_cast<unsigned int>(fHeight);
   Load();
 }
 
 SORE_Font::Font::~ Font()
 {
+}
+
+std::string SORE_Font::Font::ProcessFilename(std::string file)
+{
+  ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "in ProcessFilename");
 }
 
 void SORE_Font::Font::Load()
@@ -44,9 +52,7 @@ void SORE_Font::Font::Load()
   size_t length = GetFilename().size();
   if(length>59) return;
 	
-  std::string path = FontPaths::GetFontPath(GetFilename());
-  SetFilename(path);
-  SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(path.c_str());
+  SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(GetFilename().c_str());
 		
   size_t size = SORE_FileIO::Size(fontObj);
   size_t err;

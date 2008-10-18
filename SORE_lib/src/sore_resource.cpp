@@ -12,25 +12,21 @@ namespace SORE_Resource
 {
   ResourcePool* Resource::rm = NULL;
 	
-  Resource::Resource(std::string file, std::string info) : additionalInfo(info)
+  Resource::Resource(std::string file, std::string info, bool delayedNotify) : additionalInfo(info)
   {
-    SetFilename(file);
+    if(!delayedNotify)
+      SetFilename(file);
   }
   
   Resource::~Resource()
   {
   }
-  
+
   void Resource::SetFilename(std::string file)
   {
     boost::function<void (std::string)> callback = std::bind1st(std::mem_fun(&Resource::OnNotify),this);
     filename = file;
     SORE_FileIO::Notify(filename, callback);
-  }
-
-  std::string Resource::GetFilename() const
-  {
-    return filename;
   }
   
   void Resource::AddDependentFile(std::string file)

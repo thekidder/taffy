@@ -31,28 +31,29 @@
 
 namespace SORE_Graphics
 {
-	class Material : public SORE_Resource::Resource
-	{
-		public:
-			Material(std::string materialFile, std::string additionalInfo);
-			~Material();
+  class Material : public SORE_Resource::Resource
+    {
+    public:
+      Material(std::string materialFile, std::string additionalInfo);
+      ~Material();
 			
-			void Bind();
+      void Bind();
 			
-			std::vector<std::string> GetFlags();
-			void                     AddFlag(std::string flag);
-			bool                     HasFlag(std::string flag);
-		protected:
-			void Load();
-			GLSLShader* shader;
-			bool useShader;
-			std::string file;
-			//std::vector<std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> > > textures;
-			std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> > textureMap;
-			//std::vector<std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> >::iterator> textureOrder;
-			std::vector<std::string> textureOrder;
-			std::vector<std::string> flags;
-	};
+      std::vector<std::string> GetFlags();
+      void                     AddFlag(std::string flag);
+      bool                     HasFlag(std::string flag);
+    protected:
+      void Load();
+      GLSLShader* shader;
+      bool useShader;
+      virtual std::string ProcessFilename(std::string file) {return file;}
+      std::string file;
+      //std::vector<std::pair<std::string, std::pair<int, SORE_Resource::Texture2D*> > > textures;
+      std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> > textureMap;
+      //std::vector<std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> >::iterator> textureOrder;
+      std::vector<std::string> textureOrder;
+      std::vector<std::string> flags;
+    };
 }
 
 #endif /*__SORE_MATERIAL__*/

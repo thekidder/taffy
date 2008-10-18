@@ -18,12 +18,12 @@ namespace SORE_Resource
   class Resource
   {
   public:
-    Resource(std::string file, std::string info="");
+    Resource(std::string file, std::string info="", bool delayedNotify=false);
     Resource() {filename="Not loaded from file";}
     virtual ~Resource();
     virtual const char* Type() const {return "generic resource";}
 			
-    std::string GetFile() const {return filename;}
+    std::string GetFilename() const {return filename;}
 			
     static void SetRM(ResourcePool* _rm) {rm = _rm;}
 			
@@ -33,7 +33,6 @@ namespace SORE_Resource
     void OnNotify(std::string file);
     void AddDependentFile(std::string file); //used for file notification - for example, a shader is made up of multiple files, we want to reload it if the shader files are changed
     void SetFilename(std::string file);
-    std::string GetFilename() const;
     bool IsDependent(std::string file);
     std::string additionalInfo;
     std::vector<std::string> dependentFiles;
