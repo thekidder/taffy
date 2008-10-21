@@ -31,51 +31,51 @@
 
 namespace SORE_Graphics
 {
-	typedef unsigned int gc_id;
+  typedef unsigned int gc_id;
 	
-	class IRenderer
-	{
-		public:
-			IRenderer() {}
-			virtual ~IRenderer() {}
+  class IRenderer
+  {
+  public:
+    IRenderer() {}
+    virtual ~IRenderer() {}
 			
-			virtual void Render() = 0;
-			void SetScreenInfo(ScreenInfo _screen);
-			void SetProjectionInfo(ProjectionInfo _proj);
-		protected:
-			virtual void OnScreenChange() {}
-			virtual void OnProjectionChange() {}
-			ScreenInfo screen;
-			ProjectionInfo proj;
-	};
+    virtual void Render() = 0;
+    void SetScreenInfo(ScreenInfo _screen);
+    void SetProjectionInfo(ProjectionInfo _proj);
+  protected:
+    virtual void OnScreenChange() {}
+    virtual void OnProjectionChange() {}
+    ScreenInfo screen;
+    ProjectionInfo proj;
+  };
 	
-	class Renderer2D : public IRenderer
-	{
-		public:
-			Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene);
-			~Renderer2D();
+  /*  class Renderer2D : public IRenderer
+  {
+  public:
+    Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene);
+    ~Renderer2D();
 			
-			//gc_id AddRenderable(IRenderable gc);
-			//IRenderable* GeometryChunkPtr(gc_id id);
-			//void RemoveGeometryChunk(gc_id gc);
-			void SetSpriteList(std::vector<Sprite2D*> s);
+    //gc_id AddRenderable(IRenderable gc);
+    //IRenderable* GeometryChunkPtr(gc_id id);
+    //void RemoveGeometryChunk(gc_id gc);
+    void SetSpriteList(std::vector<Sprite2D*> s);
 			
-			void Render();
-		protected:
-			void RenderSprite(Sprite2D* s);
-			void OnScreenChange();
+    void Render();
+  protected:
+    void RenderSprite(Sprite2D* s);
+    void OnScreenChange();
 			
-			//void CleanupFBO();
-			//void SetupFBO();
-			//std::map<gc_id, IRenderable> geometry;
-			//std::list<gc_id> unusedIds;
-			std::vector<Sprite2D*> sprites;
-			SceneGraph2D* scene;
-			Material* currMaterial;
-			SORE_Resource::ResourcePool* rm;
+    //void CleanupFBO();
+    //void SetupFBO();
+    //std::map<gc_id, IRenderable> geometry;
+    //std::list<gc_id> unusedIds;
+    std::vector<Sprite2D*> sprites;
+    SceneGraph2D* scene;
+    Material* currMaterial;
+    SORE_Resource::ResourcePool* rm;
 			
-			SORE_Font::Font* printFPS;
-	};
+    SORE_Font::Font* printFPS;
+    };*/
 }
 
 #endif /*__SORE_RENDERER__*/

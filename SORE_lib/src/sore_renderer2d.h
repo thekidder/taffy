@@ -1,0 +1,48 @@
+/*
+  Untitled Project
+  Flatland-inspired RTS project code. Created by Adam Kidder.
+  Licensing currently undecided; view as proprietary code.
+*/
+//$Id: dimensionalityrenderer.h 23 2008-10-08 02:14:59Z me $
+
+#ifndef DIMENSIONALITYRENDERER_H
+#define DIMENSIONALITYRENDERER_H
+
+#include "sore_renderer.h"
+#include "sore_resource.h"
+#include "sore_geometrychunk.h"
+#include "sore_vbo.h"
+
+/**
+   @author Adam Kidder <thekidder@gmail.com>
+*/
+namespace SORE_Graphics
+{
+  class Renderer2D : public SORE_Graphics::IRenderer
+    {
+    public:
+      Renderer2D(SORE_Resource::ResourcePool& _rm);
+      ~Renderer2D();
+
+      virtual void Render();
+
+      void SetGeometryCallback(boost::function<render_list ()> c);
+      void SetCameraCallback(boost::function<SORE_Math::Matrix4<float>& ()> c);
+      void Build();
+		
+    protected:
+      virtual void OnProjectionChange();
+      virtual void OnScreenChange();
+    private:
+      SORE_Resource::ResourcePool& rm;
+      GLuint fbo, depthbuffer, color0, color1;
+      SORE_Graphics::GLSLShader* glowv, *glowh;
+
+      boost::function<render_list ()> geometryCallback;
+      boost::function<SORE_Math::Matrix4<float>& ()> camera;
+		
+      SORE_Font::Font* font;
+      std::vector<VBO> batches;
+    };
+}
+#endif
