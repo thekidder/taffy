@@ -29,16 +29,16 @@
 
 namespace SORE_Graphics
 {
-	class Sprite2D
-	{
-		public:
-			Sprite2D() {}
-			Sprite2D(SORE_Resource::ResourcePool* rm, std::string materialName, GLfloat _x, GLfloat _y, GLfloat _depth, GLfloat _width, GLfloat _height, color _c);
-			void SetAlpha(float a) {c.a = a; }
-			Material* m;
-			color c;
-			GLfloat x,y,width,height,depth;
-	};
+  class Sprite2D
+  {
+  public:
+    Sprite2D() {}
+    Sprite2D(SORE_Resource::ResourcePool* rm, std::string materialName, GLfloat _x, GLfloat _y, GLfloat _depth, GLfloat _width, GLfloat _height, color _c);
+    void SetAlpha(float a) {c.a = a; }
+    Material* m;
+    color c;
+    GLfloat x,y,width,height,depth;
+  };
 }
 
 #endif /*__SORE_2DPRIMITIVES__*/

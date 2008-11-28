@@ -8,6 +8,8 @@ Licensing currently undecided; view as proprietary code.
 #ifndef GEOMETRYCHUNK_H
 #define GEOMETRYCHUNK_H
 
+#include <boost/function.hpp>
+
 #include <map>
 #include "sore_material.h"
 #include "math/sore_matrix4x4.h"
@@ -15,39 +17,53 @@ Licensing currently undecided; view as proprietary code.
 /**
    @author Adam Kidder <thekidder@gmail.com>
 */
-class GeometryChunk
+namespace SORE_Graphics
 {
- public:
-  GeometryChunk();
-  ~GeometryChunk();
+  class GeometryChunk
+  {
+  public:
+    GeometryChunk(SORE_Resource::Texture2D* texture, float left, float right, float top, float bottom); //create sprite
+    GeometryChunk();
+    ~GeometryChunk();
 		
-  bool HasTexture() const;
-  bool HasColor() const;
+    bool HasTexture() const;
+    bool HasColor() const;
 		
-  const float* Vertices();
-  const float* Colors();
-  const unsigned short* Indices();
+    const float* Vertices() const;
+    const float* Colors() const;
+		const float* TexCoords() const;
+    const unsigned short* Indices() const;
 		
-  const unsigned int NumVertices();
-  const unsigned int NumIndices();
-				
- protected:
- private:
-  //geometry
-  float* vertices;
-  float* texCoords;
-  float* colors;
+    unsigned int NumVertices() const;
+    unsigned int NumIndices() const;
 		
-  unsigned short* indices;
-  bool opaque;
-		
-  unsigned int numVertices, numIndices;
-		
-  SORE_Graphics::Material* mat;
-		
-  unsigned int primitiveType;
-};
+		const SORE_Resource::Texture2D* GetTexture() const;
 
-typedef std::map<const SORE_Math::Matrix4<float>*, GeometryChunk * > render_list;
+  protected:
+  private:
+    //geometry
+    float* vertices;
+    float* texCoords;
+    float* colors;
+		
+    unsigned short* indices;
+    bool opaque;
+		
+    unsigned int numVertices, numIndices;
+		
+    SORE_Resource::Texture2D* tex;
+		
+    unsigned int primitiveType;
+  };
 
+  typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> > render_list;
+
+	const int SORT_LESS    = -1;
+	const int SORT_EQUAL   =  0;
+	const int SORT_GREATER =  1;
+
+	typedef boost::function<int (GeometryChunk*, GeometryChunk*)> geometry_sort;
+
+	inline int NullGeometrySort(SORE_Graphics::GeometryChunk* one, SORE_Graphics::GeometryChunk* two); //sorts by ptr
+}
 #endif

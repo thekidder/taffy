@@ -11,6 +11,7 @@
 #include "sore_renderer.h"
 #include "sore_resource.h"
 #include "sore_geometrychunk.h"
+#include "sore_shaders.h"
 #include "sore_vbo.h"
 
 /**
@@ -18,31 +19,36 @@
 */
 namespace SORE_Graphics
 {
-  class Renderer2D : public SORE_Graphics::IRenderer
-    {
-    public:
-      Renderer2D(SORE_Resource::ResourcePool& _rm);
-      ~Renderer2D();
+				class Renderer2D : public SORE_Graphics::IRenderer
+				{
+				public:
+								Renderer2D(SORE_Resource::ResourcePool& _rm);
+								~Renderer2D();
 
-      virtual void Render();
+								virtual void Render();
 
-      void SetGeometryCallback(boost::function<render_list ()> c);
-      void SetCameraCallback(boost::function<SORE_Math::Matrix4<float>& ()> c);
-      void Build();
+								void SetGeometryCallback(boost::function<render_list ()> c);
+								void SetCameraCallback(boost::function<SORE_Math::Matrix4<float>& ()> c);
+								void Build();
 		
-    protected:
-      virtual void OnProjectionChange();
-      virtual void OnScreenChange();
-    private:
-      SORE_Resource::ResourcePool& rm;
-      GLuint fbo, depthbuffer, color0, color1;
-      SORE_Graphics::GLSLShader* glowv, *glowh;
+				protected:
+								virtual void OnProjectionChange();
+								virtual void OnScreenChange();
+				private:
+								SORE_Resource::ResourcePool& rm;
+								GLuint fbo, depthbuffer, color0, color1;
 
-      boost::function<render_list ()> geometryCallback;
-      boost::function<SORE_Math::Matrix4<float>& ()> camera;
+								boost::function<render_list ()> geometryCallback;
+								boost::function<SORE_Math::Matrix4<float>& ()> camera;
 		
-      SORE_Font::Font* font;
-      std::vector<VBO> batches;
-    };
+								SORE_Font::Font* font;
+								SORE_Graphics::GLSLShader* shad;
+								//std::vector<VBO> batches;
+								VBO all;
+								std::vector<std::pair<unsigned int, const SORE_Resource::Texture2D*> > textureStack; 
+				};
+				
+				inline int TextureSort(GeometryChunk* one, GeometryChunk* two);
+				bool operator<(std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> one, std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> two);
 }
 #endif

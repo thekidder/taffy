@@ -24,24 +24,24 @@
 
 namespace SORE_Graphics
 {
-	struct color
-	{
-		float r,g,b,a;
-		color operator+=(color& c)
-		{
-			r+=c.r;
-			g+=c.g;
-			b+=c.b;
-			return *this;
-		}
-		color(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
-		color() : r(0.0f),g(0.0f),b(0.0f),a(0.0f) {}
-	};
+  struct color
+  {
+    float r,g,b,a;
+    color operator+=(color& c)
+    {
+      r+=c.r;
+      g+=c.g;
+      b+=c.b;
+      return *this;
+    }
+  color(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
+  color() : r(0.0f),g(0.0f),b(0.0f),a(0.0f) {}
+  };
 	
-	struct viewport
-	{
-		float x,y,width,height;
-	};
+  struct viewport
+  {
+    float x,y,width,height;
+  };
 }
 
 #endif /*__SORE_GFXPRIMITIVES__*/

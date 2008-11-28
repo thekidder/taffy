@@ -21,9 +21,9 @@ set(SORE_SRCS sore_2dprimitives.cpp sore_2dscenegraph.cpp
   sore_material.cpp sore_math.cpp sore_network_client.cpp
   sore_network_server.cpp sore_network.cpp sore_profiler.cpp
   sore_renderer.cpp sore_renderer2d.cpp sore_resource.cpp
-  sore_screen.cpp sore_screeninfo.cpp sore_settings.cpp
-  sore_shaders.cpp sore_texture.cpp sore_timing.cpp sore_util.cpp
-  sore_vbo.cpp)
+  sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp
+  sore_screeninfo.cpp sore_settings.cpp sore_shaders.cpp
+  sore_texture.cpp sore_timing.cpp sore_util.cpp sore_vbo.cpp)
 
 set(SORE_HEADERS sore.h sore_2dprimitives.h sore_2dscenegraph.h
   sore_allgl.h sore_defines.h sore_fileio.h sore_font.h
@@ -33,8 +33,9 @@ set(SORE_HEADERS sore.h sore_2dprimitives.h sore_2dscenegraph.h
   sore_material.h sore_math.h math/sore_vector2.h math/sore_vector3.h
   math/sore_vector4.h math/sore_matrix4x4.h sore_network.h
   sore_profiler.h sore_renderer.h sore_renderer2d.h sore_resource.h
-  sore_screen.h sore_screeninfo.h sore_settings.h sore_shaders.h
-  sore_task.h sore_texture.h sore_timing.h sore_util.h sore_vbo.h)
+  sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
+  sore_settings.h sore_shaders.h sore_task.h sore_texture.h
+  sore_timing.h sore_util.h sore_vbo.h)
 
 IF(UNIX)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp sore_timing_linux.cpp)
