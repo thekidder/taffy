@@ -77,8 +77,8 @@ namespace SORE_Graphics
 								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 								textureStack.begin()->second->Bind();
 								all.BeginDraw();
-								all.DrawElements(2, 0);
-								all.DrawElements(2, 2);
+								//all.DrawElements(2, 0);
+								//all.DrawElements(2, 2);
 								all.DrawAll();
 								all.EndDraw();
 
