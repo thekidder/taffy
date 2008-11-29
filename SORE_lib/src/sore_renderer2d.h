@@ -19,6 +19,14 @@
 */
 namespace SORE_Graphics
 {
+	struct vbo_tex_order
+	{
+	vbo_tex_order(const SORE_Resource::Texture2D* t, unsigned int s, unsigned int l) : tex(t), triStart(s), triLen(l) {}
+		const SORE_Resource::Texture2D* tex;
+		unsigned int triStart;
+		unsigned int triLen;
+	};
+
 				class Renderer2D : public SORE_Graphics::IRenderer
 				{
 				public:
@@ -45,10 +53,10 @@ namespace SORE_Graphics
 								SORE_Graphics::GLSLShader* shad;
 								//std::vector<VBO> batches;
 								VBO all;
-								std::vector<std::pair<unsigned int, const SORE_Resource::Texture2D*> > textureStack; 
+								std::vector<vbo_tex_order > textureStack; 
 				};
 				
-				inline int TextureSort(GeometryChunk* one, GeometryChunk* two);
-				bool operator<(std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> one, std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> two);
+				inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two);
+				bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one, std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
 }
 #endif

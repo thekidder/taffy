@@ -199,6 +199,11 @@ namespace SORE_Math
 			{
 				return &value[0];
 			}
+
+			const T* GetData() const
+			{
+				return &value[0];
+			}
 			
 		protected:
 			T value[16];

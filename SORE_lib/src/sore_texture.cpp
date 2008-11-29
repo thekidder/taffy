@@ -109,21 +109,21 @@ void SORE_Resource::Texture2D::LoadTGA(const char* filename)
 	
 	switch(bpp)
 	{
-		case 24:
-			type = GL_RGB;
-			break;
-		case 32:
-			type = GL_RGBA;
-			break;
-		default:
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unrecognized image type - only supports 24bit or 32bit (uncompressed) TGAs");
-			delete[] imgData;
-			return;
+	case 24:
+		type = GL_RGB;
+		break;
+	case 32:
+		type = GL_RGBA;
+		break;
+	default:
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unrecognized image type - only supports 24bit or 32bit (uncompressed) TGAs");
+		delete[] imgData;
+		return;
 	}
 	
 	glTexImage2D( GL_TEXTURE_2D, 0, type, width,
 								height, 0, type,
-				GL_UNSIGNED_BYTE, imgData);
+								GL_UNSIGNED_BYTE, imgData);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

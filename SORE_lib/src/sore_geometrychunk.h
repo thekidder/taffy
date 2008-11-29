@@ -62,8 +62,8 @@ namespace SORE_Graphics
 	const int SORT_EQUAL   =  0;
 	const int SORT_GREATER =  1;
 
-	typedef boost::function<int (GeometryChunk*, GeometryChunk*)> geometry_sort;
+	//typedef boost::function<int (GeometryChunk*, GeometryChunk*)> geometry_sort;
 
-	inline int NullGeometrySort(SORE_Graphics::GeometryChunk* one, SORE_Graphics::GeometryChunk* two); //sorts by ptr
+	//inline int NullGeometrySort(SORE_Graphics::GeometryChunk* one, SORE_Graphics::GeometryChunk* two); //sorts by ptr
 }
 #endif
