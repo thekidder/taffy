@@ -3,7 +3,7 @@
   Flatland-inspired RTS project code. Created by Adam Kidder.
   Licensing currently undecided; view as proprietary code.
 */
-//$Id: geometrychunk.cpp 23 2008-10-08 02:14:59Z me $
+//$Id$
 
 #include <fstream>
 
@@ -25,8 +25,6 @@ namespace SORE_Graphics
 
 	void GeometryChunk::setup(SORE_Resource::Texture2D* texture, float left, float right, float top, float bottom)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("creating gc - tex: %d, l %f, r %f, t %f, b %f") % 
-							 texture->GetHandle() % left % right % top % bottom);
 		vertices = new float[12];
 		texCoords = new float[8];
 		indices = new unsigned short[6];

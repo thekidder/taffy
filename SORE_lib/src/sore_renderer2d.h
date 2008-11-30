@@ -3,7 +3,7 @@
   Flatland-inspired RTS project code. Created by Adam Kidder.
   Licensing currently undecided; view as proprietary code.
 */
-//$Id: dimensionalityrenderer.h 23 2008-10-08 02:14:59Z me $
+//$Id$
 
 #ifndef DIMENSIONALITYRENDERER_H
 #define DIMENSIONALITYRENDERER_H

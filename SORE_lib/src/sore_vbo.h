@@ -3,7 +3,7 @@ Untitled Project
 Flatland-inspired RTS project code. Created by Adam Kidder.
 Licensing currently undecided; view as proprietary code.
 */
-//$Id: vbo.h 23 2008-10-08 02:14:59Z me $
+//$Id$
 
 #ifndef DYNAMICVBO_H
 #define DYNAMICVBO_H

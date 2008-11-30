@@ -3,7 +3,7 @@
   Flatland-inspired RTS project code. Created by Adam Kidder.
   Licensing currently undecided; view as proprietary code.
 */
-//$Id: dimensionalityrenderer.cpp 23 2008-10-08 02:14:59Z me $
+//$Id$
 
 #include "sore_renderer2d.h"
 

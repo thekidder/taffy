@@ -1,4 +1,4 @@
-// $Id: sore_geometry.h 288 2008-07-13 17:14:36Z thekidder $
+// $Id$
 
 #ifndef _SORE_GEOMETRY_H_
 #define _SORE_GEOMETRY_H_
