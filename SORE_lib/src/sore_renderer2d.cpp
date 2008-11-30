@@ -55,11 +55,11 @@ namespace SORE_Graphics
 			{
 				if(textureStack.size()>0)
 				{
-					ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Modifying len of previous entry: %d") % (numIndices/3));
+					//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Modifying len of previous entry: %d") % (numIndices/3));
 					textureStack.back().triLen = numIndices/3;
 				}
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Adding entry to textureStack: s %d tex %d x %f")
-									 % (numIndices/3) % (it->second->GetTexture()->GetHandle()) % it->first->GetData()[12]);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Adding entry to textureStack: s %d tex %d x %f")
+				//					 % (numIndices/3) % (it->second->GetTexture()->GetHandle()) % it->first->GetData()[12]);
 				textureStack.push_back(
 					vbo_tex_order(it->second->GetTexture(), numIndices/3, 0));
 				numIndices = 0;
@@ -67,7 +67,7 @@ namespace SORE_Graphics
 			numIndices+=it->second->NumIndices();
 			totalIndices+=it->second->NumIndices();
 		}
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Modifying len of previous entry: %d") % (totalIndices/3 - textureStack.back().triStart));
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Modifying len of previous entry: %d") % (totalIndices/3 - textureStack.back().triStart));
 		textureStack.back().triLen = totalIndices/3 - textureStack.back().triStart;
 
 		all.Build();
@@ -88,7 +88,7 @@ namespace SORE_Graphics
 	
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//Build();
+		Build();
 		if(all.numIndices())
 		{
 			shad->Bind();

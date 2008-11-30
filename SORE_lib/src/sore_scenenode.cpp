@@ -51,6 +51,12 @@ namespace SORE_Graphics
     InvalidateCache();
   }
 
+	void SceneNode::SetIdentity()
+	{
+		mat.SetIdentity();
+		InvalidateCache();
+	}
+
   void SceneNode::AddChild(shared_ptr< SceneNode > c)
   {
     children.push_back(c);

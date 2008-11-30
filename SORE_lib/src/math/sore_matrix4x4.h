@@ -46,6 +46,13 @@ namespace SORE_Math
 				Matrix4<T> translate = Matrix4<T>::GetTranslation(x, y, z);
 				*this *= translate;
 			}
+
+			void SetPosition(T x, T y, T z)
+			{
+				value[12] = x;
+				value[13] = y;
+				value[14] = z;
+			}
 			
 			void Scale(T x, T y, T z)
 			{

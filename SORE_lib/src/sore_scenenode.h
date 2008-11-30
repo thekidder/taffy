@@ -37,6 +37,7 @@ namespace SORE_Graphics
 		
     void Translate(float x, float y, float z);
     void Rotate(float rad, unsigned int axis);
+		void SetIdentity();
 		
     void UpdateCache(SORE_Math::Matrix4<float>& view);
     void AddToRenderList(render_list& list);
