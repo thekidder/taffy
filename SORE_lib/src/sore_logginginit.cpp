@@ -24,7 +24,7 @@
 #include "sore_logginginit.h"
 
 const unsigned int SORE_MAJOR = 0;
-const unsigned int SORE_MINOR = 2;
+const unsigned int SORE_MINOR = 3;
 
 const char*        SORE_BRANCH = "trunk"; //ex tag 1.2.1, branch 1.2, trunk, etc
 
