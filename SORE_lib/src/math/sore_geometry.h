@@ -3,7 +3,7 @@
 #ifndef _SORE_GEOMETRY_H_
 #define _SORE_GEOMETRY_H_
 
-#include "math/sore_vector2.h"
+#include "sore_vector2.h"
 
 namespace SORE_Math
 {
@@ -13,7 +13,7 @@ namespace SORE_Math
 			Vector2<T> topLeft, bottomRight;
 			Rect(Vector2<T> one, Vector2<T> two)
 			{
-				if(one.x<two.x)
+				if(one[0]<two[0])
 				{
 					topLeft = one;
 					bottomRight = two;
@@ -23,8 +23,8 @@ namespace SORE_Math
 					topLeft = two;
 					bottomRight = one;
 				}
-				assert(one.x!=two.x || one.y!=two.y);
-				assert(one.y<two.y);
+				assert(one[0]!=two[0] || one[1]!=two[1]);
+				assert(one[1]<two[1]);
 			}
 		Rect() : topLeft(static_cast<T>(0),static_cast<T>(0)), bottomRight(static_cast<T>(1),static_cast<T>(1))
 			{}

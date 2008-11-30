@@ -13,6 +13,7 @@ Licensing currently undecided; view as proprietary code.
 #include <map>
 #include "sore_material.h"
 #include "math/sore_matrix4x4.h"
+#include "math/sore_geometry.h"
 
 /**
    @author Adam Kidder <thekidder@gmail.com>
@@ -23,6 +24,7 @@ namespace SORE_Graphics
   {
   public:
     GeometryChunk(SORE_Resource::Texture2D* texture, float left, float right, float top, float bottom); //create sprite
+		GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds); //create sprite
     GeometryChunk();
     ~GeometryChunk();
 		
@@ -41,6 +43,8 @@ namespace SORE_Graphics
 
   protected:
   private:
+		void setup(SORE_Resource::Texture2D* texture, float left, float right, float top, float bottom);
+
     //geometry
     float* vertices;
     float* texCoords;
