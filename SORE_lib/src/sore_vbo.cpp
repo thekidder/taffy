@@ -182,4 +182,9 @@ namespace SORE_Graphics
 		colors.clear();
 		indices.clear();
 	}
+
+	unsigned int VBO::numIndices() const
+	{
+		return indices.size();
+	}
 }

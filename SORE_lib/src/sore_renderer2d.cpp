@@ -42,6 +42,8 @@ namespace SORE_Graphics
 		all.Clear();
 		textureStack.clear();
 		render_list geometry = geometryCallback();
+		if(!geometry.size())
+			return;
 		std::sort(geometry.begin(), geometry.end(), &GeometrySort);
 		render_list::iterator it;
 		unsigned int numIndices = 0, totalIndices = 0;
@@ -85,20 +87,20 @@ namespace SORE_Graphics
 		}
 	
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	
-		//Build();
-
-		shad->Bind();
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		textureStack.begin()->tex->Bind();
-		all.BeginDraw();
-		for(std::vector<vbo_tex_order>::iterator it=textureStack.begin();it!=textureStack.end();++it)
+		//Build();
+		if(all.numIndices())
 		{
-			it->tex->Bind();
-			all.DrawElements(it->triLen, it->triStart);
+			shad->Bind();
+			textureStack.begin()->tex->Bind();
+			all.BeginDraw();
+			for(std::vector<vbo_tex_order>::iterator it=textureStack.begin();it!=textureStack.end();++it)
+			{
+				it->tex->Bind();
+				all.DrawElements(it->triLen, it->triStart);
+			}
+			all.EndDraw();
 		}
-		all.EndDraw();
-
 		static int frames = 0;
 		static int T0 = SORE_Timing::GetGlobalTicks();
 		static float fps;

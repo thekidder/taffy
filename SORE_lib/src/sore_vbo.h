@@ -31,6 +31,7 @@ namespace SORE_Graphics
     void DrawAll();
 		void DrawElements(unsigned int numTris, unsigned short triOffset);
 		void EndDraw();
+		unsigned int numIndices() const;
   private:
     GLuint vbo, vboIndices, vboNormals, vboTexCoords, vboColors;
 		
