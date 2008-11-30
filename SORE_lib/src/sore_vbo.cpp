@@ -71,15 +71,11 @@ namespace SORE_Graphics
 			for(unsigned int i=0;i<numVertices;++i)
 			{
 				SORE_Math::Vector4<float> pos(v[i*3], v[i*3+1],v[i*3+2], 1.0f);
-			
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("adding vertex (pre-transform) (%f, %f, %f)") % pos[0] % pos[1] % pos[2]);
 
 				pos = *transform * pos;
 				vertices.push_back(pos[0]);
 				vertices.push_back(pos[1]);
 				vertices.push_back(pos[2]);
-
-				ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("adding vertex (%f, %f, %f)") % pos[0] % pos[1] % pos[2]);
 			}
 		}
 	
