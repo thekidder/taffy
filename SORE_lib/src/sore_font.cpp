@@ -36,6 +36,7 @@ SORE_Font::Font::~ Font()
 std::string SORE_Font::Font::ProcessFilename(std::string file)
 {
   ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "in ProcessFilename");
+	return file;
 }
 
 void SORE_Font::Font::Load()
