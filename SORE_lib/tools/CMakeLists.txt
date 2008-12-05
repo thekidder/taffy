@@ -1,0 +1,8 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+IF(UNIX)
+  ADD_CUSTOM_TARGET(svnversion_sore ALL ./svn_update.sh WORKING_DIRECTORY ${SORE_lib_SOURCE_DIR}/tools/)
+ENDIF(UNIX)
+IF(WIN32)
+  ADD_CUSTOM_TARGET(svnversion_sore ALL ./svn_update.bat)
+ENDIF(WIN32)
