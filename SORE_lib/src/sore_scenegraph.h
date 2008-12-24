@@ -22,13 +22,15 @@ namespace SORE_Graphics
     SceneGraph();
     ~SceneGraph();
 		
-    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, SORE_Math::Vector3<float> pos, shared_ptr<SceneNode> parent);
-    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, SORE_Math::Vector3<float> pos);
+    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, shared_ptr<SceneNode> parent, SORE_Math::Vector3<float> pos=defaultPos);
+    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, SORE_Math::Vector3<float> pos=defaultPos);
 		
     render_list GetRenderList();
     SORE_Math::Matrix4<float>& GetViewMatrix();
   protected:
   private:
+		static SORE_Math::Vector3<float> defaultPos;;
+
     shared_ptr<SceneNode> parent;
     //std::vector<GeometryChunk*> flatList;
     SORE_Math::Matrix4<float> view;

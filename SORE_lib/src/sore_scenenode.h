@@ -35,6 +35,8 @@ namespace SORE_Graphics
 		
     const SORE_Math::Matrix4<float>& GetTransform() const;
 		
+		void SetGeometry(GeometryChunk* g);
+
     void Translate(float x, float y, float z);
     void Rotate(float rad, unsigned int axis);
 		void SetIdentity();
