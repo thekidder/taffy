@@ -22,60 +22,27 @@
 #ifndef  __SORE_RENDERER__
 #define  __SORE_RENDERER__
 
-#include "sore_2dprimitives.h"
-#include "sore_font.h"
-#include "sore_timing.h"
-#include "sore_2dscenegraph.h"
 #include "sore_screeninfo.h"
-#include "sore_texture.h"
 
 namespace SORE_Graphics
 {
-  typedef unsigned int gc_id;
+	typedef unsigned int gc_id;
 	
-  class IRenderer
-  {
-  public:
-    IRenderer() {}
-    virtual ~IRenderer() {}
+	class IRenderer
+	{
+	public:
+		IRenderer() {}
+		virtual ~IRenderer() {}
 			
-    virtual void Render() = 0;
-    void SetScreenInfo(ScreenInfo _screen);
-    void SetProjectionInfo(ProjectionInfo _proj);
-  protected:
-    virtual void OnScreenChange() {}
-    virtual void OnProjectionChange() {}
-    ScreenInfo screen;
-    ProjectionInfo proj;
-  };
-	
-  /*  class Renderer2D : public IRenderer
-  {
-  public:
-    Renderer2D(SORE_Resource::ResourcePool* _rm, SceneGraph2D* _scene);
-    ~Renderer2D();
-			
-    //gc_id AddRenderable(IRenderable gc);
-    //IRenderable* GeometryChunkPtr(gc_id id);
-    //void RemoveGeometryChunk(gc_id gc);
-    void SetSpriteList(std::vector<Sprite2D*> s);
-			
-    void Render();
-  protected:
-    void RenderSprite(Sprite2D* s);
-    void OnScreenChange();
-			
-    //void CleanupFBO();
-    //void SetupFBO();
-    //std::map<gc_id, IRenderable> geometry;
-    //std::list<gc_id> unusedIds;
-    std::vector<Sprite2D*> sprites;
-    SceneGraph2D* scene;
-    Material* currMaterial;
-    SORE_Resource::ResourcePool* rm;
-			
-    SORE_Font::Font* printFPS;
-    };*/
+		virtual void Render() = 0;
+		void SetScreenInfo(ScreenInfo _screen);
+		void SetProjectionInfo(ProjectionInfo _proj);
+	protected:
+		virtual void OnScreenChange() {}
+		virtual void OnProjectionChange() {}
+		ScreenInfo screen;
+		ProjectionInfo proj;
+	};
 }
 
 #endif /*__SORE_RENDERER__*/

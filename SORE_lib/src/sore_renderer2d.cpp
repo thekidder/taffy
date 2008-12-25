@@ -133,7 +133,7 @@ namespace SORE_Graphics
 		geometryCallback = c;
 	}
 
-	void Renderer2D::SetCameraCallback(boost::function< SORE_Math::Matrix4 < float > & ( ) > c)
+	void Renderer2D::SetCameraCallback(boost::function<const SORE_Math::Matrix4 < float > & ( ) > c)
 	{
 		camera = c;
 	}
