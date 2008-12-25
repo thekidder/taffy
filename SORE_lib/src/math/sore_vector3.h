@@ -53,6 +53,16 @@ namespace SORE_Math
 				return value[index];
 			}
 
+			T operator[] (int index) const
+			{
+				if(index<0 || index>2)
+				{
+					assert("Index out of range");
+					return value[0];
+				}
+				return value[index];
+			}
+
 			T dot(Vector3<T>& v)
 			{
 				T temp = v[0]*value[0] + v[1]*value[1] + v[2]*value[2];
