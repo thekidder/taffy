@@ -47,6 +47,7 @@ namespace SORE_Graphics
 		std::sort(geometry.begin(), geometry.end(), &GeometrySort);
 		render_list::iterator it;
 		unsigned int numIndices = 0, totalIndices = 0;
+		//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Beginning geometry build"));
 		for(it=geometry.begin();it!=geometry.end();++it)
 		{
 			all.AddObject(it->second->Vertices(), it->second->Indices(), it->second->NumVertices(), 
@@ -58,10 +59,10 @@ namespace SORE_Graphics
 					//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Modifying len of previous entry: %d") % (numIndices/3));
 					textureStack.back().triLen = numIndices/3;
 				}
-				//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Adding entry to textureStack: s %d tex %d x %f")
-				//					 % (numIndices/3) % (it->second->GetTexture()->GetHandle()) % it->first->GetData()[12]);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Adding entry to textureStack: start %d tex %d")
+				//					 % (numIndices/3) % (it->second->GetTexture()->GetHandle()));
 				textureStack.push_back(
-					vbo_tex_order(it->second->GetTexture(), numIndices/3, 0));
+					vbo_tex_order(it->second->GetTexture(), totalIndices/3, 0));
 				numIndices = 0;
 			}
 			numIndices+=it->second->NumIndices();
