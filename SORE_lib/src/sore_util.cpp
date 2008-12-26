@@ -18,6 +18,12 @@ double SORE_Utility::getRandomMinMax( double dMin, double dMax )
 	return dMin + (dMax - dMin) * dRandNum;
 }
 
+int SORE_Utility::getRandomMinMax(int min, int max)
+{
+	int randNum = rand() / RAND_MAX;
+	return static_cast<int>((min + (max - min) * randNum)+0.5);
+}
+
 int SORE_Utility::GetFileExt(const char* filename, char* ext)
 {
 	size_t len = strlen(filename);

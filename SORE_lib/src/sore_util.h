@@ -14,8 +14,11 @@ namespace SORE_Utility
 {
 	typedef std::map<std::string, std::map<std::string, std::string> > settings_map;
 	int GetFileExt(const char* filename, char* ext); //returns 0 on success
+
 	double getRandomMinMax( double dMin, double fMax );
 	float getRandomMinMax( float fMin, float fMax );
+	int getRandomMinMax(int min, int max);
+
 	settings_map ParseIniFile(const char* file);
 	std::string TrimString(std::string toTrim);
 	std::vector<std::string> ParseList(std::string list);
