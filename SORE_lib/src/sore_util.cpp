@@ -20,7 +20,7 @@ double SORE_Utility::getRandomMinMax( double dMin, double dMax )
 
 int SORE_Utility::getRandomMinMax(int min, int max)
 {
-	int randNum = rand() / RAND_MAX;
+	double randNum = (double)rand() / RAND_MAX;
 	return static_cast<int>((min + (max - min) * randNum)+0.5);
 }
 
