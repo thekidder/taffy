@@ -226,20 +226,26 @@ std::string SORE_Font::FontPaths::GetFontPath(std::string name)
   SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(full.c_str());
 	
   if(fontObj==0)
-    {
-      std::vector<std::string>::iterator it;
-      for(it=fontPaths.begin();it<fontPaths.end();it++)
 	{
-	  full = *it;
-	  full += name;
-	  fontObj = SORE_FileIO::Open(full.c_str());
-	  if(fontObj!=0)
+		std::vector<std::string>::iterator it;
+		for(it=fontPaths.begin();it<fontPaths.end();it++)
+		{
+			full = *it;
+			full += name;
+			fontObj = SORE_FileIO::Open(full.c_str());
+			if(fontObj!=0)
 	    {
 	      break;
 	    }
-	  fontObj = 0;
+			fontObj = 0;
+		}
 	}
-    }
   SORE_FileIO::Close(fontObj);
-  return full;
+	if(fontObj!=0)
+		return full;
+	else
+	{
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not find font with name %s") % name);
+		return "";
+	}
 }
