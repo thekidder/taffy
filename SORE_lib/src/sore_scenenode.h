@@ -32,7 +32,8 @@ namespace SORE_Graphics
     const GeometryChunk* GetChunk() const;
     const std::vector<shared_ptr<SceneNode> >& GetChildren() const;
     void AddChild(shared_ptr<SceneNode> c);
-		
+		void RemoveChild(shared_ptr<SceneNode> c);
+
     const SORE_Math::Matrix4<float>& GetTransform() const;
 		
 		void SetGeometry(GeometryChunk* g);
@@ -43,6 +44,8 @@ namespace SORE_Graphics
 		
     void UpdateCache(SORE_Math::Matrix4<float>& view);
     void AddToRenderList(render_list& list);
+
+		weak_ptr<SceneNode> GetParent();
   protected:
     void InvalidateCache();
   private:

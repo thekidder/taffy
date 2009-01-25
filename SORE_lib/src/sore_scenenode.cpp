@@ -22,6 +22,18 @@ namespace SORE_Graphics
 	{
 	}
 
+	void SceneNode::RemoveChild(shared_ptr<SceneNode> c)
+	{
+		std::vector<shared_ptr<SceneNode> >::iterator it = find(children.begin(), children.end(), c);
+		if(it != children.end())
+			children.erase(it);
+	}
+
+	weak_ptr<SceneNode> SceneNode::GetParent()
+	{
+		return parent;
+	}
+
 	const GeometryChunk * SceneNode::GetChunk() const
 	{
 		return geometry;
