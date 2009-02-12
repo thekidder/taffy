@@ -44,7 +44,7 @@ IF(UNIX)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp sore_timing_linux.cpp ${INOTIFY})
 ENDIF(UNIX)
 IF(WIN32)
-SET(SORE_PLATFORM_SPECIFIC )
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp sore_timing_windows.cpp)
 ENDIF(WIN32)
 
 ADD_LIBRARY(sore_lib STATIC ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS})
