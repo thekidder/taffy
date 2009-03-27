@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007-2008 by Adam Kidder                                *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,8 +19,8 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_MATERIAL__
-#define  __SORE_MATERIAL__
+#ifndef  SORE_MATERIAL_H
+#define  SORE_MATERIAL_H
 
 #include "sore_resource.h"
 #include "sore_shaders.h"
@@ -56,4 +56,4 @@ namespace SORE_Graphics
     };
 }
 
-#endif /*__SORE_MATERIAL__*/
+#endif

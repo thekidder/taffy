@@ -1,8 +1,22 @@
-/*
-  Untitled Project
-  Flatland-inspired RTS project code. Created by Adam Kidder.
-  Licensing currently undecided; view as proprietary code.
-*/
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 //$Id$
 
 #include "sore_scenenode.h"
@@ -22,11 +36,12 @@ namespace SORE_Graphics
 	{
 	}
 
-	void SceneNode::RemoveChild(shared_ptr<SceneNode> c)
+	void SceneNode::RemoveChild(node_list::iterator it)
 	{
-		std::vector<shared_ptr<SceneNode> >::iterator it = find(children.begin(), children.end(), c);
-		if(it != children.end())
-			children.erase(it);
+		SceneNode* s = *it;
+		delete s;
+		*it = 0;
+		children.erase(it);
 	}
 
 	weak_ptr<SceneNode> SceneNode::GetParent()
@@ -39,7 +54,7 @@ namespace SORE_Graphics
 		return geometry;
 	}
 
-	const std::vector< shared_ptr<SceneNode> > & SceneNode::GetChildren() const
+	const node_list & SceneNode::GetChildren() const
 	{
 		return children;
 	}
@@ -72,38 +87,43 @@ namespace SORE_Graphics
 		InvalidateCache();
 	}
 
-	void SceneNode::AddChild(shared_ptr< SceneNode > c)
+	node_list::iterator SceneNode::AddChild(GeometryChunk* gc, SORE_Math::Vector3<float> pos)
 	{
-		children.push_back(c);
+		SceneNode* c = new SceneNode(gc);
+		c->Translate(pos[0], pos[1], pos[2]);
+		return children.insert(children.end(), c);
 	}
 
 	void SceneNode::InvalidateCache()
 	{
 		cacheUpdated = false;
-		for(std::vector<shared_ptr<SceneNode> >::iterator it=children.begin();it!=children.end();++it)
-			it->get()->InvalidateCache();
+		for(node_list::iterator it=children.begin();it!=children.end();++it)
+			(*it)->InvalidateCache();
 	}
 
-	void SceneNode::UpdateCache(SORE_Math::Matrix4<float>& view)
+
+
+
+	void SceneNode::UpdateCache(SceneNode* parent)
   {
 		if(!cacheUpdated)
 		{
 			if(shared_ptr<SceneNode> p = parent.lock())
 			{
-				if(!p->cacheUpdated)
-					p->UpdateCache(view);
-				cachedAbsoluteTransform = p.get()->cachedAbsoluteTransform * mat;
-				cachedViewTransform     = p.get()->cachedViewTransform     * mat;
+				if(!parent->cacheUpdated)
+					ENGINE_LOG(SORE_Logging::LVL_WARNING, 
+										 "Trying to update node with out-of-date parent");
+				
+				cachedAbsoluteTransform = parent->cachedAbsoluteTransform * mat;
 			}
 			else
 			{
 				//ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not get parent pointer for updating cached matrix");
-				cachedViewTransform = view * mat;
 			}
 			cacheUpdated = true;
 		}
-		for(std::vector<shared_ptr<SceneNode> >::iterator it=children.begin();it!=children.end();++it)
-			it->get()->UpdateCache(view);
+		for(node_list::iterator it=children.begin();it!=children.end();++it)
+			(*it)->UpdateCache(this);
 	}
 
 	void SceneNode::AddToRenderList(render_list & list)
@@ -112,7 +132,7 @@ namespace SORE_Graphics
 		{
 			list.push_back(std::make_pair(&cachedAbsoluteTransform, geometry));
 		}
-		for(std::vector<shared_ptr<SceneNode> >::iterator it=children.begin();it!=children.end();++it)
-			it->get()->AddToRenderList(list);
+		for(node_list::iterator it=children.begin();it!=children.end();++it)
+			(*it)->AddToRenderList(list);
 	}
 }

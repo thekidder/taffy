@@ -215,6 +215,8 @@ namespace SORE_Math
 	{
 		return v1*num;
 	}
+
+	const Vector3<float> zeroVector3f(0.0f, 0.0f, 0.0f);
 }
 
 #endif

@@ -1,27 +1,34 @@
-// $Id$
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+//$Id$
 
-#ifndef  __SORE_H__
-#define  __SORE_H__
+#ifndef SORE_GRAPHICS_H
+#define SORE_GRAPHICS_H
 
-#include "sore_screen.h"
-#include "sore_font.h"
 #include "sore_logger.h"
-#include "sore_input.h"
+#include "sore_screeninfo.h"
 
 namespace SORE_Graphics
 {
-	void SetScreen(SORE_Kernel::Screen* _r);
-	
-	void ScreenAlignedQuad();
-	
-	void PushProjection(SORE_Graphics::ProjectionInfo& info);
-	void PopProjection();
-	
-	void PushOverlay();
-	void PopOverlay();
-	
-	int  GetHeight();
-	int  GetWidth();
+	void DrawFullscreenQuad(ProjectionInfo& proj);
+	void PrintGLErrors(unsigned int logLevel);
 }
 
-#endif /*__SORE_H__*/
+#endif

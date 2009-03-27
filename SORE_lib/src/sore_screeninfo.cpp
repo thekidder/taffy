@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,18 +21,21 @@
 
 #include "sore_screeninfo.h"
 
-SORE_Math::Vector2<float> SORE_Graphics::ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
+namespace SORE_Graphics
 {
-	SORE_Math::Vector2<float> projected;
-	projected[0] = proj.left + (proj.right-proj.left)*(double(pos[0])/double(screen.width));
-	projected[1] = proj.bottom + (proj.top-proj.bottom)*(double(pos[1])/double(screen.height));
-	return projected;
-}
+	SORE_Math::Vector2<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
+	{
+		SORE_Math::Vector2<float> projected;
+		projected[0] = proj.left + (proj.right-proj.left)*(static_cast<float>(pos[0])/static_cast<float>(screen.width));
+		projected[1] = proj.bottom + (proj.top-proj.bottom)*(static_cast<float>(pos[1])/static_cast<float>(screen.height));
+		return projected;
+	}
 
-SORE_Math::Vector2<int> SORE_Graphics::ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos)
-{
-	SORE_Math::Vector2<int> screenPos;
-	screenPos[0] = static_cast<int>((screen.width )*(pos[0]/(proj.right-proj.left)));
-	screenPos[1] = static_cast<int>((screen.height)*(pos[1]/(proj.top-proj.bottom)));
-	return screenPos;
+	SORE_Math::Vector2<int> ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos)
+	{
+		SORE_Math::Vector2<int> screenPos;
+		screenPos[0] = static_cast<int>((screen.width )*(pos[0]/(proj.right-proj.left)));
+		screenPos[1] = static_cast<int>((screen.height)*(pos[1]/(proj.top-proj.bottom)));
+		return screenPos;
+	}
 }

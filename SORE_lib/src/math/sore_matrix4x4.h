@@ -71,7 +71,7 @@ namespace SORE_Math
 				}
 			}
 			
-			Matrix4<T>& operator*=(Matrix4<T> m)
+			Matrix4<T>& operator*=(const Matrix4<T>& m)
 			{
 				T newValues[16];
 				for(unsigned int c=0;c<4;++c)

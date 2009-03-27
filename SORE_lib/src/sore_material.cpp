@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

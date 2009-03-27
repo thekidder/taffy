@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,14 +19,17 @@
  ***************************************************************************/
  // $Id$
 
-#include "sore_fileio.h"
-#include <windows.h>
+#pragma warning(disable : 4995)
 
+#include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <string.h>
 #include <psapi.h>
 #include <strsafe.h>
+
+#include "sore_fileio.h"
+#include "sore_logger.h"
 
 namespace SORE_FileIO
 {
@@ -148,7 +151,7 @@ namespace SORE_FileIO
 	class WindowsFileWatch : public SORE_Kernel::Task
 	{
 		public:
-			WindowsFileWatch(SORE_Kernel::GameKernel* gk) : Task(gk)
+			WindowsFileWatch(SORE_Kernel::GameKernel* gk)
 			{
 				ENGINE_LOG(SORE_Logging::LVL_INFO, "Spawning file watch thread");
 				/*thread = CreateThread(NULL,

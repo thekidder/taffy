@@ -1,10 +1,33 @@
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 // $Id$
 
-#ifndef  __FONT_H__
-#define  __FONT_H__
+#ifndef  SORE_FONT_H
+#define  SORE_FONT_H
 
 #include "sore_allgl.h"
+#include "sore_geometrychunk.h"
 #include "sore_resource.h"
+#include "sore_texture.h"
+
+#include "math/sore_matrix4x4.h"
 
 //freetype
 #include <ft2build.h>
@@ -32,34 +55,38 @@ namespace SORE_Font
   private:
     static std::vector<std::string> fontPaths;
   };
+
+	struct CharInfo
+	{
+		SORE_Resource::Texture2D* tex;
+		SORE_Graphics::GeometryChunk* gc;
+		SORE_Math::Matrix4<float> transform;
+		float advance;
+	};
   
   class Font : public SORE_Resource::Resource
-    {
-    public:
-      //pass height in pixels as a string
-      Font(std::string filename, std::string fHeight);
-      ~Font();
+	{
+	public:
+		Font(std::string filename);
+		~Font();
       
-      const char* Type() {return "Font";}
-      unsigned int Height() const;
+		const char* Type() {return "Font";}
+		bool GLContextDependent() const {return true;}
+
+		void LoadFace(unsigned int height);
+		const CharInfo& GetCharacter(unsigned int height, char c); 
+	protected:
+		//This loads our face, but no specific characters
+		void Load();
+	private:
+		void LoadCharacter(FT_Face& face, char ch, unsigned int h);
       
-      float Print(int x, int y, std::string str);
-      float Print(int x, int y, boost::format str);
-    protected:
-      std::string ProcessFilename(std::string file);
-      void Load();
-    private:
-      void MakeDisplayList(FT_Face& face, char ch);
-      
-      unsigned int height;
-      
-      GLuint*  textures;
-      GLuint   listBase;
-    };
-  
-  /*int         Print(font_ref fontIndex, int x, int y, const char* fmt, ...);
-    float       Print(font_ref fontIndex, int x, int y, char c);*/
-  
+		//(height, CharInfo[128])
+		std::map<unsigned int, CharInfo*> characters;
+		FT_Library library;
+		FT_Face face;
+		FT_Byte* fontInfo;
+	};
 }
 
-#endif //__FONT_H__
+#endif

@@ -17,7 +17,7 @@ namespace SORE_Utility
 {
 	int IInterpolater::open = 0;
 	
-	InterpolaterTask::InterpolaterTask(SORE_Kernel::GameKernel* gk) : Task(gk)
+	InterpolaterTask::InterpolaterTask()
 	{
 	}
 	

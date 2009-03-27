@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,8 +19,8 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_SETTINGS_H__
-#define  __SORE_SETTINGS_H__
+#ifndef  SORE_SETTINGS_H
+#define  SORE_SETTINGS_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
@@ -140,4 +140,4 @@ namespace SORE_Utility
 	};
 }
 
-#endif /*__SORE_SETTINGS_H__*/
+#endif

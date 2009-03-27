@@ -19,13 +19,17 @@
  ***************************************************************************/
 // $Id$ 
 
-#include "sore_timing.h"
-#include "sore_network.h"
 #include <cstdio>
+
+#include "../sore_logger.h"
+#include "../sore_timing.h"
+#include "sore_network_broadcaster.h"
+#include "sore_network_client.h"
+#include "sore_network_server.h"
 
 namespace SORE_Network
 {
-	Server::Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), sm(_sm), broadcaster(gk, ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL), lastTicks(0), seed(0)
+	Server::Server(SORE_Utility::SettingsManager& _sm) : sm(_sm), broadcaster(ENetAddress(), NULL), nextId(1), current(NULL), factory(NULL), lastTicks(0), seed(0)
 	{
 		ENetAddress address;
 		address.host = ENET_HOST_ANY;
@@ -173,7 +177,7 @@ namespace SORE_Network
 						channel = "0";
 					ReceiveBuffer raw(*event.packet);
 					ubyte dataHead = raw.GetUByte();
-					ReceiveBuffer msg(raw, dataHead);
+					ReceiveBuffer msg(raw, dataHead!=0);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{
@@ -465,7 +469,7 @@ namespace SORE_Network
 		header.Broadcast(server, 1, 0);
 	}
 	
-	void SORE_Network::Server::BroadcastGameDelta(Game* old, player_ref toExclude)
+	void Server::BroadcastGameDelta(Game* old, player_ref toExclude)
 	{
 		SendBuffer send;
 		send.AddUByte(DATATYPE_GAMESTATE_DELTA);

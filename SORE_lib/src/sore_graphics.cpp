@@ -1,110 +1,80 @@
-//
-// C++ Implementation: sore_graphics
-//
-// Description: 
-//
-//
-// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-// $Id$
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+//$Id$
 
-
-#include "sore_graphics.h"
-#include "sore_logger.h"
 #include "sore_allgl.h"
-#include <cassert>
+#include "sore_graphics.h"
 
 namespace SORE_Graphics
 {
-	SORE_Kernel::Screen* r;
-	//ProjectionInfo old;
-	void WindowToReal(int* window, int* real);
-}
-
-void SORE_Graphics::SetScreen(SORE_Kernel::Screen* _r) 
-{
-	r = _r;
-}
-
-void SORE_Graphics::PushProjection(SORE_Graphics::ProjectionInfo& info)
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	r->ChangeProjection(info);
-	glPopAttrib();
-	glLoadIdentity();
-}
-
-void SORE_Graphics::PopProjection()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-	//r->ChangeProjection(old);
-}
-
-void SORE_Graphics::PushOverlay()
-{
-	//old = r->GetProjection();
-	static SORE_Graphics::ProjectionInfo overlay;
-	overlay.type   = SORE_Graphics::ORTHO2D;
-	overlay.useScreenCoords = true;
-	PushProjection(overlay);
-}
-
-void SORE_Graphics::PopOverlay()
-{
-	PopProjection();
-}
-
-int SORE_Graphics::GetWidth()
-{
-	return r->GetScreen()->width;
-}
-
-int SORE_Graphics::GetHeight()
-{
-	return r->GetScreen()->height;
-}
-
-void SORE_Graphics::WindowToReal(int* window, int* real)
-{
-	GLint* viewport = r->GetViewport();
-	if(window[0]>viewport[2] || window[1]>viewport[3] || window[0]<0 || window[1]<0)
+	void DrawFullscreenQuad(ProjectionInfo& proj)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Viewport is inconsistent: (%d, %d, %d, %d) to (%d, %d)") % viewport[0] % viewport[1] % viewport[2] % viewport[3] % window[0] % window[1]);
-		return;
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(0.0f, 0.0f); 
+			glVertex3f(proj.left, proj.top, 0.0f);
+			glTexCoord2f(0.0f, 1.0f); 
+			glVertex3f(proj.left, proj.bottom, 0.0f);
+			glTexCoord2f(1.0f, 1.0f); 
+			glVertex3f(proj.right, proj.bottom, 0.0f);
+			glTexCoord2f(1.0f, 0.0f); 
+			glVertex3f(proj.right, proj.top, 0.0f);
+		}
+		glEnd();
 	}
-	real[0] = window[0];
-	real[1] = viewport[3]-window[1];
-}
 
-void SORE_Graphics::ScreenAlignedQuad()
-{
-	glMatrixMode (GL_MODELVIEW); 
-	glPushMatrix (); 
-	glLoadIdentity (); 
-	glMatrixMode (GL_PROJECTION); 
-	glPushMatrix (); 
-	glLoadIdentity ();
-	glBegin(GL_QUADS);
+	void PrintGLErrors(unsigned int logLevel)
 	{
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex3i(-1, -1, -1);
-		glTexCoord2f(0.0f, 1.0f);
-		glVertex3i(-1, 1, -1);
-		glTexCoord2f(1.0f, 1.0f);
-		glVertex3i(1, 1, -1);
-		glTexCoord2f(1.0f, 0.0f);
-		glVertex3i(1, -1, -1);
+		GLenum error;
+    while((error=glGetError())!=GL_NO_ERROR)
+		{
+			switch(error)
+			{
+			case GL_INVALID_ENUM:
+				ENGINE_LOG(logLevel, "GL Error: invalid enum");
+				break;
+			case GL_INVALID_VALUE:
+				ENGINE_LOG(logLevel, "GL Error: invalid value");
+				break;
+			case GL_INVALID_OPERATION:
+				ENGINE_LOG(logLevel, "GL Error: invalid operation");
+				break;
+			case GL_STACK_OVERFLOW:
+				ENGINE_LOG(logLevel, "GL Error: stack overflow");
+				break;
+			case GL_STACK_UNDERFLOW:
+				ENGINE_LOG(logLevel, "GL Error: stack underflow");
+				break;
+			case GL_OUT_OF_MEMORY:
+				ENGINE_LOG(logLevel, "GL Error: out of memory");
+				break;
+			case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+				ENGINE_LOG(logLevel, "GL Error: invalid framebuffer operation");
+				break;
+			default:
+				ENGINE_LOG(logLevel, "GL Error: unknown error");
+				break;
+			}
+		}
+
 	}
-	glEnd();
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPopMatrix ();
+
 }

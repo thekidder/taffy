@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -34,10 +34,6 @@ namespace SORE_Utility
 	Datum::Datum(std::string _datum) : changed(false), datum(_datum)
 	{
 	}
-	
-	//Datum::Datum(Datum& _datum) :datum(_datum)
-	//{
-	//}
 	
 	Datum Datum::operator=(Datum& _datum)
 	{

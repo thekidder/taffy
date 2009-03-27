@@ -1,20 +1,46 @@
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_RESOURCE_H__
-#define  __SORE_RESOURCE_H__
+#ifndef  SORE_RESOURCE_H
+#define  SORE_RESOURCE_H
 
 #include <map>
 #include <vector>
 #include <string>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/functional/hash.hpp>
+
+#include "sore_input.h"
 #include "sore_logger.h"
 
 namespace SORE_Resource
 {
   class ResourcePool;
 	
+	//as a little bit of a hack, we will put the logic for reloading textures into ResourcePool
+	//to do this, we add a new field to Resource: GLContextDependent, which returns true if we 
+	//need to reload on GL context change
+
   class Resource
   {
   public:
@@ -28,10 +54,14 @@ namespace SORE_Resource
     static void SetRM(ResourcePool* _rm) {rm = _rm;}
 			
     virtual void Reload() {Load();}
+		virtual bool GLContextDependent() const {return false;}
   protected:
     virtual void Load() = 0;
     void OnNotify(std::string file);
-    void AddDependentFile(std::string file); //used for file notification - for example, a shader is made up of multiple files, we want to reload it if the shader files are changed
+
+		//used for file notification - for example, a shader is made up of multiple files, 
+		//we want to reload it if the shader files are changed
+    void AddDependentFile(std::string file);
     void SetFilename(std::string file);
     bool IsDependent(std::string file);
     std::string additionalInfo;
@@ -48,26 +78,31 @@ namespace SORE_Resource
     ~ResourcePool();
 			
     template<class T>
-      T* GetResource(std::string filename, std::string additionalInfo="")
-      {
-	std::size_t hash = string_hash(filename+additionalInfo);
-	if(resources.find(hash)==resources.end())
-	  {
-	    T* temp = new T(filename, additionalInfo);
-	    resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
-	    return temp;
-	  }
-	else
-	  {
-	    //ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Retrieved resource: %s") % filename);
-	    Resource* r = resources.find(hash)->second;
-	    T* resource = dynamic_cast<T*>(r);
-	    if(resource==NULL) ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not downcast resource for filename %s") % filename);
-	    return resource;
-	  }
-      }
+      T* GetResource(std::string filename)
+		{
+			std::size_t hash = string_hash(filename);
+			if(resources.find(hash)==resources.end())
+			{
+				T* temp = new T(filename);
+				resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
+				return temp;
+			}
+			else
+			{
+				Resource* r = resources.find(hash)->second;
+				T* resource = dynamic_cast<T*>(r);
+				if(resource==NULL) 
+					ENGINE_LOG(SORE_Logging::LVL_ERROR, 
+										 boost::format("Could not downcast resource for filename %s") 
+										 % filename);
+				return resource;
+			}
+		}
+		//searchs for r in resource map, then unloads it. returns true if it was unloaded, false if not found
+		bool UnloadResource(Resource* r);
 			
     void for_each(boost::function<void (Resource*)> func);
+		bool OnResize(SORE_Kernel::Event* e);
   protected:
     std::map<std::size_t, Resource*> resources;
   private:
@@ -75,4 +110,4 @@ namespace SORE_Resource
   };
 }
 
-#endif /*__SORE_RESOURCE_H__*/
+#endif 

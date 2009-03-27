@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,8 +19,10 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_SCREENINFO__
-#define  __SORE_SCREENINFO__
+#ifndef  SORE_SCREENINFO_H
+#define  SORE_SCREENINFO_H
+
+#include <boost/function.hpp>
 
 #include "sore_math.h"
 
@@ -50,6 +52,8 @@ namespace SORE_Graphics
 	
 	SORE_Math::Vector2<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos);
 	SORE_Math::Vector2<int>   ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos);
+
+	typedef boost::function<ProjectionInfo (ScreenInfo)> proj_callback;
 }
 
-#endif /*__SORE_SCREENINFO__*/
+#endif

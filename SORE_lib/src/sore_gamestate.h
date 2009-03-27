@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,218 +17,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-// $Id$
+//$Id$
 
-#ifndef  __SORE_GAMESTATE__
-#define  __SORE_GAMESTATE__
 
-#include <vector>
-#include <string>
-#include <map>
-#ifdef _WIN32
-#include <windows.h>
-#endif
-#include <enet/enet.h>
+#ifndef SORE_GAMESTATE_H
+#define SORE_GAMESTATE_H
 
-#include "sore_input.h"
+#include "sore_task.h"
 
-//Type definitions for network transmission
-typedef   signed char     sbyte;  //signed 8bit value
-typedef unsigned char     ubyte;  //unsigned 8bit value
-typedef   signed short    sbyte2; //signed 16bit value
-typedef unsigned short    ubyte2; //unsigned 16bit value
-typedef   signed int      sbyte4; //signed 32bit value
-typedef unsigned int      ubyte4; //unsigned 32bit value
-
-#ifdef _WIN32
-typedef   signed __int64  sbyte8; //signed 64bit value
-typedef unsigned __int64  ubyte8; //unsigned 64bit value
-#else
-typedef           int64_t sbyte8; //signed 64bit value
-typedef          uint64_t ubyte8; //unsigned 64bit value
-#endif
-
-//single and double precision floats
-typedef            float  float1;
-typedef            double float2;
-
-namespace SORE_Network
+namespace SORE_Game
 {
-	const ubyte STATE_CONNECTING    = 0;
-	const ubyte STATE_CONNECTED     = 1;
-	const ubyte STATE_DISCONNECTING = 2;
-	const ubyte STATE_OBSERVER      = 3;
-	const ubyte STATE_PLAYER        = 4;
-	
-	const ubyte CHATMASK_ALL        = 0;
-	const ubyte CHATMASK_TEAM       = 1;
-	const ubyte CHATMASK_WHISPER    = 2;
+	class GamestateManager;
 
-	typedef std::vector<ubyte> net_buffer;
-	
-	struct player;
-	
-	typedef std::map<ubyte, player> player_list;
-	typedef player_list::iterator player_ref;
-	
-	struct player
+	class Gamestate : public SORE_Kernel::Task
 	{
-		player() : name("unnamed"), playerState(STATE_CONNECTING), team(0), player_ip(0), peer(NULL), ticksToKick(0) {player_ip_str[0]='\0';}
-		std::string name;
-		ubyte playerState;
-		ubyte team; //implementation defined
-		
-		//network info
-		enet_uint32 player_ip;
-		char player_ip_str[16];
-		
-		//only used on server
-		player_ref id_iter; //retrieved from server
-		ENetPeer* peer;
-		unsigned int ticksToKick;
-	};
-	
-	ubyte8 pack754(long double f, unsigned bits, unsigned expbits);
-	long double unpack754(ubyte8 i, unsigned bits, unsigned expbits);
-	
-	ubyte8 htonll(ubyte8 h);
-	ubyte8 ntohll(ubyte8 n);
-	
-	class ReceiveBuffer
-	{
-		public:
-			ReceiveBuffer(ENetPacket& packet);
-			ReceiveBuffer(ReceiveBuffer& b, bool compressed = false);
-			~ReceiveBuffer();
-			
-			//primitives
-			ubyte  GetUByte();
-			sbyte  GetByte();
-			ubyte2 GetUByte2();
-			sbyte2 GetByte2();
-			ubyte4 GetUByte4();
-			sbyte4 GetByte4();
-			ubyte8 GetUByte8();
-			sbyte8 GetByte8();
-			 
-			 //conversions needed
-			std::string GetString(size_t len); //string with given length
-			std::string GetString1(); //string with one-byte (unsigned) preceding length
-			std::string GetString2(); //string with two-byte (unsigned) preceding length
-			
-			double GetFloat(size_t numBytes);
-			
-			size_t Remaining() const;
-			
-		private:
-			ubyte* data;
-			std::vector<ubyte> ownData;
-			size_t length;
-			size_t remaining;
-	};
-	
-	class SendBuffer
-	{
-		public:
-			SendBuffer();
-			
-			void AddUByte (ubyte b);
-			void AddByte  (sbyte b);
-			
-			void AddUByte2(ubyte2 b);
-			void AddByte2 (sbyte2 b);
-			
-			void AddUByte4(ubyte4 b);
-			void AddByte4 (sbyte4 b);
-			
-			void AddUByte8(ubyte8 b);
-			void AddByte8 (sbyte8 b);
-			
-			void AddString(std::string str);
-			void AddString1(std::string str);
-			void AddString2(std::string str);
-			
-			void AddFloat(float1 f, size_t numBytes);
-			void AddFloat(float2 f, size_t numBytes);
-			
-			void AddFloat(float1 f); //default precision: 4 bytes
-			void AddFloat(float2 f); //default precision: 8 bytes
-			
-			ENetPacket* GetPacket(enet_uint32 flags);
-			unsigned int size() const;
-			void Send(ENetPeer* peer, enet_uint8 channelID, enet_uint32 flags);
-			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
-			void Clear();
-			
-			static unsigned int GetTotalBytes() { return totalBytesSent;}
-			static void         ResetTotalBytes() { totalBytesSent = 0.0; }
-			
-			SendBuffer& operator+=(SendBuffer& b);
-			
-			void Compress(SendBuffer& compressed); //compresses into argument
-		protected:
-			net_buffer buf;
-			
-			static unsigned int totalBytesSent;
-	};
-	
-	class Game;
-	
-	class GameInput
-	{
-		//TODO: Add some sort of method to transform real input -> GameInput. Should be flexible enough to allow for different settings, etc
-		public:
-			GameInput() {}
-					
-			virtual ~GameInput() {}
-			
-			virtual void Serialize(SendBuffer& send) = 0; //shove this into send
-			virtual void SetGame(Game* game) = 0;
-			virtual bool RequestUpdate() = 0;
-			
-		protected:
-			virtual void Deserialize(ReceiveBuffer& receive) = 0; //deserializes into this
-	};
-	
-	typedef unsigned int gamestate_diff;
-	
-	const gamestate_diff NO_DIFFERENCE        = 0;
-	const gamestate_diff DEVIATION_DIFFERENCE = 1;
-	const gamestate_diff SEVERE_DIFFERENCE    = 2;
-	
-	class Game
-	{
-		public:
-			virtual ~Game() {}
-			
-			//TODO: Gatestate needs a time signal - contained in GameInput, or separately to Simulate? also, non-player-influenced actions should be dealt with somehow...
-			
-			virtual void SimulateInput(ubyte player, GameInput* input) = 0;
-			virtual void SimulateTime(unsigned int ticks) = 0; //tick = 1/10000 sec
-			
-			virtual void Delta(Game* old, SendBuffer& send) = 0;
-			virtual void Serialize(SendBuffer& send) = 0;
-			virtual void Deserialize(ReceiveBuffer& receive) = 0; //capable of deserializing deltas/full transfers
-			virtual bool ForceCompleteUpdate() = 0;
-			
-			//server notification functions
-			virtual void OnPlayerStateChange(player_ref player, ubyte oldState) {}
-			
-			virtual gamestate_diff Difference(Game* old) = 0; //returns DEVIATION is this and old are different enough to warrant sending a correction packet, SEVERE if host must send complete gamestate, NO if no action needed
-			
-			virtual std::string NetworkVersion() = 0;
-	};
-	
-	class GameFactory
-	{
-		public:
-			virtual ~GameFactory() {}
-			
-			virtual Game* CreateGame() = 0;
-			virtual Game* CreateGame(Game* copy) = 0; //copy constructor
-			virtual GameInput* CreateGameInput() = 0;
-			virtual GameInput* CreateGameInput(ReceiveBuffer& receive) = 0;
+	public:
+		Gamestate(int ms = -1); //ms is the time interval for const tasks: -1 if a regular task
+
+		void Initialize(GamestateManager* o);
+		int GetInterval() const;
+	protected:
+		void PushState(Gamestate* newState);
+		//make sure to return directly after calling PopState
+		void PopState();
+
+		GamestateManager* owner;
+	private:
+		//called when we receive our GamestateManager pointer
+		virtual void Init() = 0;
+
+		int interval;
 	};
 }
 
-#endif /*__SORE_GAMESTATE__*/
+#endif

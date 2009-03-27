@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,25 +19,16 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_NETWORK_H__
-#define  __SORE_NETWORK_H__
+#ifndef SORE_NETWORK_CLIENT_H
+#define SORE_NETWORK_CLIENT_H
 
-#include "sore_task.h"
-#include "sore_settings.h"
-#include "sore_defines.h"
-#include "sore_gamestate.h"
+#include <boost/function.hpp>
 #include <enet/enet.h>
-#include <deque>
 
-/*
- * This subsystem is experimental. It provides a testing ground for networking
- * additions to the SORE library.
- * Current status: UDP broadcasting/listening works for discovering servers on LAN
- * Clients can connect/disconnect to servers, and change their handles
- * Code for packing/unpacking data into/from a network stream is present and should work
- * 
- */
-
+#include "../sore_task.h"
+#include "../sore_settings.h"
+#include "sore_network_buffers.h"
+#include "sore_network_game.h"
 
 namespace SORE_Network
 {
@@ -51,7 +42,6 @@ namespace SORE_Network
 	
 	//messages that affect current player
 	const ubyte DATATYPE_CHANGEHANDLE       = DATATYPE_START + 2;
-	//const ubyte DATATYPE_JOINSERVER         = DATATYPE_START + 3; //deprecated
 	const ubyte DATATYPE_STATUSCONNECTED    = DATATYPE_START + 3;
 	const ubyte DATATYPE_QUITSERVER         = DATATYPE_START + 4;
 	const ubyte DATATYPE_STATUSOBSERVE      = DATATYPE_START + 5;
@@ -68,96 +58,14 @@ namespace SORE_Network
 	const ubyte DATATYPE_CHANGESEED         = DATATYPE_START + 12;
 	const ubyte DATATYPE_NETWORKVERSION     = DATATYPE_START + 13;
 	
-	void InitNetwork();
-	
-	std::string PrintPlayer(player_ref player);
-	std::string PrintPlayer(std::pair<ubyte, player> p);
-	void PrintPlayers(unsigned int lvl, player_list playerList);
-	
 	const ubyte COMPRESSED = 1;
-	
-	class Server;
-	
-	class UDPBroadcaster : public SORE_Kernel::Task
-	{
-		public:
-			UDPBroadcaster(SORE_Kernel::GameKernel* gk, ENetAddress broadcastAddress, boost::function<ENetBuffer (Server*)> c);
-			~UDPBroadcaster();
-			
-			void SetBroadcastAddress(ENetAddress broadcastAddress);
-			void SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
-			void SetServer(Server* s);
-			
-			void Frame(int elapsed);
-			const char* GetName() const {return "UDP Broadcaster";}
-		protected:
-			ENetSocket broadcaster;
-			ENetAddress address;
-			SORE_Kernel::task_ref thisTask;
-			boost::function<ENetBuffer (Server*)> callback;
-			Server* serv;
-	};
-	
-	class Server : public SORE_Kernel::Task
-	{
-		public:
-			Server(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
-			~Server();
-			
-			void        SeedRNG(unsigned int s);
-			
-			void        SetBroadcastCallback(boost::function<ENetBuffer (Server*)> c);
-			void        SetGame(Game* g);
-			void        SetFactory(GameFactory* gf);
-			size_t      NumPlayers() const;
-			
-			//call this after gamestate is changed
-			void        PushGame(); //send out new gamestate: will determine to send full/deltas to each client 
-			
-			void        Frame(int elapsed);
-			const char* GetName() const {return "SORE Networking server task";}
-		protected:
-			//player methods
-			player_ref GetPlayerRef(ENetPeer* peer);
-			void       UpdatePlayer(player_ref toUpdate);
-			void       UpdateDisconnects();
-			
-			bool       VersionMatch(player_ref pos, std::string type, std::string client, std::string server);
-			void       Disconnect(player_ref player, std::string reason, unsigned int timeout); //timeout in ms
-			
-			//gamestate update methods
-			void       PrepareGameUpdate(SendBuffer& send);
-			void       SendGame(player_ref p);
-			void       SendGameDelta(Game* old, player_ref p);
-			void       BroadcastGameDelta(Game* old, player_ref toExclude);
-			void       BroadcastGame();
-			
-			//functions responsible for handling network messages
-			void       HandlePlayerChat(ReceiveBuffer& msg, player_ref& peer);
-			void       HandleGameTransfer(ReceiveBuffer& msg, player_ref& peer);
-			void       HandleGameDelta(ReceiveBuffer& msg, player_ref& peer);
-			
-			void       SetGameFactory(GameFactory* gf);
-			
-			ENetHost* server;
-			SORE_Utility::SettingsManager sm;
-			UDPBroadcaster broadcaster;
-			player_list playerList;
-			std::deque<ubyte> unusedIDs;
-			ubyte nextId;
-			Game* current;//, * last;
-			std::map<ubyte, Game*> clientStates;
-			GameFactory* factory;
-			unsigned int lastTicks;
-			ubyte4 seed;
-	};
-	
+
 	typedef std::map<ubyte4, std::pair<unsigned int, net_buffer> > server_list; //(host, (last seen, message) )
-	
+
 	class Client : public SORE_Kernel::Task
 	{
 		public:
-			Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm);
+			Client(SORE_Utility::SettingsManager& _sm);
 			~Client();
 			
 			server_list GetLANServers() const;
@@ -206,4 +114,4 @@ namespace SORE_Network
 	};
 }
 
-#endif /*__SORE_NETWORK_H__*/
+#endif

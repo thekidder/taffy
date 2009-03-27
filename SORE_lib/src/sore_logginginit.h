@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,12 +19,12 @@
  ***************************************************************************/
  // $Id$
  
-#ifndef  __SORE_LOGGINGINIT_H__
-#define  __SORE_LOGGINGINIT_H__
+#ifndef  SORE_LOGGINGINIT_H
+#define  SORE_LOGGINGINIT_H
 
 namespace SORE_Logging
 {
 	void LoggingStartMessages();
 }
 
-#endif /*__SORE_LOGGINGINIT_H__*/
+#endif

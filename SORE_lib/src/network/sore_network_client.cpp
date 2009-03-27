@@ -19,11 +19,14 @@
  ***************************************************************************/
 // $Id$ 
 
-#include "sore_network.h"
+#include "../sore_logger.h"
+#include "sore_network_common.h"
+#include "sore_network_buffers.h"
+#include "sore_network_client.h"
 
 namespace SORE_Network
 {
-	Client::Client(SORE_Kernel::GameKernel* gk, SORE_Utility::SettingsManager& _sm) : Task(gk), client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), last(NULL), input(NULL), factory(NULL), seed(0), bytesPerSec(0.0)
+	Client::Client(SORE_Utility::SettingsManager& _sm) : client(NULL), server(NULL), sm(_sm), myID(0), game(NULL), last(NULL), input(NULL), factory(NULL), seed(0), bytesPerSec(0.0)
 	{
 		client = enet_host_create(NULL, 2, 0, 0);
 		if(client == NULL)
@@ -224,7 +227,7 @@ namespace SORE_Network
 					ReceiveBuffer raw(*event.packet);
 					recv += raw.Remaining();
 					ubyte dataHead = raw.GetUByte();
-					ReceiveBuffer msg(raw, dataHead);
+					ReceiveBuffer msg(raw, dataHead!=0);
 					ubyte dataType = msg.GetUByte();
 					switch(dataType)
 					{

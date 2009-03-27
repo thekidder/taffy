@@ -1,12 +1,26 @@
-/*
-  Untitled Project
-  Flatland-inspired RTS project code. Created by Adam Kidder.
-  Licensing currently undecided; view as proprietary code.
-*/
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 //$Id$
 
-#ifndef SCENEGRAPH_H_
-#define SCENEGRAPH_H_
+#ifndef SORE_SCENEGRAPH_H
+#define SORE_SCENEGRAPH_H
 
 #include "sore_scenenode.h"
 #include "sore_geometrychunk.h"
@@ -22,18 +36,15 @@ namespace SORE_Graphics
     SceneGraph();
     ~SceneGraph();
 		
-    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, shared_ptr<SceneNode> parent, SORE_Math::Vector3<float> pos=defaultPos);
-    shared_ptr<SceneNode> AddNode(GeometryChunk* gc, SORE_Math::Vector3<float> pos=defaultPos);
+		node_list::iterator AddNode(GeometryChunk* gc = NULL, 
+																SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+
+		SceneNode& GetParent();
 		
     render_list GetRenderList();
-    SORE_Math::Matrix4<float>& GetViewMatrix();
   protected:
   private:
-		static SORE_Math::Vector3<float> defaultPos;;
-
-    shared_ptr<SceneNode> parent;
-    //std::vector<GeometryChunk*> flatList;
-    SORE_Math::Matrix4<float> view;
+    SceneNode* parent;
   };
 }
 #endif

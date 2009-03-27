@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,7 +26,7 @@
 const unsigned int SORE_MAJOR = 0;
 const unsigned int SORE_MINOR = 3;
 
-const char*        SORE_BRANCH = "trunk"; //ex tag 1.2.1, branch 1.2, trunk, etc
+const char*        SORE_BRANCH = "2d engine experimental branch"; //ex tag 1.2.1, branch 1.2, trunk, etc
 
 namespace SORE_Logging
 {

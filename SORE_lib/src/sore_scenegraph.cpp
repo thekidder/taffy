@@ -1,16 +1,28 @@
-/*
-  Untitled Project
-  Flatland-inspired RTS project code. Created by Adam Kidder.
-  Licensing currently undecided; view as proprietary code.
-*/
+/***************************************************************************
+ *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 //$Id$
 
 #include "sore_scenegraph.h"
 
 namespace SORE_Graphics
 {
-	SORE_Math::Vector3<float> SceneGraph::defaultPos = SORE_Math::Vector3<float>(0.0f, 0.0f, 0.0f);
-
 	SceneGraph::SceneGraph()
 	{
 		shared_ptr<SceneNode> p(new SceneNode(NULL));
@@ -23,7 +35,7 @@ namespace SORE_Graphics
 
 	render_list SceneGraph::GetRenderList()
 	{
-		parent->UpdateCache(view);
+		parent->UpdateCache(NULL);
 		render_list all;
 	
 		parent->AddToRenderList(all);
@@ -31,29 +43,13 @@ namespace SORE_Graphics
 		return all;
 	}
 
-	shared_ptr<SceneNode> SceneGraph::AddNode(GeometryChunk * gc, shared_ptr< SceneNode > parent, SORE_Math::Vector3< float > pos)
+	SceneNode& SceneGraph::GetParent()
 	{
-		shared_ptr<SceneNode> newNode(new SceneNode(parent, gc));
-		if(parent == NULL)
-			this->parent->AddChild(newNode);
-		else
-			parent->AddChild(newNode);
-		newNode->Translate(pos[0], pos[1], pos[2]);
-		return newNode;
+		return *parent;
 	}
 
-	shared_ptr< SceneNode > SceneGraph::AddNode(GeometryChunk * gc, SORE_Math::Vector3< float > pos)
+	node_list::iterator SceneGraph::AddNode(GeometryChunk * gc, SORE_Math::Vector3< float > pos)
 	{
-		shared_ptr<SceneNode> newNode(new SceneNode(parent, gc));
-		parent->AddChild(newNode);
-		newNode->Translate(pos[0], pos[1], pos[2]);
-		//if(gc!=NULL)
-		//	flatList.push_back(gc);
-		return newNode;
-	}
-
-	SORE_Math::Matrix4< float > & SceneGraph::GetViewMatrix()
-	{
-		return view;
+		return parent->AddChild(gc, pos);
 	}
 }

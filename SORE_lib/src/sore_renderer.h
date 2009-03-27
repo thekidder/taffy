@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Adam Kidder                                     *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
  *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,8 +19,8 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_RENDERER__
-#define  __SORE_RENDERER__
+#ifndef  SORE_RENDERER_H
+#define  SORE_RENDERER_H
 
 #include "sore_screeninfo.h"
 
@@ -36,13 +36,15 @@ namespace SORE_Graphics
 			
 		virtual void Render() = 0;
 		void SetScreenInfo(ScreenInfo _screen);
-		void SetProjectionInfo(ProjectionInfo _proj);
+		ScreenInfo GetScreenInfo() const;
+
+		//Renderer has a "state": used by Gamestate. Only geometry in the current state should be rendered
+		virtual void PushState() = 0;
+		virtual void PopState() = 0;
 	protected:
 		virtual void OnScreenChange() {}
-		virtual void OnProjectionChange() {}
 		ScreenInfo screen;
-		ProjectionInfo proj;
 	};
 }
 
-#endif /*__SORE_RENDERER__*/
+#endif

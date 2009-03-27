@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Adam Kidder   *
- *   thekidder@gmail.com   *
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,9 +19,12 @@
  ***************************************************************************/
 // $Id$
 
-#include "sore_fileio.h"
 #include <map>
+
 #include <boost/shared_ptr.hpp>
+
+#include "sore_logger.h"
+#include "sore_fileio.h"
 #include "inotify-cxx.h"
 
 namespace SORE_FileIO
@@ -33,14 +36,9 @@ namespace SORE_FileIO
   class LinuxINotifyWatch : public SORE_Kernel::Task
   {
   public:
-    LinuxINotifyWatch(SORE_Kernel::GameKernel* gk) : Task(gk) {}
+    LinuxINotifyWatch() {}
     ~LinuxINotifyWatch()
     {
-      std::multimap<std::string, file_callback>::iterator it;
-      for(it=callbacks.begin();it!=callbacks.end();it++)
-	{
-					
-	}
     }
 			
     void Pause() {}
@@ -49,27 +47,27 @@ namespace SORE_FileIO
     {
       InotifyEvent ie;
       try
-	{
-	  if(callbacks.empty()) return;
+			{
+				if(callbacks.empty()) return;
 					
-	  in.WaitForEvents();
-	  if(in.GetEventCount()==0) return;
-	  in.GetEvent(ie);
+				in.WaitForEvents();
+				if(in.GetEventCount()==0) return;
+				in.GetEvent(ie);
 
-	  std::string path = ie.GetWatch()->GetPath().empty() ?  "" : ie.GetWatch()->GetPath();
-	  ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
-	  std::multimap<std::string, file_callback>::iterator it;
-	  it = callbacks.find(path);
-	  while(it!=callbacks.end() && it->first == path)
-	    {
-	      it->second(it->first);
-	      it++;
-	    }
-	}
+				std::string path = ie.GetWatch()->GetPath().empty() ?  "" : ie.GetWatch()->GetPath();
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
+				std::multimap<std::string, file_callback>::iterator it;
+				it = callbacks.find(path);
+				while(it!=callbacks.end() && it->first == path)
+				{
+					it->second(it->first);
+					it++;
+				}
+			}
       catch(InotifyException e)
-	{
-	  ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
-	}
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+			}
     }
 			
     const char* GetName() const { return "File Notify task";}
@@ -80,33 +78,32 @@ namespace SORE_FileIO
   bool InitFileNotify(SORE_Kernel::GameKernel* gk)
   {
     in.SetNonBlock(true);
-    static LinuxINotifyWatch watchTask(gk);
-    gk->AddConstTask(0, 5000, &watchTask);
+    static LinuxINotifyWatch watchTask;
+    gk->AddConstTask(0, 500, &watchTask);
     ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max events: %d") % Inotify::GetCapability(IN_MAX_EVENTS));
     ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max instances: %d") % Inotify::GetCapability(IN_MAX_INSTANCES));
-    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max watchs: %d") % Inotify::GetCapability(IN_MAX_WATCHES));
+    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Inotify: max watches: %d") % Inotify::GetCapability(IN_MAX_WATCHES));
     return true;
   }
 	
   void Notify(std::string filename, boost::function<void (std::string)> callback)
   {
     if(callbacks.find(filename)==callbacks.end())
-      {
-	boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
-	watches.push_back(iw);
-	//iw = new InotifyWatch(filename, IN_MODIFY);
-	InotifyWatch* ptr = iw.get();
-	try
-	  {
-	    in.Add(ptr);
-	    ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Added Inotify watch on path \"%s\"") % filename);
-	  }
-	catch(InotifyException e)
-	  {
-	    ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
-	    ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Watch path: %s") % ptr->GetPath());
-	  }
-      }
+		{
+			boost::shared_ptr<InotifyWatch> iw(new InotifyWatch(filename, IN_MODIFY));
+			watches.push_back(iw);
+			InotifyWatch* ptr = iw.get();
+			try
+			{
+				in.Add(ptr);
+				ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Added Inotify watch on path \"%s\"") % filename);
+			}
+			catch(InotifyException e)
+			{
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Caught Inotify exception: %s") % e.GetMessage());
+				ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Watch path: %s") % ptr->GetPath());
+			}
+		}
     callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
   }
 }

@@ -1,18 +1,26 @@
-//
-// C++ Interface: sore_math
-//
-// Description: 
-//
-//
-// Author: Adam Kidder <thekidder@gmail.com>, (C) 2007
-//
-// Copyright: See COPYING file that comes with this distribution
-//
+/***************************************************************************
+ *   Copyright (C) 2009 by Adam Kidder                                     *
+ *   thekidder@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 // $Id$
 
-
-#ifndef  __SORE_MATH_H__
-#define  __SORE_MATH_H__
+#ifndef  SORE_MATH_H
+#define  SORE_MATH_H
 
 #ifndef M_PI
 #define M_PI 3.14159265358979
@@ -45,4 +53,4 @@ namespace SORE_Math
 	bool   DoubleEquals(double value, double compare, double epsilon);
 }
 
-#endif /*__SORE_MATH_H__*/
+#endif

@@ -14,11 +14,13 @@
 #ifndef  __SORE_INTERPOLATER_H__
 #define  __SORE_INTERPOLATER_H__
 
-#include "sore_task.h"
-#include "sore_logger.h"
 #include <list>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+
+#include "sore_logger.h"
+#include "sore_task.h"
 
 namespace SORE_Utility
 {
@@ -151,7 +153,7 @@ namespace SORE_Utility
 	class InterpolaterTask  : public SORE_Kernel::Task
 	{
 		public:
-			InterpolaterTask(SORE_Kernel::GameKernel* gk);
+			InterpolaterTask();
 			~InterpolaterTask();
 			
 			const char* GetName() const { return "Interpolater task"; };
