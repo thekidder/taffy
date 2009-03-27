@@ -24,10 +24,6 @@
 
 namespace SORE_Graphics
 {
-	SceneNode::SceneNode(weak_ptr<SceneNode> p, GeometryChunk* g) : geometry(g), parent(p)
-	{
-	}
-
 	SceneNode::SceneNode(GeometryChunk* g) : geometry(g)
 	{
 	}
@@ -42,11 +38,6 @@ namespace SORE_Graphics
 		delete s;
 		*it = 0;
 		children.erase(it);
-	}
-
-	weak_ptr<SceneNode> SceneNode::GetParent()
-	{
-		return parent;
 	}
 
 	const GeometryChunk * SceneNode::GetChunk() const
@@ -101,14 +92,11 @@ namespace SORE_Graphics
 			(*it)->InvalidateCache();
 	}
 
-
-
-
 	void SceneNode::UpdateCache(SceneNode* parent)
   {
 		if(!cacheUpdated)
 		{
-			if(shared_ptr<SceneNode> p = parent.lock())
+			if(parent)
 			{
 				if(!parent->cacheUpdated)
 					ENGINE_LOG(SORE_Logging::LVL_WARNING, 
@@ -118,7 +106,7 @@ namespace SORE_Graphics
 			}
 			else
 			{
-				//ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not get parent pointer for updating cached matrix");
+				cachedAbsoluteTransform = mat;
 			}
 			cacheUpdated = true;
 		}

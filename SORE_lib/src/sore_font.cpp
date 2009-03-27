@@ -103,8 +103,8 @@ namespace SORE_Font
 		if((err=SORE_FileIO::Read(fontInfo, 1, size, fontObj))!=size)
     {
       ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
-									 "Font load failed: Could not read font from disk "
-									 "(expected %d bytes, read %d bytes)") % size % err);
+																												"Font load failed: Could not read font from disk "
+																												"(expected %d bytes, read %d bytes)") % size % err);
       SORE_FileIO::Close(fontObj);
       return;
     }
@@ -113,7 +113,7 @@ namespace SORE_Font
     {
       FT_Done_FreeType(library);
       ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
-									 "Font load failed: Freetype error code %d") % err);
+																												"Font load failed: Freetype error code %d") % err);
       return;
     }
 		return;
@@ -156,16 +156,16 @@ namespace SORE_Font
 		if(x != 0 && y != 0)
 		{
 			c[ch].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA, 
-																									 GL_LUMINANCE_ALPHA, width, height);
+																							 GL_LUMINANCE_ALPHA, width, height);
 
 			c[ch].transform = SORE_Math::Matrix4<float>::GetTranslation(
-				static_cast<float>(face->glyph->bitmap_left), 
-				static_cast<float>(bitmap.rows-face->glyph->bitmap_top) + (h - bitmap.rows),
-				0.0f);
+																																	static_cast<float>(face->glyph->bitmap_left), 
+																																	static_cast<float>(bitmap.rows-face->glyph->bitmap_top) + (h - bitmap.rows),
+																																	0.0f);
 
 			SORE_Math::Rect<float> bounds (0.0f, 
-				static_cast<float>(bitmap.width), 0.0f, 
-				static_cast<float>(bitmap.rows));
+																		 static_cast<float>(bitmap.width), 0.0f, 
+																		 static_cast<float>(bitmap.rows));
 			SORE_Math::Rect<float> texCoords(0.0f, x, 0.0f, y);
 
 			c[ch].gc = new SORE_Graphics::GeometryChunk(c[ch].tex, bounds, texCoords);
@@ -203,6 +203,9 @@ namespace SORE_Font
 		SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(full.c_str());
 	
 		if(fontObj==0)
+		{
+			std::vector<std::string>::iterator it;
+			for(it=fontPaths.begin();it<fontPaths.end();it++)
 			{
 				full = *it;
 				full += name;
@@ -213,6 +216,7 @@ namespace SORE_Font
 				}
 				fontObj = 0;
 			}
+		}
 		if(fontObj)
 		{
 			SORE_FileIO::Close(fontObj);

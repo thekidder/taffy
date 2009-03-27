@@ -37,8 +37,7 @@ namespace SORE_Graphics
   class SceneNode
   {
   public:
-    SceneNode(weak_ptr<SceneNode> p, GeometryChunk* g = NULL);
-    SceneNode(GeometryChunk* g = NULL); //root-level
+    SceneNode(GeometryChunk* g = NULL);
     ~SceneNode();
 		
     const GeometryChunk* GetChunk() const;
@@ -57,14 +56,11 @@ namespace SORE_Graphics
 		
     void UpdateCache(SceneNode* parent);
     void AddToRenderList(render_list& list);
-
-		weak_ptr<SceneNode> GetParent();
   protected:
     void InvalidateCache();
   private:
     GeometryChunk* geometry;
     node_list children;
-    weak_ptr<SceneNode> parent;
 		
     //transformations
     SORE_Math::Matrix4<float> mat;

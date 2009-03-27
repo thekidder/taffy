@@ -25,12 +25,12 @@ namespace SORE_Graphics
 {
 	SceneGraph::SceneGraph()
 	{
-		shared_ptr<SceneNode> p(new SceneNode(NULL));
-		parent = p;
+		parent = new SceneNode;
 	}
 
 	SceneGraph::~SceneGraph()
 	{
+		delete parent;
 	}
 
 	render_list SceneGraph::GetRenderList()
