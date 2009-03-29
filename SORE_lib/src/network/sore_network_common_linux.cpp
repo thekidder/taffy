@@ -19,49 +19,64 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  SORE_NETWORK_COMMON_H
-#define  SORE_NETWORK_COMMON_H
-
-#include <vector>
-#include <boost/cstdint.hpp>
+#include <cassert>
+#include <cstring>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <enet/enet.h>
 
-//Type definitions for network transmission
-typedef boost::int_least8_t   sbyte;  //signed 8bit value
-typedef boost::uint_least8_t  ubyte;  //unsigned 8bit value
-typedef boost::int_least16_t  sbyte2; //signed 16bit value
-typedef boost::uint_least16_t ubyte2; //unsigned 16bit value
-typedef boost::int_least32_t  sbyte4; //signed 32bit value
-typedef boost::uint_least32_t ubyte4; //unsigned 32bit value
-typedef boost::int_least64_t  sbyte8; //signed 64bit value
-typedef boost::uint_least64_t ubyte8; //unsigned 64bit value
-
-//single and double precision floats
-typedef            float  float1;
-typedef            double float2;
+#include "../sore_logger.h"
+#include "sore_network_common.h"
 
 namespace SORE_Network
 {
-	const ubyte STATE_CONNECTING    = 0;
-	const ubyte STATE_CONNECTED     = 1;
-	const ubyte STATE_DISCONNECTING = 2;
-	const ubyte STATE_OBSERVER      = 3;
-	const ubyte STATE_PLAYER        = 4;
-	
-	const ubyte CHATMASK_ALL        = 0;
-	const ubyte CHATMASK_TEAM       = 1;
-	const ubyte CHATMASK_WHISPER    = 2;
-	
-	ubyte8 pack754(long double f, unsigned bits, unsigned expbits);
-	long double unpack754(ubyte8 i, unsigned bits, unsigned expbits);
-	
-	ubyte8 htonll(ubyte8 h);
-	ubyte8 ntohll(ubyte8 n);
+	std::vector<ENetAddress> GetHostAddresses()
+	{
+		const unsigned int len = 1024;
 
-	//call before any network calls - initializes ENet
-	void InitNetwork();
+		std::vector<ENetAddress> addresses;
+		char hostname[len];// = "localhost";
+		gethostname(hostname, len);
 
-	std::vector<ENetAddress> GetHostAddresses();
+		addrinfo hints, *result;
+
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET;
+		hints.ai_protocol = IPPROTO_UDP;
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("Hostname is ") + hostname);
+
+		int error = getaddrinfo(hostname, NULL, &hints, &result);
+		//hostent* h = gethostbyname(hostname);
+
+		//in_addr** addr_list = reinterpret_cast<in_addr**>(h->h_addr_list);
+
+		//for(int i=0; addr_list[i] != NULL; ++i)
+		for(addrinfo* i=result; i!=NULL; i = i->ai_next)
+		{
+			if(i->ai_addr->sa_family == AF_INET)
+			{
+				sockaddr_in* socket = reinterpret_cast<sockaddr_in*>(i->ai_addr);
+
+				//in_addr* addr = addr_list[i];
+
+				ENetAddress temp;
+				temp.host = socket->sin_addr.s_addr;//addr->s_addr
+				addresses.push_back(temp);
+
+				//char* ip = inet_ntoa(*addr);
+				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("IP is: ") + ip);
+
+				//char hostname[1025];
+				//getnameinfo(i->ai_addr, i->ai_addrlen, hostname, 1025, NULL, 0, NI_NUMERICHOST);
+				//if(*hostname)
+				//	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Found hostname: %s") % hostname);
+			}
+		}
+
+		freeaddrinfo(result);
+
+		return addresses;
+	}
 }
-
-#endif
