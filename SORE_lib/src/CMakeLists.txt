@@ -20,6 +20,13 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 set(INOTIFY inotify-cxx.cpp inotify-cxx.h)
 
+IF(UNIX)
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp sore_timing_linux.cpp ${INOTIFY})
+ENDIF(UNIX)
+IF(WIN32)
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp sore_timing_windows.cpp)
+ENDIF(WIN32)
+
 ADD_SUBDIRECTORY("gui")
 ADD_SUBDIRECTORY("network")
 
@@ -48,13 +55,6 @@ set(SORE_HEADERS sore.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_task.h sore_text.h sore_texture.h
   sore_timing.h sore_util.h sore_vbo.h ${SORE_GUI_HEADERS} ${SORE_NETWORK_HEADERS})
-
-IF(UNIX)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp sore_timing_linux.cpp ${INOTIFY})
-ENDIF(UNIX)
-IF(WIN32)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp sore_timing_windows.cpp)
-ENDIF(WIN32)
 
 ADD_LIBRARY(sore_lib STATIC ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS})
 SET_TARGET_PROPERTIES(
