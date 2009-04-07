@@ -38,6 +38,7 @@ namespace SORE_GUI
 		~TextField();
 
 		const std::string& GetText() const;
+		void SetContents(const std::string& t);
 	private:
 		virtual SORE_Graphics::render_list GetThisRenderList();
 		bool ProcessEvents(SORE_Kernel::Event* e);

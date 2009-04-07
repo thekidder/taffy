@@ -63,6 +63,13 @@ namespace SORE_GUI
 		return text;
 	}
 
+	void TextField::SetContents(const std::string& t)
+	{
+		text = t;
+		UpdateText(1);
+		UpdatePosition();
+	}
+
 	SORE_Graphics::render_list TextField::GetThisRenderList()
 	{
 		SORE_Graphics::render_list list;
