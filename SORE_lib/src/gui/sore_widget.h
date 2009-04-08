@@ -84,6 +84,7 @@ namespace SORE_GUI
 		bool PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p);
 		void PropagateGLReload();
 		void AddChild(Widget* c);
+		void RemoveChild(Widget* c);
 		void UpdatePositionMatrix();
 
 		SORE_Kernel::Event prev;

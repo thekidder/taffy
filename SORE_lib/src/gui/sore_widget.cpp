@@ -44,6 +44,8 @@ namespace SORE_GUI
 	{
 		if(HasFocus())
 			ClearFocus();
+		if(parent)
+			parent->RemoveChild(this);
 	}
 
 	const SVec& Widget::GetPosition() const
@@ -298,6 +300,18 @@ namespace SORE_GUI
 			{
 				children.push_back(c);
 				c->parent = this;
+			}
+		}
+	}
+
+	void Widget::RemoveChild(Widget* c)
+	{
+		if(c)
+		{
+			std::vector<Widget*>::iterator it;
+			if((it = find(children.begin(), children.end(), c)) != children.end())
+			{
+				children.erase(it);
 			}
 		}
 	}
