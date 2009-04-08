@@ -22,6 +22,7 @@
 #ifndef SORE_SLIDERWIDGET_H
 #define SORE_SLIDERWIDGET_H
 
+#include <boost/signals.hpp>
 #include <boost/function.hpp>
 
 #include "../sore_resource.h"
@@ -35,7 +36,8 @@ namespace SORE_GUI
 		SliderWidget(SVec s, SVec p, int min, int max, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
 		~SliderWidget();
 
-		void SetChangeCallback(boost::function<void (int)> c);
+		void ConnectChange(boost::function<void (int)> c);
+
 		int GetValue() const;
 		void SetValue(int value);
 	private:
@@ -51,7 +53,7 @@ namespace SORE_GUI
 		SORE_Graphics::GeometryChunk* sliderChunk;
 		SORE_Math::Matrix4<float> sliderMat;
 
-		boost::function<void (int)> callback;
+		boost::signal<void (int)> onChange;
 		bool dragged;
 
 		int minimum, maximum, current;

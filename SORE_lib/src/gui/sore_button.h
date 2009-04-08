@@ -23,6 +23,7 @@
 #define SORE_BUTTON_H
 
 #include <boost/function.hpp>
+#include <boost/signals.hpp>
 
 #include "../sore_resource.h"
 #include "../sore_font.h"
@@ -38,7 +39,7 @@ namespace SORE_GUI
 					 SORE_Resource::ResourcePool& pool, Widget* par=NULL);
 		~Button();
 
-		void SetCallback(boost::function<void ()> c);
+		void ConnectPressed(boost::function<void ()> c);
 	private:
 		virtual SORE_Graphics::render_list GetThisRenderList();
 		bool ProcessEvents(SORE_Kernel::Event* e);
@@ -48,7 +49,7 @@ namespace SORE_GUI
 		SORE_Graphics::Text* t;
 		SORE_Resource::Texture2D* normal, *active, *hover;
 
-		boost::function<void ()> callback;
+		boost::signal<void ()> onRelease;
 
 		bool pressed;
 		bool inArea;

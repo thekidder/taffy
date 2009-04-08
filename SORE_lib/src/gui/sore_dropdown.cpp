@@ -111,9 +111,9 @@ namespace SORE_GUI
 		}
 	}
 
-	void Dropdown::SetChangeCallback(boost::function<void (unsigned int)> c)
+	void Dropdown::ConnectChange(boost::function<void (unsigned int)> c)
 	{
-		callback = c;
+		onChange.connect(c);
 	}
 
 	SORE_Graphics::render_list Dropdown::GetThisRenderList()
@@ -185,8 +185,7 @@ namespace SORE_GUI
 				SetSize(originalSize);
 				inArea = false;
 				SetCurrent(choices[OrderToID(choice)]);
-				if(callback)
-					callback(OrderToID(choice));
+				onChange(OrderToID(choice));
 			}
 			ChangeTexture();
 			return true;

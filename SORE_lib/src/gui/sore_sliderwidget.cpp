@@ -40,9 +40,9 @@ namespace SORE_GUI
 		delete sliderChunk;
 	}
 
-	void SliderWidget::SetChangeCallback(boost::function<void (int)> c)
+	void SliderWidget::ConnectChange(boost::function<void (int)> c)
 	{
-		callback = c;
+		onChange.connect(c);
 	}
 
 	int SliderWidget::GetValue() const
@@ -56,7 +56,7 @@ namespace SORE_GUI
 		value = value > maximum ? maximum : value;
 		current = value;
 		UpdateSlider();
-		if(callback) callback(current);
+		onChange(value);
 	}
 
 	SORE_Graphics::render_list SliderWidget::GetThisRenderList()

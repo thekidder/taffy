@@ -24,6 +24,7 @@
 
 #include <map>
 
+#include <boost/signals.hpp>
 #include <boost/function.hpp>
 
 #include "../sore_resource.h"
@@ -41,7 +42,7 @@ namespace SORE_GUI
 
 		//add a new choice or update the one specified by id
 		void UpdateChoice(unsigned int id, std::string text, bool selected = false);
-		void SetChangeCallback(boost::function<void (unsigned int)> c);
+		void ConnectChange(boost::function<void (unsigned int)> c);
 	private:
 		void OnGLReload();
 		virtual SORE_Graphics::render_list GetThisRenderList();
@@ -64,7 +65,8 @@ namespace SORE_GUI
 		std::map<unsigned int, SORE_Graphics::Text*> choices;
 		SORE_Graphics::Text* curChoice;
 		std::vector<std::pair<SORE_Math::Matrix4<float>, SORE_Graphics::GeometryChunk*> > menu;
-		boost::function<void (unsigned int)> callback;
+
+		boost::signal<void (unsigned int)> onChange;
 
 		bool pressed;
 		bool inArea;

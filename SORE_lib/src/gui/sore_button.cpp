@@ -89,9 +89,9 @@ namespace SORE_GUI
 		return list;
 	}
 
-	void Button::SetCallback(boost::function<void ()> c)
+	void Button::ConnectPressed(boost::function<void ()> c)
 	{
-		callback = c;
+		onRelease.connect(c);
 	}
 
 	bool Button::ProcessEvents(SORE_Kernel::Event* e)
@@ -127,8 +127,7 @@ namespace SORE_GUI
 				SetTexture(hover);
 			else
 				SetTexture(normal);
-			if(callback)
-				callback();
+			onRelease();
 			return true;
 		}
 		return false;
