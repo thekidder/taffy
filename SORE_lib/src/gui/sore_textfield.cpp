@@ -58,6 +58,11 @@ namespace SORE_GUI
 		delete caret;
 	}
 
+	void TextField::ConnectChange(boost::function<void (std::string)> c)
+	{
+		onChange.connect(c);
+	}
+
 	const std::string& TextField::GetText() const
 	{
 		return text;
@@ -66,6 +71,7 @@ namespace SORE_GUI
 	void TextField::SetContents(const std::string& t)
 	{
 		text = t;
+		onChange(text);
 		UpdateText(1);
 		UpdatePosition();
 	}
@@ -126,6 +132,7 @@ namespace SORE_GUI
 				{
 					text.erase(pos - 1, 1);
 					pos--;
+					onChange(text);
 					dir = -1;
 				}
 			}
@@ -134,6 +141,7 @@ namespace SORE_GUI
 				char insert = static_cast<char>(e->key.unicode);
 				text.insert(pos, 1, insert);
 				pos++;
+				onChange(text);
 				dir = 1;
 			}
 			UpdateText(dir);

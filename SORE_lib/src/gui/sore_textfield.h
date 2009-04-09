@@ -23,6 +23,7 @@
 #define SORE_TEXTFIELD_H
 
 #include <boost/function.hpp>
+#include <boost/signals.hpp>
 
 #include "../sore_resource.h"
 #include "../sore_font.h"
@@ -39,6 +40,8 @@ namespace SORE_GUI
 
 		const std::string& GetText() const;
 		void SetContents(const std::string& t);
+
+		void ConnectChange(boost::function<void (std::string)> c);
 	private:
 		virtual SORE_Graphics::render_list GetThisRenderList();
 		bool ProcessEvents(SORE_Kernel::Event* e);
@@ -63,6 +66,8 @@ namespace SORE_GUI
 		unsigned int pos;
 
 		unsigned int textStart, textEnd;
+
+		boost::signal<void (std::string)> onChange;
 	};
 }
 
