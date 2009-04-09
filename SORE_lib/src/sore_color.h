@@ -34,7 +34,7 @@ namespace SORE_Graphics
 		Color(float r, float g, float b, float a);
 
 		const float* GetColor() const;
-		float GetComponent(ColorComponent c);
+		float GetComponent(ColorComponent c) const;
 		void SetComponent(ColorComponent c, float v);
 
 		//all operations clamp to [0,1]

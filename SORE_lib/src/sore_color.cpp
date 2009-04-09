@@ -56,7 +56,7 @@ namespace SORE_Graphics
 		return color;
 	}
 
-	float Color::GetComponent(ColorComponent c)
+	float Color::GetComponent(ColorComponent c) const
 	{
 		return color[c];
 	}
