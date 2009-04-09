@@ -120,6 +120,9 @@ namespace SORE_Game
 			if(popFlag)
 				Pop();
 		}
+		//properly clean up all existing states
+		while(states.size()) Pop();
+
 		return 0;
 	}
 }
