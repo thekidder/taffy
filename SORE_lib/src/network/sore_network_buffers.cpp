@@ -227,7 +227,8 @@ namespace SORE_Network
 				strm.avail_in = CHUNK;
 			flush = size() - read == 0 ? Z_FINISH : Z_NO_FLUSH;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Compressing - starting at %u") % static_cast<unsigned int>(buf[read]));
-			strm.next_in = &(buf[read]);
+			if(strm.avail_in)
+				strm.next_in = &(buf[read]);
 			read += strm.avail_in;
 			do
 			{
