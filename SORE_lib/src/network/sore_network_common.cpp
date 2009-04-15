@@ -20,7 +20,7 @@
 // $Id$
 
 #include <cassert>
-
+#include <boost/format.hpp>
 #include <enet/enet.h>
 
 #include "../sore_logger.h"
@@ -104,6 +104,13 @@ namespace SORE_Network
 		result *= (i>>(bits-1))&1? -1.0: 1.0;
 
 		return result;
+	}
+
+	std::string AddrToStr(ENetAddress& addr)
+	{
+		char host[256];
+		enet_address_get_host_ip(&addr, host, 255);
+		return boost::str(boost::format("%s:%d") % host % addr.port);
 	}
 
 	static bool network_ok = false;

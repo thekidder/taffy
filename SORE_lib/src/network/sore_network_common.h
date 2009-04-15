@@ -58,6 +58,8 @@ namespace SORE_Network
 	ubyte8 htonll(ubyte8 h);
 	ubyte8 ntohll(ubyte8 n);
 
+	std::string AddrToStr(ENetAddress& addr);
+
 	//call before any network calls - initializes ENet
 	void InitNetwork();
 
