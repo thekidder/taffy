@@ -22,6 +22,7 @@
 #ifndef  SORE_NETWORK_COMMON_H
 #define  SORE_NETWORK_COMMON_H
 
+#include <string>
 #include <vector>
 #include <boost/cstdint.hpp>
 #include <enet/enet.h>
