@@ -32,106 +32,170 @@ namespace SORE_Network
 
 	unsigned int SendBuffer::totalBytesSent = 0;
 	
-	/*static unsigned int SendBuffer::GetTotalBytes()
+	unsigned int SendBuffer::GetTotalBytes()
 	{
 		return totalBytesSent;
 	}
 	
-	static void SendBuffer::ResetTotalBytes()
+	void SendBuffer::ResetTotalBytes()
 	{
 		totalBytesSent = 0;
-	}*/
+	}
 	
 	SendBuffer::SendBuffer()
 	{
 	}
 			
-	void SendBuffer::AddUByte (ubyte b)
+	SendBuffer& SendBuffer::operator<<(const ubyte& data)
 	{
-		buf.push_back(b);
+		buf.push_back(data);
+		return *this;
 	}
 	
-	void SendBuffer::AddByte  (sbyte b)
+	SendBuffer& SendBuffer::operator<<(const sbyte& data)
 	{
-		buf.push_back(static_cast<ubyte>(b));
+		ubyte copy =  static_cast<ubyte>(data);
+		*this << copy;
+		return *this;
 	}
 			
-	void SendBuffer::AddUByte2(ubyte2 b)
+	SendBuffer& SendBuffer::operator<<(const ubyte2& data)
 	{
-		ubyte2 n = htons(b);
+		ubyte2 copy = htons(data);
 		size_t len = buf.size();
 		buf.resize(len+2);
 		ubyte2* ptr = reinterpret_cast<ubyte2*>(&buf[len]);
-		*ptr = n;
+		*ptr = copy;
+		return *this;
 	}
 
-	void SendBuffer::AddByte2 (sbyte2 b)
+	SendBuffer& SendBuffer::operator<<(const sbyte2& data)
 	{
-		AddUByte2(static_cast<ubyte2>(b));
+		ubyte2 copy = static_cast<ubyte2>(data);
+		*this << copy;
+		return *this;
 	}
 
-	void SendBuffer::AddUByte4(ubyte4 b)
+	SendBuffer& SendBuffer::operator<<(const ubyte4& data)
 	{
-		ubyte4 n = htonl(b);
+		ubyte4 copy = htonl(data);
 		size_t len = buf.size();
 		buf.resize(len+4);
 		ubyte4* ptr = reinterpret_cast<ubyte4*>(&buf[len]);
-		*ptr = n;
+		*ptr = copy;
+		return *this;
 	}
 
-	void SendBuffer::AddByte4 (sbyte4 b)
+	SendBuffer& SendBuffer::operator<<(const sbyte4& data)
 	{
-		AddUByte4(static_cast<ubyte4>(b));
+		ubyte4 copy = static_cast<ubyte4>(data);
+		*this << copy;
+		return *this;
 	}
 	
-	void SendBuffer::AddUByte8(ubyte8 b)
+	SendBuffer& SendBuffer::operator<<(const ubyte8& data)
 	{
-		ubyte8 n = htonll(b);
+		ubyte8 copy = htonll(data);
 		size_t len = buf.size();
 		buf.resize(len+8);
 		ubyte8* ptr = reinterpret_cast<ubyte8*>(&buf[len]);
-		*ptr = n;
+		*ptr = copy;
+		return *this;
 	}
 
-	void SendBuffer::AddByte8 (sbyte8 b)
+	SendBuffer& SendBuffer::operator<<(const sbyte8& data)
 	{
-		AddUByte8(static_cast<ubyte8>(b));
+		ubyte8 copy = static_cast<ubyte8>(data);
+		*this << copy;
+		return *this;
 	}
 
-	void SendBuffer::AddString(std::string str)
+	SendBuffer& SendBuffer::operator<<(const std::string& data)
 	{
-		assert(str.size()<65536);
-		if(str.size()<256) return AddString1(str);
-		else return AddString2(str);
-	}
-
-	void SendBuffer::AddString1(std::string str)
-	{
-		assert(str.size()<256);
-		AddUByte(static_cast<ubyte>(str.size()));
 		size_t len = buf.size();
-		buf.resize(len+str.size());
-		for(size_t i=0;i<str.size();i++)
-		{
-			buf[len+i] = static_cast<ubyte>(str[i]);
-		}
+		buf.resize(len + data.length() + 1);
+		//std::copy(data.c_str()[0], data.c_str()[data.length()-1], &buf[len]);
+		memcpy(&buf[len], data.c_str(), data.length());
+		buf[len + data.length()] = '\0';
+		return *this;
 	}
 
-	void SendBuffer::AddString2(std::string str)
+	SendBuffer& SendBuffer::operator<<(const float1& data)
 	{
-		assert(str.size()<65536);
-		AddUByte2(static_cast<ubyte2>(str.size()));
-		size_t len = buf.size();
-		buf.resize(len+str.size());
-		for(size_t i=0;i<str.size();i++)
-		{
-			buf[len+i] = static_cast<ubyte>(str[i]);
-		}
+		AddFloat(data, 4);
+		return *this;
 	}
 
-	void SendBuffer::AddFloat(float1 f, size_t numBytes)
+	SendBuffer& SendBuffer::operator<<(const float2& data)
 	{
-		return AddFloat(static_cast<float2>(f), numBytes);
+		AddFloat(data, 8);
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const ubyte & data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const sbyte & data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const ubyte2& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const sbyte2& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const ubyte4& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const sbyte4& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const ubyte8& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const sbyte8& data)
+	{
+		*this << data;
+		return *this;
+	}
+
+	SendBuffer& SendBuffer::operator&(const std::string& data)
+	{
+		*this << data;
+		return *this;
+	}
+			
+	SendBuffer& SendBuffer::operator&(const float1& data)
+	{
+		*this << data;
+		return *this;
+	}
+			
+	SendBuffer& SendBuffer::operator&(const float2& data)
+	{
+		*this << data;
+		return *this;
 	}
 
 	void SendBuffer::AddFloat(float2 f, size_t numBytes)
@@ -144,7 +208,7 @@ namespace SORE_Network
 				bits = 8;
 				expbits = 2;
 				ubyte packed = static_cast<ubyte>(pack754(f, bits, expbits));
-				AddUByte2(packed);
+				*this << packed;
 				break;
 			}
 			case 2:
@@ -152,7 +216,7 @@ namespace SORE_Network
 				bits = 16;
 				expbits = 4;
 				ubyte2 packed = static_cast<ubyte2>(pack754(f, bits, expbits));
-				AddUByte2(packed);
+				*this << packed;
 				break;
 			}
 			case 4:
@@ -240,7 +304,8 @@ namespace SORE_Network
 				written += have;
 				for(unsigned int i=0;i<have;++i)
 				{
-					compressed.AddUByte(out[i]);
+					compressed << out[i];
+					//compressed.AddUByte(out[i]);
 				}
 			} while (strm.avail_out == 0);
 			assert(strm.avail_in == 0);
@@ -279,7 +344,7 @@ namespace SORE_Network
 	
 	ReceiveBuffer::ReceiveBuffer(ENetPacket& packet)
 	{
-		data = static_cast<ubyte*>(packet.data);
+		buf = static_cast<ubyte*>(packet.data);
 		length = static_cast<size_t>(packet.dataLength);
 		remaining = length;
 	}
@@ -311,7 +376,7 @@ namespace SORE_Network
 				else
 					strm.avail_in = b.remaining;
 				read += strm.avail_in;
-				strm.next_in = (b.data + (b.length - b.remaining) );
+				strm.next_in = (b.buf + (b.length - b.remaining) );
 				b.remaining -= strm.avail_in;
 				
 				do
@@ -338,14 +403,14 @@ namespace SORE_Network
 					written += have;
 				} while(strm.avail_out == 0);
 			} while(ret != Z_STREAM_END);
-			data = &(ownData[0]);
+			buf = &(ownData[0]);
 			length = written;
 			remaining = length;
 			//ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("Decompressed %d bytes to %d bytes") % read % written);
 		}
 		else
 		{
-			data = b.data;
+			buf = b.buf;
 			length = b.length;
 			remaining = b.remaining;
 		}
@@ -353,100 +418,168 @@ namespace SORE_Network
 	
 	ReceiveBuffer::~ReceiveBuffer()
 	{
-		/*if(ownData && data)
-			delete[] data;*/
 	}
 
-	ubyte ReceiveBuffer::GetUByte()
+	ReceiveBuffer& ReceiveBuffer::operator>>(ubyte& data)
 	{
 		assert(remaining>=1);
-		ubyte temp = data[length-remaining];
+		data = buf[length-remaining];
 		remaining--;
-		return temp;
+		return *this;
 	}
 	
-	sbyte ReceiveBuffer::GetByte()
+	ReceiveBuffer& ReceiveBuffer::operator>>(sbyte& data)
 	{
-		assert(remaining>=1);
-		sbyte temp = static_cast<sbyte>(data[length-remaining]);
-		remaining--;
-		return temp;
+		ubyte copy = static_cast<ubyte>(data);
+		*this >> copy;
+		return *this;
 	}
 	
-	ubyte2 ReceiveBuffer::GetUByte2()
+	ReceiveBuffer& ReceiveBuffer::operator>>(ubyte2& data)
 	{
 		assert(remaining>=2);
-		ubyte2* pos = reinterpret_cast<ubyte2*>(&data[length-remaining]);
-		ubyte2 i = *pos;
+		ubyte2* pos = reinterpret_cast<ubyte2*>(&buf[length-remaining]);
+		data = *pos;
 		remaining-=2;
-		return ntohs(i);
+		data = ntohs(data);
+		return *this;
 	}
 	
-	sbyte2 ReceiveBuffer::GetByte2()
+	ReceiveBuffer& ReceiveBuffer::operator>>(sbyte2& data)
 	{
-		assert(remaining>=2);
-		ubyte2 u = GetUByte2();
-		sbyte2 i = static_cast<sbyte2>(u);
-		return i;
+		ubyte2 copy = static_cast<ubyte2>(data);
+		*this >> copy;
+		return *this;
 	}
 	
-	ubyte4 ReceiveBuffer::GetUByte4()
+	ReceiveBuffer& ReceiveBuffer::operator>>(ubyte4& data)
 	{
 		assert(remaining>=4);
-		ubyte4* pos = reinterpret_cast<ubyte4*>(&data[length-remaining]);
-		ubyte4 i = *pos;
+		ubyte4* pos = reinterpret_cast<ubyte4*>(&buf[length-remaining]);
+		data = *pos;
 		remaining-=4;
-		return ntohl(i);
+		data = ntohl(data);
+		return *this;
 	}
 	
-	sbyte4 ReceiveBuffer::GetByte4()
+	ReceiveBuffer& ReceiveBuffer::operator>>(sbyte4& data)
 	{
-		assert(remaining>=4);
-		ubyte4 u = GetUByte4();
-		sbyte4 i = static_cast<sbyte4>(u);
-		return i;
+		ubyte4 copy = static_cast<ubyte4>(data);
+		*this >> copy;
+		return *this;
 	}
 	
-	ubyte8 ReceiveBuffer::GetUByte8()
+	ReceiveBuffer& ReceiveBuffer::operator>>(ubyte8& data)
 	{
 		assert(remaining>=8);
-		ubyte8* pos = reinterpret_cast<ubyte8*>(&data[length-remaining]);
-		ubyte8 i = *pos;
+		ubyte8* pos = reinterpret_cast<ubyte8*>(&buf[length-remaining]);
+		data = *pos;
 		remaining-=8;
-		return ntohll(i);
+		data = ntohll(data);
+		return *this;
 	}
 	
-	sbyte8 ReceiveBuffer::GetByte8()
+	ReceiveBuffer& ReceiveBuffer::operator>>(sbyte8& data)
 	{
-		assert(remaining>=8);
-		ubyte8 u = GetUByte8();
-		sbyte8 i = static_cast<sbyte8>(u);
-		return i;
+		ubyte8 copy = static_cast<ubyte8>(data);
+		*this >> copy;
+		return *this;
 	}
 	
-	std::string ReceiveBuffer::GetString(size_t len)
+	ReceiveBuffer& ReceiveBuffer::operator>>(std::string& data)
 	{
-		std::string str = "";
-		for(size_t i=0;i<len;i++)
+		data.clear();
+		sbyte c;
+		*this >> c;
+		while(c != '\0')
 		{
-			str += static_cast<char>(GetByte());
+			data += static_cast<char>(c);
+			*this >> c;
 		}
-		return str;
+		return *this;
 	}
-	
-	std::string ReceiveBuffer::GetString1()
+
+	ReceiveBuffer& ReceiveBuffer::operator>>(float1& data)
 	{
-		size_t len = static_cast<size_t>(GetUByte());
-		return GetString(len);
+		data = static_cast<float1>(GetFloat(4));
+		return *this;
 	}
-	
-	std::string ReceiveBuffer::GetString2()
+
+	ReceiveBuffer& ReceiveBuffer::operator>>(float2& data)
 	{
-		size_t len = static_cast<size_t>(GetUByte2());
-		return GetString(len);
+		data = GetFloat(8);
+		return *this;
 	}
 	
-	double ReceiveBuffer::GetFloat(size_t numBytes)
+	ReceiveBuffer& ReceiveBuffer::operator&(ubyte & data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(sbyte & data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(ubyte2& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(sbyte2& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(ubyte4& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(sbyte4& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(ubyte8& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(sbyte8& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+
+	ReceiveBuffer& ReceiveBuffer::operator&(std::string& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+			
+	ReceiveBuffer& ReceiveBuffer::operator&(float1& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	ReceiveBuffer& ReceiveBuffer::operator&(float2& data)
+	{
+		*this >> data;
+		return *this;
+	}
+
+	float2 ReceiveBuffer::GetFloat(size_t numBytes)
 	{
 		assert(numBytes==1 || numBytes==2 || numBytes==4 || numBytes==8);
 		ubyte8 num;
@@ -454,12 +587,18 @@ namespace SORE_Network
 		switch(numBytes)
 		{
 			case 1:
-				num = static_cast<ubyte8>(GetUByte());
+			{
+				ubyte temp;
+				*this >> temp;
+				num = static_cast<ubyte8>(temp);
 				bits = 8;
 				expbits = 2;
 				break;
+			}
 			case 2:
-				num = static_cast<ubyte8>(GetUByte2());
+				ubyte2 temp;
+				*this >> temp;
+				num = static_cast<ubyte8>(temp);
 				bits = 16;
 				expbits = 4;
 				break;
@@ -469,7 +608,7 @@ namespace SORE_Network
 				bits = 32;
 				expbits = 8;*/
 				assert(remaining>=4);
-				float1* pos = reinterpret_cast<float1*>(&data[length-remaining]);
+				float1* pos = reinterpret_cast<float1*>(&buf[length-remaining]);
 				float1 i = *pos;
 				remaining-=4;
 				return static_cast<float2>(i);
@@ -482,7 +621,7 @@ namespace SORE_Network
 				bits = 64;
 				expbits = 11;*/
 				assert(remaining>=8);
-				float2* pos = reinterpret_cast<float2*>(&data[length-remaining]);
+				float2* pos = reinterpret_cast<float2*>(&buf[length-remaining]);
 				float2 i = *pos;
 				remaining-=8;
 				return i;

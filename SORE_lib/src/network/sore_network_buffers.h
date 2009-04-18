@@ -43,26 +43,40 @@ namespace SORE_Network
 			~ReceiveBuffer();
 			
 			//primitives
-			ubyte  GetUByte();
-			sbyte  GetByte();
-			ubyte2 GetUByte2();
-			sbyte2 GetByte2();
-			ubyte4 GetUByte4();
-			sbyte4 GetByte4();
-			ubyte8 GetUByte8();
-			sbyte8 GetByte8();
-			 
-			 //conversions needed
-			std::string GetString(size_t len); //string with given length
-			std::string GetString1(); //string with one-byte (unsigned) preceding length
-			std::string GetString2(); //string with two-byte (unsigned) preceding length
+			ReceiveBuffer& operator>>(ubyte & data);
+			ReceiveBuffer& operator>>(sbyte & data);
+			ReceiveBuffer& operator>>(ubyte2& data);
+			ReceiveBuffer& operator>>(sbyte2& data);
+			ReceiveBuffer& operator>>(ubyte4& data);
+			ReceiveBuffer& operator>>(sbyte4& data);
+			ReceiveBuffer& operator>>(ubyte8& data);
+			ReceiveBuffer& operator>>(sbyte8& data);
+
+			ReceiveBuffer& operator>>(std::string& data);
+	
+			ReceiveBuffer& operator>>(float1& data);
+			ReceiveBuffer& operator>>(float2& data);
+
+			ReceiveBuffer& operator&(ubyte & data);
+			ReceiveBuffer& operator&(sbyte & data);
+			ReceiveBuffer& operator&(ubyte2& data);
+			ReceiveBuffer& operator&(sbyte2& data);
+			ReceiveBuffer& operator&(ubyte4& data);
+			ReceiveBuffer& operator&(sbyte4& data);
+			ReceiveBuffer& operator&(ubyte8& data);
+			ReceiveBuffer& operator&(sbyte8& data);
+
+			ReceiveBuffer& operator&(std::string& data);
 			
-			double GetFloat(size_t numBytes);
+			ReceiveBuffer& operator&(float1& data);
+			ReceiveBuffer& operator&(float2& data);
 			
 			size_t Remaining() const;
 			
 		private:
-			ubyte* data;
+			float2 GetFloat(size_t numBytes);
+
+			ubyte* buf;
 			std::vector<ubyte> ownData;
 			size_t length;
 			size_t remaining;
@@ -73,27 +87,33 @@ namespace SORE_Network
 		public:
 			SendBuffer();
 			
-			void AddUByte (ubyte b);
-			void AddByte  (sbyte b);
+			SendBuffer& operator<<(const ubyte & data);
+			SendBuffer& operator<<(const sbyte & data);
+			SendBuffer& operator<<(const ubyte2& data);
+			SendBuffer& operator<<(const sbyte2& data);
+			SendBuffer& operator<<(const ubyte4& data);
+			SendBuffer& operator<<(const sbyte4& data);
+			SendBuffer& operator<<(const ubyte8& data);
+			SendBuffer& operator<<(const sbyte8& data);
+
+			SendBuffer& operator<<(const std::string& data);
+	
+			SendBuffer& operator<<(const float1& data);
+			SendBuffer& operator<<(const float2& data);
+
+			SendBuffer& operator&(const ubyte & data);
+			SendBuffer& operator&(const sbyte & data);
+			SendBuffer& operator&(const ubyte2& data);
+			SendBuffer& operator&(const sbyte2& data);
+			SendBuffer& operator&(const ubyte4& data);
+			SendBuffer& operator&(const sbyte4& data);
+			SendBuffer& operator&(const ubyte8& data);
+			SendBuffer& operator&(const sbyte8& data);
+
+			SendBuffer& operator&(const std::string& data);
 			
-			void AddUByte2(ubyte2 b);
-			void AddByte2 (sbyte2 b);
-			
-			void AddUByte4(ubyte4 b);
-			void AddByte4 (sbyte4 b);
-			
-			void AddUByte8(ubyte8 b);
-			void AddByte8 (sbyte8 b);
-			
-			void AddString(std::string str);
-			void AddString1(std::string str);
-			void AddString2(std::string str);
-			
-			void AddFloat(float1 f, size_t numBytes);
-			void AddFloat(float2 f, size_t numBytes);
-			
-			void AddFloat(float1 f); //default precision: 4 bytes
-			void AddFloat(float2 f); //default precision: 8 bytes
+			SendBuffer& operator&(const float1& data);
+			SendBuffer& operator&(const float2& data);
 			
 			ENetPacket* GetPacket(enet_uint32 flags);
 			unsigned int size() const;
@@ -101,15 +121,16 @@ namespace SORE_Network
 			void Broadcast(ENetHost* host, enet_uint8 channelID, enet_uint32 flags);
 			void Clear();
 			
-			static unsigned int GetTotalBytes() { return totalBytesSent;}
-			static void         ResetTotalBytes() { totalBytesSent = 0u; }
+			static unsigned int GetTotalBytes();
+			static void         ResetTotalBytes();
 			
 			SendBuffer& operator+=(SendBuffer& b);
 			
 			void Compress(SendBuffer& compressed); //compresses into argument
-		protected:
+		private:
+			void AddFloat(float2 f, size_t numBytes);
+
 			net_buffer buf;
-			
 			static unsigned int totalBytesSent;
 	};
 }
