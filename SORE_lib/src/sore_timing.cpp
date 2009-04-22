@@ -23,6 +23,11 @@
 
 namespace SORE_Timing
 {
+	unsigned int GetGlobalMS()
+	{
+		return GetGlobalTicks()/10;
+	}
+
 	Timer::Timer()
 	{
 		Reset();
@@ -30,16 +35,16 @@ namespace SORE_Timing
 
 	void Timer::Reset()
 	{
-		startTicks = GetGlobalTicks();
+		startTicks = GetGlobalMS();
 	}
 
 	unsigned int Timer::GetMS() const
 	{
-		return (GetGlobalTicks() - startTicks)/10;
+		return GetGlobalMS() - startTicks;
 	}
 
 	float Timer::GetSeconds() const
 	{
-		return (GetGlobalTicks() - startTicks)/10000.0f;
+		return (GetGlobalMS() - startTicks)/1000.0f;
 	}
 }

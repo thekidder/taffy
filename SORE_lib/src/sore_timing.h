@@ -25,6 +25,7 @@
 namespace SORE_Timing
 {
 	unsigned int GetGlobalTicks(); // in 1/10000 sec
+	unsigned int GetGlobalMS(); //provided for convenience 
 	
 	void Sleep(unsigned int ms);
 
