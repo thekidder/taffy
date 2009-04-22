@@ -20,7 +20,7 @@
 // $Id$
 
 #include <cassert>
-
+#include <string.h>
 #include <zlib.h>
 
 #include "../sore_logger.h"
