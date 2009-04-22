@@ -489,7 +489,7 @@ namespace SORE_Network
 	ReceiveBuffer& ReceiveBuffer::operator>>(std::string& data)
 	{
 		data.clear();
-		sbyte c;
+		ubyte c;
 		*this >> c;
 		while(c != '\0')
 		{
