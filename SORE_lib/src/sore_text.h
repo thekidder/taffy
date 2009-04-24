@@ -46,6 +46,7 @@ namespace SORE_Graphics
 
 		//returns number of characters in text
 		size_t GetLength() const;
+		size_t GetIndex(float xpos) const;
 		const std::string& GetText() const;
 	private:
 		void Update();

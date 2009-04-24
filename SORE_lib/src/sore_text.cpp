@@ -34,6 +34,21 @@ namespace SORE_Graphics
 		return width;
 	}
 
+	size_t Text::GetIndex(float xpos) const
+	{
+		float currentAdvance = 0.0f;
+		const char* str = text.c_str();
+		unsigned int i;
+		for(i = 0; str[i]; ++i)
+		{
+			const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
+
+			currentAdvance += c.advance;
+			if(currentAdvance > xpos) return i;
+		}
+		return i;
+	}
+
 	unsigned int Text::GetHeight() const
 	{
 		return height;

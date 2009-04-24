@@ -148,6 +148,17 @@ namespace SORE_GUI
 			UpdatePosition();
 			return true;
 		}
+		else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+		{
+			float x = static_cast<float>(e->mouse.x - 8);
+			size_t index = displayText->GetIndex(x);
+			unsigned int oldPos = pos;
+			pos = index + textStart;
+			dir = pos > oldPos ? 1 :
+				pos < oldPos ? -1 : 0;
+			UpdateText(dir);
+			UpdatePosition();
+		}
 		return false;
 	}
 
