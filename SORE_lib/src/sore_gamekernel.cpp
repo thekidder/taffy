@@ -46,6 +46,7 @@ namespace SORE_Kernel
 
 	void GameKernel::Frame()
 	{
+		if(paused) return;
 		const int maxDeltaT = 20000; //if frame time is over 2 seconds don't run frame
 		task_ref it;
 		int ticks = SORE_Timing::GetGlobalTicks();
@@ -59,12 +60,16 @@ namespace SORE_Kernel
 					it->second.accum += deltaT;
 					while(it->second.accum>it->second.ms*10)
 					{
-						it->second.task->Frame(it->second.ms*10);
-						it->second.accum -= it->second.ms*10;
+						if(!it->second.paused)
+						{
+							it->second.task->Frame(it->second.ms*10);
+							it->second.accum -= it->second.ms*10;
+						}
 					}
 				}
 				else
-					it->second.task->Frame(deltaT);
+					if(!it->second.paused)
+						it->second.task->Frame(deltaT);
 			}
 		}
 #ifdef DEBUG
@@ -78,7 +83,7 @@ namespace SORE_Kernel
 		task_ref it;
 		for(it=tasks.begin();it!=tasks.end();it++)
 		{
-			it->second.task->Pause();
+			PauseTask(it);
 		}
 		paused = true;
 	}
@@ -88,7 +93,7 @@ namespace SORE_Kernel
 		task_ref it;
 		for(it=tasks.begin();it!=tasks.end();it++)
 		{
-			it->second.task->Resume();
+			ResumeTask(it);
 		}
 		paused = false;
 	}
@@ -105,6 +110,7 @@ namespace SORE_Kernel
 		newTask.task = task;
 		newTask.ms = ms;
 		newTask.accum = 0;
+		newTask.paused = false;
 		task_ref size = tasks.insert(std::pair<unsigned int, const_task>(priority, newTask));
 		return size;
 	}
@@ -115,12 +121,33 @@ namespace SORE_Kernel
 		newTask.task = task;
 		newTask.ms = 0;
 		newTask.accum = 0;
+		newTask.paused = false;
 		task_ref size = tasks.insert(std::pair<unsigned int, const_task>(priority, newTask));
 		return size;
 	}
 
+	void GameKernel::PauseTask(SORE_Kernel::task_ref task)
+	{
+		if(task == tasks.end()) return;
+		task->second.paused = true;
+		task->second.task->Pause();
+	}
+
+	void GameKernel::ResumeTask(SORE_Kernel::task_ref task)
+	{
+		if(task == tasks.end()) return;
+		task->second.paused = false;
+		task->second.task->Resume();
+	}
+
+	task_ref GameKernel::end()
+	{
+		return tasks.end();
+	}
+
 	Task* GameKernel::RemoveTask(SORE_Kernel::task_ref task)
 	{
+		if(task == tasks.end()) return NULL;
 		Task* temp = task->second.task;
 		tasks.erase(task);
 		return temp;

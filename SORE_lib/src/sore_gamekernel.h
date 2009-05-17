@@ -41,6 +41,8 @@ namespace SORE_Kernel
 		void      Pause();
 		void      Frame();
 		void      Resume();
+		void      PauseTask(task_ref task);
+		void      ResumeTask(task_ref task);
 			
 		bool      Running();
 			
@@ -49,12 +51,14 @@ namespace SORE_Kernel
 		Task*     RemoveTask(task_ref task);
 		Task*     RemoveTask(const char* taskName);
 		void      RemoveAllTasks();
+
+		task_ref  end();
 			
 		task_list GetTasksByName(const char* taskName);
 		void      PrintTasks(int lvl);
 
 		bool ShouldQuit() const;
-	protected:
+	private:
 		task_list tasks;
 		int lastTicks;
 		bool paused;

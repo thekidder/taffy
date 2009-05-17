@@ -45,6 +45,8 @@ namespace SORE_Kernel
 		Task* task;
 		unsigned int ms;
 		unsigned int accum;
+
+		bool paused;
 	};
 }
 

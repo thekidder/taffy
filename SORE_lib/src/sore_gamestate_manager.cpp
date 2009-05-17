@@ -29,6 +29,8 @@ namespace SORE_Game
 	GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle) 
 		: kernel(gk), pool(), popFlag(false), screen(screenInfo, input, windowTitle, NULL)
 	{
+		curr = gk.end();
+
 		gk.AddTask(0, &input);
 		gk.AddTask(10, &screen);
 		SORE_Resource::Resource::SetRM(&pool);
@@ -50,6 +52,14 @@ namespace SORE_Game
 		kernel.RemoveTask(states.back().first);
 		delete states.back().second;
 		states.pop_back();
+
+		if(states.size())
+			curr = states.back().first;
+		else
+			curr = kernel.end();
+
+		kernel.ResumeTask(curr);
+
 		popFlag = false;
 	}
 
@@ -63,7 +73,9 @@ namespace SORE_Game
 		input.PushState();
 		renderer->PushState();
 		newState->Initialize(this);
-		SORE_Kernel::task_ref curr;
+
+		kernel.PauseTask(curr);
+
 		if(newState->GetInterval() == -1)
 			curr = kernel.AddTask(50, newState);
 		else

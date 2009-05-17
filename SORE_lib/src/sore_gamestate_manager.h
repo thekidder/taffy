@@ -59,6 +59,7 @@ namespace SORE_Game
 
 		SORE_Kernel::Screen screen;
 
+		SORE_Kernel::task_ref curr;
 		std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
 
 		//should we pop the state on frame end?
