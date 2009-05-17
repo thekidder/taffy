@@ -43,8 +43,6 @@ namespace SORE_Kernel
 		~Screen();
 		
 		void Frame(int elapsedTime);
-		void Pause();
-		void Resume();
 		
 		const char* GetName() const {return "Screen";}
 			
@@ -58,7 +56,7 @@ namespace SORE_Kernel
 		const GLint* GetViewport() const; 
 		SORE_Graphics::ScreenInfo GetScreen() const;
 			
-	protected:
+	private:
 		int  InitializeSDL(std::string windowTitle);
 		int  InitializeGL();
 		void InitExtensions();

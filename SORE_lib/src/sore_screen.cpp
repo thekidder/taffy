@@ -135,14 +135,6 @@ namespace SORE_Kernel
 		SDL_GL_SwapBuffers();
 	}
 
-	void Screen::Pause()
-	{
-	}
-
-	void Screen::Resume()
-	{
-	}
-
 	void Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
 	{
 		renderer = _renderer;
