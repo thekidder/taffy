@@ -56,6 +56,8 @@ namespace SORE_Kernel
 	const unsigned int MOUSE_BUTTON1   = 0x01;
 	const unsigned int MOUSE_BUTTON2   = 0x02;
 	const unsigned int MOUSE_BUTTON3   = 0x04;
+	const unsigned int MOUSE_WHEELDOWN = 0x08;
+	const unsigned int MOUSE_WHEELUP   = 0x10;
 
 	const unsigned int INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP 
 		| MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK | MOUSEENTER | MOUSELEAVE;

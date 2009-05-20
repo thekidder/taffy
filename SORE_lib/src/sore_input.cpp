@@ -59,46 +59,41 @@ namespace SORE_Kernel
 			switch(sdl_event.button.button)
 			{
 			case SDL_BUTTON_LEFT:
-				event.mouse.buttonState |= MOUSE_BUTTON1;
+				event.mouse.buttonState = MOUSE_BUTTON1;
 				break;
 			case SDL_BUTTON_MIDDLE:
-				event.mouse.buttonState |= MOUSE_BUTTON3;
+				event.mouse.buttonState = MOUSE_BUTTON3;
 				break;
 			case SDL_BUTTON_RIGHT:
-				event.mouse.buttonState |= MOUSE_BUTTON2;
+				event.mouse.buttonState = MOUSE_BUTTON2;
 				break;
-		
 			case SDL_BUTTON_WHEELDOWN:
+				event.mouse.buttonState = MOUSE_WHEELDOWN;
 				break;
 			case SDL_BUTTON_WHEELUP:
+				event.mouse.buttonState = MOUSE_WHEELUP;
 				break;
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
-
 			event.type = MOUSEBUTTONUP;
-			if(sdl_event.button.button & SDL_BUTTON_LEFT && event.mouse.buttonState & MOUSE_BUTTON1) 
-				event.mouse.buttonState ^= MOUSE_BUTTON1;
-			if(sdl_event.button.button & SDL_BUTTON_RIGHT && event.mouse.buttonState & MOUSE_BUTTON2) 
-				event.mouse.buttonState ^= MOUSE_BUTTON2;
-			if(sdl_event.button.button & SDL_BUTTON_MIDDLE && event.mouse.buttonState & MOUSE_BUTTON3) 
-				event.mouse.buttonState ^= MOUSE_BUTTON3;
 			switch(sdl_event.button.button)
 			{
-				{
-				case SDL_BUTTON_LEFT:
-					if(event.mouse.buttonState & MOUSE_BUTTON1)
-						event.mouse.buttonState ^= MOUSE_BUTTON1;
-					break;
-				case SDL_BUTTON_MIDDLE:
-					if(event.mouse.buttonState & MOUSE_BUTTON3)
-						event.mouse.buttonState ^= MOUSE_BUTTON3;
-					break;
-				case SDL_BUTTON_RIGHT:
-					if(event.mouse.buttonState & MOUSE_BUTTON2)
-						event.mouse.buttonState ^= MOUSE_BUTTON2;
-					break;
-				}
+			case SDL_BUTTON_LEFT:
+				event.mouse.buttonState = MOUSE_BUTTON1;
+				break;
+			case SDL_BUTTON_MIDDLE:
+				event.mouse.buttonState = MOUSE_BUTTON3;
+				break;
+			case SDL_BUTTON_RIGHT:
+				event.mouse.buttonState = MOUSE_BUTTON2;
+				break;
+			case SDL_BUTTON_WHEELDOWN:
+				event.mouse.buttonState = MOUSE_WHEELDOWN;
+				break;
+			case SDL_BUTTON_WHEELUP:
+				event.mouse.buttonState = MOUSE_WHEELUP;
+				break;
 			}
 			break;
 		case SDL_KEYDOWN:
