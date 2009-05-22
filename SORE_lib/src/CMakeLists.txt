@@ -48,7 +48,7 @@ set(SORE_HEADERS sore.h
   sore_gamestate.h sore_gamestate_manager.h
   sore_gamekernel.h sore_geometrychunk.h sore_graphics.h sore_input.h
   sore_interpolater.h sore_logger.h sore_logginginit.h
-  sore_material.h sore_math.h math/sore_vector2.h math/sore_vector3.h
+  sore_material.h sore_math.h math/sore_geometry.h math/sore_vector2.h math/sore_vector3.h
   math/sore_vector4.h math/sore_matrix4x4.h sore_particle.h sore_particle_circle.h sore_particle_emitter.h sore_particle_explosion.h
   sore_postprocess.h
   sore_profiler.h sore_renderer.h sore_renderer2d.h sore_resource.h

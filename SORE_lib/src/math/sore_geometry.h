@@ -29,7 +29,7 @@ namespace SORE_Math
 			{				
 				if(topLeft[0]>bottomRight[0])
 				{
-					SORE_Math::Vector2<float> temp = topLeft;
+					SORE_Math::Vector2<T> temp = topLeft;
 					topLeft = bottomRight;
 					bottomRight = temp;
 				}
