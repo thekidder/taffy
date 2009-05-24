@@ -83,12 +83,10 @@ namespace SORE_Graphics
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glLoadIdentity();
 		
-		fbo->BindBuffers(3);
+		fbo->BindBuffer(3);
 		
 		combine->Bind();
 		combine->SetUniform1i("tex", 0);
-		combine->SetUniform1i("horz", 1);
-		combine->SetUniform1i("vert", 2);
 		
 		DrawFullscreenQuad(proj);
 
