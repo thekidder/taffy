@@ -83,7 +83,7 @@ namespace SORE_Graphics
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glLoadIdentity();
 		
-		fbo->BindBuffer(3);
+		fbo->BindBuffer(2);
 		
 		combine->Bind();
 		combine->SetUniform1i("tex", 0);
