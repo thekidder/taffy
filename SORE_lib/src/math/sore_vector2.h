@@ -4,6 +4,7 @@
 #define _SORE_VECTOR2_H_
 
 #include <cassert>
+#include <cmath>
 
 namespace SORE_Math
 {
