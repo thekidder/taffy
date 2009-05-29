@@ -94,6 +94,11 @@ namespace SORE_Kernel
 	
 		glViewport( 0, 0, ( GLsizei )screen.width, ( GLsizei )screen.height );
 		glGetIntegerv(GL_VIEWPORT, viewport);
+		Event e;
+		e.type = RESIZE;
+		e.resize.w = screen.width;
+		e.resize.h = screen.height;
+		input.InjectEvent(e);
 	}
 
 	std::vector<SORE_Math::Vector2<unsigned int> > Screen::ListModes()
@@ -174,11 +179,6 @@ namespace SORE_Kernel
 		if(drawContext)
 			SDL_FreeSurface(drawContext);
 		drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
-		Event e;
-		e.type = RESIZE;
-		e.resize.w = screen.width;
-		e.resize.h = screen.height;
-		input.InjectEvent(e);
 	}
 
 	int Screen::InitializeSDL(std::string windowTitle)
@@ -235,12 +235,9 @@ namespace SORE_Kernel
 		/* Really Nice Perspective Calculations */
 		glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-		if(!OnResize())
-		{
-			return 1;
-		}
 		InitExtensions();
-		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") 
+							 % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
 		char* glExtensions = (char*)glGetString(GL_EXTENSIONS);
 		std::string extensions;
 		if(glExtensions==NULL) extensions = "";
