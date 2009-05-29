@@ -37,7 +37,7 @@ namespace SORE_Graphics
 	public:
 		ParticleEmitter(unsigned int numParticles, unsigned int spawnAmount, 
 										SORE_Math::Matrix4<float> pos, const Color& min, const Color& max, SORE_Resource::Texture2D* tex)
-			: num(numParticles), transform(pos), particles(0), spawn(spawnAmount), texture(tex), position(0), cMin(min), cMax(max)
+                                        : particles(0), num(numParticles), spawn(spawnAmount), position(0), transform(pos), texture(tex), cMin(min), cMax(max)
 		{
 			if(num)
 			{
