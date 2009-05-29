@@ -239,10 +239,9 @@ namespace SORE_Math
 	template<class T>
 			Vector3<T> operator*(const Matrix4<T>& m1, const Vector3<T>& v1) //multiplies v1 by the top-left 3x3 matrix of m1
 	{
-		Vector3<T> result;
-		result[0] = m1.GetData()[ 0]*v1[0] + m1.GetData()[ 4]*v1[1] + m1.GetData()[ 8]*v1[2];
-		result[1] = m1.GetData()[ 1]*v1[0] + m1.GetData()[ 5]*v1[1] + m1.GetData()[ 9]*v1[2];
-		result[2] = m1.GetData()[ 2]*v1[0] + m1.GetData()[ 6]*v1[1] + m1.GetData()[10]*v1[2];
+		Vector4<T> temp(v[0], v[1], static_cast<T>(1), static_cast<T>(1));
+		temp = m * temp;
+		Vector3<T> result(temp[0], temp[1], temp[2]);
 		return result;
 	}
 
@@ -250,9 +249,9 @@ namespace SORE_Math
 	template<typename T>
 	Vector2<T> operator*(const Matrix4<T>& m, const Vector2<T>& v)
 	{
-		Vector2<T> result;
-		result[0] = m.GetData()[ 0]*v[0] + m.GetData()[ 4]*v[1] + m.GetData()[ 8]*v[2];
-		result[1] = m.GetData()[ 1]*v[0] + m.GetData()[ 5]*v[1] + m.GetData()[ 9]*v[2];
+		Vector4<T> temp(v[0], v[1], static_cast<T>(1), static_cast<T>(1));
+		temp = m * temp;
+		Vector2<T> result(temp[0], temp[1]);
 		return result;
 	}
 }
