@@ -57,6 +57,16 @@ namespace SORE_Math
 				return value;
 			}
 			
+			const T& operator[] (int index) const
+			{
+				if(index<0 || index>3)
+				{
+					assert("Index out of range!");
+					return value[0];
+				}
+				return value[index];
+			}
+
 			T& operator[] (int index)
 			{
 				if(index<0 || index>3)
