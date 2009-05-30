@@ -237,7 +237,7 @@ namespace SORE_Math
 	}
 	
 	template<class T>
-			Vector3<T> operator*(const Matrix4<T>& m1, const Vector3<T>& v1) //multiplies v1 by the top-left 3x3 matrix of m1
+			Vector3<T> operator*(const Matrix4<T>& m, const Vector3<T>& v)
 	{
 		Vector4<T> temp(v[0], v[1], static_cast<T>(1), static_cast<T>(1));
 		temp = m * temp;
