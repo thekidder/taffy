@@ -27,9 +27,10 @@ IF(WIN32)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp sore_timing_windows.cpp)
 ENDIF(WIN32)
 
+ADD_SUBDIRECTORY("create_package")
+ADD_SUBDIRECTORY("math")
 ADD_SUBDIRECTORY("gui")
 ADD_SUBDIRECTORY("network")
-ADD_SUBDIRECTORY("create_package")
 
 set(SORE_SRCS
   sore_color.cpp sore_fbo.cpp sore_fileio.cpp sore_font.cpp sore_gamekernel.cpp 
@@ -42,31 +43,35 @@ set(SORE_SRCS
   sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp sore_screenglow.cpp
   sore_screeninfo.cpp sore_settings.cpp sore_shaders.cpp sore_task.cpp
   sore_text.cpp sore_texture.cpp sore_timing.cpp sore_util.cpp 
-  sore_vbo.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS})
+  sore_vbo.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
 
 set(SORE_HEADERS sore.h
   sore_allgl.h sore_color.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
   sore_gamestate.h sore_gamestate_manager.h
   sore_gamekernel.h sore_geometrychunk.h sore_graphics.h sore_input.h
   sore_interpolater.h sore_logger.h sore_logginginit.h
-  sore_material.h sore_math.h math/sore_geometry.h math/sore_vector2.h math/sore_vector3.h
-  math/sore_vector4.h math/sore_matrix4x4.h sore_particle.h sore_particle_circle.h sore_particle_emitter.h sore_particle_explosion.h
+  sore_material.h sore_math.h 
+  sore_particle.h sore_particle_circle.h sore_particle_emitter.h sore_particle_explosion.h
   sore_postprocess.h
   sore_profiler.h sore_renderer.h sore_renderer2d.h sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_task.h sore_text.h sore_texture.h
-  sore_timing.h sore_util.h sore_vbo.h ${SORE_GUI_HEADERS} ${SORE_NETWORK_HEADERS})
+  sore_timing.h sore_util.h sore_vbo.h )
 
-ADD_LIBRARY(sore_lib STATIC ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS})
+ADD_LIBRARY(sore_lib STATIC ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
+  ${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS})
 SET_TARGET_PROPERTIES(
 sore_lib
 PROPERTIES
   DEBUG_POSTFIX _d
   OUTPUT_NAME sore
   ARCHIVE_OUTPUT_DIRECTORY ../bin
-	COMPILE_DEFINITIONS_DEBUG DEBUG
+  COMPILE_DEFINITIONS_DEBUG DEBUG
 )
 ADD_DEPENDENCIES(sore_lib svnversion_sore)
 
 INSTALL(TARGETS sore_lib DESTINATION lib)
 INSTALL(FILES ${SORE_HEADERS} DESTINATION include)
+INSTALL(FILES ${SORE_NETWORK_HEADERS} DESTINATION include/network)
+INSTALL(FILES ${SORE_GUI_HEADERS} DESTINATION include/gui)
+INSTALL(FILES ${SORE_MATH_HEADERS} DESTINATION include/math)
