@@ -1,4 +1,4 @@
-
+#include <cstring>
 #include <zlib.h>
 #include <iostream>
 #include <cstdio>

@@ -29,6 +29,7 @@ ENDIF(WIN32)
 
 ADD_SUBDIRECTORY("gui")
 ADD_SUBDIRECTORY("network")
+ADD_SUBDIRECTORY("create_package")
 
 set(SORE_SRCS
   sore_color.cpp sore_fbo.cpp sore_fileio.cpp sore_font.cpp sore_gamekernel.cpp 
