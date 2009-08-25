@@ -70,7 +70,17 @@ int main(int argc, char** argv)
     {
         prefix = vm["prefix"].as<string>();
         if(prefix.at(prefix.length()-1) != '/') prefix += "/";
-        top = AddFile(boost::filesystem::path(prefix), top, "", files);
+        //take all but the trailing slash so the path iterator doesn't generator a '.'
+        boost::filesystem::path prefix_path(prefix.substr(0, prefix.size()-1));
+        boost::filesystem::path p("");
+        for(boost::filesystem::path::iterator it=prefix_path.begin(); it!=prefix_path.end(); ++it)
+        {
+            p /= *it;
+            std::string thisPrefix = p.parent_path().string();
+            if(thisPrefix.size()) thisPrefix += "/";
+            top = AddFile(*it, top, thisPrefix, files);
+        }
+
     }
 
 	

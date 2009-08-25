@@ -11,7 +11,12 @@ unsigned short int AddFile(boost::filesystem::path p, unsigned short int top, st
     file_info temp;
     temp.fileID = files.size()+1;
     temp.parentID = top;
-    temp.file = boost::filesystem::is_directory(boost::filesystem::status(p)) ? false : true;
+    if(!boost::filesystem::exists(p))
+        temp.file = false;
+    else if(boost::filesystem::is_directory(boost::filesystem::status(p)))
+        temp.file = false;
+    else
+        temp.file = true;
     strcpy(temp.filename, p.filename().c_str());
     strcpy(temp.fullname, p.string().c_str());
 
