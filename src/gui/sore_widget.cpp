@@ -315,4 +315,16 @@ namespace SORE_GUI
 			}
 		}
 	}
+
+    std::string Widget::style = "ix_style";
+
+    void Widget::SetStyle(std::string widgetStyle)
+    {
+        style = widgetStyle;
+    }
+
+    std::string Widget::GetStyle()
+    {
+        return style;
+    }
 }

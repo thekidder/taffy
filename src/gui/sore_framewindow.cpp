@@ -27,8 +27,11 @@ namespace SORE_GUI
 													 SORE_Resource::ResourcePool& pool, Widget* par)
 		: FrameWidget(s, p, SCALE_CENTER, par), title(t), titleText(0), dragged(false)
 	{
+        std::string styleDir("data/Textures/");
+        styleDir += GetStyle() + "/";
+
 		SORE_Resource::Texture2D* tex = 
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/frame.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "frame.tga");
 		SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
 		SetTexture(tex);
 

@@ -27,8 +27,11 @@ namespace SORE_GUI
 	SliderWidget::SliderWidget(SVec s, SVec p, int min, int max, SORE_Resource::ResourcePool& pool, Widget* par)
 		: FrameWidget(s, p, SCALE_ALL, par), minimum(min), maximum(max), current((max -  min)/2), dragged(false), sliderChunk(0)
 	{
-		bg = pool.GetResource<SORE_Resource::Texture2D>("data/Textures/slider_bg.tga");
-		slider = pool.GetResource<SORE_Resource::Texture2D>("data/Textures/slider.tga");
+        std::string styleDir("data/Textures/");
+        styleDir += GetStyle() + "/";
+
+		bg = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "slider_bg.tga");
+		slider = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "slider.tga");
 
 		UpdatePosition();
 		SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);

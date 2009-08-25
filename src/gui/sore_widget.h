@@ -48,6 +48,9 @@ namespace SORE_GUI
 		int GetPosition(unit_type type) const;
 
 		bool HasFocus() const;
+
+        static void SetStyle(std::string style);
+        static std::string GetStyle();
 	protected:
 		//returns true if inside widget area
 		bool InBounds(unsigned int x, unsigned int y);
@@ -106,6 +109,8 @@ namespace SORE_GUI
 
 		float& HighestLayer();
 		float highestLayer;
+
+        static std::string style;
 	};
 }
 

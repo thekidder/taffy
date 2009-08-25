@@ -30,8 +30,11 @@ namespace SORE_GUI
 		: FrameWidget(s, p, SCALE_CENTER, par), texture(0), displayText(0), font(0), text(""), caret(0), caretTex(0), pos(0),
 			textStart(0), textEnd(0)
 	{
-		texture = pool.GetResource<SORE_Resource::Texture2D>("data/Textures/textfield.tga");
-		caretTex = pool.GetResource<SORE_Resource::Texture2D>("data/Textures/caret.tga");
+        std::string styleDir("data/Textures/");
+        styleDir += GetStyle() + "/";
+
+		texture = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "textfield.tga");
+		caretTex = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "caret.tga");
 
 		SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
 		SetTexture(texture);

@@ -29,16 +29,19 @@ namespace SORE_GUI
 	{
 		font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
 
+        std::string styleDir("data/Textures/");
+        styleDir += GetStyle() + "/";
+
 		normal = 
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_normal.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_normal.tga");
 		active = 
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_active.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_active.tga");
 		hover =
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_hover.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_hover.tga");
 		arrow =
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/arrow.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "arrow.tga");
 		menuBg =
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/dropdown_bg.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "dropdown_bg.tga");
 
 		textHeight = GetSize(VERTICAL) / 2;
 		if(textHeight < 16) textHeight = 16;

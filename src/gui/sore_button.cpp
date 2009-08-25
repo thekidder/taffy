@@ -29,12 +29,15 @@ namespace SORE_GUI
 								 SORE_Resource::ResourcePool& pool, Widget* par) 
 		: FrameWidget(s, p, SCALE_ALL, par), normal(0), active(0), hover(0), pressed(false), inArea(false)
 	{
+        std::string styleDir("data/Textures/");
+        styleDir += GetStyle() + "/";
+
 		normal = 
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_normal.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_normal.tga");
 		active = 
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_active.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_active.tga");
 		hover =
-			pool.GetResource<SORE_Resource::Texture2D>("data/Textures/button_sheet_hover.tga");
+			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_hover.tga");
 
 		unsigned int height = GetSize(VERTICAL);
 		unsigned int width = GetSize(HORIZONTAL);
