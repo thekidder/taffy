@@ -3,7 +3,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cassert>
-#include <getopt.h>
+
+#include <boost/program_options.hpp>
 
 #include "walker.h"
 
@@ -17,53 +18,76 @@
 
 using namespace std;
 
-void showHelp(const char* name)
+void showHelp(const char* program_name, boost::program_options::options_description options)
 {
-    std::cout << "Usage: " << name << " [-c] folder output\n"
-              << "-c : if specified compresses output archive\n"
-              << "folder : the folder to archive\n"
-              << "output : output filename\n";
+    std::cout << "Usage: " << program_name << " [OPTIONS] output-file input-files\n";
+    std::cout << options;
 }
 
 int main(int argc, char** argv)
-{
-	int c, index;
-	
-	bool compress = false;
-	
-	while((c=getopt(argc, argv, "ch"))!=-1)
+{	
+    boost::program_options::options_description generic("Generic Options");
+    generic.add_options()
+        ("help,h", "Show help");
+
+    boost::program_options::options_description config("Configuration");
+    config.add_options()
+        ("compression,c", "Compress output")
+        ("prefix,p", boost::program_options::value< std::string >(), "Folder prefix for archived files");
+
+    boost::program_options::options_description hidden("Hidden");
+    hidden.add_options()
+        ("files", boost::program_options::value< vector<string> >(), "Files to add to archive")
+        ("archive-name", boost::program_options::value< string >(), "Output archive name");
+
+    boost::program_options::options_description visible;
+    visible.add(generic).add(config);
+
+    boost::program_options::options_description all;
+    all.add(visible).add(hidden);
+
+    boost::program_options::positional_options_description po;
+    po.add("archive-name", 1);
+    po.add("files", -1);
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(boost::program_options::command_line_parser(argc, argv).
+              options(all).positional(po).run(), vm);
+    boost::program_options::notify(vm);
+
+
+	if(!vm.count("files") || !vm.count("archive-name")) 
     {
-        switch(c)
-        {
-        case 'c':
-            compress = true;
-            break;
-        case '?':
-            cerr << "Unknown option " << optopt << "\n";
-            break;
-        case 'h':
-            showHelp(argv[0]);
-            return 0;
-        default:
-            break;
-        }
-    }
-	
-	index = optind;
-	
-	if(argc-index!=2) 
-    {
-        //cerr << "Bad number of non-option arguments (" << argc-index << "), expected two\n";
-        showHelp(argv[0]);
+        showHelp(argv[0], visible);
         return -1;
     }
-	
+   
+    unsigned short int top = 65535;
 	file_list files;
+    std::string prefix;
+
+    if(vm.count("prefix"))
+    {
+        prefix = vm["prefix"].as<string>();
+        if(prefix.at(prefix.length()-1) != '/') prefix += "/";
+        top = AddFile(boost::filesystem::path(prefix), top, "", files);
+    }
+
 	
 	cout << "Creating file list...\n";
-	
-	Walk(argv[index], 65535, files);
-			
+
+    std::vector<std::string> inputFiles = vm["files"].as<std::vector<std::string> >();
+
+    for(std::vector<std::string>::iterator it=inputFiles.begin(); it!=inputFiles.end(); ++it)
+    {
+        boost::filesystem::path p(*it);
+        if(!boost::filesystem::exists(p))
+            std::cerr << "Cannot add " << p.string() << ": path does not exist\n";
+        else if(boost::filesystem::is_directory(boost::filesystem::status(p)))
+            Walk(p, top, prefix, files);
+        else
+            AddFile(p, top, prefix, files);
+    }	
 	/*for(int i=0;i<files.size();i++)
       {
       if(files[i].file)
@@ -93,7 +117,7 @@ int main(int argc, char** argv)
 	unsigned int fileSizeRaw; //size of file compressed (only present in compressed files)
 	unsigned int filePos;
 	
-	out = fopen(argv[index+1], "wb");
+	out = fopen(vm["archive-name"].as<string>().c_str(), "wb");
 	
 	fputs("SDP", out);
 	fputc(major, out);
@@ -131,7 +155,7 @@ int main(int argc, char** argv)
     }
 	
 	cout << "Finished writing file table, now copying data...\n";
-	if(compress)
+	if(vm.count("compression"))
 		cout << "Using DEFLATE compression mode\n";
 	
 	const int CHUNK = 131072;
@@ -148,7 +172,7 @@ int main(int argc, char** argv)
         it->size = 0;
         it->sizeRaw = 0;
         it->pos = ftell(out);
-        if(!compress)
+        if(!vm.count("compression"))
         {
 			
             int c;
@@ -209,7 +233,7 @@ int main(int argc, char** argv)
 	
 	cout << "Finished copying data, now updating file table...\n";
 	
-	out = fopen(argv[index+1], "rb+");
+	out = fopen(vm["archive-name"].as<std::string>().c_str(), "rb+");
 	
 	fseek(out, 7, SEEK_SET);
 	
@@ -231,7 +255,7 @@ int main(int argc, char** argv)
 	
 	fclose(out);
 	
-	cout << "Wrote " << argv[index+1] << " successfully ";
+	cout << "Wrote " << vm["archive-name"].as<std::string>() << " successfully ";
 	cout << "with " << numFiles << " files and directories\n";
 	
 	return 0;

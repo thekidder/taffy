@@ -1,5 +1,7 @@
-
+#include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
 
 struct file_info
 {
@@ -17,4 +19,5 @@ struct file_info
 
 typedef std::vector<file_info> file_list;
 
-void Walk(const char* directory, unsigned short int top, file_list& files);
+unsigned short int AddFile(boost::filesystem::path p, unsigned short int parent, std::string prefix, file_list& files);
+void Walk(boost::filesystem::path p, unsigned short int top, std::string prefix, file_list& files);
