@@ -6,14 +6,8 @@
 #include <sore_gamekernel.h>
 #include <sore_gamestate.h>
 #include <sore_gamestate_manager.h>
-#include <sore_input.h>
-#include <sore_screen.h>
-#include <sore_timing.h>
-#include <gui/sore_button.h>
-#include <gui/sore_framewindow.h>
-#include <gui/sore_topwidget.h>
-#include <gui/sore_textwidget.h>
-#include <sore_renderer2d.h>
+
+#include "state_default.h"
 
 SORE_Logging::Logger* mainLog;
 
