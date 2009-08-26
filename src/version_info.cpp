@@ -1,7 +1,7 @@
 // $Id$
 
 #include "app_log.h"
-#include "project_name_svnrev.h"
+#include "project_svnrev.h"
 
 const unsigned int VERSION_MAJOR = 0;
 const unsigned int VERSION_MINOR = 0;
