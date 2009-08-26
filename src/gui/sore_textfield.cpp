@@ -30,7 +30,7 @@ namespace SORE_GUI
 		: FrameWidget(s, p, SCALE_CENTER, par), texture(0), displayText(0), font(0), text(""), caret(0), caretTex(0), pos(0),
 			textStart(0), textEnd(0)
 	{
-        std::string styleDir("data/Textures/");
+        std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
 		texture = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "textfield.tga");
@@ -48,7 +48,7 @@ namespace SORE_GUI
 
 		unsigned int textHeight = GetSize(VERTICAL) - 16;
 
-		font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
+		font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
 		displayText = new SORE_Graphics::Text(*font, textHeight, text);
 
 		UpdateText(0);

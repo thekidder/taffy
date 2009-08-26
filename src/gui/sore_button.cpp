@@ -29,7 +29,7 @@ namespace SORE_GUI
 								 SORE_Resource::ResourcePool& pool, Widget* par) 
 		: FrameWidget(s, p, SCALE_ALL, par), normal(0), active(0), hover(0), pressed(false), inArea(false)
 	{
-        std::string styleDir("data/Textures/");
+        std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
 		normal = 
@@ -45,13 +45,13 @@ namespace SORE_GUI
 		unsigned int textHeight = height / 2;
 		if(textHeight < 16) textHeight = 16;
 
-		font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
+		font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
 		t = new SORE_Graphics::Text(*font, textHeight, text);
 		if(t->GetWidth() >= (width-16))
 		{
 			float factor = static_cast<float>(t->GetWidth()) / (width - 16);
 			unsigned int newHeight = static_cast<unsigned int>(static_cast<float>(textHeight) / factor);
-			font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
+			font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
 			delete t;
 			t = new SORE_Graphics::Text(*font, newHeight, text);
 		}

@@ -27,7 +27,7 @@ namespace SORE_GUI
 													 SORE_Resource::ResourcePool& pool, Widget* par)
 		: FrameWidget(s, p, SCALE_CENTER, par), title(t), titleText(0), dragged(false)
 	{
-        std::string styleDir("data/Textures/");
+        std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
 		SORE_Resource::Texture2D* tex = 
@@ -35,7 +35,7 @@ namespace SORE_GUI
 		SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
 		SetTexture(tex);
 
-		font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
+		font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
 		titleText = new SORE_Graphics::Text(*font, 24, title);
 
 		UpdatePosition();

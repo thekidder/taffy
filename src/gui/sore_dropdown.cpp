@@ -27,10 +27,10 @@ namespace SORE_GUI
 		: FrameWidget(s, p, SCALE_ALL, par), font(0), normal(0), active(0), hover(0), arrow(0), pressed(false), inArea(false), arrowChunk(0),
 			originalSize(s), curChoice(0)
 	{
-		font = pool.GetResource<SORE_Font::Font>("LiberationSans-Regular.ttf");
-
-        std::string styleDir("data/Textures/");
+        std::string styleDir("data/");
         styleDir += GetStyle() + "/";
+
+		font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
 
 		normal = 
 			pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_normal.tga");
