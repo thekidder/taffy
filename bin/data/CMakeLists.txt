@@ -2,3 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 ADD_SUBDIRECTORY(Textures)
 ADD_SUBDIRECTORY(Shaders)
+
+#should be in prefix path - installed by SORE
+FIND_FILE(IX_STYLE ix_style.sdp)
+
+INSTALL(FILES ${IX_STYLE} DESTINATION .)
