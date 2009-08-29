@@ -37,6 +37,13 @@ namespace SORE_GUI
 		UpdateCache();
 	}
 
+	void TextWidget::SetColor(const SORE_Graphics::Color& c)
+	{
+		color = c;
+		text.UpdateText(text.GetText(), color);
+		UpdateCache();
+	}
+
 	void TextWidget::UpdatePosition()
 	{
 		UpdateCache();
