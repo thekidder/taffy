@@ -348,10 +348,13 @@ void SORE_FileIO::Close(file_ref file)
 				DeleteLinkedList(cachedFiles[file].out_buf.next);
 			cachedFiles[file].out_size = CHUNK * RATIO;
 		}
-		if(--openPackageCount[cachedFiles[file].package]==0)
+		--openPackageCount[cachedFiles[file].package];
+#ifdef SORE_FILEIO_CLOSE_PACKAGE_STRICT
+		if(openPackageCount[cachedFiles[file].package]==0)
 		{
 			ClosePackage(cachedFiles[file].package);
 		}
+#endif
 	}
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
 	{
