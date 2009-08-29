@@ -6,5 +6,6 @@ FreeType 2 (http://freetype.sourceforge.net/index2.html): Licensed under the Fre
 GLEW (http://glew.sourceforge.net/): Licensed under a modified BSD license (see glew.txt) and the MIT license.
 SDL (http://www.libsdl.org/): Licensed under the LGPL 2.1 or greater (see lgpl-2.1.txt).
 SORE: licensed under the LGPL 2.1 or greater (see lgpl-2.1.txt). Contact the author for more information.
+zlib (http://www.zlib.net/): Licensed under a liberal license (see zlib.txt)
 
 Copyright 2009 by Adam Kidder <thekidder@gmail.com>
