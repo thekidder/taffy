@@ -37,6 +37,11 @@ namespace SORE_GUI
 		UpdateCache();
 	}
 
+	void TextWidget::UpdatePosition()
+	{
+		UpdateCache();
+	}
+
 	void TextWidget::UpdateCache()
 	{
 		transforms.clear();

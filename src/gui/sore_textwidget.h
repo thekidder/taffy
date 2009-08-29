@@ -36,6 +36,7 @@ namespace SORE_GUI
 
 		void UpdateText(const std::string& t);
 	private:
+		void UpdatePosition();
 		void OnGLReload();
 		SORE_Graphics::render_list GetThisRenderList();
 		bool ProcessEvents(SORE_Kernel::Event* e);
