@@ -21,8 +21,8 @@
 
 #include <algorithm>
 
-#include "sore_renderer2d.h"
 #include "sore_allgl.h"
+#include "sore_renderer2d.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
@@ -174,9 +174,9 @@ namespace SORE_Graphics
 				for(it=geometry.begin();it!=geometry.end();++it)
 				{
 					newBatch.second->AddObject(it->second->Vertices(), it->second->Indices(), 
-																		 it->second->NumVertices(), it->second->NumIndices(), 
-																		 it->first, it->second->TexCoords(), NULL, 
-																		 it->second->Colors());
+						it->second->NumVertices(), it->second->NumIndices(), 
+						it->first, it->second->TexCoords(), NULL, 
+						it->second->Colors());
 					if(!newBatch.first.size() || 
 						 newBatch.first.back().tex->GetHandle() != it->second->GetTexture()->GetHandle())
 					{
