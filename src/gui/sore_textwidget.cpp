@@ -25,7 +25,7 @@ namespace SORE_GUI
 {
 	TextWidget::TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t, 
 												 const SORE_Graphics::Color& c, Widget* parent)
-		: Widget(SVec(SUnit(), SUnit()), p, parent), face(f), text(f, h, t), color(c), height(h)
+		: Widget(SVec(SUnit(), SUnit()), p, parent), face(f), text(f, h, t, c), color(c), height(h)
 	{
 		SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
 		UpdateCache();

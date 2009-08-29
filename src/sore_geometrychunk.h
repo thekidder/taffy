@@ -37,56 +37,55 @@ namespace SORE_Graphics
 {
 	static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
-  class SORE_EXPORT GeometryChunk
-  {
-  public:
+	class SORE_EXPORT GeometryChunk
+	{
+	public:
 		GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
 									SORE_Math::Rect<float> texCoords = defaultTexCoords,
 									const Color& color = White); 
-    GeometryChunk();
-    ~GeometryChunk();
+		GeometryChunk();
+		~GeometryChunk();
 		
 		const Color& GetColor() const;
 		void SetColor(const Color& color);
 
-    bool HasTexture() const;
-    bool HasColor() const;
+		bool HasTexture() const;
+		bool HasColor() const;
 		bool IsOpaque() const;		
-    const float* Vertices() const;
-    const float* Colors() const;
+		const float* Vertices() const;
+		const float* Colors() const;
 		const float* TexCoords() const;
-    const unsigned short* Indices() const;
+		const unsigned short* Indices() const;
 		
-    unsigned int NumVertices() const;
-    unsigned int NumIndices() const;
+		unsigned int NumVertices() const;
+		unsigned int NumIndices() const;
 		
 		const SORE_Resource::Texture2D* GetTexture() const;
 		void SetTexture(SORE_Resource::Texture2D* texture);
 
-  protected:
-  private:
+	private:
 		void setup(SORE_Math::Rect<float> bounds,
-							 SORE_Math::Rect<float> texCoordRect);
+			SORE_Math::Rect<float> texCoordRect);
 
-    //geometry
-    float* vertices;
-    float* texCoords;
-    float* colors;
+		//geometry
+		float* vertices;
+		float* texCoords;
+		float* colors;
 		
-    unsigned short* indices;
-    bool opaque;
+		unsigned short* indices;
+		bool opaque;
 		
-    unsigned int numVertices, numIndices;
+		unsigned int numVertices, numIndices;
 		
-    SORE_Resource::Texture2D* tex;
+		SORE_Resource::Texture2D* tex;
 		Color c;
-    unsigned int primitiveType;
+		unsigned int primitiveType;
   };
 
-  typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> > 
+	typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> > 
 		render_list;
 
-  typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> > 
+	typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> > 
 		render_list_owned;
 
 	void ApplyTransform(const SORE_Math::Matrix4<float>& transform, render_list_owned& list);
