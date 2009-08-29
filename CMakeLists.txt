@@ -7,3 +7,4 @@ ADD_SUBDIRECTORY(bin)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tools)
 
+INSTALL(FILES freetype.txt glew.txt info.txt lgpl-2.1.txt DESTINATION .)
