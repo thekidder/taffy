@@ -27,17 +27,17 @@
 namespace SORE_Graphics
 {
 	GeometryChunk::GeometryChunk(SORE_Resource::Texture2D* texture, 
-															 SORE_Math::Rect<float> bounds,
-															 SORE_Math::Rect<float> texCoords,
-															 const Color& color)
-		: colors(0), opaque(false), tex(0), vertices(0), texCoords(0), c(color)
+		SORE_Math::Rect<float> bounds,
+		SORE_Math::Rect<float> texCoords,
+		const Color& color) : 
+		colors(0), opaque(false), tex(0), vertices(0), texCoords(0), c(color)
 	{
 		setup(bounds, texCoords);
 		tex = texture;
 	}
 
 	void GeometryChunk::setup(SORE_Math::Rect<float> bounds,
-														SORE_Math::Rect<float> texCoordRect)
+		SORE_Math::Rect<float> texCoordRect)
 	{
 		vertices = new float[3 * 4];
 		texCoords = new float[2 * 4];
@@ -83,20 +83,42 @@ namespace SORE_Graphics
 
 		numVertices = 4;
 		numIndices = 6;
+
+		sharedTexCoords = false;
+		sharedVertices  = false;
+		sharedColors    = false;
+		sharedIndices   = false;
 	}
 
-	GeometryChunk::GeometryChunk()
-		: vertices(0), texCoords(0), colors(0), indices(0), opaque(false), numVertices(0), numIndices(0), tex(0)
+	GeometryChunk::GeometryChunk() : 
+		vertices(0), texCoords(0), colors(0), indices(0), opaque(false), numVertices(0), numIndices(0), tex(0)
 	{
+		sharedTexCoords = false;
+		sharedVertices  = false;
+		sharedColors    = false;
+		sharedIndices   = false;
 	}
 
+	GeometryChunk::GeometryChunk(const GeometryChunk& gc) :
+		vertices(gc.vertices), texCoords(gc.texCoords), colors(gc.colors), indices(gc.indices), opaque(gc.opaque), 
+		numVertices(gc.numVertices), numIndices(gc.numIndices), tex(gc.tex)
+	{
+		sharedTexCoords = true;
+		sharedVertices  = true;
+		sharedColors    = true;
+		sharedIndices   = true;
+	}
 
 	GeometryChunk::~GeometryChunk()
 	{
-		delete[] vertices;
-		delete[] texCoords;
-		delete[] colors;
-		delete[] indices;
+		if(!sharedVertices)
+			delete[] vertices;
+		if(!sharedTexCoords)
+			delete[] texCoords;
+		if(!sharedColors)
+			delete[] colors;
+		if(!sharedIndices)
+			delete[] indices;
 	}
 
 	const Color& GeometryChunk::GetColor() const
@@ -107,6 +129,11 @@ namespace SORE_Graphics
 	void GeometryChunk::SetColor(const Color& color)
 	{
 		c = color;
+		if(sharedColors)
+		{
+			sharedColors = false;
+			colors = new float[4*4];
+		}
 		for(unsigned int i=0;i<4*4;i+=4)
 		{
 			memcpy(colors + i, color.GetColor(), 4 * sizeof(float));

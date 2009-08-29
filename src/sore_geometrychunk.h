@@ -42,8 +42,10 @@ namespace SORE_Graphics
 	public:
 		GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
 									SORE_Math::Rect<float> texCoords = defaultTexCoords,
-									const Color& color = White); 
+									const Color& color = White);
 		GeometryChunk();
+		//produces a shallow copy
+		GeometryChunk(const GeometryChunk& gc);
 		~GeometryChunk();
 		
 		const Color& GetColor() const;
@@ -71,6 +73,7 @@ namespace SORE_Graphics
 		float* vertices;
 		float* texCoords;
 		float* colors;
+		bool sharedVertices, sharedTexCoords, sharedColors, sharedIndices;
 		
 		unsigned short* indices;
 		bool opaque;
