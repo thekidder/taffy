@@ -18,14 +18,10 @@ int main(int argc, char** argv)
 	SORE_Logging::XMLLogger fileLog(SORE_Logging::SHOW_ALL, "logs/program_log.xml", "program_name log");
 #ifdef DEBUG
 	SORE_Logging::ConsoleLogger consoleLog(SORE_Logging::SHOW_ALL);
-#endif
-
-	mainLog->AddBackend(&fileLog);
-
-#ifdef DEBUG
 	mainLog->AddBackend(&consoleLog);
 	APP_LOG(SORE_Logging::LVL_INFO, "DEBUG BUILD");
 #endif
+	mainLog->AddBackend(&fileLog);
 
 	PrintVersionInfo();
 	
