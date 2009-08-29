@@ -26,13 +26,14 @@
 #include "sore_fileio.h"
 #include "sore_logger.h"
 
-#include <vector>
+#include <zlib.h>
+
+#include <cassert>
+#include <cstring>
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
-#include <zlib.h>
-#include <cassert>
-
+#include <vector>
 
 #define MODULE_FILEIO 1
 
@@ -249,32 +250,36 @@ int SORE_FileIO::CachePackage(const char* package)
 
 int SORE_FileIO::ClosePackage(const char* package)
 {
-	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % package);
 	if(openPackages.find(package)==openPackages.end())
 	{
 		ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Cannot close %s: package is not open") % package);
 		return 0;
 	}
-	if(openPackageCount[package]>0)
+	if(openPackageCount.find(package)!=openPackageCount.end() && openPackageCount[package]!=0)
 	{
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing open files (%u) before closing package") % openPackageCount[package], MODULE_FILEIO);
+
 		file_list::iterator it;
 
 		for(it=cachedFiles.begin();it!=cachedFiles.end();++it)
 		{
-			if(it->package != package)
+			if(strcmp(it->package, package) != 0)
 				continue;
 			if(!it->isOpen)
 				continue;
 			
 			it->isOpen = false;
-			openPackageCount[package]--;
+			--openPackageCount[package];
+			ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("closing %s (%u)") % it->fullname % openPackageCount[package], MODULE_FILEIO);
 		}
 	}
-	if(openPackageCount[package]!=0)
+	if(openPackageCount.find(package)!=openPackageCount.end() && openPackageCount[package]!=0)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Consistency error - incorrect number of open files for package %s") % package);
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Consistency error - incorrect number of open files for package %s (%u)") 
+			% package % openPackageCount[package]);
 		return 1;
 	}
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % package);
 	fclose(openPackages[package]);
 	openPackages.erase(package);
 	return 0;
@@ -319,8 +324,8 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 	{
 		if(cachedFiles[it->second].isOpen)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_WARNING,"This file is already open, aborting.");
-			return 0;
+			ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("%s is already open") % file);
+			return it->second;
 		}
 		cachedFiles[it->second].currPos = 0;
 		cachedFiles[it->second].currPosRaw  = 0;
@@ -334,7 +339,11 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 			if(openPackageCount.find(cachedFiles[it->second].package)==openPackageCount.end())
 				openPackageCount[cachedFiles[it->second].package] = 1;
 			else
-				openPackageCount[cachedFiles[it->second].package]++;
+				++openPackageCount[cachedFiles[it->second].package];
+		}
+		else
+		{
+			++openPackageCount[cachedFiles[it->second].package];
 		}
 		cachedFiles[it->second].isOpen = true;
 		if(cachedFiles[it->second].compressed)
@@ -390,8 +399,10 @@ void SORE_FileIO::Close(file_ref file)
 {
 	if(file<FILESYSTEM_START && file>=PACKAGE_START)
 	{
-		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache") % cachedFiles[file].filename, MODULE_FILEIO);
 		cachedFiles[file].isOpen = false;
+		--openPackageCount[cachedFiles[file].package];
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache (%u)") 
+			% cachedFiles[file].fullname % openPackageCount[cachedFiles[file].package], MODULE_FILEIO);
 		if(cachedFiles[file].compressed)
 		{
 			delete   cachedFiles[file].strm;
@@ -400,7 +411,6 @@ void SORE_FileIO::Close(file_ref file)
 				DeleteLinkedList(cachedFiles[file].out_buf.next);
 			cachedFiles[file].out_size = CHUNK * RATIO;
 		}
-		--openPackageCount[cachedFiles[file].package];
 #ifdef SORE_FILEIO_CLOSE_PACKAGE_STRICT
 		if(openPackageCount[cachedFiles[file].package]==0)
 		{
