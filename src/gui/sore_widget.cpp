@@ -56,7 +56,7 @@ namespace SORE_GUI
 	void Widget::SetPosition(const SVec& p)
 	{
 		position = p;
-	  UpdatePositionMatrix();
+		UpdatePositionMatrix();
 	}
 
 	const SVec& Widget::GetSize() const
