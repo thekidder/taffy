@@ -38,23 +38,23 @@
 namespace SORE_Font
 {
   //let's define some nice error constants
-  const int LIBRARY_LOAD_FAILED    = 1;
-  const int FONTCONFIG_LOAD_FAILED = 5;
-  const int FONT_LOAD_FAILED       = 2;
-  const int GLYPH_LOAD_FAILED      = 3;
-  const int GET_GLYPH_FAILED       = 4;
-  const int INVALID_FONT_NAME      = 6;
-  const int INVALID_FONT_OBJ       = 7;
-  const int INVALID_FONT_HEIGHT    = 8;
+	const int LIBRARY_LOAD_FAILED    = 1;
+	const int FONTCONFIG_LOAD_FAILED = 5;
+	const int FONT_LOAD_FAILED       = 2;
+	const int GLYPH_LOAD_FAILED      = 3;
+	const int GET_GLYPH_FAILED       = 4;
+	const int INVALID_FONT_NAME      = 6;
+	const int INVALID_FONT_OBJ       = 7;
+	const int INVALID_FONT_HEIGHT    = 8;
   
-  class FontPaths
-  {
-  public:
-    static void InitPaths();
-    static std::string GetFontPath(std::string name);
-  private:
-    static std::vector<std::string> fontPaths;
-  };
+	class FontPaths
+	{
+	public:
+		static void InitPaths();
+		static std::string GetFontPath(std::string name);
+	private:
+		static std::vector<std::string> fontPaths;
+	};
 
 	struct CharInfo
 	{
@@ -64,12 +64,12 @@ namespace SORE_Font
 		float advance;
 	};
   
-  class Font : public SORE_Resource::Resource
+	class Font : public SORE_Resource::Resource
 	{
 	public:
 		Font(std::string filename);
 		~Font();
-      
+
 		const char* Type() {return "Font";}
 		bool GLContextDependent() const {return true;}
 
@@ -80,7 +80,7 @@ namespace SORE_Font
 		void Load();
 	private:
 		void LoadCharacter(FT_Face& face, char ch, unsigned int h);
-      
+
 		//(height, CharInfo[128])
 		std::map<unsigned int, CharInfo*> characters;
 		FT_Library library;
