@@ -42,9 +42,14 @@ namespace SORE_FileIO
   /*
     Call this to include a package and make its contents available to the application
     If filenames in two or more packages are duplicated, the last one included will 
-		always be used
+    always be used. Returns 0 on success.
   */
-  int          CachePackageInfo(const char* package); //return 0 on success
+  int          CachePackage(const char* package);
+  /* 
+    Call this to explicitly close a package. Package cache is still available to the 
+	application, but the file handle is not open. Returns 0 on success.
+  */
+  int          ClosePackage(const char* package);
 	
   file_ref     Open(const char* file); //return a file_ref on success, 0 on failure
   void         Close(file_ref file);

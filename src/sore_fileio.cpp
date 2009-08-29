@@ -113,7 +113,7 @@ int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
 	return 0;
 }
 
-int SORE_FileIO::CachePackageInfo(const char* package)
+int SORE_FileIO::CachePackage(const char* package)
 {
 	int errCode = 0;
 	char header[7];
@@ -195,11 +195,43 @@ int SORE_FileIO::CachePackageInfo(const char* package)
 	return errCode;
 }
 
+int SORE_FileIO::ClosePackage(const char* package)
+{
+	ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % package);
+	if(openPackages.find(package)==openPackages.end())
+	{
+		ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Cannot close %s: package is not open") % package);
+		return 0;
+	}
+	if(openPackageCount[package]>0)
+	{
+		file_list::iterator it;
+
+		for(it=cachedFiles.begin();it!=cachedFiles.end();++it)
+		{
+			if(it->package != package)
+				continue;
+			if(!it->isOpen)
+				continue;
+			
+			it->isOpen = false;
+			openPackageCount[package]--;
+		}
+	}
+	if(openPackageCount[package]!=0)
+	{
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Consistency error - incorrect number of open files for package %s") % package);
+		return 1;
+	}
+	fclose(openPackages[package]);
+	openPackages.erase(package);
+	return 0;
+}
+
 /*
   All file_ref's from packages are in the range 1-2147483647
   All file_ref's from the normal filesystem are in the range 2147483648-4294967295
 */
-
 SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 {
 	std::map<std::string, size_t>::iterator it;
@@ -216,8 +248,10 @@ SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
 		}
 			
 		unsigned int cur = nOpenFilesystemFiles;
-			/*TODO: Currently, the approach below doesnt completely "free" file_ref's to be used when a file is closed - so theoretically, after opening files a couple billion times, we may be unable to open any more. This should be made more elegant sometime in the future.
-			*/
+		/*
+		  TODO: Currently, the approach below doesnt completely "free" file_ref's to be used when a file is closed - so theoretically, 
+		  after opening files a couple billion times, we may be unable to open any more. This should be made more elegant sometime in the future.
+		*/
 		while(openFilesystemFiles.find(FILESYSTEM_START+cur)!=openFilesystemFiles.end())
 			cur++;
 		filesystem_file fileStruct;
@@ -316,9 +350,7 @@ void SORE_FileIO::Close(file_ref file)
 		}
 		if(--openPackageCount[cachedFiles[file].package]==0)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % cachedFiles[file].package);
-			fclose(openPackages[cachedFiles[file].package]);
-			openPackages.erase(cachedFiles[file].package);
+			ClosePackage(cachedFiles[file].package);
 		}
 	}
 	else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
