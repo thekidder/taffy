@@ -53,6 +53,7 @@ namespace SORE_Graphics
 		size_t GetIndex(float xpos) const;
 		const std::string& GetText() const;
 	private:
+		void DeleteOldGeometry();
 		void Update();
 
 		Color color;

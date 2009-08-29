@@ -106,8 +106,18 @@ namespace SORE_Graphics
 		return overallTransform;
 	}
 
+	void Text::DeleteOldGeometry()
+	{
+		std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
+		for(it = geometry.begin();it!=geometry.end();++it)
+		{
+			delete it->second;
+		}
+	}
+
 	void Text::Update()
 	{
+		DeleteOldGeometry();
 		geometry.clear();
 		const char* str = text.c_str();
 		float currentAdvance = 0.0f;
@@ -117,11 +127,15 @@ namespace SORE_Graphics
 
 			if(c.gc) //account for characters without any geometry (i.e. space)
 			{
+				//create a shared geometry
+				GeometryChunk* coloredCharacter = new GeometryChunk(*c.gc);
+				coloredCharacter->SetColor(color);
+
 				SORE_Math::Matrix4<float> m = c.transform;
 				m *= SORE_Math::Matrix4<float>::GetTranslation(currentAdvance, 0.0f, 0.0f);
 				m *= overallTransform;
 				
-				geometry.push_back(std::make_pair(m, c.gc));
+				geometry.push_back(std::make_pair(m, coloredCharacter));
 			}
 			currentAdvance += c.advance;
 		}
