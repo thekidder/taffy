@@ -22,6 +22,10 @@
 #ifndef SORE_TEXT_H
 #define SORE_TEXT_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include "sore_color.h"
 #include "sore_font.h"
 #include "sore_geometrychunk.h"
@@ -29,7 +33,7 @@
 
 namespace SORE_Graphics
 {
-	class Text
+	class SORE_EXPORT Text
 	{
 	public:
 		Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText, const Color& c = White);
@@ -62,5 +66,7 @@ namespace SORE_Graphics
 		std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> > geometry;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

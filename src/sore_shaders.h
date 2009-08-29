@@ -22,6 +22,10 @@
 #ifndef  SORE_SHADERS_H
 #define  SORE_SHADERS_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 #include <string>
 
@@ -32,7 +36,7 @@
 
 namespace SORE_Graphics
 {
-  class GLSLShader : public SORE_Resource::Resource
+  class SORE_EXPORT GLSLShader : public SORE_Resource::Resource
 	{
 	public:
 		static int  InitShaders();
@@ -83,5 +87,7 @@ namespace SORE_Graphics
 		static bool supported;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

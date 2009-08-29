@@ -22,6 +22,10 @@
 #ifndef SORE_TEXTFIELD_H
 #define SORE_TEXTFIELD_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <boost/function.hpp>
 #include <boost/signals.hpp>
 
@@ -32,7 +36,7 @@
 
 namespace SORE_GUI
 {
-	class TextField : public FrameWidget
+	class SORE_EXPORT TextField : public FrameWidget
 	{
 	public:
 		TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
@@ -70,5 +74,7 @@ namespace SORE_GUI
 		boost::signal<void (std::string)> onChange;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

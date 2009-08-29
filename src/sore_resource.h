@@ -22,6 +22,10 @@
 #ifndef  SORE_RESOURCE_H
 #define  SORE_RESOURCE_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <map>
 #include <vector>
 #include <string>
@@ -35,13 +39,13 @@
 
 namespace SORE_Resource
 {
-  class ResourcePool;
+  class SORE_EXPORT ResourcePool;
 	
 	//as a little bit of a hack, we will put the logic for reloading textures into ResourcePool
 	//to do this, we add a new field to Resource: GLContextDependent, which returns true if we 
 	//need to reload on GL context change
 
-  class Resource
+  class SORE_EXPORT Resource
   {
   public:
     Resource(std::string file, std::string info="", bool delayedNotify=false);
@@ -71,13 +75,13 @@ namespace SORE_Resource
     std::string filename;
   };
 	
-  class ResourcePool
+  class SORE_EXPORT ResourcePool
   {
   public:
     ResourcePool();
     ~ResourcePool();
 			
-    template<class T>
+    template<typename T>
       T* GetResource(std::string filename)
 		{
 			std::size_t hash = string_hash(filename);
@@ -109,5 +113,7 @@ namespace SORE_Resource
     boost::hash<std::string> string_hash;
   };
 }
+
+#pragma warning( pop )
 
 #endif 

@@ -33,7 +33,7 @@
 
 namespace SORE_Game
 {
-	class GamestateManager
+	class SORE_EXPORT GamestateManager
 	{
 	public:
 		GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle = "SORE Framework Application");

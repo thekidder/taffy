@@ -26,7 +26,7 @@
 
 namespace SORE_Graphics
 {
-	class ExplosionParticle : public Particle
+	class SORE_EXPORT ExplosionParticle : public Particle
 	{
 	public:
 		ExplosionParticle(SORE_Math::Matrix4<float> initial, const Color& c, SORE_Resource::Texture2D* tex);

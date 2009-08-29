@@ -22,6 +22,8 @@
 #ifndef  SORE_TIMING_H
 #define  SORE_TIMING_H
 
+#include "sore_dll.h"
+
 namespace SORE_Timing
 {
 	unsigned int GetGlobalTicks(); // in 1/10000 sec
@@ -30,7 +32,7 @@ namespace SORE_Timing
 	void Sleep(unsigned int ms);
 
 	//implements a timer that starts when it comes in scope
-	class Timer
+	class SORE_EXPORT Timer
 	{
 	public:
 		Timer();

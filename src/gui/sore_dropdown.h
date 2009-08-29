@@ -22,6 +22,10 @@
 #ifndef SORE_DROPDOWN_H
 #define SORE_DROPDOWN_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <map>
 
 #include <boost/signals.hpp>
@@ -34,7 +38,7 @@
 
 namespace SORE_GUI
 {
-	class Dropdown : public FrameWidget
+	class SORE_EXPORT Dropdown : public FrameWidget
 	{
 	public:
 		Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
@@ -72,5 +76,7 @@ namespace SORE_GUI
 		bool inArea;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

@@ -22,11 +22,13 @@
 #ifndef SORE_UNITS_H
 #define SORE_UNITS_H
 
+#include "../sore_dll.h"
+
 //inspired by the CEGUI system of "unified size and positioning"
 
 namespace SORE_GUI
 {
-	class SUnit
+	class SORE_EXPORT SUnit
 	{
 	public:
 		SUnit(double rel, int abs);
@@ -44,7 +46,7 @@ namespace SORE_GUI
 	SUnit operator+(const SUnit& lhs, const SUnit& rhs);
 	SUnit operator-(const SUnit& lhs, const SUnit& rhs);
 
-	class SVec //two-dimensional GUIUnit
+	class SORE_EXPORT SVec //two-dimensional GUIUnit
 	{
 	public:
 		SVec(SUnit h, SUnit v);

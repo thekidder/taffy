@@ -28,7 +28,7 @@ namespace SORE_Graphics
 {
 	typedef unsigned int gc_id;
 	
-	class IRenderer
+	class SORE_EXPORT IRenderer
 	{
 	public:
 		IRenderer() {}

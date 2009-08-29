@@ -22,9 +22,11 @@
 #ifndef  SORE_TASK_H
 #define  SORE_TASK_H
 
+#include "sore_dll.h"
+
 namespace SORE_Kernel
 {	
-	class Task
+	class SORE_EXPORT Task
 	{
 	public:
 		Task();

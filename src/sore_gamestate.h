@@ -27,9 +27,9 @@
 
 namespace SORE_Game
 {
-	class GamestateManager;
+	class SORE_EXPORT GamestateManager;
 
-	class Gamestate : public SORE_Kernel::Task
+	class SORE_EXPORT Gamestate : public SORE_Kernel::Task
 	{
 	public:
 		Gamestate(int ms = -1); //ms is the time interval for const tasks: -1 if a regular task

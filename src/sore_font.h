@@ -22,6 +22,10 @@
 #ifndef  SORE_FONT_H
 #define  SORE_FONT_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include "sore_allgl.h"
 #include "sore_geometrychunk.h"
 #include "sore_resource.h"
@@ -47,7 +51,7 @@ namespace SORE_Font
 	const int INVALID_FONT_OBJ       = 7;
 	const int INVALID_FONT_HEIGHT    = 8;
   
-	class FontPaths
+	class SORE_EXPORT FontPaths
 	{
 	public:
 		static void InitPaths();
@@ -64,7 +68,7 @@ namespace SORE_Font
 		float advance;
 	};
   
-	class Font : public SORE_Resource::Resource
+	class SORE_EXPORT Font : public SORE_Resource::Resource
 	{
 	public:
 		Font(std::string filename);
@@ -88,5 +92,7 @@ namespace SORE_Font
 		FT_Byte* fontInfo;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

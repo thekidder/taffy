@@ -22,6 +22,10 @@
 #ifndef SORE_SLIDERWIDGET_H
 #define SORE_SLIDERWIDGET_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <boost/signals.hpp>
 #include <boost/function.hpp>
 
@@ -30,7 +34,7 @@
 
 namespace SORE_GUI
 {
-	class SliderWidget : public FrameWidget
+	class SORE_EXPORT SliderWidget : public FrameWidget
 	{
 	public:
 		SliderWidget(SVec s, SVec p, int min, int max, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
@@ -59,5 +63,7 @@ namespace SORE_GUI
 		int minimum, maximum, current;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

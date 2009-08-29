@@ -22,6 +22,10 @@
 #ifndef  SORE_SCREEN_H
 #define  SORE_SCREEN_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <boost/function.hpp>
 
 #include "sore_renderer.h"
@@ -35,7 +39,7 @@
 
 namespace SORE_Kernel
 {
-	class Screen : public Task
+	class SORE_EXPORT Screen : public Task
 	{
 	public:
 		Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
@@ -83,5 +87,7 @@ namespace SORE_Kernel
 		std::string uiDataPath;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

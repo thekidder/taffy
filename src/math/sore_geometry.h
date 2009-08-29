@@ -26,7 +26,7 @@
 
 namespace SORE_Math
 {
-	template<class T>
+	template<typename T>
 		struct Rect
 		{
 			Vector2<T> topLeft, bottomRight;

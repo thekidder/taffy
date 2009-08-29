@@ -27,7 +27,7 @@
 
 namespace SORE_Graphics
 {
-	class Particle
+	class SORE_EXPORT Particle
 	{
 	public:
 		Particle(SORE_Math::Matrix4<float> initial, const Color& c);

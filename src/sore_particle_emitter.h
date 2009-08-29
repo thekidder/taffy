@@ -31,8 +31,8 @@
 
 namespace SORE_Graphics
 {
-	template<class T>
-	class ParticleEmitter : public SORE_Kernel::Task
+	template<typename T>
+	class SORE_EXPORT ParticleEmitter : public SORE_Kernel::Task
 	{
 	public:
 		ParticleEmitter(unsigned int numParticles, unsigned int spawnAmount, 

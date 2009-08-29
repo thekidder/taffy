@@ -29,8 +29,8 @@
 
 namespace SORE_Math
 {
-	template<class T>
-			class Quaternion
+	template<typename T>
+			class SORE_EXPORT Quaternion
 	{
 		public:
 			Quaternion() : real(static_cast<T>(0.0))
@@ -121,7 +121,7 @@ namespace SORE_Math
 			Vector3<T> imaginary;
 	};
 	
-	template<class T>
+	template<typename T>
 			Quaternion<T> operator*(Quaternion<T> q1, Quaternion<T> q2)
 	{
 		Quaternion<T> temp = q1;

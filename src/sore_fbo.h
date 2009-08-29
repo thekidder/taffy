@@ -23,10 +23,11 @@
 #define SORE_FBO_H
 
 #include "sore_allgl.h"
+#include "sore_dll.h"
 
 namespace SORE_Graphics
 {
-	class FBO
+	class SORE_EXPORT FBO
 	{
 	public:
 		FBO(unsigned int w, unsigned int h, bool depthBuffer = true, unsigned int colorBuffers = 1);

@@ -22,12 +22,14 @@
 #ifndef SORE_COLOR_H
 #define SORE_COLOR_H
 
+#include "sore_dll.h"
+
 namespace SORE_Graphics
 {
 	enum ColorComponent {RED = 0, GREEN, BLUE, ALPHA};
 
 	//represents a four-component color with an internal type of float
-	class Color
+	class SORE_EXPORT Color
 	{
 	public:
 		Color();

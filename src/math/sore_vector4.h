@@ -28,8 +28,8 @@
 
 namespace SORE_Math
 {
-	template<class T>
-			class Vector4
+	template<typename T>
+			class SORE_EXPORT Vector4
 	{
 		public:
 			Vector4()
@@ -129,7 +129,7 @@ namespace SORE_Math
 				return *this;
 			}
 			
-			//template<class OP>
+			//template<class SORE_EXPORT OP>
 			Vector4<T>& operator+=(T v)
 			{
 				value[0] += v;
@@ -138,7 +138,7 @@ namespace SORE_Math
 				value[3] += v;
 				return *this;
 			}
-			//template<class OP>
+			//template<class SORE_EXPORT OP>
 			Vector4<T>& operator*=(T v)
 			{
 				value[0] *= v;
@@ -149,7 +149,7 @@ namespace SORE_Math
 			}
 			
 			
-			//template<class OP>
+			//template<class SORE_EXPORT OP>
 			Vector4<T>& operator/=(T num)
 			{
 				value[0] /= num;
@@ -184,20 +184,20 @@ namespace SORE_Math
 			T value[4];
 	};
 	
-	template<class T>
+	template<typename T>
 			double distance(Vector4<T> one, Vector4<T> two)
 	{
 		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1])+(one[2]-two[2])*(one[2]-two[2]) + (one[3]-two[3])*(one[3]-two[3]));
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator-(Vector4<T> v)
 	{
 		Vector4<T> temp(-v[0],-v[1],-v[2], -v[3]);
 		return temp;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator+(Vector4<T> v1, Vector4<T> v2)
 	{
 		Vector4<T> r = v1;
@@ -205,7 +205,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator-(Vector4<T> v1, Vector4<T> v2)
 	{
 		Vector4<T> r = v1;
@@ -213,7 +213,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator/(Vector4<T> v1, T& num)
 	{
 		Vector4<T> r = v1;
@@ -221,7 +221,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator*(Vector4<T> v1, T num)
 	{
 		Vector4<T> r = v1;
@@ -229,7 +229,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator*(T num, Vector4<T> v1)
 	{
 		return v1*num;

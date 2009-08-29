@@ -26,7 +26,7 @@
 
 namespace SORE_Graphics
 {
-	class CircleParticle : public Particle
+	class SORE_EXPORT CircleParticle : public Particle
 	{
 	public:
 		CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c, SORE_Resource::Texture2D* tex);

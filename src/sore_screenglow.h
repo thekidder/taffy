@@ -29,7 +29,7 @@
 
 namespace SORE_Graphics
 {
-	class ScreenGlow : public PostProcessEffect
+	class SORE_EXPORT ScreenGlow : public PostProcessEffect
 	{
 	public:
 		ScreenGlow(unsigned int w, unsigned int h, SORE_Resource::ResourcePool& pool);

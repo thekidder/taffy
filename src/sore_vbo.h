@@ -22,16 +22,21 @@
 #ifndef SORE_VBO_H
 #define SORE_VBO_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 #include "sore_allgl.h"
 #include "math/sore_matrix4x4.h"
+
 namespace SORE_Graphics
 {
   /**
      @author Adam Kidder <thekidder@gmail.com>
      For use with dynamic (change every frame) indexed VBOs
   */
-  class VBO
+  class SORE_EXPORT VBO
   {
   public:
     VBO(bool t = false, bool n = false, bool c = false);
@@ -55,4 +60,7 @@ namespace SORE_Graphics
     std::vector<unsigned short> indices;
   };
 }
+
+#pragma warning( pop )
+
 #endif

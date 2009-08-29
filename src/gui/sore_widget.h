@@ -22,8 +22,13 @@
 #ifndef SORE_WIDGET_H
 #define SORE_WIDGET_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 
+#include "../sore_dll.h"
 #include "../sore_geometrychunk.h"
 #include "../sore_input.h"
 
@@ -35,7 +40,7 @@ namespace SORE_GUI
 
 	enum unit_type {HORIZONTAL, VERTICAL};
 
-	class Widget
+	class SORE_EXPORT Widget
 	{
 	public:
 		Widget(SVec s, SVec p, Widget* par=NULL);
@@ -113,5 +118,7 @@ namespace SORE_GUI
         static std::string style;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

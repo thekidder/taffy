@@ -28,7 +28,7 @@
 
 namespace SORE_GUI
 {
-	class TopWidget : public Widget
+	class SORE_EXPORT TopWidget : public Widget
 	{
 	public:
 		TopWidget(unsigned int width, unsigned int height);

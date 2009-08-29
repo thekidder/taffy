@@ -26,7 +26,7 @@
 
 namespace SORE_Graphics
 {
-	class PostProcessEffect
+	class SORE_EXPORT PostProcessEffect
 	{
 	public:
 		PostProcessEffect(unsigned int w, unsigned int h);

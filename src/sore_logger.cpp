@@ -64,7 +64,7 @@ namespace SORE_Logging
 	ConsoleLogger sore_console_logger(SHOW_ALL);
 #endif
 
-	Logger sore_log("SORE Engine");
+	Logger SORE_EXPORT sore_log("SORE Engine");
 	void InitLogging();
 }
 

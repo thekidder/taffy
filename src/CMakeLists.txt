@@ -37,7 +37,8 @@ set(SORE_SRCS
   sore_gamestate.cpp sore_gamestate_manager.cpp
   sore_geometrychunk.cpp sore_graphics.cpp sore_input.cpp sore_interpolater.cpp
   sore_logger.cpp sore_logginginit.cpp
-  sore_material.cpp sore_math.cpp sore_particle.cpp sore_particle_circle.cpp sore_particle_emitter.cpp sore_particle_explosion.cpp
+  sore_material.cpp sore_math.cpp sore_particle.cpp sore_particle_circle.cpp 
+  sore_particle_emitter.cpp sore_particle_explosion.cpp
   sore_postprocess.cpp sore_profiler.cpp
   sore_renderer.cpp sore_renderer2d.cpp sore_resource.cpp
   sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp sore_screenglow.cpp
@@ -46,7 +47,7 @@ set(SORE_SRCS
   sore_vbo.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
 
 set(SORE_HEADERS sore.h
-  sore_allgl.h sore_color.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
+  sore_allgl.h sore_color.h sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
   sore_gamestate.h sore_gamestate_manager.h
   sore_gamekernel.h sore_geometrychunk.h sore_graphics.h sore_input.h
   sore_interpolater.h sore_logger.h sore_logginginit.h
@@ -58,19 +59,28 @@ set(SORE_HEADERS sore.h
   sore_settings.h sore_shaders.h sore_task.h sore_text.h sore_texture.h
   sore_timing.h sore_util.h sore_vbo.h )
 
-ADD_LIBRARY(sore_lib STATIC ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
+ADD_LIBRARY(sore_lib SHARED ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
   ${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS})
 SET_TARGET_PROPERTIES(
 sore_lib
 PROPERTIES
   DEBUG_POSTFIX _debug
   OUTPUT_NAME sore
-  ARCHIVE_OUTPUT_DIRECTORY ../bin
   COMPILE_DEFINITIONS_DEBUG DEBUG
 )
 ADD_DEPENDENCIES(sore_lib svnversion_sore)
+TARGET_LINK_LIBRARIES(sore_lib ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
+${Boost_LIBRARIES} ${FREETYPE_LIBRARY} ${ZLIB_LIBRARY}
+${FONTCONFIG_LIBRARIES} ${GLEW_LIBRARY} ${SDL_LIBRARY})
+IF(ENET_FOUND)
+  TARGET_LINK_LIBRARIES(sore_lib ${ENET_LIBRARIES})
+ENDIF()
 
-INSTALL(TARGETS sore_lib DESTINATION lib)
+INSTALL(TARGETS sore_lib
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 INSTALL(FILES ${SORE_HEADERS} DESTINATION include)
 INSTALL(FILES ${SORE_NETWORK_HEADERS} DESTINATION include/network)
 INSTALL(FILES ${SORE_GUI_HEADERS} DESTINATION include/gui)

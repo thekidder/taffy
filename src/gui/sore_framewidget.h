@@ -28,7 +28,7 @@ namespace SORE_GUI
 {
 	enum size_mode {SCALE_ALL, SCALE_CENTER};
 
-	class FrameWidget : public Widget
+	class SORE_EXPORT FrameWidget : public Widget
 	{
 	public:
 		FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);

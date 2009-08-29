@@ -19,8 +19,12 @@
  ***************************************************************************/
 //$Id$
 
-#ifndef  __SORE_INPUT_H__
-#define  __SORE_INPUT_H__
+#ifndef  SORE_INPUT_H
+#define  SORE_INPUT_H
+
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
 
 #include <map>
 #include <vector>
@@ -93,17 +97,17 @@ namespace SORE_Kernel
 	
 	typedef std::vector<std::pair<unsigned int, boost::function<bool (Event*)> > > event_map;
 
-	class InputTask;
+	class SORE_EXPORT InputTask;
 
 	struct event_listener_ref
 	{
 	private:
 		std::vector<event_map>::iterator stackPos;
 		event_map::iterator event;
-		friend class InputTask;
+		friend class SORE_EXPORT InputTask;
 	};
 	
-	class InputTask : public Task
+	class SORE_EXPORT InputTask : public Task
 	{
 	public:
 		InputTask();
@@ -144,4 +148,6 @@ namespace SORE_Kernel
 	};
 }
 
-#endif /*__SORE_INPUT_H__*/
+#pragma warning( pop )
+
+#endif

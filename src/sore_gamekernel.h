@@ -22,9 +22,14 @@
 #ifndef  SORE_GAMEKERNEL_H
 #define  SORE_GAMEKERNEL_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 #include <map>
 
+#include "sore_dll.h"
 #include "sore_task.h"
 
 namespace SORE_Kernel
@@ -32,7 +37,7 @@ namespace SORE_Kernel
 	typedef std::multimap<unsigned int, const_task> task_list;
 	typedef task_list::iterator task_ref;
 	
-	class GameKernel
+	class SORE_EXPORT GameKernel
 	{
 	public:
 		GameKernel();
@@ -64,5 +69,7 @@ namespace SORE_Kernel
 		bool paused;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

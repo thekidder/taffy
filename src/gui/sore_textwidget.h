@@ -28,7 +28,7 @@
 
 namespace SORE_GUI
 {
-	class TextWidget : public Widget
+	class SORE_EXPORT TextWidget : public Widget
 	{
 	public:
 		TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t, 

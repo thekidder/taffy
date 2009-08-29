@@ -91,11 +91,32 @@ namespace SORE_FileIO
 	std::map<std::string, unsigned int> openPackageCount;
 	unsigned int nOpenFilesystemFiles;
 	
-	
+	file_info* GetFile(unsigned int ID);
+	file_info* GetFile(std::string fullname);
 	void BuildFullName(file_list& list, file_info& file, file_info& orig);
 
 	const int MAX_MAJOR = 0;
 	const int MAX_MINOR = 2;
+}
+
+SORE_FileIO::file_info* SORE_FileIO::GetFile(unsigned int ID)
+{
+	for(file_list::iterator it=cachedFiles.begin(); it!=cachedFiles.end(); ++it)
+	{
+		if(it->fileID == ID) 
+			return &*it;
+	}
+	return 0;
+}
+
+SORE_FileIO::file_info* SORE_FileIO::GetFile(std::string fullname)
+{
+	for(file_list::iterator it=cachedFiles.begin(); it!=cachedFiles.end(); ++it)
+	{
+		if(it->fullname == fullname) 
+			return &*it;
+	}
+	return 0;
 }
 
 int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
@@ -146,6 +167,12 @@ int SORE_FileIO::CachePackage(const char* package)
 	int pos;
 	
 	file_info tempInfo;
+
+	//we need to reassign IDs given how many files are already cached so we don't mangle existing ideas
+	unsigned int idPrefix = cachedFiles.size(); 
+
+	//we also need to reassign folder IDs if a folder already exists in the cache
+	std::map<unsigned int, unsigned int> reassignedIDs;
 	
 	for(int i=0;i<numPackageFiles;i++)
 	{
@@ -153,6 +180,13 @@ int SORE_FileIO::CachePackage(const char* package)
 		fread(&tempInfo.fileID, sizeof(short int), 1, in); 
 		fread(&flags, sizeof(char), 1, in); 
 		fread(&tempInfo.parentID, sizeof(short int), 1, in);
+
+		tempInfo.fileID += idPrefix;
+		if(tempInfo.parentID == 65535 )
+			tempInfo.parentID = 0;
+		else
+			tempInfo.parentID += idPrefix;
+
 		while((c=fgetc(in))!=(unsigned char)'\0')
 		{
 			tempInfo.filename[pos] = (unsigned char)c;
@@ -160,6 +194,12 @@ int SORE_FileIO::CachePackage(const char* package)
 		}
 		tempInfo.filename[pos] = '\0';
 		
+		if(reassignedIDs.find(tempInfo.parentID)!=reassignedIDs.end())
+		{
+			ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Reassigning parent for %s to %d") % tempInfo.filename % reassignedIDs[tempInfo.parentID], MODULE_FILEIO);
+			tempInfo.parentID = reassignedIDs[tempInfo.parentID];
+		}
+
 		if(!(flags & 0x01))
 		{
 			tempInfo.file = true;
@@ -169,13 +209,25 @@ int SORE_FileIO::CachePackage(const char* package)
 				fread(&tempInfo.sizeRaw, sizeof(int), 1, in);
 		}
 		else
+		{
 			tempInfo.file = false;
+			//look for existing directory of the same name
+			BuildFullName(cachedFiles, tempInfo, tempInfo);
+			file_info* info = GetFile(tempInfo.fullname);
+			if(info)
+			{
+				reassignedIDs.insert(std::make_pair(tempInfo.fileID, info->fileID));
+				continue;
+			}
+		}
 		if(flags & 0x02)
 		{
 			tempInfo.compressed = true;
 		}
 		else
+		{
 			tempInfo.compressed = false;
+		}
 		tempInfo.isOpen = false;
 		strncpy(tempInfo.package, package, 511);
 		if(cachedFiles.size()>=FILESYSTEM_START-1)
@@ -186,8 +238,8 @@ int SORE_FileIO::CachePackage(const char* package)
 		}
 		cachedFiles.push_back(tempInfo);
 		BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1], cachedFiles[cachedFiles.size()-1]);
-		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Adding %s to cache") % cachedFiles[cachedFiles.size()-1].fullname, MODULE_FILEIO);
 		fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
+		ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Added %s to cache") % cachedFiles[cachedFiles.size()-1].fullname, MODULE_FILEIO);
 	}
 	
 	fclose(in);
@@ -615,9 +667,9 @@ size_t SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref 
 
 void SORE_FileIO::BuildFullName(file_list& list, file_info& file, file_info& orig)
 {
-	if(file.parentID!=65535)
+	if(file.parentID!=0)
 	{
-		BuildFullName(list, list[file.parentID], orig);
+		BuildFullName(list, *GetFile(file.parentID), orig);
 		strcat(orig.fullname, file.filename);
 	}
 	else

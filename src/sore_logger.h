@@ -22,11 +22,18 @@
 #ifndef  SORE_LOGGER_H
 #define  SORE_LOGGER_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 #include <map>
 #include <cstdio>
 #include <string>
+
 #include <boost/format.hpp>
+
+#include "sore_dll.h"
 
 #ifndef _WIN32
 #define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)
@@ -66,9 +73,9 @@ namespace SORE_Logging
 		int module;
 	};
 	
-	void AddLogLevel(int lvl, const char* name); //name should be 8 characters long
+	void SORE_EXPORT AddLogLevel(int lvl, const char* name); //name should be 8 characters long
 	
-	class LoggerBackend
+	class SORE_EXPORT LoggerBackend
 	{
 		public:
 			virtual ~LoggerBackend() {}
@@ -80,7 +87,7 @@ namespace SORE_Logging
 			int level;
 	};
 	
-	class FileLogger : public LoggerBackend
+	class SORE_EXPORT FileLogger : public LoggerBackend
 	{
 		public:
 			FileLogger(int lvl, std::string filename);
@@ -93,7 +100,7 @@ namespace SORE_Logging
 			FILE* filePtr;
 	};
 	
-	class ConsoleLogger : public LoggerBackend
+	class SORE_EXPORT ConsoleLogger : public LoggerBackend
 	{
 		public:
 			ConsoleLogger(int lvl);
@@ -104,7 +111,7 @@ namespace SORE_Logging
 			void Write(log_message* log);
 	};
 	
-	class XMLLogger : public LoggerBackend
+	class SORE_EXPORT XMLLogger : public LoggerBackend
 	{
 		public:
 			XMLLogger(int lvl, std::string filename, std::string logName);
@@ -122,7 +129,7 @@ namespace SORE_Logging
 			bool ok; //file stream is good for writing
 	};
 	
-	class Logger
+	class SORE_EXPORT Logger
 	{
 		public:
 			Logger();
@@ -143,14 +150,16 @@ namespace SORE_Logging
 			void IgnoreModule(int module, int level);
 			
 			const char* GetName() const;
-		protected:
+		private:
 			std::vector<LoggerBackend*> logs;
 			std::vector<LoggerBackend*>::iterator it;
 			std::vector<log_message> buffers;
 			std::string logName;
 			std::vector<std::pair<int,int> > ignoredModules;
 	};
-	extern Logger sore_log;
+	extern SORE_EXPORT Logger sore_log;
 }
+
+#pragma warning( pop )
 
 #endif

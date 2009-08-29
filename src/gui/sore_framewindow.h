@@ -27,7 +27,7 @@
 
 namespace SORE_GUI
 {
-	class FrameWindow : public FrameWidget
+	class SORE_EXPORT FrameWindow : public FrameWidget
 	{
 	public:
 		FrameWindow(SVec s, SVec p, const std::string& t, 

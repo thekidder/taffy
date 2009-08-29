@@ -22,13 +22,19 @@
 #ifndef  SORE_PROFILER_H
 #define  SORE_PROFILER_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <string>
+
+#include "sore_dll.h"
 
 namespace SORE_Profiler
 {
 	const unsigned int MAX_SAMPLES = 20;
 	const unsigned int SHORT_INTERVAL = 20;
-	class Sample
+	class SORE_EXPORT Sample
 	{
 		public:
 			Sample(std::string name);
@@ -67,5 +73,7 @@ namespace SORE_Profiler
 		
 	};
 }
+
+#pragma warning( pop )
 
 #endif

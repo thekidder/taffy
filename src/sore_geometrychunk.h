@@ -37,7 +37,7 @@ namespace SORE_Graphics
 {
 	static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
-  class GeometryChunk
+  class SORE_EXPORT GeometryChunk
   {
   public:
 		GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,

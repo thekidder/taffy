@@ -49,7 +49,7 @@ namespace SORE_Graphics
 		unsigned int triLen;
 	};
 
-	class Renderer2D;
+	class SORE_EXPORT Renderer2D;
 
 	typedef std::vector<vbo_tex_order> texture_stack;
 
@@ -75,7 +75,7 @@ namespace SORE_Graphics
 		boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
 	};
 
-	class Renderer2D : public SORE_Graphics::IRenderer
+	class SORE_EXPORT Renderer2D : public SORE_Graphics::IRenderer
 	{
 	public:
 		Renderer2D(SORE_Resource::ResourcePool& _rm);

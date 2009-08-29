@@ -22,6 +22,10 @@
 #ifndef SORE_BUTTON_H
 #define SORE_BUTTON_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <boost/function.hpp>
 #include <boost/signals.hpp>
 
@@ -32,7 +36,7 @@
 
 namespace SORE_GUI
 {
-	class Button : public FrameWidget
+	class SORE_EXPORT Button : public FrameWidget
 	{
 	public:
 		Button(SVec s, SVec p, const std::string& text,
@@ -55,5 +59,7 @@ namespace SORE_GUI
 		bool inArea;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

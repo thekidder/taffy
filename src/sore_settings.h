@@ -22,6 +22,10 @@
 #ifndef  SORE_SETTINGS_H
 #define  SORE_SETTINGS_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
@@ -33,7 +37,7 @@
 
 namespace SORE_Utility
 {
-	class Datum
+	class SORE_EXPORT Datum
 	{
 		public:
 			Datum(std::string _datum = "");
@@ -77,9 +81,9 @@ namespace SORE_Utility
 	
 	
 	
-	class SettingsManager;
+	class SORE_EXPORT SettingsManager;
 		
-	class ISettingsBackend
+	class SORE_EXPORT ISettingsBackend
 	{
 		public:
 			ISettingsBackend();
@@ -91,7 +95,7 @@ namespace SORE_Utility
 			SettingsManager* sm;
 	};
 	
-	class IniSettingsBackend : public ISettingsBackend
+	class SORE_EXPORT IniSettingsBackend : public ISettingsBackend
 	{
 		public:
 			IniSettingsBackend(std::string fileName);
@@ -105,7 +109,7 @@ namespace SORE_Utility
 			std::map<std::string, settingsList > data;
 	};
 	
-	class SettingsManager
+	class SORE_EXPORT SettingsManager
 	{
 		public:
 			SettingsManager(ISettingsBackend* _sb);
@@ -124,7 +128,7 @@ namespace SORE_Utility
 			ISettingsBackend* sb;
 	};
 	
-	class WatchedDatum : public Datum
+	class SORE_EXPORT WatchedDatum : public Datum
 	{
 		public:
 			WatchedDatum(std::string _section, std::string _name, Datum& _datum, SettingsManager* _sm);
@@ -139,5 +143,7 @@ namespace SORE_Utility
 			datum_watch_id watch; 
 	};
 }
+
+#pragma warning( pop )
 
 #endif

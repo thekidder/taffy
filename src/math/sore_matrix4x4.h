@@ -34,8 +34,8 @@ namespace SORE_Math
 	const unsigned int AXIS_Y = 1;
 	const unsigned int AXIS_Z = 2;
 	
-	template<class T>
-			class Matrix4
+	template<typename T>
+			class SORE_EXPORT Matrix4
 	{
 		public:
 			Matrix4()
@@ -236,7 +236,7 @@ namespace SORE_Math
 			T value[16];
 	};
 	
-	template<class T>
+	template<typename T>
 			Matrix4<T> operator*(Matrix4<T> m1, Matrix4<T> m2)
 	{
 		Matrix4<T> temp = m1;
@@ -244,7 +244,7 @@ namespace SORE_Math
 		return m1;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector4<T> operator*(const Matrix4<T>& m1, const Vector4<T>& v1)
 	{
 		Vector4<T> temp;
@@ -255,7 +255,7 @@ namespace SORE_Math
 		return temp;
 	}
 	
-	template<class T>
+	template<typename T>
 			Vector3<T> operator*(const Matrix4<T>& m, const Vector3<T>& v)
 	{
 		Vector4<T> temp(v[0], v[1], static_cast<T>(1), static_cast<T>(1));

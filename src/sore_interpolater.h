@@ -19,8 +19,12 @@
  ***************************************************************************/
 // $Id$
 
-#ifndef  __SORE_INTERPOLATER_H__
-#define  __SORE_INTERPOLATER_H__
+#ifndef  SORE_INTERPOLATER_H
+#define  SORE_INTERPOLATER_H
+
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
 
 #include <list>
 
@@ -33,7 +37,7 @@
 namespace SORE_Utility
 {
 	//we need to define a template-less interface so we can have a heterogeneous list
-	class IInterpolater
+	class SORE_EXPORT IInterpolater
 	{
 		public:
 			IInterpolater() { ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Created interpolater (%d interpolaters opened)") % open); }
@@ -48,8 +52,8 @@ namespace SORE_Utility
 	typedef std::list<boost::shared_ptr<IInterpolater> >::iterator interpolater_iterator;
 	
 	//Interpolater interface. Interpolaters take an input value and apply an operation on it each timestep
-	template<class T>
-			class Interpolater : public IInterpolater
+	template<typename T>
+			class SORE_EXPORT Interpolater : public IInterpolater
 	{
 		public:
 			Interpolater(T input, boost::function<void (T)> callback)
@@ -84,8 +88,8 @@ namespace SORE_Utility
 			boost::function<void (T)> death;
 	};
 	
-	template<class T>
-			class LinearInterpolater : public Interpolater<T>
+	template<typename T>
+			class SORE_EXPORT LinearInterpolater : public Interpolater<T>
 	{
 		public:
 			LinearInterpolater(T input, T _factor, T _limit, boost::function<void (T)> callback) : Interpolater<T>(input, callback)
@@ -115,8 +119,8 @@ namespace SORE_Utility
 			bool done;
 	};
 	
-	template<class T>
-			class LinearTwoInterpolater : public Interpolater<T>
+	template<typename T>
+			class SORE_EXPORT LinearTwoInterpolater : public Interpolater<T>
 	{
 		public:
 			LinearTwoInterpolater(T input, T _factor, T _limit1, T _limit2, bool _repeat, boost::function<void (T)> callback, boost::function<void (T)> onDeath) : Interpolater<T>(input, callback)
@@ -158,7 +162,7 @@ namespace SORE_Utility
 			int done;
 	};
 	
-	class InterpolaterTask  : public SORE_Kernel::Task
+	class SORE_EXPORT InterpolaterTask  : public SORE_Kernel::Task
 	{
 		public:
 			InterpolaterTask();
@@ -178,4 +182,6 @@ namespace SORE_Utility
 	};
 }
 
-#endif /*__SORE_INTERPOLATER_H__*/
+#pragma warning( pop )
+
+#endif

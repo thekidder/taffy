@@ -22,6 +22,10 @@
 #ifndef SORE_NETWORK_BUFFERS_H
 #define SORE_NETWORK_BUFFERS_H
 
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <vector>
 #include <string>
 #ifdef _WIN32
@@ -35,7 +39,7 @@ namespace SORE_Network
 {
 	typedef std::vector<ubyte> net_buffer;
 
-	class ReceiveBuffer
+	class SORE_EXPORT ReceiveBuffer
 	{
 		public:
 			ReceiveBuffer(ENetPacket& packet);
@@ -82,7 +86,7 @@ namespace SORE_Network
 			size_t remaining;
 	};
 	
-	class SendBuffer
+	class SORE_EXPORT SendBuffer
 	{
 		public:
 			SendBuffer();
@@ -134,5 +138,7 @@ namespace SORE_Network
 			static unsigned int totalBytesSent;
 	};
 }
+
+#pragma warning( pop )
 
 #endif

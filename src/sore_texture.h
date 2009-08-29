@@ -27,7 +27,7 @@
 
 namespace SORE_Resource
 {
-  class Texture2D : public Resource
+  class SORE_EXPORT Texture2D : public Resource
   {
   public:
     Texture2D(std::string filename);

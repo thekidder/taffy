@@ -25,10 +25,12 @@
 #include <cassert>
 #include <cmath>
 
+#include "../sore_dll.h"
+
 namespace SORE_Math
 {
-	template<class T>
-	class Vector2
+	template<typename T>
+	class SORE_EXPORT Vector2
 	{
 	public:
 		Vector2()
@@ -156,20 +158,20 @@ namespace SORE_Math
 		T value[2];
 	};
 	
-	template<class T>
+	template<typename T>
 	double distance(Vector2<T> one, Vector2<T> two)
 	{
 		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1]));
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator-(Vector2<T> v)
 	{
 		Vector2<T> temp(-v[0],-v[1]);
 		return temp;
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator+(Vector2<T> v1, Vector2<T> v2)
 	{
 		Vector2<T> r = v1;
@@ -177,7 +179,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator-(Vector2<T> v1, Vector2<T> v2)
 	{
 		Vector2<T> r = v1;
@@ -185,7 +187,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator/(Vector2<T> v1, T& num)
 	{
 		Vector2<T> r = v1;
@@ -193,7 +195,7 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator*(Vector2<T> v1, T num)
 	{
 		Vector2<T> r = v1;
@@ -201,13 +203,13 @@ namespace SORE_Math
 		return r;
 	}
 	
-	template<class T>
+	template<typename T>
 	Vector2<T> operator*(const T& num, const Vector2<T>& v1)
 	{
 		return v1*num;
 	}
 
-	template<class T>
+	template<typename T>
 	bool operator>(Vector2<T> one, Vector2<T> two)
 	{
 		return one.Magnitude() > two.Magnitude();

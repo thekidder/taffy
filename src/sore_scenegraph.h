@@ -30,7 +30,7 @@
 
 namespace SORE_Graphics
 {
-  class SceneGraph
+  class SORE_EXPORT SceneGraph
   {
   public:
     SceneGraph();

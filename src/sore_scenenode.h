@@ -22,19 +22,24 @@
 #ifndef SORE_SCENENODE_H
 #define SORE_SCENENODE_H
 
-#include "sore_geometrychunk.h"
+//MSVC++ template-exporting warning
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <list>
+
+#include "sore_geometrychunk.h"
 
 namespace SORE_Graphics
 {
-	class SceneNode;
+	class SORE_EXPORT SceneNode;
 
 	typedef std::list<SceneNode*> node_list;
 
   /**
      @author Adam Kidder <thekidder@gmail.com>
   */
-  class SceneNode
+  class SORE_EXPORT SceneNode
   {
   public:
     SceneNode(GeometryChunk* g = NULL);
@@ -68,4 +73,7 @@ namespace SORE_Graphics
     bool cacheUpdated;
   };
 }
+
+#pragma warning( pop )
+
 #endif
