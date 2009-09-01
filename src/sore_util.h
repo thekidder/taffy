@@ -39,7 +39,9 @@ namespace SORE_Utility
 	int getRandomMinMax(int min, int max);
 
 	settings_map ParseIniFile(const char* file);
+	//trims a string of whitespace: ' ', '\r', and '\t'
 	std::string TrimString(std::string toTrim);
+	//breaks a string into a vector of strings delimited by , { and }. Each string is trimmed of whitespace.
 	std::vector<std::string> ParseList(std::string list);
 }
 

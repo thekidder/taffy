@@ -158,7 +158,7 @@ namespace SORE_Utility
 		tokenizer separator(list, sep);
 		for(tokenizer::iterator it=separator.begin();it!=separator.end(); ++it)
 		{
-			result.push_back(*it);
+			result.push_back(TrimString(*it));
 		}
 		return result;
 	}
