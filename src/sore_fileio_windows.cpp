@@ -19,7 +19,8 @@
  ***************************************************************************/
  // $Id$
 
-#pragma warning(disable : 4995)
+#pragma warning( push )
+#pragma warning( disable : 4995 )
 
 #include <windows.h>
 #include <stdio.h>
@@ -200,3 +201,5 @@ namespace SORE_FileIO
 		callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
 	}
 }
+
+#pragma warning( pop )
