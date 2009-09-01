@@ -23,8 +23,10 @@
 #define  SORE_LOGGER_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <vector>
 #include <map>
@@ -160,6 +162,8 @@ namespace SORE_Logging
 	extern SORE_EXPORT Logger sore_log;
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

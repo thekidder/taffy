@@ -23,8 +23,10 @@
 #define SORE_SLIDERWIDGET_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <boost/signals.hpp>
 #include <boost/function.hpp>
@@ -64,6 +66,8 @@ namespace SORE_GUI
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

@@ -23,8 +23,10 @@
 #define  SORE_FONT_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include "sore_allgl.h"
 #include "sore_geometrychunk.h"
@@ -93,6 +95,10 @@ namespace SORE_Font
 	};
 }
 
+#ifdef _MSC_VER
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
+#endif
 
 #endif

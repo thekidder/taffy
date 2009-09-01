@@ -23,8 +23,10 @@
 #define  SORE_INTERPOLATER_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <list>
 
@@ -182,6 +184,8 @@ namespace SORE_Utility
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

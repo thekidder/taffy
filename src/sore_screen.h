@@ -23,8 +23,10 @@
 #define  SORE_SCREEN_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <boost/function.hpp>
 
@@ -88,6 +90,8 @@ namespace SORE_Kernel
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

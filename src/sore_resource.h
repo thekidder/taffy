@@ -23,8 +23,10 @@
 #define  SORE_RESOURCE_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <map>
 #include <vector>
@@ -114,6 +116,8 @@ namespace SORE_Resource
   };
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif 

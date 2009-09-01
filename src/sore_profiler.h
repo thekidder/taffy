@@ -23,8 +23,10 @@
 #define  SORE_PROFILER_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <string>
 
@@ -74,6 +76,8 @@ namespace SORE_Profiler
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

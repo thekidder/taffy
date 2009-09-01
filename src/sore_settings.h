@@ -23,8 +23,10 @@
 #define  SORE_SETTINGS_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
@@ -144,6 +146,8 @@ namespace SORE_Utility
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif

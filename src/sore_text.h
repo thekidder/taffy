@@ -23,8 +23,10 @@
 #define SORE_TEXT_H
 
 //MSVC++ template-exporting warning
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4251 )
+#endif
 
 #include "sore_color.h"
 #include "sore_font.h"
@@ -68,6 +70,8 @@ namespace SORE_Graphics
 	};
 }
 
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
 
 #endif
