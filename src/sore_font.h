@@ -96,9 +96,7 @@ namespace SORE_Font
 }
 
 #ifdef _MSC_VER
-#ifdef _MSC_VER
 #pragma warning( pop )
-#endif
 #endif
 
 #endif
