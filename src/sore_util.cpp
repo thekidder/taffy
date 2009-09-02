@@ -23,11 +23,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <boost/tokenizer.hpp>
+
 #include "sore_util.h"
 #include "sore_logger.h"
 #include "sore_fileio.h"
 
-#include <boost/tokenizer.hpp>
+using namespace std;
 
 namespace SORE_Utility
 {

@@ -187,7 +187,7 @@ namespace SORE_Resource
 			data[i+2] = temp;
 		}
 
-		std::ofstream file(filename, ios::binary | ios::trunc);
+		std::ofstream file(filename, std::ios::binary | std::ios::trunc);
 		file.write(header, 18);
 		file.write(reinterpret_cast<char*>(data), w*h*4);
 		file.close();

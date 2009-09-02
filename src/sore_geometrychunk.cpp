@@ -212,7 +212,7 @@ namespace SORE_Graphics
 		for(it = list.begin(); it != list.end(); ++it)
 		{
 			assert(it->second);
-			newList.push_back(make_pair(&it->first, it->second));
+			newList.push_back(std::make_pair(&it->first, it->second));
 		}
 		return newList;
 	}

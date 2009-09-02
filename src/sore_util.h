@@ -22,27 +22,27 @@
 #ifndef  SORE_UTIL_H
 #define  SORE_UTIL_H
 
+#include "sore_dll.h"
+
 #include <cmath>
 #include <map>
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace SORE_Utility
 {
-	typedef std::map<std::string, std::map<std::string, std::string> > settings_map;
-	int GetFileExt(const char* filename, char* ext); //returns 0 on success
+	typedef SORE_EXPORT std::map<std::string, std::map<std::string, std::string> > settings_map;
+	int SORE_EXPORT GetFileExt(const char* filename, char* ext); //returns 0 on success
 
-	double getRandomMinMax( double dMin, double fMax );
-	float getRandomMinMax( float fMin, float fMax );
-	int getRandomMinMax(int min, int max);
+	double SORE_EXPORT getRandomMinMax( double dMin, double fMax );
+	float SORE_EXPORT getRandomMinMax( float fMin, float fMax );
+	int SORE_EXPORT getRandomMinMax(int min, int max);
 
-	settings_map ParseIniFile(const char* file);
+	settings_map SORE_EXPORT ParseIniFile(const char* file);
 	//trims a string of whitespace: ' ', '\r', and '\t'
-	std::string TrimString(std::string toTrim);
+	std::string SORE_EXPORT TrimString(std::string toTrim);
 	//breaks a string into a vector of strings delimited by , { and }. Each string is trimmed of whitespace.
-	std::vector<std::string> ParseList(std::string list);
+	std::vector<std::string> SORE_EXPORT ParseList(std::string list);
 }
 
 #endif
