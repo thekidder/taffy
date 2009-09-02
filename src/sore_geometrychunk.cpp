@@ -140,6 +140,27 @@ namespace SORE_Graphics
 		}
 	}
 
+	void GeometryChunk::SetTexCoords(SORE_Math::Rect<float> texCoordRect)
+	{
+		if(sharedTexCoords)
+		{
+			sharedTexCoords = false;
+			texCoords = new float[8];
+		}
+
+		texCoords[0] = texCoordRect.topLeft[0];
+		texCoords[1] = texCoordRect.topLeft[1];
+
+		texCoords[2] = texCoordRect.topLeft[0];
+		texCoords[3] = texCoordRect.bottomRight[1];
+
+		texCoords[4] = texCoordRect.bottomRight[0];
+		texCoords[5] = texCoordRect.topLeft[1];
+
+		texCoords[6] = texCoordRect.bottomRight[0];
+		texCoords[7] = texCoordRect.bottomRight[1];
+	}
+
 	bool GeometryChunk::IsOpaque() const
 	{
 		return opaque;

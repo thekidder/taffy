@@ -51,12 +51,14 @@ namespace SORE_Graphics
 		const Color& GetColor() const;
 		void SetColor(const Color& color);
 
+		const float* TexCoords() const;
+		void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
+
 		bool HasTexture() const;
 		bool HasColor() const;
 		bool IsOpaque() const;		
 		const float* Vertices() const;
 		const float* Colors() const;
-		const float* TexCoords() const;
 		const unsigned short* Indices() const;
 		
 		unsigned int NumVertices() const;
