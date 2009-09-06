@@ -26,10 +26,10 @@
 
 namespace SORE_Timing
 {
-	unsigned int GetGlobalTicks(); // in 1/10000 sec
-	unsigned int GetGlobalMS(); //provided for convenience 
+	unsigned int SORE_EXPORT GetGlobalTicks(); // in 1/10000 sec
+	unsigned int SORE_EXPORT GetGlobalMS(); //provided for convenience 
 	
-	void Sleep(unsigned int ms);
+	void SORE_EXPORT Sleep(unsigned int ms);
 
 	//implements a timer that starts when it comes in scope
 	class SORE_EXPORT Timer
