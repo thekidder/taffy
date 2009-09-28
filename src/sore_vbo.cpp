@@ -27,7 +27,7 @@ namespace SORE_Graphics
 {
 	VBO::VBO(bool t, bool n, bool c) : vbo(0), vboIndices(0), vboNormals(0), vboTexCoords(0), vboColors(0)
 	{
-		glGenBuffersARB(1, &vbo);
+		/*glGenBuffersARB(1, &vbo);
 		if(!vbo)
 			ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
 		glGenBuffersARB(1, &vboIndices);
@@ -50,25 +50,28 @@ namespace SORE_Graphics
 			glGenBuffersARB(1, &vboColors);
 			if(!vboColors)
 				ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create color buffer");
-		}
+		}*/
+        if(t) vboTexCoords = 1;
+        if(c) vboColors = 1;
+        if(n) vboNormals = 1;
 	}
 
 
 	VBO::~VBO()
 	{
-		glDeleteBuffersARB(1, &vbo);
+		/*glDeleteBuffersARB(1, &vbo);
 		glDeleteBuffersARB(1, &vboIndices);
 		if(vboColors)
 			glDeleteBuffersARB(1, &vboColors);
 		if(vboNormals)
 			glDeleteBuffersARB(1, &vboNormals);
 		if(vboTexCoords)
-			glDeleteBuffersARB(1, &vboTexCoords);
+        glDeleteBuffersARB(1, &vboTexCoords);*/
 	}
 
 	void VBO::AddObject(const GLfloat* v, const unsigned short* i, unsigned int numVertices, 
-											unsigned int numIndices, const SORE_Math::Matrix4<float>* transform, 
-											const GLfloat* t, const GLfloat* n, const GLfloat* c)
+                        unsigned int numIndices, const SORE_Math::Matrix4<float>* transform, 
+                        const GLfloat* t, const GLfloat* n, const GLfloat* c)
 	{
 		if( (vboNormals && !n) || (vboTexCoords && !t) || (vboColors && !c) )
 		{
@@ -87,8 +90,8 @@ namespace SORE_Graphics
 			for(unsigned int i=0;i<numVertices;++i)
 			{
 				SORE_Math::Vector4<float> pos(v[i*3], v[i*3+1],v[i*3+2], 1.0f);
-
 				pos = *transform * pos;
+
 				vertices.push_back(pos[0]);
 				vertices.push_back(pos[1]);
 				vertices.push_back(pos[2]);
@@ -120,29 +123,30 @@ namespace SORE_Graphics
 		glEnableClientState(GL_VERTEX_ARRAY);
 		if(vboTexCoords)
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		if(vboNormals)
+		if(vboNormals)        
 			glEnableClientState(GL_NORMAL_ARRAY);
 		if(vboColors)
 			glEnableClientState(GL_COLOR_ARRAY);
 	
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-		glVertexPointer(3, GL_FLOAT, 0, 0);
+		//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
+		//glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
+		glVertexPointer(3, GL_FLOAT, 0, &(vertices[0]));
 	
 		if(vboNormals)
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboNormals);
-			glNormalPointer(GL_FLOAT, 0, 0);
+			//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboNormals);
+			glNormalPointer(GL_FLOAT, 0, &(normals[0]));
 		}
 		if(vboTexCoords)
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboTexCoords);
-			glTexCoordPointer(2, GL_FLOAT, 0, 0);
+			//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboTexCoords);
+            glClientActiveTexture(GL_TEXTURE0);
+			glTexCoordPointer(2, GL_FLOAT, 0, &(texCoords[0]));
 		}
 		if(vboColors)
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboColors);
-			glColorPointer(4, GL_FLOAT, 0, 0);
+			//glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboColors);
+			glColorPointer(4, GL_FLOAT, 0, &(colors[0]));
 		}
 	}
 
@@ -152,7 +156,7 @@ namespace SORE_Graphics
 			glDisableClientState(GL_COLOR_ARRAY);
 		if(vboNormals)
 			glDisableClientState(GL_NORMAL_ARRAY);
-		if(vboTexCoords)
+        if(vboTexCoords)
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
@@ -164,13 +168,36 @@ namespace SORE_Graphics
 
 	void VBO::DrawElements(unsigned int numTris, unsigned short triOffset)
 	{
-		glDrawRangeElements(GL_TRIANGLES, 0, indices.size(), numTris*3, GL_UNSIGNED_SHORT, (char*)NULL + (triOffset*3)*sizeof(unsigned short));
+		//glDrawRangeElements(GL_TRIANGLES, 0, indices.size(), numTris*3, GL_UNSIGNED_SHORT, 
+        //                 (char*)NULL + (triOffset*3)*sizeof(unsigned short));
+
+#ifndef SORE_NO_VBO
+        glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
+                       /*(char*)NULL*/&(indices[triOffset*3])/* + (triOffset*3)*sizeof(unsigned short)*/);
+#else
+        glBegin(GL_TRIANGLES);
+        for(unsigned int i = 0;i<numTris*3;i++)
+        {
+            if(vboTexCoords)
+                glTexCoord2f(texCoords[indices[triOffset*3+i]*2+0],
+                             texCoords[indices[triOffset*3+i]*2+1]);
+            if(vboColors)
+                glColor4f(colors[indices[triOffset*3+i]*4+0],
+                          colors[indices[triOffset*3+i]*4+1],
+                          colors[indices[triOffset*3+i]*4+2],
+                          colors[indices[triOffset*3+i]*4+3]);
+            glVertex3f(vertices[indices[triOffset*3+i]*3+0],
+                       vertices[indices[triOffset*3+i]*3+1],
+                       vertices[indices[triOffset*3+i]*3+2]);
+        }
+        glEnd();
+#endif
 	}
 
 	void VBO::Build()
 	{
 		if(!indices.size()) return;
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
+		/*glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
 		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indices.size()*sizeof(unsigned short), &indices[0], GL_DYNAMIC_DRAW_ARB);
 	
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
@@ -186,7 +213,7 @@ namespace SORE_Graphics
 		{
 			glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboTexCoords);
 			glBufferDataARB(GL_ARRAY_BUFFER_ARB, texCoords.size()*sizeof(GLfloat), &texCoords[0], GL_DYNAMIC_DRAW_ARB);
-		}
+            }*/
 	}
 
 	void VBO::Clear()

@@ -45,16 +45,16 @@ namespace SORE_Graphics
     ~VBO();
 		
     void Clear();
-    void AddObject(const GLfloat* v, const unsigned short* i, unsigned int numVertices, unsigned int numIndices, 
-									 const SORE_Math::Matrix4<float>* transform = NULL, 
-									 const GLfloat* t = NULL, const GLfloat* n = NULL, const GLfloat* c = NULL);
+    void AddObject(const GLfloat* v, const unsigned short* i, unsigned int numVertices, 
+                   unsigned int numIndices, const SORE_Math::Matrix4<float>* transform = NULL, 
+                   const GLfloat* t = NULL, const GLfloat* n = NULL, const GLfloat* c = NULL);
     void Build();
 		
-		void BeginDraw();
+    void BeginDraw();
     void DrawAll();
-		void DrawElements(unsigned int numTris, unsigned short triOffset);
-		void EndDraw();
-		unsigned int numIndices() const;
+    void DrawElements(unsigned int numTris, unsigned short triOffset);
+    void EndDraw();
+    unsigned int numIndices() const;
   private:
     GLuint vbo, vboIndices, vboNormals, vboTexCoords, vboColors;
 		

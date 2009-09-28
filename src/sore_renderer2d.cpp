@@ -202,11 +202,11 @@ namespace SORE_Graphics
 	{
 		if(b.second->numIndices())
 		{
-			shad->Bind();
-			b.first.begin()->tex->Bind();
+			//shad->Bind();
 			b.second->BeginDraw();
 			for(std::vector<vbo_tex_order>::iterator it=b.first.begin();it!=b.first.end();++it)
 			{
+                glActiveTexture(GL_TEXTURE0);
 				it->tex->Bind();
 				b.second->DrawElements(it->triLen, it->triStart);
 				numPolys += it->triLen;
@@ -223,15 +223,16 @@ namespace SORE_Graphics
 		numPolys = 0;
 		drawCalls = 0;
 
-		shad->Bind();
+		//shad->Bind();
+        SORE_Graphics::GLSLShader::UnbindShaders();
 
 		glClearColor(0.0,0.0,0.0,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_BLEND);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-		glActiveTexture(GL_TEXTURE0);
-
+        glEnable(GL_TEXTURE_2D);
+                
 		for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
 		{
 			if(it->second->numIndices())
@@ -241,19 +242,36 @@ namespace SORE_Graphics
 				proj = it->projCallback(screen);
 				ChangeProjectionMatrix(proj);
 
-				if(it->effect)
-					it->effect->StartFrame(proj);
+                if(it->effect)
+                    it->effect->StartFrame(proj);
 
-				glLoadIdentity();
 				if(it->cameraCallback)
 				{
-					glMatrixMode(GL_MODELVIEW);
 					glLoadMatrixf(const_cast<const GLfloat*>(it->cameraCallback().GetData()));
 				}
+
+                /*glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+                glBegin(GL_QUADS);
+                glVertex3f( 10.0f,  0.0f,  0.5f);
+                glVertex3f( 10.0f,  10.0f, 0.5f);
+                glVertex3f(  0.0f,  10.0f, 0.5f);
+                glVertex3f(  0.0f,  0.0f,  0.5f);
+                glEnd();
+
+                glBegin(GL_TRIANGLES);
+                glVertex3f(40.0, 81.0, -.1);
+                glVertex3f(40.0, 94.0, -.1);
+                glVertex3f(48.0, 81.0, -.1);
+                glVertex3f(48.0, 81.0, -.1);
+                glVertex3f(40.0, 94.0, -.1);
+                glVertex3f(48.0, 94.0, -.1);
+                glEnd();*/
+
 				RenderBatch(*it);
 
-				if(it->effect)
-					it->effect->EndFrame(proj);
+                if(it->effect)
+            		it->effect->EndFrame(proj);
 			}
 		}
 			
