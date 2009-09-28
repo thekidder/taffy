@@ -38,43 +38,41 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT TextField : public FrameWidget
-	{
-	public:
-		TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-		~TextField();
+    class SORE_EXPORT TextField : public FrameWidget
+    {
+    public:
+        TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        ~TextField();
 
-		const std::string& GetText() const;
-		void SetContents(const std::string& t);
+        const std::string& GetText() const;
+        void SetContents(const std::string& t);
 
-		void ConnectChange(boost::function<void (std::string)> c);
-	private:
-		virtual SORE_Graphics::render_list GetThisRenderList();
-		bool ProcessEvents(SORE_Kernel::Event* e);
-		void UpdatePosition();
-		void UpdateText(int dir);
+        void ConnectChange(boost::function<void (std::string)> c);
+    private:
+        virtual SORE_Graphics::render_list GetThisRenderList();
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        void UpdatePosition();
+        void UpdateText(int dir);
 
-		std::string text;
-		SORE_Font::Font* font;
-		SORE_Graphics::Text* displayText;
-		SORE_Resource::Texture2D* texture;
+        std::string text;
+        SORE_Font::Font* font;
+        SORE_Graphics::Text* displayText;
+        SORE_Resource::Texture2D* texture;
 
-		SORE_Graphics::GeometryChunk* caret;
-		SORE_Resource::Texture2D* caretTex;
-		SORE_Math::Matrix4<float> caretMat;
-		unsigned int caretPos;
-		unsigned int caretWidth;
-		//used for caret blinking
-		unsigned int caretEnd;
+        SORE_Graphics::GeometryChunk* caret;
+        SORE_Resource::Texture2D* caretTex;
+        SORE_Math::Matrix4<float> caretMat;
+        unsigned int caretPos;
+        unsigned int caretWidth;
+        //used for caret blinking
+        unsigned int caretEnd;
 
-		//enum caret_pos {BEGIN, MIDDLE, END};
-		//caret_pos caretPos;
-		unsigned int pos;
+        unsigned int pos;
 
-		unsigned int textStart, textEnd;
+        unsigned int textStart, textEnd;
 
-		boost::signal<void (std::string)> onChange;
-	};
+        boost::signal<void (std::string)> onChange;
+    };
 }
 
 #ifdef _MSC_VER

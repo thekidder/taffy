@@ -23,60 +23,60 @@
 
 namespace SORE_GUI
 {
-	TextWidget::TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t, 
-												 const SORE_Graphics::Color& c, Widget* parent)
-		: Widget(SVec(SUnit(), SUnit()), p, parent), face(f), text(f, h, t, c), color(c), height(h)
-	{
-		SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
-		UpdateCache();
-	}
+    TextWidget::TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
+                                                 const SORE_Graphics::Color& c, Widget* parent)
+        : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h), text(f, h, t, c), color(c)
+    {
+        SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
+        UpdateCache();
+    }
 
-	void TextWidget::UpdateText(const std::string& t)
-	{
-		text.UpdateText(t, color);
-		UpdateCache();
-	}
+    void TextWidget::UpdateText(const std::string& t)
+    {
+        text.UpdateText(t, color);
+        UpdateCache();
+    }
 
-	void TextWidget::SetColor(const SORE_Graphics::Color& c)
-	{
-		color = c;
-		text.UpdateText(text.GetText(), color);
-		UpdateCache();
-	}
+    void TextWidget::SetColor(const SORE_Graphics::Color& c)
+    {
+        color = c;
+        text.UpdateText(text.GetText(), color);
+        UpdateCache();
+    }
 
-	void TextWidget::UpdatePosition()
-	{
-		UpdateCache();
-	}
+    void TextWidget::UpdatePosition()
+    {
+        UpdateCache();
+    }
 
-	void TextWidget::UpdateCache()
-	{
-		transforms.clear();
-		transforms.reserve(text.GetLength());
-		all.clear();
-		SORE_Graphics::render_list raw = text.GetGeometry();
+    void TextWidget::UpdateCache()
+    {
+        transforms.clear();
+        transforms.reserve(text.GetLength());
+        all.clear();
+        SORE_Graphics::render_list raw = text.GetGeometry();
 
-		SORE_Graphics::render_list::iterator it;
-		for(it = raw.begin(); it != raw.end(); ++it)
-		{
-			transforms.push_back(*(it->first) * GetPositionMatrix());
-			all.push_back(std::make_pair(&transforms.back(), it->second));
-		}
-	}
+        SORE_Graphics::render_list::iterator it;
+        for(it = raw.begin(); it != raw.end(); ++it)
+        {
+            transforms.push_back(*(it->first) * GetPositionMatrix());
+            all.push_back(std::make_pair(&transforms.back(), it->second));
+        }
+    }
 
-	SORE_Graphics::render_list TextWidget::GetThisRenderList()
-	{
-		return all;
-	}
+    SORE_Graphics::render_list TextWidget::GetThisRenderList()
+    {
+        return all;
+    }
 
-	bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
-	{
-		return false;
-	}
+    bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
+    {
+        return false;
+    }
 
-	void TextWidget::OnGLReload()
-	{
-		text.UpdateText(text.GetText(), color);
-		UpdateCache();
-	}
+    void TextWidget::OnGLReload()
+    {
+        text.UpdateText(text.GetText(), color);
+        UpdateCache();
+    }
 }

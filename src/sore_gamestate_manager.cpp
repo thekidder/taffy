@@ -24,117 +24,117 @@
 
 namespace SORE_Game
 {
-	static SORE_Graphics::ScreenInfo screenInfo = {1024, 768, 1024.0f/768.0f, true, false, false};
+    static SORE_Graphics::ScreenInfo screenInfo = {1024, 768, 1024.0f/768.0f, true, false, false};
 
-	GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle) 
-		: kernel(gk), pool(), popFlag(false), screen(screenInfo, input, windowTitle, NULL)
-	{
-		curr = gk.end();
+    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle)
+        : kernel(gk), pool(), screen(screenInfo, input, windowTitle, NULL), popFlag(false)
+    {
+        curr = gk.end();
 
-		gk.AddTask(0, &input);
-		gk.AddTask(10, &screen);
-		SORE_Resource::Resource::SetRM(&pool);
-		renderer = new SORE_Graphics::Renderer2D(pool);
-		screen.SetRenderer(renderer);
-		input.AddListener(SORE_Kernel::WINDOWRESIZE, std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-		input.AddListener(SORE_Kernel::RESIZE, std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize), &pool));
-	}
+        gk.AddTask(0, &input);
+        gk.AddTask(10, &screen);
+        SORE_Resource::Resource::SetRM(&pool);
+        renderer = new SORE_Graphics::Renderer2D(pool);
+        screen.SetRenderer(renderer);
+        input.AddListener(SORE_Kernel::WINDOWRESIZE, std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
+        input.AddListener(SORE_Kernel::RESIZE, std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize), &pool));
+    }
 
-	GamestateManager::~GamestateManager()
-	{
-		delete renderer;
-	}
+    GamestateManager::~GamestateManager()
+    {
+        delete renderer;
+    }
 
-	void GamestateManager::Pop()
-	{
-		input.PopState();
-		renderer->PopState();
-		kernel.RemoveTask(states.back().first);
-		delete states.back().second;
-		states.pop_back();
+    void GamestateManager::Pop()
+    {
+        input.PopState();
+        renderer->PopState();
+        kernel.RemoveTask(states.back().first);
+        delete states.back().second;
+        states.pop_back();
 
-		if(states.size())
-			curr = states.back().first;
-		else
-			curr = kernel.end();
+        if(states.size())
+            curr = states.back().first;
+        else
+            curr = kernel.end();
 
-		kernel.ResumeTask(curr);
+        kernel.ResumeTask(curr);
 
-		popFlag = false;
-	}
+        popFlag = false;
+    }
 
-	void GamestateManager::PopState()
-	{
-		popFlag = true;
-	}
+    void GamestateManager::PopState()
+    {
+        popFlag = true;
+    }
 
-	void GamestateManager::PushState(Gamestate* newState)
-	{
-		input.PushState();
-		renderer->PushState();
-		newState->Initialize(this);
+    void GamestateManager::PushState(Gamestate* newState)
+    {
+        input.PushState();
+        renderer->PushState();
+        newState->Initialize(this);
 
-		kernel.PauseTask(curr);
+        kernel.PauseTask(curr);
 
-		if(newState->GetInterval() == -1)
-			curr = kernel.AddTask(50, newState);
-		else
-			curr = kernel.AddConstTask(50, newState->GetInterval(), newState);
-		states.push_back(std::make_pair(curr, newState));
-	}
+        if(newState->GetInterval() == -1)
+            curr = kernel.AddTask(50, newState);
+        else
+            curr = kernel.AddConstTask(50, newState->GetInterval(), newState);
+        states.push_back(std::make_pair(curr, newState));
+    }
 
-	SORE_Graphics::Renderer2D* GamestateManager::GetRenderer()
-	{
-		return renderer;
-	}
+    SORE_Graphics::Renderer2D* GamestateManager::GetRenderer()
+    {
+        return renderer;
+    }
 
-	SORE_Kernel::InputTask* GamestateManager::GetInputTask()
-	{
-		return &input;
-	}
+    SORE_Kernel::InputTask* GamestateManager::GetInputTask()
+    {
+        return &input;
+    }
 
-	SORE_Kernel::Screen* GamestateManager::GetScreen()
-	{
-		return &screen;
-	}
+    SORE_Kernel::Screen* GamestateManager::GetScreen()
+    {
+        return &screen;
+    }
 
-	SORE_Resource::ResourcePool& GamestateManager::GetPool()
-	{
-		return pool;
-	}
+    SORE_Resource::ResourcePool& GamestateManager::GetPool()
+    {
+        return pool;
+    }
 
-	int GamestateManager::Run()
-	{
-		if(kernel.ShouldQuit())
-		{
-			ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize one or more subsystems - now exiting");
-			return 1;
-		}
-	
-		unsigned int maxfps = 10000;
-		unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
-		while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
-		{
-			unsigned int ticks = SORE_Timing::GetGlobalTicks();
-			unsigned int time = ticks - lastTicks;
-			double fps = 10000.0/double(time);
-			if(fps>static_cast<double>(maxfps))
-			{
-				SORE_Timing::Sleep(0);
-				continue;
-			}
-			lastTicks = ticks;	
-		
-			kernel.Frame();
+    int GamestateManager::Run()
+    {
+        if(kernel.ShouldQuit())
+        {
+            ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize one or more subsystems - now exiting");
+            return 1;
+        }
 
-			//if a PopState is requested, we delay it until the end of the frame, to make sure no invalid
-			//memory accessed are performed
-			if(popFlag)
-				Pop();
-		}
-		//properly clean up all existing states
-		while(states.size()) Pop();
+        unsigned int maxfps = 10000;
+        unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
+        while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
+        {
+            unsigned int ticks = SORE_Timing::GetGlobalTicks();
+            unsigned int time = ticks - lastTicks;
+            double fps = 10000.0/double(time);
+            if(fps>static_cast<double>(maxfps))
+            {
+                SORE_Timing::Sleep(0);
+                continue;
+            }
+            lastTicks = ticks;
 
-		return 0;
-	}
+            kernel.Frame();
+
+            //if a PopState is requested, we delay it until the end of the frame, to make sure no invalid
+            //memory accessed are performed
+            if(popFlag)
+                Pop();
+        }
+        //properly clean up all existing states
+        while(states.size()) Pop();
+
+        return 0;
+    }
 }
