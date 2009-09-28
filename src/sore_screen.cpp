@@ -168,7 +168,8 @@ namespace SORE_Kernel
 
 	void Screen::Resize(int width, int height)
 	{
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("resizing from (%d, %d) to (%d, %d)") % screen.width % screen.height % width % height);
+		ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("resizing from (%d, %d) to (%d, %d)") 
+                   % screen.width % screen.height % width % height);
 		screen.width = width;
 		screen.height = height;
 		screen.ratio = static_cast<GLfloat>(screen.width) / static_cast<GLfloat>(screen.height);
@@ -194,7 +195,8 @@ namespace SORE_Kernel
 
 		if ( !videoInfo )
 		{
-			ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, boost::format("Video query failed: %s") % SDL_GetError());
+			ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, boost::format("Video query failed: %s") 
+                       % SDL_GetError());
 			return 1;
 		}
 		//save current resolution
@@ -237,7 +239,8 @@ namespace SORE_Kernel
 		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 		InitExtensions();
 		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s") 
-							 % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) % (char*)glGetString(GL_VERSION));
+                   % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR) 
+                   % (char*)glGetString(GL_VERSION));
 		char* glExtensions = (char*)glGetString(GL_EXTENSIONS);
 		std::string extensions;
 		if(glExtensions==NULL) extensions = "";
@@ -247,7 +250,8 @@ namespace SORE_Kernel
 		{
 			extensions.replace(pos, 1, "\n");
 		}
-		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL extension string:\n%s") % extensions);
+		ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL extension string:\n%s") 
+                   % extensions);
 #ifdef WIN32
 		if(WGLEW_EXT_swap_control)
 		{
@@ -267,7 +271,9 @@ namespace SORE_Kernel
 		GLenum glewError = glewInit();
 		if(glewError != GLEW_OK)
 		{
-			ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to initialize OpenGL extensions. GLEW Error: %s") % glewGetErrorString(glewError));
+			ENGINE_LOG(SORE_Logging::LVL_ERROR, 
+                       boost::format("Failed to initialize OpenGL extensions. GLEW Error: %s")
+                       % glewGetErrorString(glewError));
 		}
 	}
 
