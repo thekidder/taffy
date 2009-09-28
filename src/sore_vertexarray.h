@@ -19,40 +19,23 @@
  ***************************************************************************/
 //$Id$
 
-#ifndef SORE_VBO_H
-#define SORE_VBO_H
-
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#ifndef SORE_VERTEX_ARRAY_H
+#define SORE_VERTEX_ARRAY_H
 
 #include "sore_graphicsarray.h"
 
 namespace SORE_Graphics
 {
-    /**
-       @author Adam Kidder <thekidder@gmail.com>
-       For use with dynamic (change every frame) indexed VBOs
-    */
-    class SORE_EXPORT VBO : public GraphicsArray
+    class SORE_EXPORT VertexArray : public GraphicsArray
     {
     public:
-        VBO(bool t = false, bool c = false, bool n = false);
-        ~VBO();
+        VertexArray(bool t = false, bool c = false, bool n = false);
 
-        virtual void Build();
+        void Build() {}
     private:
-        virtual void BeginDrawHook();
-        virtual void* GetOffset(void* pointer, unsigned int offset);
-
-        GLuint vbo, vboIndices, vboTexCoords, vboColors, vboNormals;
+        void* GetOffset(void* pointer, unsigned int offset);
+        void BeginDrawHook() {}
     };
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-
-#endif
+#endif //SORE_VERTEX_ARRAY_H

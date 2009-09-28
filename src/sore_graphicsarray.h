@@ -19,40 +19,50 @@
  ***************************************************************************/
 //$Id$
 
-#ifndef SORE_VBO_H
-#define SORE_VBO_H
+#ifndef SORE_GRAPHICS_ARRAY_H
+#define SORE_GRAPHICS_ARRAY_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <vector>
 
-#include "sore_graphicsarray.h"
+#include "math/sore_matrix4x4.h"
+#include "sore_allgl.h"
 
 namespace SORE_Graphics
 {
     /**
        @author Adam Kidder <thekidder@gmail.com>
-       For use with dynamic (change every frame) indexed VBOs
+       Class abstracting the details of Vertex Arrays and VBOs
     */
-    class SORE_EXPORT VBO : public GraphicsArray
+    class SORE_EXPORT GraphicsArray
     {
     public:
-        VBO(bool t = false, bool c = false, bool n = false);
-        ~VBO();
+        GraphicsArray(bool t = false, bool c = false, bool n = false);
+        virtual ~GraphicsArray() {}
 
-        virtual void Build();
-    private:
-        virtual void BeginDrawHook();
-        virtual void* GetOffset(void* pointer, unsigned int offset);
+        virtual void Build() = 0;
 
-        GLuint vbo, vboIndices, vboTexCoords, vboColors, vboNormals;
+        void Clear();
+        void AddObject(const GLfloat* v, const unsigned short* i, unsigned int numVertices,
+                       unsigned int numIndices, const SORE_Math::Matrix4<float>* transform = NULL,
+                       const GLfloat* t = NULL, const GLfloat* n = NULL, const GLfloat* c = NULL);
+
+        void BeginDraw();
+        void EndDraw();
+
+        void DrawAll();
+        void DrawElements(unsigned int numTris, unsigned short triOffset);
+
+        bool Empty() const;
+    protected:
+        virtual void BeginDrawHook() = 0;
+        virtual void* GetOffset(void* pointer, unsigned int offset) = 0;
+
+        bool hasTexCoords, hasNormals, hasColors;
+
+        std::vector<GLfloat> vertices, normals, texCoords, colors;
+        std::vector<unsigned short> indices;
+
     };
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-
-#endif
+#endif //SORE_GRAPHICS_ARRAY_H

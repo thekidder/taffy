@@ -22,107 +22,119 @@
 #ifndef SORE_RENDERER2D_H
 #define SORE_RENDERER2D_H
 
+#include "sore_fbo.h"
 #include "sore_font.h"
 #include "sore_geometrychunk.h"
+#include "sore_graphics.h"
+#include "sore_graphicsarray.h"
+#include "sore_postprocess.h"
 #include "sore_renderer.h"
 #include "sore_resource.h"
 #include "sore_shaders.h"
 #include "sore_timing.h"
-#include "sore_fbo.h"
+#ifndef SORE_NO_VBO
 #include "sore_vbo.h"
-#include "sore_graphics.h"
-#include "sore_postprocess.h"
+#else
+#include "sore_vertexarray.h"
+#endif
 
 /**
    @author Adam Kidder <thekidder@gmail.com>
 */
 namespace SORE_Graphics
 {
-	typedef std::pair<proj_callback, boost::function<render_list ()> > geometry_callback;
+    typedef std::pair<proj_callback, boost::function<render_list ()> > geometry_callback;
 
-	struct vbo_tex_order
-	{
-		vbo_tex_order(const SORE_Resource::Texture2D* t, unsigned int s, unsigned int l)
-			: tex(t), triStart(s), triLen(l) {}
-		const SORE_Resource::Texture2D* tex;
-		unsigned int triStart;
-		unsigned int triLen;
-	};
+    struct vbo_tex_order
+    {
+        vbo_tex_order(const SORE_Resource::Texture2D* t, unsigned int s, unsigned int l)
+            : tex(t), triStart(s), triLen(l) {}
+        const SORE_Resource::Texture2D* tex;
+        unsigned int triStart;
+        unsigned int triLen;
+    };
 
-	class SORE_EXPORT Renderer2D;
+    class SORE_EXPORT Renderer2D;
 
-	typedef std::vector<vbo_tex_order> texture_stack;
+    typedef std::vector<vbo_tex_order> texture_stack;
 
-	enum blend_mode {ADDITIVE, SUBTRACTIVE};
+    enum blend_mode {ADDITIVE, SUBTRACTIVE};
 
-	struct geometry_provider
-	{
-		boost::function<render_list ()> geometryCallback;
-		proj_callback projCallback;
-		boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
-		PostProcessEffect* effect;
-		blend_mode blend;
-	};
+    struct geometry_provider
+    {
+        boost::function<render_list ()> geometryCallback;
+        proj_callback projCallback;
+        boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
+        PostProcessEffect* effect;
+        blend_mode blend;
+    };
 
-	struct batch
-	{
-		batch() {second = new VBO(true, false, true);}
-		texture_stack first;
-		VBO* second;
-		PostProcessEffect* effect;
-		GLenum blendSFactor, blendDFactor;
-		proj_callback projCallback;
-		boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
-	};
+    struct batch
+    {
+        batch()
+        {
+#ifndef SORE_NO_VBO
+            second = new VBO(true, true);
+#else
+            second = new VertexArray(true, true);
+#endif
+        }
+        texture_stack first;
+        GraphicsArray* second;
+        PostProcessEffect* effect;
+        GLenum blendSFactor, blendDFactor;
+        proj_callback projCallback;
+        boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
+    };
 
-	class SORE_EXPORT Renderer2D : public SORE_Graphics::IRenderer
-	{
-	public:
-		Renderer2D(SORE_Resource::ResourcePool& _rm);
-		~Renderer2D();
+    class SORE_EXPORT Renderer2D : public SORE_Graphics::IRenderer
+    {
+    public:
+        Renderer2D(SORE_Resource::ResourcePool& _rm);
+        ~Renderer2D();
 
-		virtual void Render();
+        virtual void Render();
 
-		void ClearGeometryProviders();
-		void AddGeometryProvider(geometry_provider c);
-		void Build();
+        void ClearGeometryProviders();
+        void AddGeometryProvider(geometry_provider c);
+        void Build();
 
-		//Rendering Statistics
-		float GetFPS() const;
-		unsigned int GetDrawCalls() const;
-		unsigned int GetNumPolys() const;
+        //Rendering Statistics
+        float GetFPS() const;
+        unsigned int GetDrawCalls() const;
+        unsigned int GetNumPolys() const;
 
-		void PushState();
-		void PopState();		
-	protected:
-		void RenderBatch(batch& b);
-		virtual void OnScreenChange();
+        void PushState();
+        void PopState();
+    protected:
+        void RenderBatch(batch& b);
+        virtual void OnScreenChange();
 
-		//returns 0 on success
-		int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
-	private:
-		void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
+        //returns 0 on success
+        int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
+    private:
+        void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
 
-		SORE_Resource::ResourcePool& rm;
+        SORE_Resource::ResourcePool& rm;
 
-		//acts as a stack: only providers on the top are called
-		std::vector<
-			std::vector<geometry_provider> 
-			> geometryProviders;
+        //acts as a stack: only providers on the top are called
+        std::vector<
+            std::vector<geometry_provider>
+            > geometryProviders;
 
-		std::vector<std::vector<geometry_provider> >::iterator currentProvider;
+        std::vector<std::vector<geometry_provider> >::iterator currentProvider;
 
-		SORE_Graphics::GLSLShader* shad;
-		std::vector<batch> batches;
+        SORE_Graphics::GLSLShader* shad;
+        std::vector<batch> batches;
 
-		//statistics: get info about current rendering
-		float fps;
-		unsigned int drawCalls;
-		unsigned int numPolys;
-	};
-				
-	inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two);
-	bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one, std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
+        //statistics: get info about current rendering
+        float fps;
+        unsigned int drawCalls;
+        unsigned int numPolys;
+    };
+
+    inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two);
+    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one, std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
 }
 
 #endif
