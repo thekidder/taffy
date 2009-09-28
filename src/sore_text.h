@@ -35,39 +35,39 @@
 
 namespace SORE_Graphics
 {
-	class SORE_EXPORT Text
-	{
-	public:
-		Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText, const Color& c = White);
+    class SORE_EXPORT Text
+    {
+    public:
+        Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText, const Color& c = White);
 
-		void UpdateText(const std::string& newText, const Color& c = White);
-		void SetTransform(const SORE_Math::Matrix4<float>& transform);
-		void TrimToWidth(unsigned int width, size_t start);
+        void UpdateText(const std::string& newText, const Color& c = White);
+        void SetTransform(const SORE_Math::Matrix4<float>& transform);
+        void TrimToWidth(unsigned int width, size_t start);
 
-		const SORE_Math::Matrix4<float>& GetTransform();
-		render_list GetGeometry() const;
-		//following two functions are only valid if text is not scaled or rotated
-		unsigned int GetWidth() const;
-		unsigned int GetHeight() const;
+        const SORE_Math::Matrix4<float>& GetTransform();
+        render_list GetGeometry() const;
+        //following two functions are only valid if text is not scaled or rotated
+        unsigned int GetWidth() const;
+        unsigned int GetHeight() const;
 
 		//returns number of characters in text
-		size_t GetLength() const;
-		size_t GetIndex(float xpos) const;
-		const std::string& GetText() const;
-	private:
-		void DeleteOldGeometry();
-		void Update();
+        size_t GetLength() const;
+        size_t GetIndex(float xpos) const;
+        const std::string& GetText() const;
+    private:
+        void DeleteOldGeometry();
+        void Update();
 
-		Color color;
-		SORE_Font::Font& face;
-		std::string text;
-		unsigned int height;
-		unsigned int width;
+        unsigned int height;
+        unsigned int width;
+        std::string text;
+        Color color;
+        SORE_Font::Font& face;
 
-		SORE_Math::Matrix4<float> overallTransform;
+        SORE_Math::Matrix4<float> overallTransform;
 
-		std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> > geometry;
-	};
+        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> > geometry;
+    };
 }
 
 #ifdef _MSC_VER
