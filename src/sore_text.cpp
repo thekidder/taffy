@@ -24,7 +24,7 @@
 namespace SORE_Graphics
 {
 	Text::Text(SORE_Font::Font& f, unsigned int h, const std::string& initialText, const Color& c)
-		: face(f), text(initialText), color(c), height(h)
+		: height(h), text(initialText), color(c), face(f)
 	{
 		Update();
 	}
