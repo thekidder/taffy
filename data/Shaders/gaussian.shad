@@ -1,0 +1,6 @@
+[Vertex]
+data/Shaders/default_vertex.glsl
+
+[Fragment]
+data/Shaders/fragment_gauss.glsl
+
