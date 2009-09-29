@@ -23,78 +23,79 @@
 
 namespace SORE_Graphics
 {
-	ScreenGlow::ScreenGlow(unsigned int w, unsigned int h, SORE_Resource::ResourcePool& pool) : PostProcessEffect(w, h), fbo(0)
-	{
-		blur    = pool.GetResource<GLSLShader>("data/Shaders/gaussian.shad");
-		combine = pool.GetResource<GLSLShader>("data/Shaders/combine.shad");
+    ScreenGlow::ScreenGlow(unsigned int w, unsigned int h, SORE_Resource::ResourcePool& pool) : PostProcessEffect(w, h), fbo(0)
+    {
+        blur    = pool.GetResource<GLSLShader>("data/Shaders/gaussian.shad");
+        combine = pool.GetResource<GLSLShader>("data/Shaders/combine.shad");
 
-		fbo = new FBO(GetWidth(), GetHeight(), true, 3);
-	}
+        fbo = new FBO(GetWidth(), GetHeight(), true, 3);
+    }
 
-	ScreenGlow::~ScreenGlow()
-	{
-		delete fbo;
-	}
+    ScreenGlow::~ScreenGlow()
+    {
+        delete fbo;
+    }
 
-	void ScreenGlow::StartFrame(ProjectionInfo& proj)
-	{
-		fbo->Bind();
-		fbo->SelectBuffer(0);
-		glClearColor(0.0,0.0,0.0,0.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+    void ScreenGlow::StartFrame(ProjectionInfo& proj)
+    {
+        fbo->Bind();
+        fbo->SelectBuffer(0);
+        glClearColor(0.0,0.0,0.0,0.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
-	void ScreenGlow::EndFrame(ProjectionInfo& proj)
-	{
-		const float pixel_offset = 1.2f;
+    void ScreenGlow::EndFrame(ProjectionInfo& proj)
+    {
+        const float pixel_offset = 1.2f;
 
-		blur->Bind();
-		blur->SetUniform1i("source", 0);
-		blur->SetUniform1f("offsetx", 0);
-		blur->SetUniform1f("offsety", pixel_offset / GetHeight());
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_2D);
-		
-		fbo->SelectBuffer(1);
-		fbo->BindBuffer(0);
-		
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glLoadIdentity();
-		
-		DrawFullscreenQuad(proj);
-		
-		fbo->SelectBuffer(2);
-		fbo->BindBuffer(1);
-		
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glLoadIdentity();
-		
-		blur->SetUniform1i("source", 0);
-		blur->SetUniform1f("offsetx", pixel_offset / GetWidth());
-		blur->SetUniform1f("offsety", 0.0f);
-		
-		DrawFullscreenQuad(proj);
-		
-		fbo->Unbind();
-		
-		glClearColor(0.0,0.0,0.0,1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glLoadIdentity();
-		
-		fbo->BindBuffer(2);
-		
-		combine->Bind();
-		combine->SetUniform1i("tex", 0);
-		
-		DrawFullscreenQuad(proj);
+        blur->Bind();
+        blur->SetUniform1i("source", 0);
+        blur->SetUniform1f("offsetx", 0);
+        blur->SetUniform1f("offsety", pixel_offset / GetHeight());
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
 
-		glActiveTexture(GL_TEXTURE0);
-	}
+        fbo->SelectBuffer(1);
+        fbo->BindBuffer(0);
 
-	void ScreenGlow::OnScreenChange()
-	{
-		fbo->Resize(GetWidth(), GetHeight());
-	}
+        glClearColor(0.0,0.0,0.0,1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        DrawFullscreenQuad(proj);
+
+        fbo->SelectBuffer(2);
+        fbo->BindBuffer(1);
+
+        glClearColor(0.0,0.0,0.0,1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        blur->SetUniform1i("source", 0);
+        blur->SetUniform1f("offsetx", pixel_offset / GetWidth());
+        blur->SetUniform1f("offsety", 0.0f);
+
+        DrawFullscreenQuad(proj);
+
+        fbo->Unbind();
+
+        glClearColor(0.0,0.0,0.0,1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        fbo->BindBuffers(3);
+
+        combine->Bind();
+        combine->SetUniform1i("blur", 2);
+        combine->SetUniform1i("unblur", 0);
+
+        DrawFullscreenQuad(proj);
+
+        glActiveTexture(GL_TEXTURE0);
+    }
+
+    void ScreenGlow::OnScreenChange()
+    {
+        fbo->Resize(GetWidth(), GetHeight());
+    }
 }
