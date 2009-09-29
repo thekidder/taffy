@@ -38,14 +38,16 @@ namespace SORE_Graphics
         }
         else
         {
-            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s") % version);
+            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s")
+                       % version);
             supported = true;
         }
         if(supported)
         {
             if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
             {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR, "No shader support - check OpenGL version and extensions string");
+                ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                           "No shader support - check OpenGL version and extensions string");
                 supported = false;
             }
             else
@@ -104,7 +106,8 @@ namespace SORE_Graphics
         if(!ShadersSupported())
             return;
         Init();
-        std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(GetFilename().c_str());
+        std::map<std::string, std::map<std::string, std::string> > list =
+            SORE_Utility::ParseIniFile(GetFilename().c_str());
 
         std::map<std::string, std::map<std::string, std::string> >::iterator i;
         std::map<std::string, std::string>::iterator i2;
@@ -128,7 +131,8 @@ namespace SORE_Graphics
                 }
                 else
                 {
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Invalid material heading: %s") % section);
+                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                               boost::format("Invalid material heading: %s") % section);
                 }
             }
         }
@@ -207,7 +211,8 @@ namespace SORE_Graphics
         if(!ShadersSupported())
         {
             program = 0;
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program (shaders are not supported on this system)");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Error creating shader program (shaders are not supported on this system)");
             return 1;
         }
         uniforms.clear();
@@ -225,7 +230,9 @@ namespace SORE_Graphics
     {
         if(!(type==GL_VERTEX_SHADER || type==GL_FRAGMENT_SHADER))
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Attempted to create shader of unknown type (type given: %u)") % type);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Attempted to create shader of unknown type (type given: %u)")
+                       % type);
             return 1;
         }
         if(!ShadersSupported() || program==0)
@@ -268,10 +275,12 @@ namespace SORE_Graphics
                 delete[] infoLog;
             }
             else
-                ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("No info log for %s shader") % shaderType.c_str());
+                ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("No info log for %s shader")
+                           % shaderType.c_str());
             return 1;
         }
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Compiling %s shader successful") % shaderType.c_str());
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Compiling %s shader successful")
+                   % shaderType.c_str());
         glAttachObjectARB(program, shader);
         if(type==GL_VERTEX_SHADER)
             vertexShaders.push_back(shader);
