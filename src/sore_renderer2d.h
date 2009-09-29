@@ -106,6 +106,8 @@ namespace SORE_Graphics
 
         void PushState();
         void PopState();
+
+        void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
     protected:
         void RenderBatch(batch& b);
         virtual void OnScreenChange();
@@ -113,8 +115,6 @@ namespace SORE_Graphics
         //returns 0 on success
         int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
     private:
-        void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
-
         SORE_Resource::ResourcePool& rm;
 
         //acts as a stack: only providers on the top are called
