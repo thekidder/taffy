@@ -240,7 +240,8 @@ namespace SORE_Graphics
         else if(type==GL_FRAGMENT_SHADER) shaderType = "fragment";
         if(shader==0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error creating %s shader object.") % shaderType.c_str());
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error creating %s shader object.")
+                       % shaderType.c_str());
             return 1;
         }
         glShaderSourceARB(shader, 1, &src, NULL);
@@ -251,7 +252,8 @@ namespace SORE_Graphics
         glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &compile);
         if(compile!=GL_TRUE)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to compile %s shader") % shaderType.c_str());
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to compile %s shader")
+                       % shaderType.c_str());
 
             int infologLength = 0;
             int charsWritten  = 0;
@@ -284,7 +286,8 @@ namespace SORE_Graphics
         SORE_FileIO::file_ref file = SORE_FileIO::Open(vertex);
         if(file == 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load vertex shader program: %s") % vertex);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Could not load vertex shader program: %s") % vertex);
             return -1;
         }
         size_t size = SORE_FileIO::Size(file);
@@ -296,7 +299,8 @@ namespace SORE_Graphics
         delete[] src;
         if(status == 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Loaded vertex shader file %s") % vertex);
+            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
+                       boost::format("Loaded vertex shader file %s") % vertex);
         }
         return status;
     }
@@ -313,7 +317,8 @@ namespace SORE_Graphics
         SORE_FileIO::file_ref file = SORE_FileIO::Open(fragment);
         if(file == 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load fragment shader program: %s") % fragment);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Could not load fragment shader program: %s") % fragment);
             return -1;
         }
         size_t size = SORE_FileIO::Size(file);
@@ -324,7 +329,8 @@ namespace SORE_Graphics
         delete[] src;
         if(status == 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Loaded fragment shader file %s") % fragment);
+            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
+                       boost::format("Loaded fragment shader file %s") % fragment);
         }
         return status;
     }
