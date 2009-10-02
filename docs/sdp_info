@@ -8,7 +8,7 @@ Any other characters indicate a non-SDP formatted file
 
 2 bytes: format version
 Major version (1 byte) Minor version (1 byte)
-ex 0x00 0x01 represents version 0.1 (this specification)
+ex 0x00 0x02 represents version 0.2 (this specification)
 
 2 bytes: number of files and directory entries (little endian)
 ex 0xff 0x00 represents 256 files/directories in the archive
