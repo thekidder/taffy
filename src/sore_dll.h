@@ -1,4 +1,4 @@
-// $Id$
+
 
 #ifndef SORE_DLLDEFINES_H
 #define SORE_DLLDEFINES_H

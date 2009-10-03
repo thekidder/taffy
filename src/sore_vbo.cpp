@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-//$Id$
 
 #include "sore_vbo.h"
 #include "sore_logger.h"
@@ -53,7 +52,6 @@ namespace SORE_Graphics
                 ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create normal buffer");
         }
     }
-
 
     VBO::~VBO()
     {

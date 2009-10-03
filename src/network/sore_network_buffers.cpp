@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-// $Id$
 
 #include <cassert>
 #include <string.h>
@@ -558,7 +557,6 @@ namespace SORE_Network
 		*this >> data;
 		return *this;
 	}
-
 
 	ReceiveBuffer& ReceiveBuffer::operator&(std::string& data)
 	{
