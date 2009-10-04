@@ -42,6 +42,16 @@ IF(ENET_FOUND)
   ADD_SUBDIRECTORY("network")
 ENDIF()
 
+SET(VERSION_MAJOR 0)
+SET(VERSION_MINOR 2)
+SET(VERSION_PATCH 0)
+SET(VERSION_BRANCH "trunk")
+
+SET(CMAKE_VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h)
+SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h.in)
+
+CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
+
 set(SORE_SRCS
   sore_color.cpp sore_fbo.cpp sore_fileio.cpp sore_font.cpp sore_gamekernel.cpp 
   sore_gamestate.cpp sore_gamestate_manager.cpp
@@ -68,7 +78,7 @@ set(SORE_HEADERS sore.h
   sore_profiler.h sore_renderer.h sore_renderer2d.h sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_task.h sore_text.h sore_texture.h
-  sore_timing.h sore_util.h sore_vbo.h sore_vertexarray.h)
+  sore_timing.h sore_util.h sore_vbo.h sore_vertexarray.h ${CMAKE_VERSION_OUT} ${CMAKE_VERSION_IN})
 
 ADD_LIBRARY(sore_lib SHARED ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
   ${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS})
@@ -79,7 +89,7 @@ PROPERTIES
   OUTPUT_NAME sore
   COMPILE_DEFINITIONS_DEBUG DEBUG
 )
-ADD_DEPENDENCIES(sore_lib svnversion_sore)
+
 TARGET_LINK_LIBRARIES(sore_lib ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
 ${Boost_LIBRARIES} ${FREETYPE_LIBRARY} ${ZLIB_LIBRARY}
 ${FONTCONFIG_LIBRARIES} ${GLEW_LIBRARY} ${SDL_LIBRARY})

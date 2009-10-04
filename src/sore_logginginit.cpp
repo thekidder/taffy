@@ -18,26 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_svnrev.h"
+#include "cmake_version.h"
 #include "sore_logger.h"
 #include "sore_logginginit.h"
 
-const unsigned int SORE_MAJOR = 0;
-const unsigned int SORE_MINOR = 3;
-
-const char*        SORE_BRANCH = "trunk"; //ex tag 1.2.1, branch 1.2, trunk, etc
-
 namespace SORE_Logging
 {
-	void LoggingStartMessages()
-	{
-		ENGINE_LOG(SORE_Logging::LVL_INFO, 
-							 boost::format("SORE Engine Version %d.%d (SVN revision %s, date %s, %s)")
-							 % SORE_MAJOR % SORE_MINOR % SVN_REVSTR % SVN_REVDATE % SORE_BRANCH);
-		if(SVN_MODIFIED)
-		{
-			ENGINE_LOG(SORE_Logging::LVL_WARNING, "One or more source files have been modified"
-								 " since last commit (version number will be inaccurate)");
-		}
-	}
+    void LoggingStartMessages()
+    {
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("%s version %d.%d.%d (%s)")
+                   % VERSION_NAME % VERSION_MAJOR % VERSION_MINOR % VERSION_PATCH % VERSION_BRANCH);
+    }
 }
