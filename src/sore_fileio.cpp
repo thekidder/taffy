@@ -17,16 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
-
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
-#include "sore_fileio.h"
-#include "sore_logger.h"
-
-#include <zlib.h>
 
 #include <cassert>
 #include <cstring>
@@ -35,12 +25,74 @@
 #include <string>
 #include <vector>
 
+#include <zlib.h>
+
+#include "sore_fileio.h"
+#include "sore_logger.h"
+
 #define MODULE_FILEIO 1
 
 namespace SORE_FileIO
 {
     const size_t CHUNK = 131072;
     const int RATIO = 4;
+
+    PackageCache::PackageCache()
+    {
+    }
+
+    PackageCache::~PackageCache()
+    {
+        CloseAllPackages();
+    }
+
+    void PackageCache::CloseAllPackages()
+    {
+        std::map<std::string, std::ofstream>::iterator it;
+        for(it = openPackages.begin(); it != openPackages.end(); ++it)
+        {
+            it->second.close();
+        }
+    }
+
+    std::ofstream& PackageCache::GetPackage(const char* packagename)
+    {
+        if(openPackages.find(packagename) == openPackages.end())
+        {
+            std::ofstream packageFile(packagename);
+            openPackages.insert(std::make_pair(packagename, packageFile));
+        }
+        return openPackages[packagename];
+    }
+
+
+    void PackageCache::AddPackage(const char* packagename)
+    {
+        char header[7];
+
+        if(fileTable.find(packagename) != fileTable.end())
+            return; //package is already in cache
+
+        std::ofstream& package = GetPackage(packagename);
+        package.get(header, 7);
+
+        if(header[0]!='S' || header[1]!='D' || header[2]!='P')
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Failed to open %s: not a valid SDP package") % packagename);
+            return;
+        }
+
+
+    }
+
+    bool PackageCache::Contains(const char* filename) const
+    {
+    }
+
+    InFile PackageCache::GetFile(const char* filename)
+    {
+    }
 
     struct linked_list
     {
