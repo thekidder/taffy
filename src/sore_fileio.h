@@ -27,21 +27,83 @@
 
 #include <boost/function.hpp>
 #include <boost/iostreams/concepts.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <zlib.h>
 
 #include "sore_gamekernel.h"
 
 namespace SORE_FileIO
 {
-  typedef size_t file_ref;
-  const file_ref PACKAGE_START = 1;
+    typedef size_t file_ref;
+    const file_ref PACKAGE_START = 1;
 #define FILESYSTEM_START  std::numeric_limits<file_ref>::max()/2
 #define FILESYSTEM_END    std::numeric_limits<file_ref>::max()
 
-    class InFile
+    typedef boost::function<void (std::string)> file_callback;
+
+    const unsigned int CHUNK = 4096;
+
+    class GenericPkgFileBuf
     {
     public:
-        virtual std::ostream& strm() = 0;
-        virtual std::size_t size() = 0;
+        GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        virtual ~GenericPkgFileBuf() {}
+
+        virtual std::streamsize read(char* s, std::streamsize n) = 0;
+    protected:
+        std::ifstream& package;
+        unsigned int pos, size;
+        unsigned int currentPos;
+    };
+
+    class UncompressedPkgFileBuf : public GenericPkgFileBuf
+    {
+    public:
+        UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        ~UncompressedPkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+    };
+
+    class CompressedPkgFileBuf : public GenericPkgFileBuf
+    {
+    public:
+        CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
+            unsigned int sizeRaw_);
+        ~CompressedPkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+    private:
+        unsigned int sizeRaw;
+
+        z_stream strm;
+
+        unsigned int num_in;
+        unsigned char in[CHUNK];
+        unsigned int num_out;
+        std::vector<unsigned char> out;
+
+        bool eof;
+    };
+
+    class PkgFileBuf
+    {
+    public:
+        typedef char        char_type;
+        typedef boost::iostreams::source_tag  category;
+
+        PkgFileBuf(std::ifstream& package, unsigned int pos, unsigned int size,
+                   unsigned int sizeRaw);
+        ~PkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+
+    private:
+        boost::shared_ptr<GenericPkgFileBuf> d_ptr;
+
+        unsigned int raw;
     };
 
     class PackageCache
@@ -53,7 +115,7 @@ namespace SORE_FileIO
         void AddPackage(const char* packagename);
 
         bool Contains(const char* filename) const;
-        InFile* GetFile(const char* filename);
+        PkgFileBuf* GetFileBuf(const char* filename);
     private:
         struct file_info
         {
@@ -75,7 +137,7 @@ namespace SORE_FileIO
         std::string BuildFullName(file_info& file);
         cache_type::iterator FileInfo(unsigned int id);
         //opens package if not open
-        std::ofstream& GetPackage(const char* packagename);
+        std::ifstream& GetPackage(const char* packagename);
 
         //all cached files and where they are
         //stored as a (fullname, file_info) pair
@@ -83,40 +145,20 @@ namespace SORE_FileIO
         //which packages have currently been cached
         std::vector<std::string> cachedPackages;
         //open file handles
-        std::map<std::string, std::ifstream> openPackages;
+        std::map<std::string, std::ifstream*> openPackages;
     };
 
-    class CompressedPkgFileBuf : public boost::iostreams::source
+    class InFile
     {
     public:
-        CompressedPkgFileBuf();
-        std::streamsize read(char* s, std::streamsize n);
+        InFile(const char* filename, PackageCache* cache = NULL);
+        ~InFile();
+
+        std::istream& strm();
     private:
+        std::istream* in;
+        PkgFileBuf* buf;
     };
-
-  /*
-    Call this to include a package and make its contents available to the application
-    If filenames in two or more packages are duplicated, the last one included will
-    always be used. Returns 0 on success.
-  */
-  int          SORE_EXPORT CachePackage(const char* package);
-  /*
-    Call this to explicitly close a package. Package cache is still available to the
-    application, but the file handle is not open. Returns 0 on success.
-  */
-  int          SORE_EXPORT ClosePackage(const char* package);
-
-  file_ref     SORE_EXPORT Open(const char* file); //return a file_ref on success, 0 on failure
-  void         SORE_EXPORT Close(file_ref file);
-
-// returns number of bytes read
-  size_t       SORE_EXPORT Read(void* ptr, size_t size, size_t nmemb, file_ref file,
-                                bool ignoreBuffer=false);
-// reads until num number of bytes or until any character in separator has been reached
-  size_t       SORE_EXPORT Read(char* ptr, size_t num, const char* separator, file_ref file);
-  size_t       SORE_EXPORT Size(file_ref file);
-  size_t       SORE_EXPORT CompressedSize(file_ref file);
-  bool         SORE_EXPORT Eof(file_ref file);
 
 //only implemented on local files now (no packages)
   void         SORE_EXPORT Notify(std::string filename, file_callback callback);
