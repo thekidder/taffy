@@ -32,6 +32,11 @@
 
 namespace SORE_FileIO
 {
+  typedef size_t file_ref;
+  const file_ref PACKAGE_START = 1;
+#define FILESYSTEM_START  std::numeric_limits<file_ref>::max()/2
+#define FILESYSTEM_END    std::numeric_limits<file_ref>::max()
+
     class InFile
     {
     public:
