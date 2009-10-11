@@ -371,5 +371,6 @@ namespace SORE_FileIO
     {
         return *in;
     }
+}
 
 #undef MODULE_FILEIO

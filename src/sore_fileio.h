@@ -36,13 +36,6 @@
 
 namespace SORE_FileIO
 {
-    typedef size_t file_ref;
-    const file_ref PACKAGE_START = 1;
-#define FILESYSTEM_START  std::numeric_limits<file_ref>::max()/2
-#define FILESYSTEM_END    std::numeric_limits<file_ref>::max()
-
-    typedef boost::function<void (std::string)> file_callback;
-
     const unsigned int CHUNK = 4096;
 
     class GenericPkgFileBuf
@@ -160,10 +153,11 @@ namespace SORE_FileIO
         PkgFileBuf* buf;
     };
 
-//only implemented on local files now (no packages)
-  void         SORE_EXPORT Notify(std::string filename, file_callback callback);
-//called by InitFileIO, no need to ever call this yourself
-  bool         SORE_EXPORT InitFileNotify(SORE_Kernel::GameKernel* gk);
+    typedef boost::function<void (std::string)> file_callback;
+
+    //only implemented on local files now (no packages)
+    void         SORE_EXPORT Notify(std::string filename, file_callback callback);
+    bool         SORE_EXPORT InitFileNotify(SORE_Kernel::GameKernel* gk);
 }
 
 #endif
