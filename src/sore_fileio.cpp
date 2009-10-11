@@ -34,6 +34,9 @@
 
 namespace SORE_FileIO
 {
+    const unsigned int MAX_SDP_MAJOR = 0;
+    const unsigned int MAX_SDP_MINOR = 2;
+
     const size_t CHUNK = 131072;
     const int RATIO = 4;
 
@@ -65,15 +68,38 @@ namespace SORE_FileIO
         return openPackages[packagename];
     }
 
+    cache_type::iterator PackageCache::FileInfo(unsigned int id)
+    {
+        std::map<std::string, file_info>::iterator it;
+        for(it = cache.begin(); it != cache.end(); ++it)
+        {
+            if(it->second.fileID == id)
+                return it;
+        }
+        return cache.end();
+    }
+
+    std::string PackageCache::BuildFullName(file_info& file)
+    {
+        std::string full = file.filename;
+        file_info parent;
+        while(file.parentID != 0)
+        {
+            parent = FileInfo(file.parentID)->second;
+            full = parent.filename + "/" + full;
+        }
+        return full;
+    }
 
     void PackageCache::AddPackage(const char* packagename)
     {
         char header[7];
 
-        if(fileTable.find(packagename) != fileTable.end())
+        if(cache.find(packagename) != cache.end())
             return; //package is already in cache
+        cache.push_back(packagename);
 
-        std::ofstream& package = GetPackage(packagename);
+        std::ifstream package(packagename);
         package.get(header, 7);
 
         if(header[0]!='S' || header[1]!='D' || header[2]!='P')
@@ -83,7 +109,88 @@ namespace SORE_FileIO
             return;
         }
 
+        unsigned int version_major = static_cast<unsigned int>(header[3]);
+        unsigned int version_minor = static_cast<unsigned int>(header[4]);
 
+        if(version_major > MAX_SDP_MAJOR ||
+           (version_major == MAX_SDP_MAJOR && version_minor > MAX_SDP_MINOR))
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Failed to open %s: SDP version is too high (%d.%d)")
+                       % version_major % version_minor);
+            return;
+        }
+
+        unsigned short numFiles = static_cast<unsigned short>(header[5] + header[6]<<8);
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Caching %s with %d files and directories")
+                   % packagename % numFiles);
+
+        //we need to reassign IDs given how many files are already cached so we don't mangle
+        //existing ids
+        unsigned int idPrefix = cachedFiles.size();
+
+        //we also need to reassign folder IDs if a folder already exists in the cache
+        std::map<unsigned int, unsigned int> reassignedIDs;
+
+        char flags, c;
+        int pos;
+        for(unsigned int i = 0; i < numFiles;++i)
+        {
+            pos = 0;
+
+            file_info temp;
+            package.read(&temp.fileID, sizeof(short));
+            package.read(&flags, 1);
+            package.read(&temp.parentID, sizeof(short));
+
+            temp.fileID += idPrefix;
+            if(temp.parentID == 65535)
+                tmep.parentID = 0;
+            else
+                temp.parentID += idPrefix;
+
+            temp.filename.resize(256);
+            package.get(&temp.filename.at(0), 256, '\0');
+
+            if(reassignedIDs.find(temp.parentID)!=reassignedIDs.end())
+            {
+                ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2,
+                             boost::format("Reassigning parent for %s to %d")
+                             % temp.filename % reassignedIDs[temp.parentID], MODULE_FILEIO);
+                temp.parentID = reassignedIDs[temp.parentID];
+            }
+
+            if(!(flags & 0x01))
+            {
+                temp.directory = false;
+                package.read(&temp.pos, sizeof(int));
+                package.read(&temp.size, sizeof(int));
+                //file is compressed?
+                if(flags & 0x02)
+                    package.read(&temp.sizeRaw, sizeof(int));
+            }
+            else
+            {
+                temp.directory = true;
+                std::string fullname = BuildFullName(temp);
+                std::map<std::string, file_info>::iterator it;
+                //if directory already exists in cache, reuse it
+                if((it = cache.find(fullname)) != cache.end())
+                {
+                    reassignedIDs.insert(std::make_pair(temp.fileID, it->second.fileID));
+                    continue;
+                }
+            }
+            if(flags & 0x02)
+                temp.compressed = true;
+            else
+                temp.compressed = false;
+            temp.package = packagename;
+            std::string fullname = BuildFullName(temp);
+            cache.insert(std::make_pair(fullname, temp));
+        }
+        package.close();
     }
 
     bool PackageCache::Contains(const char* filename) const

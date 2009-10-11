@@ -26,7 +26,7 @@
 #include <limits>
 
 #include <boost/function.hpp>
-#include <boost/iostreams/categories.hpp>
+#include <boost/iostreams/concepts.hpp>
 
 #include "sore_gamekernel.h"
 
@@ -48,13 +48,8 @@ namespace SORE_FileIO
         void AddPackage(const char* packagename);
 
         bool Contains(const char* filename) const;
-        InFile GetFile(const char* filename);
+        InFile* GetFile(const char* filename);
     private:
-        void CloseAllPackages();
-
-        //opens package if not open
-        std::ofstream& GetPackage(const char* packagename);
-
         struct file_info
         {
             unsigned short int fileID;
@@ -62,23 +57,34 @@ namespace SORE_FileIO
             bool               directory;
             bool               compressed;
 
+            std::string        package;
             std::string        filename;
-            std::string        fullname;
 
             size_t       pos;
             size_t       size;
             size_t       sizeRaw;
         };
+        typedef std::map<std::string, file_info> cache_type;
 
-        std::map<std::string, std::vector<file_info> > fileTable;
-        std::map<std::string, std::ofstream> openPackages;
+        void CloseAllPackages();
+        std::string BuildFullName(file_info& file);
+        cache_type::iterator FileInfo(unsigned int id);
+        //opens package if not open
+        std::ofstream& GetPackage(const char* packagename);
 
+        //all cached files and where they are
+        //stored as a (fullname, file_info) pair
+        cache_type cache;
+        //which packages have currently been cached
+        std::vector<std::string> cachedPackages;
+        //open file handles
+        std::map<std::string, std::ifstream> openPackages;
     };
 
     class CompressedPkgFileBuf : public boost::iostreams::source
     {
     public:
-        CompressedPkgFileBuf(std::
+        CompressedPkgFileBuf();
         std::streamsize read(char* s, std::streamsize n);
     private:
     };
