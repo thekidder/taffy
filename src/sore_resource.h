@@ -76,6 +76,8 @@ namespace SORE_Resource
         std::vector<std::string> dependentFiles;
         static ResourcePool* rm;
     private:
+        void SetupNotify(std::string filename);
+
         std::string filename;
     };
 

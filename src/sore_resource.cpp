@@ -48,12 +48,22 @@ namespace SORE_Resource
     {
     }
 
-    void Resource::SetFilename(std::string file)
+    void Resource::SetupNotify(std::string filename)
     {
         boost::function<void (std::string)> callback =
             std::bind1st(std::mem_fun(&Resource::OnNotify),this);
-        filename = file;
+        if(packageCache)
+        {
+            if(packageCache->Contains(filename.c_str()))
+                filename = packageCache->PackageFilename(filename.c_str());
+        }
         SORE_FileIO::Notify(filename, callback);
+    }
+
+    void Resource::SetFilename(std::string file)
+    {
+        filename = file;
+        SetupNotify(filename);
     }
 
     void Resource::AddDependentFile(std::string file)
@@ -61,9 +71,7 @@ namespace SORE_Resource
         if(!IsDependent(file))
         {
             dependentFiles.push_back(file);
-            boost::function<void (std::string)> callback =
-                std::bind1st(std::mem_fun(&Resource::OnNotify),this);
-            SORE_FileIO::Notify(file, callback );
+            SetupNotify(file);
         }
     }
 
