@@ -29,6 +29,7 @@
 #include <string>
 #include <string.h>
 #include <cstdlib>
+#include <fstream>
 
 #include <boost/lexical_cast.hpp>
 
@@ -94,13 +95,9 @@ namespace SORE_Font
         if (FT_Init_FreeType( &library ))
             return;
 
-        //SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(GetFilename().c_str());
         SORE_FileIO::InFile fontObj(GetFilename().c_str(), packageCache);
 
-        //size_t size = SORE_FileIO::Size(fontObj);
-        fontObj.strm().seekg(0, std::ios_base::end);
-        size_t size = fontObj.strm().tellg();
-        fontObj.strm().seekg(0);
+        size_t size = fontObj.size();
         size_t err;
 
         fontInfo = new FT_Byte[size];
@@ -112,10 +109,9 @@ namespace SORE_Font
             ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
                            "Font load failed: Could not read font from disk "
                            "(expected %d bytes, read %d bytes)") % size % err);
-            //SORE_FileIO::Close(fontObj);
             return;
         }
-        //SORE_FileIO::Close(fontObj);
+
         if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size), 0, &face ))!=0)
         {
             FT_Done_FreeType(library);
@@ -132,8 +128,13 @@ namespace SORE_Font
         if(h <= 24)
             mode = FT_RENDER_MODE_MONO; //NORMAL gives odd glitches with small fonts
 
-        if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), mode ))
-            return;
+        int err;
+        if((err = FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), mode ) ))
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error loading '%c' (error %d)")
+                       % ch % err);
+            //return;
+        }
 
         FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Bitmap& bitmap=face->glyph->bitmap;
@@ -207,35 +208,22 @@ namespace SORE_Font
         if(fontPaths.size()==0) InitPaths();
 
         std::string full = name;
-        //SORE_FileIO::file_ref fontObj = SORE_FileIO::Open(full.c_str());
-        SORE_FileIO::InFile fontObj(full.c_str(), pc);
+        bool good = false;
 
         std::vector<std::string>::iterator it = fontPaths.begin();
-        while(!fontObj.strm().good() && it!=fontPaths.end())
+        while(it!=fontPaths.end())
         {
+            SORE_FileIO::InFile fontObj(full.c_str(), pc);
+            if(fontObj.strm().good())
+            {
+                good = true;
+                break;
+            }
             full = *it;
             full += name;
             ++it;
-
-            fontObj = SORE_FileIO::InFile(full.c_str(), pc);
         }
-
-        /*if(!fontObj.strm().good())
-        {
-
-            for(it=fontPaths.begin();it<fontPaths.end();it++)
-            {
-                full = *it;
-                full += name;
-                fontObj = SORE_FileIO::Open(full.c_str());
-                if(fontObj!=0)
-                {
-                    break;
-                }
-                fontObj = 0;
-            }
-            }*/
-        if(fontObj.strm().good())
+        if(good)
         {
             return full;
         }
