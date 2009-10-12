@@ -161,12 +161,13 @@ namespace SORE_Font
 
         CharInfo* c = characters[h];
 
+        unsigned int index = static_cast<unsigned int>(ch);
         if(x != 0 && y != 0)
         {
-            c[ch].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA,
+            c[index].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA,
                                                      GL_LUMINANCE_ALPHA, width, height);
 
-            c[ch].transform = SORE_Math::Matrix4<float>::GetTranslation(
+            c[index].transform = SORE_Math::Matrix4<float>::GetTranslation(
                 static_cast<float>(face->glyph->bitmap_left),
                 static_cast<float>(bitmap.rows-face->glyph->bitmap_top) + (h - bitmap.rows),
                 0.0f);
@@ -176,14 +177,14 @@ namespace SORE_Font
                                            static_cast<float>(bitmap.rows));
             SORE_Math::Rect<float> texCoords(0.0f, x, 0.0f, y);
 
-            c[ch].gc = new SORE_Graphics::GeometryChunk(c[ch].tex, bounds, texCoords);
+            c[index].gc = new SORE_Graphics::GeometryChunk(c[index].tex, bounds, texCoords);
         }
         else
         {
-            c[ch].tex = NULL;
-            c[ch].gc = NULL;
+            c[index].tex = NULL;
+            c[index].gc = NULL;
         }
-        c[ch].advance = static_cast<float>(face->glyph->advance.x >> 6);
+        c[index].advance = static_cast<float>(face->glyph->advance.x >> 6);
 
         delete [] expanded_data;
     }
@@ -199,7 +200,7 @@ namespace SORE_Font
         {
             if(characters.find(height)==characters.end())
                 LoadFace(height);
-            return characters[height][c];
+            return characters[height][static_cast<unsigned int>(c)];
         }
     }
 
