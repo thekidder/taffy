@@ -17,787 +17,386 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
 
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
-#include "sore_fileio.h"
-#include "sore_logger.h"
-
-#include <zlib.h>
-
+#include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+#include <zlib.h>
+
+#include "sore_fileio.h"
+#include "sore_logger.h"
+
 #define MODULE_FILEIO 1
 
 namespace SORE_FileIO
 {
-    const size_t CHUNK = 131072;
-    const int RATIO = 4;
+    const unsigned int MAX_SDP_MAJOR = 0;
+    const unsigned int MAX_SDP_MINOR = 2;
 
-    struct linked_list
+    const unsigned int CHUNK = 4096;
+
+    PackageCache::PackageCache()
     {
-        unsigned char* data;
-        unsigned int size;
-        linked_list* next;
-    };
-
-    void DeleteLinkedList(linked_list* curr);
-    void LinkedListCopy(void* dest, linked_list* src, size_t n); //copy n bytes from src to dest
-    void LinkedListEat(linked_list* src, size_t n); //shift the data in src n bytes toward the start
-
-    struct file_info
-    {
-        unsigned short int fileID;
-        unsigned short int parentID;
-        bool               file;
-        bool               isOpen;
-        bool               compressed;
-
-        char               filename[256];
-        char               fullname[512];
-        char               package [512];
-
-        size_t       pos;
-        size_t       size;
-        size_t       sizeRaw;
-        size_t       currPos;
-        size_t       currPosRaw;
-        z_stream*    strm;
-        linked_list  out_buf;
-        size_t       out_filled;
-        size_t       out_size;
-    };
-
-    struct filesystem_file
-    {
-        FILE* fptr;
-        size_t filled;
-        char buffer[2048];
-    };
-
-    typedef std::vector<file_info> file_list;
-
-    file_list cachedFiles;
-    std::map<std::string, size_t> fileMap;
-    std::map<std::string, FILE*> openPackages;
-    std::map<unsigned int, filesystem_file> openFilesystemFiles;
-    std::map<std::string, unsigned int> openPackageCount;
-    unsigned int nOpenFilesystemFiles;
-
-    file_info* GetFile(unsigned int ID);
-    file_info* GetFile(std::string fullname);
-    void BuildFullName(file_list& list, file_info& file, file_info& orig);
-
-    const int MAX_MAJOR = 0;
-    const int MAX_MINOR = 2;
-}
-
-SORE_FileIO::file_info* SORE_FileIO::GetFile(unsigned int ID)
-{
-    for(file_list::iterator it=cachedFiles.begin(); it!=cachedFiles.end(); ++it)
-    {
-        if(it->fileID == ID)
-            return &*it;
-    }
-    return 0;
-}
-
-SORE_FileIO::file_info* SORE_FileIO::GetFile(std::string fullname)
-{
-    for(file_list::iterator it=cachedFiles.begin(); it!=cachedFiles.end(); ++it)
-    {
-        if(it->fullname == fullname)
-            return &*it;
-    }
-    return 0;
-}
-
-int SORE_FileIO::InitFileIO(SORE_Kernel::GameKernel* gk)
-{
-    SORE_Logging::sore_log.IgnoreModule(MODULE_FILEIO,
-                                        SORE_Logging::LVL_DEBUG2 | SORE_Logging::LVL_DEBUG3);
-    file_info temp;
-    cachedFiles.clear();
-    cachedFiles.push_back(temp);
-    fileMap.clear();
-    openPackages.clear();
-    openPackageCount.clear();
-    openFilesystemFiles.clear();
-    nOpenFilesystemFiles = 0;
-    if(!InitFileNotify(gk)) return 1;
-    return 0;
-}
-
-int SORE_FileIO::CachePackage(const char* package)
-{
-    int errCode = 0;
-    char header[7];
-
-    FILE* in;
-    in = fopen(package, "rb");
-    if(!in || ferror(in)!=0)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   boost::format("Could not open package file %s, aborting.") % package);
-        return -1;
-    }
-    fread(header, sizeof(char), 7, in);
-
-    if(header[0]!='S' || header[1]!='D' || header[2]!='P')
-    {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Not a SORE Data Package file");
-        return -1;
     }
 
-    if(int(header[3])>MAX_MAJOR || int(header[4])>MAX_MINOR)
+    PackageCache::~PackageCache()
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   boost::format("Can't decode SDP files greater than version %d.%d")
-                   % MAX_MAJOR % MAX_MINOR);
+        CloseAllPackages();
     }
 
-    unsigned short int numPackageFiles = (header[5]) + (header[6]<<8);
-
-    ENGINE_LOG(SORE_Logging::LVL_INFO,
-               boost::format("Now processing %s containing %d files and directories...")
-               % package % numPackageFiles);
-
-    char flags, c;
-    int pos;
-
-    file_info tempInfo;
-
-    //we need to reassign IDs given how many files are already cached so we don't mangle existing
-    //ids
-    unsigned int idPrefix = cachedFiles.size();
-
-    //we also need to reassign folder IDs if a folder already exists in the cache
-    std::map<unsigned int, unsigned int> reassignedIDs;
-
-    for(int i=0;i<numPackageFiles;i++)
+    void PackageCache::CloseAllPackages()
     {
-        pos = 0;
-        fread(&tempInfo.fileID, sizeof(short int), 1, in);
-        fread(&flags, sizeof(char), 1, in);
-        fread(&tempInfo.parentID, sizeof(short int), 1, in);
-
-        tempInfo.fileID += idPrefix;
-        if(tempInfo.parentID == 65535 )
-            tempInfo.parentID = 0;
-        else
-            tempInfo.parentID += idPrefix;
-
-        while((c=fgetc(in))!=(unsigned char)'\0')
+        std::map<std::string, std::ifstream*>::iterator it;
+        for(it = openPackages.begin(); it != openPackages.end(); ++it)
         {
-            tempInfo.filename[pos] = (unsigned char)c;
-            pos++;
+            it->second->close();
+            delete it->second;
         }
-        tempInfo.filename[pos] = '\0';
-
-        if(reassignedIDs.find(tempInfo.parentID)!=reassignedIDs.end())
-        {
-            ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Reassigning parent for %s to %d")
-                         % tempInfo.filename % reassignedIDs[tempInfo.parentID], MODULE_FILEIO);
-            tempInfo.parentID = reassignedIDs[tempInfo.parentID];
-        }
-
-        if(!(flags & 0x01))
-        {
-            tempInfo.file = true;
-            fread(&tempInfo.pos, sizeof(int), 1, in);
-            fread(&tempInfo.size, sizeof(int), 1, in);
-            if(flags & 0x02)
-                fread(&tempInfo.sizeRaw, sizeof(int), 1, in);
-        }
-        else
-        {
-            tempInfo.file = false;
-            //look for existing directory of the same name
-            BuildFullName(cachedFiles, tempInfo, tempInfo);
-            file_info* info = GetFile(tempInfo.fullname);
-            if(info)
-            {
-                reassignedIDs.insert(std::make_pair(tempInfo.fileID, info->fileID));
-                continue;
-            }
-        }
-        if(flags & 0x02)
-        {
-            tempInfo.compressed = true;
-        }
-        else
-        {
-            tempInfo.compressed = false;
-        }
-        tempInfo.isOpen = false;
-        strncpy(tempInfo.package, package, 511);
-        if(cachedFiles.size()>=FILESYSTEM_START-1)
-        {
-            //marked as critical because this should never happen, unless you load LOTS of resources
-            ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Too many cached files...aborting");
-            fclose(in);
-            return -2;
-        }
-        cachedFiles.push_back(tempInfo);
-        BuildFullName(cachedFiles, cachedFiles[cachedFiles.size()-1],
-                      cachedFiles[cachedFiles.size()-1]);
-        fileMap[cachedFiles[cachedFiles.size()-1].fullname] = cachedFiles.size()-1;
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Added %s to cache")
-                     % cachedFiles[cachedFiles.size()-1].fullname, MODULE_FILEIO);
     }
 
-    fclose(in);
-
-    return errCode;
-}
-
-int SORE_FileIO::ClosePackage(const char* package)
-{
-    if(openPackages.find(package)==openPackages.end())
+    std::ifstream& PackageCache::GetPackage(const char* packagename)
     {
-        ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Cannot close %s: package is not open")
-                   % package);
-        return 0;
-    }
-    if(openPackageCount.find(package)!=openPackageCount.end() && openPackageCount[package]!=0)
-    {
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2,
-                     boost::format("Closing open files (%u) before closing package")
-                     % openPackageCount[package], MODULE_FILEIO);
-
-        file_list::iterator it;
-
-        for(it=cachedFiles.begin();it!=cachedFiles.end();++it)
+        if(openPackages.find(packagename) == openPackages.end())
         {
-            if(strcmp(it->package, package) != 0)
-                continue;
-            if(!it->isOpen)
-                continue;
-
-            it->isOpen = false;
-            --openPackageCount[package];
-            ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("closing %s (%u)")
-                         % it->fullname % openPackageCount[package], MODULE_FILEIO);
+            std::ifstream* packageFile = new std::ifstream(packagename, std::ios::binary);
+            openPackages.insert(std::make_pair(packagename, packageFile));
+            if(!packageFile->good())
+                ENGINE_LOG(SORE_Logging::LVL_ERROR, "could not open file");
         }
+        return *(openPackages[packagename]);
     }
-    if(openPackageCount.find(package)!=openPackageCount.end() && openPackageCount[package]!=0)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   boost::format("Consistency error - incorrect number of open files in %s")
-                   % package);
-        return 1;
-    }
-    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Closing package %s") % package);
-    fclose(openPackages[package]);
-    openPackages.erase(package);
-    return 0;
-}
 
-/*
-  All file_ref's from packages are in the range 1-2147483647
-  All file_ref's from the normal filesystem are in the range 2147483648-4294967295
-*/
-SORE_FileIO::file_ref SORE_FileIO::Open(const char* file)
-{
-    std::map<std::string, size_t>::iterator it;
-    FILE* temp = NULL;
-    temp = fopen(file, "rb");
-    if(temp && ferror(temp)==0)
+    PackageCache::cache_type::iterator PackageCache::FileInfo(unsigned int id)
     {
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from disk") % file,
-                     MODULE_FILEIO);
-        if(nOpenFilesystemFiles>=(unsigned long)FILESYSTEM_END-FILESYSTEM_START)
+        std::map<std::string, file_info>::iterator it;
+        for(it = cache.begin(); it != cache.end(); ++it)
         {
-            ENGINE_LOG(SORE_Logging::LVL_WARNING,"Too many files open, aborting.");
-            fclose(temp);
-            return 0;
+            if(it->second.fileID == id)
+                return it;
+        }
+        return cache.end();
+    }
+
+    std::string PackageCache::BuildFullName(file_info& file)
+    {
+        std::string full = file.filename;
+        file_info parent = file;
+        while(parent.parentID != 0)
+        {
+            parent = FileInfo(parent.parentID)->second;
+            full = parent.filename + "/" + full;
+        }
+        return full;
+    }
+
+    void PackageCache::AddPackage(const char* packagename)
+    {
+        char header[7];
+
+        if(find(cachedPackages.begin(), cachedPackages.end(), packagename) != cachedPackages.end())
+            return; //package is already in cache
+        cachedPackages.push_back(packagename);
+
+        std::ifstream package(packagename, std::ios::binary);
+        package.read(header, 7);
+
+        if(header[0]!='S' || header[1]!='D' || header[2]!='P')
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Failed to open %s: not a valid SDP package") % packagename);
+            return;
         }
 
-        unsigned int cur = nOpenFilesystemFiles;
-        /*
-          TODO: Currently, the approach below doesnt completely "free" file_ref's to be used when a
-          file is closed - so theoretically, after opening files a couple billion times, we may be
-          unable to open any more. This should be made more elegant sometime in the future.
-        */
-        while(openFilesystemFiles.find(FILESYSTEM_START+cur)!=openFilesystemFiles.end())
-            cur++;
-        filesystem_file fileStruct;
-        fileStruct.fptr = temp;
-        fileStruct.filled = 0;
-        fileStruct.buffer[0] = '\0';
-        openFilesystemFiles[FILESYSTEM_START+cur] = fileStruct;
-        nOpenFilesystemFiles++;
+        unsigned int version_major = static_cast<unsigned int>(header[3]);
+        unsigned int version_minor = static_cast<unsigned int>(header[4]);
 
-        return FILESYSTEM_START+cur;
-    }
-    else if((it=fileMap.find(file))!=fileMap.end())
-    {
-        if(cachedFiles[it->second].isOpen)
+        if(version_major > MAX_SDP_MAJOR ||
+           (version_major == MAX_SDP_MAJOR && version_minor > MAX_SDP_MINOR))
         {
-            ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("%s is already open") % file);
-            return it->second;
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Failed to open %s: SDP version is too high (%d.%d)")
+                       % version_major % version_minor);
+            return;
         }
-        cachedFiles[it->second].currPos = 0;
-        cachedFiles[it->second].currPosRaw  = 0;
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Opening file %s from package %s")
-                     % file % cachedFiles[it->second].package, MODULE_FILEIO);
-        if(openPackages.find(cachedFiles[it->second].package)==openPackages.end())
+
+        unsigned short numFiles = static_cast<unsigned short>(header[5] + (header[6]<<8));
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Caching %s with %d files and directories")
+                   % packagename % numFiles);
+
+        //we need to reassign IDs given how many files are already cached so we don't mangle
+        //existing ids
+        unsigned int idPrefix = cache.size();
+
+        //we also need to reassign folder IDs if a folder already exists in the cache
+        std::map<unsigned int, unsigned int> reassignedIDs;
+
+        char flags;
+        int pos;
+        for(unsigned int i = 0; i < numFiles; ++i)
         {
-            FILE* temp;
-            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Opening package %s")
-                       % cachedFiles[it->second].package);
-            temp = fopen(cachedFiles[it->second].package, "rb");
-            openPackages[cachedFiles[it->second].package] = temp;
-            if(openPackageCount.find(cachedFiles[it->second].package)==openPackageCount.end())
-                openPackageCount[cachedFiles[it->second].package] = 1;
+            pos = 0;
+
+            file_info temp;
+            unsigned short tempShort;
+            package.read(reinterpret_cast<char*>(&tempShort), 2);
+            temp.fileID = tempShort;
+            package.read(&flags, 1);
+            package.read(reinterpret_cast<char*>(&tempShort), 2);
+            temp.parentID = tempShort;
+
+            temp.fileID += idPrefix;
+            if(temp.parentID == 65535)
+                temp.parentID = 0;
             else
-                ++openPackageCount[cachedFiles[it->second].package];
-        }
-        else
-        {
-            ++openPackageCount[cachedFiles[it->second].package];
-        }
-        cachedFiles[it->second].isOpen = true;
-        if(cachedFiles[it->second].compressed)
-        {
-            cachedFiles[it->second].out_buf.data = new unsigned char[CHUNK*RATIO];
-            cachedFiles[it->second].out_buf.next = NULL;
-            cachedFiles[it->second].out_buf.size = CHUNK * RATIO;
-            cachedFiles[it->second].out_filled  = 0;
+                temp.parentID += idPrefix;
 
-            cachedFiles[it->second].out_size    = CHUNK * RATIO;
-            int ret;
-            cachedFiles[it->second].strm           = new z_stream;
-            cachedFiles[it->second].strm->zalloc   = Z_NULL;
-            cachedFiles[it->second].strm->zfree    = Z_NULL;
-            cachedFiles[it->second].strm->opaque   = Z_NULL;
-            cachedFiles[it->second].strm->avail_in = 0;
-            cachedFiles[it->second].strm->next_in  = Z_NULL;
-            ret = inflateInit(cachedFiles[it->second].strm);
-            if (ret != Z_OK)
-                return 0;
-        }
-        return it->second;
-    }
-    else
-    {
-        if(temp) fclose(temp);
-        return 0;
-    }
-}
+            char c;
+            temp.filename = "";
+            while(1)
+            {
+                package.read(&c, 1);
+                if(c == '\0') break;
+                temp.filename += c;
+            }
 
-bool SORE_FileIO::Eof(file_ref file)
-{
-    if(file<FILESYSTEM_START && file>=PACKAGE_START)
+            if(reassignedIDs.find(temp.parentID)!=reassignedIDs.end())
+            {
+                ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2,
+                             boost::format("Reassigning parent for %s to %d")
+                             % temp.filename % reassignedIDs[temp.parentID], MODULE_FILEIO);
+                temp.parentID = reassignedIDs[temp.parentID];
+            }
+
+            if(!(flags & 0x01))
+            {
+                temp.directory = false;
+                package.read(reinterpret_cast<char*>(&temp.pos), 4);
+                package.read(reinterpret_cast<char*>(&temp.size), 4);
+                //file is compressed?
+                if(flags & 0x02)
+                    package.read(reinterpret_cast<char*>(&temp.sizeRaw), 4);
+            }
+            else
+            {
+                temp.directory = true;
+                std::string fullname = BuildFullName(temp);
+                std::map<std::string, file_info>::iterator it;
+                //if directory already exists in cache, reuse it
+                if((it = cache.find(fullname)) != cache.end())
+                {
+                    reassignedIDs.insert(std::make_pair(temp.fileID, it->second.fileID));
+                    continue;
+                }
+            }
+            if(flags & 0x02)
+                temp.compressed = true;
+            else
+                temp.compressed = false;
+            temp.package = packagename;
+            std::string fullname = BuildFullName(temp);
+            cache.insert(std::make_pair(fullname, temp));
+        }
+        package.close();
+    }
+
+    bool PackageCache::Contains(const char* filename) const
     {
-        if(cachedFiles[file].isOpen==false)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "File is not open");
+        if(cache.find(filename) != cache.end())
             return true;
-        }
-        if(cachedFiles[file].currPos==cachedFiles[file].size) return true;
         return false;
     }
-    else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
-    {
-        if(openFilesystemFiles[file].filled>0) return false;
-        if(feof(openFilesystemFiles[file].fptr)!=0) return true;
-        else return false;
-    }
-    return true;
-}
 
-void SORE_FileIO::Close(file_ref file)
-{
-    if(file<FILESYSTEM_START && file>=PACKAGE_START)
+    PkgFileBuf* PackageCache::GetFileBuf(const char* filename)
     {
-        cachedFiles[file].isOpen = false;
-        --openPackageCount[cachedFiles[file].package];
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file %s from package cache")
-                     % cachedFiles[file].fullname, MODULE_FILEIO);
-        if(cachedFiles[file].compressed)
-        {
-            delete   cachedFiles[file].strm;
-            delete[] cachedFiles[file].out_buf.data;
-            if(cachedFiles[file].out_buf.next != NULL)
-                DeleteLinkedList(cachedFiles[file].out_buf.next);
-            cachedFiles[file].out_size = CHUNK * RATIO;
-        }
-#ifdef SORE_FILEIO_CLOSE_PACKAGE_STRICT
-        if(openPackageCount[cachedFiles[file].package]==0)
-        {
-            ClosePackage(cachedFiles[file].package);
-        }
-#endif
-    }
-    else if(file>=FILESYSTEM_START && file<FILESYSTEM_END)
-    {
-        ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2, boost::format("Closing file reference %u from disk")
-                     % file, MODULE_FILEIO);
-        nOpenFilesystemFiles--;
-        fclose(openFilesystemFiles[file].fptr);
-        openFilesystemFiles.erase(file);
-    }
-}
-
-size_t SORE_FileIO::Read(void *ptr, size_t size, size_t nmemb, file_ref file, bool ignoreBuffer)
-{
-    if(nmemb == 0 || size == 0)
-        return 0;
-    if(file < FILESYSTEM_START && file>=PACKAGE_START)
-    {
-        if(cachedFiles[file].isOpen==false)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "File is not open");
-            return 0;
-        }
-        //how many bytes we need to read -adjusted from size*nmemb to make sure we don't go past
-        //the end of the file in our stream
-        size_t bytesToRead = cachedFiles[file].size - cachedFiles[file].currPos;
-        size_t read; //how many we've read so far
-        fseek(openPackages[cachedFiles[file].package],
-              static_cast<long>(cachedFiles[file].pos + cachedFiles[file].currPosRaw), SEEK_SET);
-        if(bytesToRead>=size*nmemb)
-        {
-            bytesToRead = nmemb;
-        }
+        file_info& fi = cache[filename];
+        std::ifstream& strm = GetPackage(fi.package.c_str());
+        if(!fi.compressed)
+            return new PkgFileBuf(strm, fi.pos, fi.size, 0);
         else
+            return new PkgFileBuf(strm, fi.pos, fi.size, fi.sizeRaw);
+    }
+
+    GenericPkgFileBuf::GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_,
+                                         unsigned int size_) :
+        package(package_), pos(pos_), fileSize(size_), currentPos(pos)
+    {
+    }
+
+    size_t GenericPkgFileBuf::size() const
+    {
+        return fileSize;
+    }
+
+    UncompressedPkgFileBuf::UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
+                           unsigned int size_) :
+        GenericPkgFileBuf(package_, pos_, size_)
+    {
+    }
+
+    UncompressedPkgFileBuf::~UncompressedPkgFileBuf()
+    {
+    }
+
+    std::streamsize UncompressedPkgFileBuf::read(char* s, std::streamsize n)
+    {
+        if(currentPos - pos == fileSize) return -1;
+        unsigned int bytesToRead = std::min(fileSize - (currentPos - pos),
+                                            static_cast<unsigned int>(n));
+        package.seekg(currentPos);
+        package.read(s, bytesToRead);
+        return package.gcount();
+    }
+
+    CompressedPkgFileBuf::CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
+                                               unsigned int size_, unsigned int sizeRaw_) :
+        GenericPkgFileBuf(package_, pos_, size_),
+        sizeRaw(sizeRaw_), num_out(0), eof(false)
+    {
+        strm.zalloc = Z_NULL;
+        strm.zfree = Z_NULL;
+        strm.opaque = Z_NULL;
+        strm.avail_in = 0;
+        strm.next_in = Z_NULL;
+        int ret = inflateInit(&strm);
+        if(ret != Z_OK)
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Failed to initialize zlib stream");
+    }
+
+    CompressedPkgFileBuf::~CompressedPkgFileBuf()
+    {
+        inflateEnd(&strm);
+    }
+
+    std::streamsize CompressedPkgFileBuf::read(char* s, std::streamsize n)
+    {
+        if(eof) return -1;
+        int ret = Z_OK;
+        package.seekg(currentPos);
+        while(num_out < n && ret != Z_STREAM_END)
         {
-            bytesToRead /= size;
-        }
-        if(cachedFiles[file].compressed)
-        {
-            size_t size, ret,have;
-            unsigned char in_buf[CHUNK];
-            read = 0;
-            if(cachedFiles[file].out_filled > bytesToRead)
+            char in[CHUNK];
+            unsigned int toRead = (sizeRaw+pos)-currentPos;
+            toRead = std::min(toRead, CHUNK);
+            package.read(in, toRead);
+            size_t num_in = package.gcount();
+            currentPos += num_in;
+
+            strm.avail_in = num_in;
+            strm.next_in = reinterpret_cast<Bytef*>(in);
+
+            do
             {
-                LinkedListCopy(ptr, &cachedFiles[file].out_buf, bytesToRead);
-                LinkedListEat(&cachedFiles[file].out_buf, bytesToRead);
-                cachedFiles[file].out_filled -= bytesToRead;
-                read += bytesToRead;
-                cachedFiles[file].currPos += read;
-            }
-            else if(cachedFiles[file].out_filled > 0)
-            {
-                LinkedListCopy(ptr, &cachedFiles[file].out_buf, cachedFiles[file].out_filled);
-                read += cachedFiles[file].out_filled;
-                cachedFiles[file].out_filled = 0;
-                if(cachedFiles[file].out_buf.next != NULL)
-                    DeleteLinkedList(cachedFiles[file].out_buf.next);
-                cachedFiles[file].out_size = CHUNK * RATIO;
-                cachedFiles[file].currPos += read;
-            }
-            while(read < bytesToRead)
-            {
-                if(CHUNK > cachedFiles[file].sizeRaw - cachedFiles[file].currPosRaw)
-                    size = cachedFiles[file].sizeRaw - cachedFiles[file].currPosRaw;
-                else
-                    size = CHUNK;
-                if((ret=fread(in_buf, 1, size, openPackages[cachedFiles[file].package]))!=size)
+                out.resize(num_out + CHUNK);
+                strm.avail_out = CHUNK;
+                strm.next_out = &(out[num_out]);
+
+                ret = inflate(&strm, Z_NO_FLUSH);
+                assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
+                switch (ret)
                 {
-                    cachedFiles[file].currPos += ret;
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING, "Reading from file failed:");
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                               boost::format("\tNeeded to read %d bytes but only got %d bytes.")
-                               % size % ret);
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                               boost::format("\t%s resides at poisition %d and is %d bytes of size")
-                               % cachedFiles[file].filename % cachedFiles[file].pos
-                               % cachedFiles[file].size);
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                               boost::format("\tCurrent package position is %u. Current file "
-                                             "position is %u bytes.")
-                               % ftell(openPackages[cachedFiles[file].package])
-                               % cachedFiles[file].currPos);
-                    return read;
+                case Z_NEED_DICT:
+                    ret = Z_DATA_ERROR;     /* and fall through */
+                case Z_DATA_ERROR:
+                case Z_MEM_ERROR:
+                    inflateEnd(&strm);
+                    ENGINE_LOG(SORE_Logging::LVL_ERROR, "Internal zlib error on read");
                 }
-                cachedFiles[file].currPosRaw += static_cast<uInt>(ret);
-                cachedFiles[file].strm->avail_in = static_cast<uInt>(ret);
-                cachedFiles[file].strm->next_in = in_buf;
-                do
-                {
-                    size_t i = 0;
-                    linked_list* curr = &cachedFiles[file].out_buf;
-                    while(true)
-                    {
-                        i += curr->size;
-                        if(i >= cachedFiles[file].out_filled)
-                            break;
-                        assert(curr->next != NULL);
-                        curr = curr->next;
-                    }
-                    size_t out;
-                    if(cachedFiles[file].out_size - cachedFiles[file].out_filled >= CHUNK)
-                        out = CHUNK;
-                    else if(cachedFiles[file].out_size - cachedFiles[file].out_filled < CHUNK &&
-                            cachedFiles[file].out_size - cachedFiles[file].out_filled > 0)
-                        out = cachedFiles[file].out_size-cachedFiles[file].out_filled;
-                    else
-                    {
-                        curr->next = new linked_list;
-                        curr->next->data = new unsigned char[CHUNK*RATIO];
-                        curr->next->size = CHUNK * RATIO;
-                        curr->next->next = NULL;
-                        cachedFiles[file].out_size += CHUNK * RATIO;
-                        out = CHUNK;
-                        curr = curr->next;
-                    }
-                    cachedFiles[file].strm->avail_out = static_cast<uInt>(out);
-                    size_t currFilled = cachedFiles[file].out_filled % (CHUNK*RATIO);
-                    cachedFiles[file].strm->next_out = (curr->data + currFilled);
-                    int inflated = inflate(cachedFiles[file].strm, Z_NO_FLUSH);
-                    assert(inflated != Z_STREAM_ERROR);
-                    switch (inflated)
-                    {
-                        case Z_NEED_DICT:
-                            inflated = Z_DATA_ERROR;     //and fall through
-                        case Z_DATA_ERROR:
-                        case Z_MEM_ERROR:
-                            inflateEnd(cachedFiles[file].strm);
-                            return read;
-                    }
-                    have = out - static_cast<size_t>(cachedFiles[file].strm->avail_out);
-                    cachedFiles[file].out_filled += have;
+                num_out += (CHUNK - strm.avail_out);
 
-                }while(cachedFiles[file].strm->avail_out == 0);
-                if(cachedFiles[file].out_filled >= bytesToRead-read)
-                {
-                    LinkedListCopy((unsigned char*)ptr+read, &cachedFiles[file].out_buf,
-                                   bytesToRead-read);
-                    LinkedListEat(&cachedFiles[file].out_buf, bytesToRead-read);
-                    cachedFiles[file].out_size -= bytesToRead / (CHUNK*RATIO);
-                    cachedFiles[file].out_filled -= bytesToRead - read;
-                    cachedFiles[file].currPos += bytesToRead - read;
-                    read = bytesToRead;
-
-                }
-                else
-                {
-                    LinkedListCopy((unsigned char*)ptr+read, &cachedFiles[file].out_buf,
-                                   cachedFiles[file].out_filled);
-                    read += cachedFiles[file].out_filled;
-                    cachedFiles[file].currPos += cachedFiles[file].out_filled;
-                    cachedFiles[file].out_filled = 0;
-                    if(cachedFiles[file].out_buf.next != NULL)
-                        DeleteLinkedList(cachedFiles[file].out_buf.next);
-                    cachedFiles[file].out_size = CHUNK * RATIO;
-                }
             }
-            return read;
+            while(strm.avail_out == 0);
+        }
+        unsigned int have = std::min(static_cast<unsigned int>(n), num_out);
+        if(have < n)
+            eof = true;
+        std::copy(out.begin(), out.begin() + have, s);
+        std::copy(out.begin() + have, out.end(), out.begin());
+        num_out -= have;
+        return have;
+    }
+
+    PkgFileBuf::PkgFileBuf(std::ifstream& package, unsigned int pos, unsigned int size,
+                           unsigned int sizeRaw) : raw(sizeRaw)
+    {
+        if(sizeRaw == 0)
+        {
+            boost::shared_ptr<GenericPkgFileBuf> p(new UncompressedPkgFileBuf(package, pos, size));
+            d_ptr = p;
         }
         else
         {
-            read = fread(ptr, size, bytesToRead, openPackages[cachedFiles[file].package]);
+            boost::shared_ptr<GenericPkgFileBuf> p
+                (new CompressedPkgFileBuf(package, pos, size, sizeRaw));
+            d_ptr =p;
         }
-        cachedFiles[file].currPosRaw += read;
-        return read;
     }
-    else if(file>=FILESYSTEM_START && file<std::numeric_limits<unsigned long>::max())
+
+    size_t PkgFileBuf::size() const
     {
-        size_t offset = 0;
-        size_t toRead = size*nmemb;
-        if(!ignoreBuffer)
+        return d_ptr->size();
+    }
+
+    std::streamsize PkgFileBuf::read(char* s, std::streamsize n)
+    {
+        return d_ptr->read(s, n);
+    }
+
+    PkgFileBuf::~PkgFileBuf()
+    {
+    }
+
+    InFile::InFile(const char* filename, PackageCache* cache) : in(0), buf(0)
+    {
+        if(cache)
         {
-            if(openFilesystemFiles[file].filled>0)
+            if(cache->Contains(filename))
             {
-                size_t amount = size*nmemb > openFilesystemFiles[file].filled ?
-                    openFilesystemFiles[file].filled : size*nmemb;
-                memcpy(ptr, openFilesystemFiles[file].buffer, amount);
-                offset = amount;
-                toRead -= amount;
-                openFilesystemFiles[file].filled -= amount;
-                openFilesystemFiles[file].buffer[0] = '\0';
+                buf = cache->GetFileBuf(filename);
+                in = new boost::iostreams::stream<PkgFileBuf>(*buf);
+                return;
             }
         }
-        size_t read = fread((char*)ptr+offset, 1, toRead, openFilesystemFiles[file].fptr);
-        if(read+offset != size*nmemb)
-        {
-            unsigned int errLvl = SORE_Logging::LVL_DEBUG2;
-            if(ferror(openFilesystemFiles[file].fptr)!=0)
-            {
-                errLvl = SORE_Logging::LVL_ERROR;
-            }
-            ENGINE_LOG_M(errLvl, boost::format("Could not read all %u bytes: ")
-                         % (static_cast<unsigned int>(size*nmemb)), MODULE_FILEIO);
-            ENGINE_LOG_M(errLvl, boost::format("ferror: %s, feof: %s")
-                         % ferror(openFilesystemFiles[file].fptr)
-                         % feof(openFilesystemFiles[file].fptr), MODULE_FILEIO);
-        }
-        return read+offset;
+        std::ifstream* in_temp = new std::ifstream;
+        in_temp->open(filename, std::ios::binary);
+        in = in_temp;
     }
-    else
-        return 0;
-}
 
-int strpos(char* str, char* chars)
-{
-    int len = 0;
-    for(char* i=str;*i!='\0';i++,len++)
+    InFile::~InFile()
     {
-        for(char* j=chars;*j!='\0';j++)
-        {
-            if(*j==*i) return len;
-        }
+        delete in;
+        delete buf;
     }
-    return -1;
-}
 
-size_t SORE_FileIO::Read(char* ptr, size_t num, const char* separator, file_ref file)
-{
-    assert(num<=2048 && "Trying to read too many characters");
-    char* data = openFilesystemFiles[file].buffer;
-    size_t length = openFilesystemFiles[file].filled;
-    if(*data=='\0')
+    std::istream& InFile::strm()
     {
-        size_t len = Read(data, sizeof(char), num, file,true);
-        data[length+len] = '\0';
-        int stop = strpos((char*)data,(char*)separator);
-        if(stop==-1)
+        return *in;
+    }
+
+    size_t InFile::size() const
+    {
+        if(buf)
         {
-            memcpy(ptr, data, len);
-            ptr[len] = '\0';
-            *data = '\0';
-            openFilesystemFiles[file].filled = 0;
-            return len;
+            return buf->size();
         }
         else
         {
-            memcpy(ptr, data, stop);
-            ptr[stop] = '\0';
-            openFilesystemFiles[file].filled = len - stop - 1;
-            memmove(data, data+stop+1, openFilesystemFiles[file].filled);
-            data[openFilesystemFiles[file].filled] = '\0';
-            return stop;
+            std::streampos cur = in->tellg();
+            in->seekg(0);
+            std::streampos begin = in->tellg();
+            in->seekg(0, std::ios::end);
+            std::streampos end = in->tellg();
+            size_t size = end - begin;
+            in->seekg(cur);
+            return size;
         }
     }
-    else
-    {
-        size_t len = Read(data+length, sizeof(char), num-length, file,true);
-        data[length+len] = '\0';
-        int stop = strpos((char*)data,(char*)separator);
-        if(stop==-1)
-        {
-            memcpy(ptr, data, len+length);
-            ptr[len+length] = '\0';
-            *data = '\0';
-            len+=length;
-            openFilesystemFiles[file].filled = 0;
-            return len;
-        }
-        else
-        {
-            memcpy(ptr, data, stop);
-            ptr[stop] = '\0';
-            openFilesystemFiles[file].filled = length - stop + len - 1;
-            memmove(data, data+stop+1, openFilesystemFiles[file].filled+1);
-            return stop;
-        }
-    }
-    return 0;
-}
-
-void SORE_FileIO::BuildFullName(file_list& list, file_info& file, file_info& orig)
-{
-    if(file.parentID!=0)
-    {
-        BuildFullName(list, *GetFile(file.parentID), orig);
-        strcat(orig.fullname, file.filename);
-    }
-    else
-    {
-        strcpy(orig.fullname, file.filename);
-    }
-    if(!file.file)
-        strcat(orig.fullname, "/");
-}
-
-void SORE_FileIO::DeleteLinkedList(linked_list* curr)
-{
-    if(curr->next!=NULL)
-        DeleteLinkedList(curr->next);
-    delete curr;
-}
-
-//copy n bytes from src to dest
-void SORE_FileIO::LinkedListCopy(void* dest, linked_list* src, size_t n)
-{
-    size_t copied = 0;
-    linked_list* curr = src;
-    while(copied < n)
-    {
-        assert(curr != NULL);
-        size_t toCopy;
-        if(n - copied > curr->size)
-            toCopy = curr->size;
-        else
-            toCopy = n - copied;
-        memcpy((unsigned char*)dest+copied, curr->data, toCopy);
-        copied += toCopy;
-        curr = curr->next;
-    }
-}
-
-//shift the data in src n bytes toward the start
-void SORE_FileIO::LinkedListEat(linked_list* src, size_t n)
-{
-    linked_list* curr = src;
-    while(n > curr->size)
-    {
-        n  -= curr->size;
-        linked_list * temp = curr;
-        while(temp->next != NULL)
-        {
-            memcpy(temp->data, temp->next->data, temp->size);
-            temp = temp->next;
-        }
-    }
-
-    for(size_t i=0;i<curr->size-n;i++)
-    {
-        curr->data[i] = curr->data[i+n];
-    }
-    while(curr->next!=NULL)
-    {
-        for(size_t i=0;i<n;i++)
-        {
-            curr->data[i + (curr->size - n)] = curr->next->data[i];
-        }
-        curr = curr->next;
-        for(size_t i=0;i<curr->size-n;i++)
-        {
-            curr->data[i] = curr->data[i+n];
-        }
-    }
-}
-
-size_t SORE_FileIO::Size(file_ref file)
-{
-    if(file >= FILESYSTEM_START)
-    {
-        unsigned int currPos = ftell(openFilesystemFiles[file].fptr);
-        fseek(openFilesystemFiles[file].fptr, 0, SEEK_END);
-        unsigned int len = ftell(openFilesystemFiles[file].fptr);
-        fseek(openFilesystemFiles[file].fptr, currPos, SEEK_SET);
-        return len;
-    }
-    else
-        return cachedFiles[file].size;
-}
-
-size_t SORE_FileIO::CompressedSize(file_ref file)
-{
-    if(file > FILESYSTEM_START || !cachedFiles[file].compressed)
-        return Size(file);
-    return cachedFiles[file].sizeRaw;
 }
 
 #undef MODULE_FILEIO

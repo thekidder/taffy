@@ -25,8 +25,9 @@ namespace SORE_Game
 {
     static SORE_Graphics::ScreenInfo screenInfo = {1024, 768, 1024.0f/768.0f, true, false, false};
 
-    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle)
-        : kernel(gk), pool(), screen(screenInfo, input, windowTitle, NULL), popFlag(false)
+    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, SORE_FileIO::PackageCache* pc,
+                                       std::string windowTitle)
+        : kernel(gk), pool(pc), screen(screenInfo, input, windowTitle, NULL), popFlag(false)
     {
         curr = gk.end();
 

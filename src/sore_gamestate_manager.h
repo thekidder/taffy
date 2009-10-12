@@ -32,38 +32,39 @@
 
 namespace SORE_Game
 {
-	class SORE_EXPORT GamestateManager
-	{
-	public:
-		GamestateManager(SORE_Kernel::GameKernel& gk, std::string windowTitle = "SORE Framework Application");
-		~GamestateManager();
+    class SORE_EXPORT GamestateManager
+    {
+    public:
+        GamestateManager(SORE_Kernel::GameKernel& gk, SORE_FileIO::PackageCache* pc = NULL,
+                         std::string windowTitle = "SORE Framework Application");
+        ~GamestateManager();
 
-		//use new to instantiate newState; the Manager will handle its deallocation
-		void PushState(Gamestate* newState);
-		void PopState();
-		//run until a task requests exit or until there are no states left
-		int Run();
+        //use new to instantiate newState; the Manager will handle its deallocation
+        void PushState(Gamestate* newState);
+        void PopState();
+        //run until a task requests exit or until there are no states left
+        int Run();
 
-		SORE_Graphics::Renderer2D* GetRenderer();
-		SORE_Kernel::InputTask* GetInputTask();
-		SORE_Resource::ResourcePool& GetPool();
-		SORE_Kernel::Screen* GetScreen();
-	private:
-		void Pop();
+        SORE_Graphics::Renderer2D* GetRenderer();
+        SORE_Kernel::InputTask* GetInputTask();
+        SORE_Resource::ResourcePool& GetPool();
+        SORE_Kernel::Screen* GetScreen();
+    private:
+        void Pop();
 
-		SORE_Kernel::GameKernel& kernel;
-		SORE_Graphics::Renderer2D* renderer;
-		SORE_Kernel::InputTask input;
-		SORE_Resource::ResourcePool pool;
+        SORE_Kernel::GameKernel& kernel;
+        SORE_Graphics::Renderer2D* renderer;
+        SORE_Kernel::InputTask input;
+        SORE_Resource::ResourcePool pool;
 
-		SORE_Kernel::Screen screen;
+        SORE_Kernel::Screen screen;
 
-		SORE_Kernel::task_ref curr;
-		std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
+        SORE_Kernel::task_ref curr;
+        std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
 
-		//should we pop the state on frame end?
-		bool popFlag;
-	};
+        //should we pop the state on frame end?
+        bool popFlag;
+    };
 }
 
 #endif

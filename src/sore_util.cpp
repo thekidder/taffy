@@ -77,12 +77,12 @@ namespace SORE_Utility
         return 0;
     }
 
-    SORE_Utility::settings_map ParseIniFile(const char* file)
+    SORE_Utility::settings_map ParseIniFile(const char* file, SORE_FileIO::PackageCache* pc)
     {
-        SORE_FileIO::file_ref settingsFile = SORE_FileIO::Open(file);
+        SORE_FileIO::InFile settingsFile(file, pc);
         std::map<std::string, std::map<std::string, std::string> > list;
         size_t len;
-        if(settingsFile == 0)
+        if(!settingsFile.strm().good())
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load INI file %s") % file);
             return list;
@@ -91,11 +91,12 @@ namespace SORE_Utility
         {
             const static unsigned int max_len = 128;
             char dataStr[max_len];
-            len = SORE_FileIO::Read(dataStr, max_len - 1, "\n", settingsFile);
+            settingsFile.strm().getline(dataStr, max_len);
+            len = settingsFile.strm().gcount();
 
             std::string currSection;
 
-            while(len>0 || !SORE_FileIO::Eof(settingsFile))
+            while(len>0 || !settingsFile.strm().eof())
             {
                 std::string name, value, oldValue;
                 std::string setting = dataStr;
@@ -113,10 +114,12 @@ namespace SORE_Utility
                 else
                 {
                     setting = TrimString(setting);
-                    if(setting[0]=='[' && setting.find(']')!=std::string::npos) //this describes a section heading
+                    //this describes a section heading
+                    if(setting[0]=='[' && setting.find(']')!=std::string::npos)
                     {
                         currSection = TrimString(setting.substr(1, setting.find(']')-1));
-                        list.insert(std::pair<std::string, std::map<std::string, std::string> >(currSection, std::map<std::string, std::string>() ));
+                        list.insert(
+                            std::make_pair(currSection, std::map<std::string, std::string>() ));
                     }
                     else if(!TrimString(setting).empty()) //treat this as a valueless setting
                     {
@@ -125,10 +128,9 @@ namespace SORE_Utility
                         list[currSection].insert(std::pair<std::string, std::string>(name, value));
                     }
                 }
-                len = SORE_FileIO::Read(dataStr, max_len - 1, "\n", settingsFile);
+                settingsFile.strm().getline(dataStr, max_len);
+                len = settingsFile.strm().gcount();
             }
-
-            SORE_FileIO::Close(settingsFile);
         }
         return list;
     }
