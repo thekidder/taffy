@@ -226,8 +226,13 @@ namespace SORE_FileIO
 
     GenericPkgFileBuf::GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_,
                                          unsigned int size_) :
-        package(package_), pos(pos_), size(size_), currentPos(pos)
+        package(package_), pos(pos_), fileSize(size_), currentPos(pos)
     {
+    }
+
+    size_t GenericPkgFileBuf::size() const
+    {
+        return fileSize;
     }
 
     UncompressedPkgFileBuf::UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
@@ -242,8 +247,8 @@ namespace SORE_FileIO
 
     std::streamsize UncompressedPkgFileBuf::read(char* s, std::streamsize n)
     {
-        if(currentPos - pos == size) return -1;
-        unsigned int bytesToRead = std::min(size - (currentPos - pos),
+        if(currentPos - pos == fileSize) return -1;
+        unsigned int bytesToRead = std::min(fileSize - (currentPos - pos),
                                             static_cast<unsigned int>(n));
         package.seekg(currentPos);
         package.read(s, bytesToRead);
@@ -280,9 +285,9 @@ namespace SORE_FileIO
             {
                 package.seekg(currentPos);
                 char* inptr = reinterpret_cast<char*>(in);
-                unsigned int toRead = (size+pos)-currentPos;
+                unsigned int toRead = (sizeRaw+pos)-currentPos;
                 toRead = std::min(toRead, CHUNK);
-                package.read(inptr, CHUNK);
+                package.read(inptr, toRead);
                 num_in = package.gcount();
                 currentPos += num_in;
             }
@@ -336,6 +341,11 @@ namespace SORE_FileIO
         }
     }
 
+    size_t PkgFileBuf::size() const
+    {
+        return d_ptr->size();
+    }
+
     std::streamsize PkgFileBuf::read(char* s, std::streamsize n)
     {
         return d_ptr->read(s, n);
@@ -345,7 +355,7 @@ namespace SORE_FileIO
     {
     }
 
-    InFile::InFile(const char* filename, PackageCache* cache) : in(0)
+    InFile::InFile(const char* filename, PackageCache* cache) : in(0), buf(0)
     {
         if(cache)
         {
@@ -370,6 +380,25 @@ namespace SORE_FileIO
     std::istream& InFile::strm()
     {
         return *in;
+    }
+
+    size_t InFile::size() const
+    {
+        if(buf)
+        {
+            return buf->size();
+        }
+        else
+        {
+            std::streampos cur = in->tellg();
+            in->seekg(0);
+            std::streampos begin = in->tellg();
+            in->seekg(0, std::ios::end);
+            std::streampos end = in->tellg();
+            size_t size = end - begin;
+            in->seekg(cur);
+            return size;
+        }
     }
 }
 

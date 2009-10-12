@@ -36,6 +36,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "sore_input.h"
+#include "sore_fileio.h"
 #include "sore_logger.h"
 
 namespace SORE_Resource
@@ -49,8 +50,9 @@ namespace SORE_Resource
     class SORE_EXPORT Resource
     {
     public:
-        Resource(std::string file, std::string info="", bool delayedNotify=false);
-        Resource() {filename="Not loaded from file";}
+        Resource(std::string file, SORE_FileIO::PackageCache* pc = NULL, std::string info = "",
+                 bool delayedNotify = false);
+        Resource(SORE_FileIO::PackageCache* pc = NULL);
         virtual ~Resource();
         virtual const char* Type() const {return "generic resource";}
 
@@ -70,6 +72,7 @@ namespace SORE_Resource
         void SetFilename(std::string file);
         bool IsDependent(std::string file);
         std::string additionalInfo;
+        SORE_FileIO::PackageCache* packageCache;
         std::vector<std::string> dependentFiles;
         static ResourcePool* rm;
     private:
@@ -79,7 +82,7 @@ namespace SORE_Resource
     class SORE_EXPORT ResourcePool
     {
     public:
-        ResourcePool();
+        ResourcePool(SORE_FileIO::PackageCache* pc = NULL);
         ~ResourcePool();
 
         template<typename T>
@@ -88,7 +91,7 @@ namespace SORE_Resource
             std::size_t hash = string_hash(filename);
             if(resources.find(hash)==resources.end())
             {
-                T* temp = new T(filename);
+                T* temp = new T(filename, packageCache);
                 resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
                 return temp;
             }
@@ -113,6 +116,7 @@ namespace SORE_Resource
         std::map<std::size_t, Resource*> resources;
     private:
         boost::hash<std::string> string_hash;
+        SORE_FileIO::PackageCache* packageCache;
     };
 }
 

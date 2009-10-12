@@ -22,6 +22,7 @@
 #define  SORE_UTIL_H
 
 #include "sore_dll.h"
+#include "sore_fileio.h"
 
 #include <cmath>
 #include <map>
@@ -30,18 +31,19 @@
 
 namespace SORE_Utility
 {
-	typedef SORE_EXPORT std::map<std::string, std::map<std::string, std::string> > settings_map;
-	int SORE_EXPORT GetFileExt(const char* filename, char* ext); //returns 0 on success
+    typedef SORE_EXPORT std::map<std::string, std::map<std::string, std::string> > settings_map;
 
-	double SORE_EXPORT getRandomMinMax( double dMin, double fMax );
-	float SORE_EXPORT getRandomMinMax( float fMin, float fMax );
-	int SORE_EXPORT getRandomMinMax(int min, int max);
+    int          SORE_EXPORT GetFileExt(const char* filename, char* ext); //returns 0 on success
 
-	settings_map SORE_EXPORT ParseIniFile(const char* file);
-	//trims a string of whitespace: ' ', '\r', and '\t'
-	std::string SORE_EXPORT TrimString(std::string toTrim);
-	//breaks a string into a vector of strings delimited by , { and }. Each string is trimmed of whitespace.
-	std::vector<std::string> SORE_EXPORT ParseList(std::string list);
+    double       SORE_EXPORT getRandomMinMax( double dMin, double fMax );
+    float        SORE_EXPORT getRandomMinMax( float fMin, float fMax );
+    int          SORE_EXPORT getRandomMinMax(int min, int max);
+
+    settings_map SORE_EXPORT ParseIniFile(const char* file, SORE_FileIO::PackageCache* pc = NULL);
+    //trims a string of whitespace: ' ', '\r', and '\t'
+    std::string  SORE_EXPORT TrimString(std::string toTrim);
+    //breaks a string into a vector of strings delimited by , { and }. Each string is trimmed of whitespace.
+    std::vector<std::string> SORE_EXPORT ParseList(std::string list);
 }
 
 #endif

@@ -77,7 +77,8 @@ namespace SORE_Graphics
         glUseProgramObjectARB(0);
     }
 
-    GLSLShader::GLSLShader(const char* vertex, const char* fragment)
+    GLSLShader::GLSLShader(const char* vertex, const char* fragment, SORE_FileIO::PackageCache* pc)
+        : Resource(pc)
     {
         ok = false;
         linked = false;
@@ -91,7 +92,8 @@ namespace SORE_Graphics
         ok = true;
     }
 
-    GLSLShader::GLSLShader(std::string shaderFile) : Resource(shaderFile)
+    GLSLShader::GLSLShader(std::string shaderFile, SORE_FileIO::PackageCache* pc) :
+        Resource(shaderFile, pc)
     {
         Load();
     }
@@ -106,7 +108,7 @@ namespace SORE_Graphics
             return;
         Init();
         std::map<std::string, std::map<std::string, std::string> > list =
-            SORE_Utility::ParseIniFile(GetFilename().c_str());
+            SORE_Utility::ParseIniFile(GetFilename().c_str(), packageCache);
 
         std::map<std::string, std::map<std::string, std::string> >::iterator i;
         std::map<std::string, std::string>::iterator i2;
@@ -288,21 +290,27 @@ namespace SORE_Graphics
         return 0;
     }
 
-    int GLSLShader::AddVertexFile(const char* vertex)
+    char* GLSLShader::LoadFile(const char* filename)
     {
-        char* src;
-        SORE_FileIO::file_ref file = SORE_FileIO::Open(vertex);
-        if(file == 0)
+        SORE_FileIO::InFile file(filename, packageCache);
+        if(!file.strm().good())
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Could not load vertex shader program: %s") % vertex);
-            return -1;
+                       boost::format("Could not load shader filename: %s") % filename);
+            return NULL;
         }
-        size_t size = SORE_FileIO::Size(file);
-        src = new char[size+1];
-        SORE_FileIO::Read(src, sizeof(char), size, file);
+        size_t size = file.size();
+        char* src = new char[size+1];
+        file.strm().read(src, size);
         src[size] = '\0';
-        SORE_FileIO::Close(file);
+        return src;
+    }
+
+    int GLSLShader::AddVertexFile(const char* vertex)
+    {
+        char* src = LoadFile(vertex);
+        if(!src)
+            return -1;
         int status = AddShader(GL_VERTEX_SHADER, src);
         delete[] src;
         if(status == 0)
@@ -320,20 +328,10 @@ namespace SORE_Graphics
 
     int GLSLShader::AddFragmentFile(const char* fragment)
     {
-        char* src;
-        int status;
-        SORE_FileIO::file_ref file = SORE_FileIO::Open(fragment);
-        if(file == 0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Could not load fragment shader program: %s") % fragment);
+        char* src = LoadFile(fragment);
+        if(!src)
             return -1;
-        }
-        size_t size = SORE_FileIO::Size(file);
-        src = new char[size+1];
-        SORE_FileIO::Read(src, sizeof(char), size, file);
-        src[size] = '\0';
-        status = AddShader(GL_FRAGMENT_SHADER, src);
+        int status = AddShader(GL_FRAGMENT_SHADER, src);
         delete[] src;
         if(status == 0)
         {

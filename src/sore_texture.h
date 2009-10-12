@@ -26,29 +26,29 @@
 
 namespace SORE_Resource
 {
-  class SORE_EXPORT Texture2D : public Resource
-  {
-  public:
-    Texture2D(std::string filename);
-		Texture2D(const unsigned char* data, GLint internalFormat, 
-							GLenum format, unsigned int width, unsigned int height);
-    GLuint GetHandle() const;
-    void Bind() const;
-    const char* Type() const {return "2D texture";}
+    class SORE_EXPORT Texture2D : public Resource
+    {
+    public:
+        Texture2D(std::string filename, SORE_FileIO::PackageCache* pc = NULL);
+        Texture2D(const unsigned char* data, GLint internalFormat,
+                  GLenum format, unsigned int width, unsigned int height);
+        GLuint GetHandle() const;
+        void Bind() const;
+        const char* Type() const {return "2D texture";}
 
-		void SaveTGA(const char* filename);
-		bool GLContextDependent() const {return true;}
-  protected:
-    void Load();
-    void LoadTGA(const char* filename);
-		void LoadFromData(const unsigned char* data, GLint internalFormat, 
-											GLenum format, unsigned int width, unsigned int height);
-    void Unload();
-    virtual std::string ProcessFilename(std::string file) {return file;}
-    GLuint handle;
-	private:
-		unsigned int w, h;
-  };
+        void SaveTGA(const char* filename);
+        bool GLContextDependent() const {return true;}
+    protected:
+        void Load();
+        void LoadTGA(const char* filename);
+        void LoadFromData(const unsigned char* data, GLint internalFormat,
+                          GLenum format, unsigned int width, unsigned int height);
+        void Unload();
+        virtual std::string ProcessFilename(std::string file) {return file;}
+        GLuint handle;
+    private:
+        unsigned int w, h;
+    };
 }
 
 #endif

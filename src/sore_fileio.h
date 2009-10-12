@@ -38,20 +38,21 @@ namespace SORE_FileIO
 {
     const unsigned int CHUNK = 4096;
 
-    class GenericPkgFileBuf
+    class SORE_EXPORT GenericPkgFileBuf
     {
     public:
         GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
         virtual ~GenericPkgFileBuf() {}
 
         virtual std::streamsize read(char* s, std::streamsize n) = 0;
+        size_t size() const;
     protected:
         std::ifstream& package;
-        unsigned int pos, size;
+        unsigned int pos, fileSize;
         unsigned int currentPos;
     };
 
-    class UncompressedPkgFileBuf : public GenericPkgFileBuf
+    class SORE_EXPORT UncompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
         UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
@@ -60,7 +61,7 @@ namespace SORE_FileIO
         std::streamsize read(char* s, std::streamsize n);
     };
 
-    class CompressedPkgFileBuf : public GenericPkgFileBuf
+    class SORE_EXPORT CompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
         CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
@@ -81,7 +82,7 @@ namespace SORE_FileIO
         bool eof;
     };
 
-    class PkgFileBuf
+    class SORE_EXPORT PkgFileBuf
     {
     public:
         typedef char        char_type;
@@ -92,14 +93,14 @@ namespace SORE_FileIO
         ~PkgFileBuf();
 
         std::streamsize read(char* s, std::streamsize n);
-
+        size_t size() const;
     private:
         boost::shared_ptr<GenericPkgFileBuf> d_ptr;
 
         unsigned int raw;
     };
 
-    class PackageCache
+    class SORE_EXPORT PackageCache
     {
     public:
         PackageCache();
@@ -141,13 +142,14 @@ namespace SORE_FileIO
         std::map<std::string, std::ifstream*> openPackages;
     };
 
-    class InFile
+    class SORE_EXPORT InFile
     {
     public:
         InFile(const char* filename, PackageCache* cache = NULL);
         ~InFile();
 
         std::istream& strm();
+        size_t size() const;
     private:
         std::istream* in;
         PkgFileBuf* buf;
@@ -156,8 +158,8 @@ namespace SORE_FileIO
     typedef boost::function<void (std::string)> file_callback;
 
     //only implemented on local files now (no packages)
-    void         SORE_EXPORT Notify(std::string filename, file_callback callback);
-    bool         SORE_EXPORT InitFileNotify(SORE_Kernel::GameKernel* gk);
+    void SORE_EXPORT Notify(std::string filename, file_callback callback);
+    bool SORE_EXPORT InitFileNotify(SORE_Kernel::GameKernel* gk);
 }
 
 #endif

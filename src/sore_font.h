@@ -43,55 +43,55 @@
 namespace SORE_Font
 {
   //let's define some nice error constants
-	const int LIBRARY_LOAD_FAILED    = 1;
-	const int FONTCONFIG_LOAD_FAILED = 5;
-	const int FONT_LOAD_FAILED       = 2;
-	const int GLYPH_LOAD_FAILED      = 3;
-	const int GET_GLYPH_FAILED       = 4;
-	const int INVALID_FONT_NAME      = 6;
-	const int INVALID_FONT_OBJ       = 7;
-	const int INVALID_FONT_HEIGHT    = 8;
-  
-	class SORE_EXPORT FontPaths
-	{
-	public:
-		static void InitPaths();
-		static std::string GetFontPath(std::string name);
-	private:
-		static std::vector<std::string> fontPaths;
-	};
+    const int LIBRARY_LOAD_FAILED    = 1;
+    const int FONTCONFIG_LOAD_FAILED = 5;
+    const int FONT_LOAD_FAILED       = 2;
+    const int GLYPH_LOAD_FAILED      = 3;
+    const int GET_GLYPH_FAILED       = 4;
+    const int INVALID_FONT_NAME      = 6;
+    const int INVALID_FONT_OBJ       = 7;
+    const int INVALID_FONT_HEIGHT    = 8;
 
-	struct CharInfo
-	{
-		SORE_Resource::Texture2D* tex;
-		SORE_Graphics::GeometryChunk* gc;
-		SORE_Math::Matrix4<float> transform;
-		float advance;
-	};
-  
-	class SORE_EXPORT Font : public SORE_Resource::Resource
-	{
-	public:
-		Font(std::string filename);
-		~Font();
+    class SORE_EXPORT FontPaths
+    {
+    public:
+        static void InitPaths();
+        static std::string GetFontPath(std::string name, SORE_FileIO::PackageCache* pc = NULL);
+    private:
+        static std::vector<std::string> fontPaths;
+    };
 
-		const char* Type() {return "Font";}
-		bool GLContextDependent() const {return true;}
+    struct CharInfo
+    {
+        SORE_Resource::Texture2D* tex;
+        SORE_Graphics::GeometryChunk* gc;
+        SORE_Math::Matrix4<float> transform;
+        float advance;
+    };
 
-		void LoadFace(unsigned int height);
-		const CharInfo& GetCharacter(unsigned int height, char c); 
-	protected:
-		//This loads our face, but no specific characters
-		void Load();
-	private:
-		void LoadCharacter(FT_Face& face, char ch, unsigned int h);
+    class SORE_EXPORT Font : public SORE_Resource::Resource
+    {
+    public:
+        Font(std::string filename, SORE_FileIO::PackageCache* pc);
+        ~Font();
 
-		//(height, CharInfo[128])
-		std::map<unsigned int, CharInfo*> characters;
-		FT_Library library;
-		FT_Face face;
-		FT_Byte* fontInfo;
-	};
+        const char* Type() {return "Font";}
+        bool GLContextDependent() const {return true;}
+
+        void LoadFace(unsigned int height);
+        const CharInfo& GetCharacter(unsigned int height, char c);
+    protected:
+        //This loads our face, but no specific characters
+        void Load();
+    private:
+        void LoadCharacter(FT_Face& face, char ch, unsigned int h);
+
+        //(height, CharInfo[128])
+        std::map<unsigned int, CharInfo*> characters;
+        FT_Library library;
+        FT_Face face;
+        FT_Byte* fontInfo;
+    };
 }
 
 #ifdef _MSC_VER
