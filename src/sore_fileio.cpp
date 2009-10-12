@@ -41,6 +41,69 @@ namespace SORE_FileIO
 
     const unsigned int CHUNK = 4096;
 
+    //implementation class declarations
+
+    class SORE_EXPORT GenericPkgFileBuf
+    {
+    public:
+        GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        virtual ~GenericPkgFileBuf() {}
+
+        virtual std::streamsize read(char* s, std::streamsize n) = 0;
+        size_t size() const;
+    protected:
+        std::ifstream& package;
+        unsigned int pos, fileSize;
+        unsigned int currentPos;
+    };
+
+    class SORE_EXPORT UncompressedPkgFileBuf : public GenericPkgFileBuf
+    {
+    public:
+        UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        ~UncompressedPkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+    };
+
+    class SORE_EXPORT CompressedPkgFileBuf : public GenericPkgFileBuf
+    {
+    public:
+        CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
+            unsigned int sizeRaw_);
+        ~CompressedPkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+    private:
+        unsigned int sizeRaw;
+
+        z_stream strm;
+
+        unsigned int num_out;
+        std::vector<unsigned char> out;
+
+        bool eof;
+    };
+
+    class SORE_EXPORT PkgFileBuf
+    {
+    public:
+        typedef char        char_type;
+        typedef boost::iostreams::source_tag  category;
+
+        PkgFileBuf(std::ifstream& package, unsigned int pos, unsigned int size,
+                   unsigned int sizeRaw);
+        ~PkgFileBuf();
+
+        std::streamsize read(char* s, std::streamsize n);
+        size_t size() const;
+    private:
+        boost::shared_ptr<GenericPkgFileBuf> d_ptr;
+
+        unsigned int raw;
+    };
+
+
     PackageCache::PackageCache()
     {
     }
@@ -83,6 +146,18 @@ namespace SORE_FileIO
         return cache.end();
     }
 
+    PackageCache::cache_type::iterator PackageCache::FileInfo(const char* filename)
+    {
+        std::map<std::string, file_info>::iterator it;
+        for(it = cache.begin(); it != cache.end(); ++it)
+        {
+            if(it->first == filename)
+                return it;
+        }
+        return cache.end();
+    }
+
+
     std::string PackageCache::BuildFullName(file_info& file)
     {
         std::string full = file.filename;
@@ -93,6 +168,14 @@ namespace SORE_FileIO
             full = parent.filename + "/" + full;
         }
         return full;
+    }
+
+    std::string PackageCache::PackageFilename(const char* filename)
+    {
+        cache_type::iterator it;
+        if((it = FileInfo(filename)) == cache.end())
+            return "";
+        return it->second.package;
     }
 
     void PackageCache::AddPackage(const char* packagename)

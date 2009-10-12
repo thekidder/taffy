@@ -36,65 +36,7 @@
 
 namespace SORE_FileIO
 {
-    class SORE_EXPORT GenericPkgFileBuf
-    {
-    public:
-        GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
-        virtual ~GenericPkgFileBuf() {}
-
-        virtual std::streamsize read(char* s, std::streamsize n) = 0;
-        size_t size() const;
-    protected:
-        std::ifstream& package;
-        unsigned int pos, fileSize;
-        unsigned int currentPos;
-    };
-
-    class SORE_EXPORT UncompressedPkgFileBuf : public GenericPkgFileBuf
-    {
-    public:
-        UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
-        ~UncompressedPkgFileBuf();
-
-        std::streamsize read(char* s, std::streamsize n);
-    };
-
-    class SORE_EXPORT CompressedPkgFileBuf : public GenericPkgFileBuf
-    {
-    public:
-        CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
-            unsigned int sizeRaw_);
-        ~CompressedPkgFileBuf();
-
-        std::streamsize read(char* s, std::streamsize n);
-    private:
-        unsigned int sizeRaw;
-
-        z_stream strm;
-
-        unsigned int num_out;
-        std::vector<unsigned char> out;
-
-        bool eof;
-    };
-
-    class SORE_EXPORT PkgFileBuf
-    {
-    public:
-        typedef char        char_type;
-        typedef boost::iostreams::source_tag  category;
-
-        PkgFileBuf(std::ifstream& package, unsigned int pos, unsigned int size,
-                   unsigned int sizeRaw);
-        ~PkgFileBuf();
-
-        std::streamsize read(char* s, std::streamsize n);
-        size_t size() const;
-    private:
-        boost::shared_ptr<GenericPkgFileBuf> d_ptr;
-
-        unsigned int raw;
-    };
+    class PkgFileBuf;
 
     class SORE_EXPORT PackageCache
     {
@@ -106,6 +48,9 @@ namespace SORE_FileIO
 
         bool Contains(const char* filename) const;
         PkgFileBuf* GetFileBuf(const char* filename);
+        //return filename of the package containing filename, or empty string if the file
+        //does not exist in this cache
+        std::string PackageFilename(const char* filename);
     private:
         struct file_info
         {
@@ -126,6 +71,7 @@ namespace SORE_FileIO
         void CloseAllPackages();
         std::string BuildFullName(file_info& file);
         cache_type::iterator FileInfo(unsigned int id);
+        cache_type::iterator FileInfo(const char* filename);
         //opens package if not open
         std::ifstream& GetPackage(const char* packagename);
 
