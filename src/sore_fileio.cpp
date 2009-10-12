@@ -39,8 +39,7 @@ namespace SORE_FileIO
     const unsigned int MAX_SDP_MAJOR = 0;
     const unsigned int MAX_SDP_MINOR = 2;
 
-    //const size_t CHUNK = 131072;
-    const int RATIO = 4;
+    const unsigned int CHUNK = 4096;
 
     PackageCache::PackageCache()
     {
@@ -258,7 +257,7 @@ namespace SORE_FileIO
     CompressedPkgFileBuf::CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
                                                unsigned int size_, unsigned int sizeRaw_) :
         GenericPkgFileBuf(package_, pos_, size_),
-        sizeRaw(sizeRaw_), num_in(0), num_out(0), eof(false)
+        sizeRaw(sizeRaw_), num_out(0), eof(false)
     {
         strm.zalloc = Z_NULL;
         strm.zfree = Z_NULL;
@@ -279,20 +278,18 @@ namespace SORE_FileIO
     {
         if(eof) return -1;
         int ret = Z_OK;
+        package.seekg(currentPos);
         while(num_out < n && ret != Z_STREAM_END)
         {
-            if(!num_in)
-            {
-                package.seekg(currentPos);
-                char* inptr = reinterpret_cast<char*>(in);
-                unsigned int toRead = (sizeRaw+pos)-currentPos;
-                toRead = std::min(toRead, CHUNK);
-                package.read(inptr, toRead);
-                num_in = package.gcount();
-                currentPos += num_in;
-            }
+            char in[CHUNK];
+            unsigned int toRead = (sizeRaw+pos)-currentPos;
+            toRead = std::min(toRead, CHUNK);
+            package.read(in, toRead);
+            size_t num_in = package.gcount();
+            currentPos += num_in;
+
             strm.avail_in = num_in;
-            strm.next_in = in;
+            strm.next_in = reinterpret_cast<Bytef*>(in);
 
             do
             {

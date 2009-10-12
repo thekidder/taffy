@@ -36,8 +36,6 @@
 
 namespace SORE_FileIO
 {
-    const unsigned int CHUNK = 4096;
-
     class SORE_EXPORT GenericPkgFileBuf
     {
     public:
@@ -74,8 +72,6 @@ namespace SORE_FileIO
 
         z_stream strm;
 
-        unsigned int num_in;
-        unsigned char in[CHUNK];
         unsigned int num_out;
         std::vector<unsigned char> out;
 
