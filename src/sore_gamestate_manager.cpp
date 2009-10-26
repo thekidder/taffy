@@ -26,8 +26,8 @@ namespace SORE_Game
     static SORE_Graphics::ScreenInfo screenInfo = {1024, 768, 1024.0f/768.0f, true, false, false};
 
     GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, SORE_FileIO::PackageCache* pc,
-                                       std::string windowTitle)
-        : kernel(gk), pool(pc), screen(screenInfo, input, windowTitle, NULL), popFlag(false)
+                                       std::string windowTitle, std::string settingsFile)
+        : kernel(gk), pool(pc), ini(settingsFile), sm(&ini), screen(screenInfo, input, windowTitle, &sm), popFlag(false)
     {
         curr = gk.end();
 
@@ -111,7 +111,7 @@ namespace SORE_Game
             return 1;
         }
 
-        unsigned int maxfps = 10000;
+        unsigned int maxfps = 100;
         unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
         while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
         {

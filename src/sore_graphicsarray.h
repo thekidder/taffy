@@ -28,6 +28,16 @@
 
 namespace SORE_Graphics
 {
+
+    struct vertex
+    {
+        GLfloat x, y, z;
+        GLfloat texi, texj;
+        GLfloat normx, normy, normz;
+        GLfloat r, g, b, a;
+        GLfloat padding[4]; //multiple of 64
+    };
+
     /**
        @author Adam Kidder <thekidder@gmail.com>
        Class abstracting the details of Vertex Arrays and VBOs
@@ -41,7 +51,7 @@ namespace SORE_Graphics
         virtual void Build() = 0;
 
         void Clear();
-        void AddObject(const GLfloat* v, const unsigned short* i, unsigned int numVertices,
+        void AddObject(const GLfloat* v, const unsigned short* ind, unsigned int numVertices,
                        unsigned int numIndices, const SORE_Math::Matrix4<float>* transform = NULL,
                        const GLfloat* t = NULL, const GLfloat* n = NULL, const GLfloat* c = NULL);
 
@@ -58,7 +68,7 @@ namespace SORE_Graphics
 
         bool hasTexCoords, hasNormals, hasColors;
 
-        std::vector<GLfloat> vertices, normals, texCoords, colors;
+        std::vector<vertex> vertices;
         std::vector<unsigned short> indices;
 
     };

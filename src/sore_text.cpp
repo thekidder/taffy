@@ -22,122 +22,127 @@
 
 namespace SORE_Graphics
 {
-	Text::Text(SORE_Font::Font& f, unsigned int h, const std::string& initialText, const Color& c)
-		: height(h), text(initialText), color(c), face(f)
-	{
-		Update();
-	}
+    Text::Text(SORE_Font::Font& f, unsigned int h, const std::string& initialText, const Color& c)
+        : height(h), text(initialText), color(c), face(f)
+    {
+        Update();
+    }
 
-	unsigned int Text::GetWidth() const
-	{
-		return width;
-	}
+    Text::~Text()
+    {
+        DeleteOldGeometry();
+    }
 
-	size_t Text::GetIndex(float xpos) const
-	{
-		float currentAdvance = 0.0f;
-		const char* str = text.c_str();
-		unsigned int i;
-		for(i = 0; str[i]; ++i)
-		{
-			const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
+    unsigned int Text::GetWidth() const
+    {
+        return width;
+    }
 
-			currentAdvance += c.advance;
-			if(currentAdvance > xpos) return i;
-		}
-		return i;
-	}
+    size_t Text::GetIndex(float xpos) const
+    {
+        float currentAdvance = 0.0f;
+        const char* str = text.c_str();
+        unsigned int i;
+        for(i = 0; str[i]; ++i)
+        {
+            const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
 
-	unsigned int Text::GetHeight() const
-	{
-		return height;
-	}
+            currentAdvance += c.advance;
+            if(currentAdvance > xpos) return i;
+        }
+        return i;
+    }
 
-	const std::string& Text::GetText() const
-	{
-		return text;
-	}
+    unsigned int Text::GetHeight() const
+    {
+        return height;
+    }
 
-	size_t Text::GetLength() const
-	{
-		return text.size();
-	}
+    const std::string& Text::GetText() const
+    {
+        return text;
+    }
 
-	render_list Text::GetGeometry() const
-	{
-		render_list r;
-		std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
-		for(it = geometry.begin();it!=geometry.end();++it)
-		{
-			r.push_back(std::make_pair(&(it->first), it->second));
-		}
-		return r;
-	}
+    size_t Text::GetLength() const
+    {
+        return text.size();
+    }
 
-	void Text::UpdateText(const std::string& newText, const Color& c)
-	{
-		color = c;
-		text = newText;
-		Update();
-	}
+    render_list Text::GetGeometry() const
+    {
+        render_list r;
+        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
+        for(it = geometry.begin();it!=geometry.end();++it)
+        {
+            r.push_back(std::make_pair(&(it->first), it->second));
+        }
+        return r;
+    }
 
-	void Text::SetTransform(const SORE_Math::Matrix4<float>& transform)
-	{
-		overallTransform = transform;
-		Update();
-	}
+    void Text::UpdateText(const std::string& newText, const Color& c)
+    {
+        color = c;
+        text = newText;
+        Update();
+    }
 
-	void Text::TrimToWidth(unsigned int width, size_t start)
-	{
-		if(start >= text.length()) return;
+    void Text::SetTransform(const SORE_Math::Matrix4<float>& transform)
+    {
+        overallTransform = transform;
+        Update();
+    }
 
-		unsigned int numChars = text.length();
+    void Text::TrimToWidth(unsigned int width, size_t start)
+    {
+        if(start >= text.length()) return;
 
-		while(GetWidth() > width)
-		{
-			numChars--;
-			UpdateText(text.substr(start, numChars));
-		} 
-	}
+        unsigned int numChars = text.length();
 
-	const SORE_Math::Matrix4<float>& Text::GetTransform()
-	{
-		return overallTransform;
-	}
+        while(GetWidth() > width)
+        {
+            numChars--;
+            UpdateText(text.substr(start, numChars));
+        }
+    }
 
-	void Text::DeleteOldGeometry()
-	{
-		std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
-		for(it = geometry.begin();it!=geometry.end();++it)
-		{
-			delete it->second;
-		}
-	}
+    const SORE_Math::Matrix4<float>& Text::GetTransform()
+    {
+        return overallTransform;
+    }
 
-	void Text::Update()
-	{
-		DeleteOldGeometry();
-		geometry.clear();
-		const char* str = text.c_str();
-		float currentAdvance = 0.0f;
-		for(unsigned int i = 0; str[i]; ++i)
-		{
-			const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
+    void Text::DeleteOldGeometry()
+    {
+        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
+        for(it = geometry.begin();it!=geometry.end();++it)
+        {
+            delete it->second;
+        }
+    }
 
-			if(c.gc) //account for characters without any geometry (i.e. space)
-			{
-				//create a shared geometry
-				GeometryChunk* coloredCharacter = new GeometryChunk(*c.gc);
-				coloredCharacter->SetColor(color);
+    void Text::Update()
+    {
+        DeleteOldGeometry();
+        geometry.clear();
+        const char* str = text.c_str();
+        float currentAdvance = 0.0f;
+        for(unsigned int i = 0; str[i]; ++i)
+        {
+            const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
 
-				SORE_Math::Matrix4<float> m = c.transform;
-				m *= SORE_Math::Matrix4<float>::GetTranslation(currentAdvance, 0.0f, 0.0f);
-				m *= overallTransform;
-				
-				geometry.push_back(std::make_pair(m, coloredCharacter));
-			}
-			currentAdvance += c.advance;
-		}
-		width = static_cast<unsigned int>(currentAdvance);
-	}
+            if(c.gc) //account for characters without any geometry (i.e. space)
+            {
+                //create a shared geometry
+                GeometryChunk* coloredCharacter = new GeometryChunk(*c.gc);
+                coloredCharacter->SetColor(color);
+
+                SORE_Math::Matrix4<float> m = c.transform;
+                m *= SORE_Math::Matrix4<float>::GetTranslation(currentAdvance, 0.0f, 0.0f);
+                m *= overallTransform;
+
+                geometry.push_back(std::make_pair(m, coloredCharacter));
+            }
+            currentAdvance += c.advance;
+        }
+        width = static_cast<unsigned int>(currentAdvance);
+    }
 }

@@ -43,7 +43,7 @@ namespace SORE_FileIO
 
     //implementation class declarations
 
-    class SORE_EXPORT GenericPkgFileBuf
+    class GenericPkgFileBuf
     {
     public:
         GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
@@ -57,7 +57,7 @@ namespace SORE_FileIO
         unsigned int currentPos;
     };
 
-    class SORE_EXPORT UncompressedPkgFileBuf : public GenericPkgFileBuf
+    class UncompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
         UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
@@ -66,7 +66,7 @@ namespace SORE_FileIO
         std::streamsize read(char* s, std::streamsize n);
     };
 
-    class SORE_EXPORT CompressedPkgFileBuf : public GenericPkgFileBuf
+    class CompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
         CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
@@ -85,7 +85,7 @@ namespace SORE_FileIO
         bool eof;
     };
 
-    class SORE_EXPORT PkgFileBuf
+    class PkgFileBuf
     {
     public:
         typedef char        char_type;

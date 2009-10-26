@@ -33,11 +33,11 @@
 #include <SDL/SDL.h>
 
 #ifdef _WIN32
-	#include <GL/wglew.h>
+    #include <GL/wglew.h>
 #else /* GLX */
-	
+
 #include <GL/glxew.h>
-	//Linux-specific to find system fonts
-	#include <fontconfig/fontconfig.h>
+    //Linux-specific to find system fonts
+    #include <fontconfig/fontconfig.h>
 #endif
 #endif //__ALLGL_H__

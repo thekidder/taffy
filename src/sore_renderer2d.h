@@ -133,7 +133,8 @@ namespace SORE_Graphics
     };
 
     inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two);
-    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one, std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
+    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one,
+                      std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
 }
 
 #endif

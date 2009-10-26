@@ -37,7 +37,9 @@ namespace SORE_Graphics
     class SORE_EXPORT Text
     {
     public:
-        Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText, const Color& c = White);
+        Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText,
+             const Color& c = White);
+        virtual ~Text();
 
         void UpdateText(const std::string& newText, const Color& c = White);
         void SetTransform(const SORE_Math::Matrix4<float>& transform);
@@ -49,7 +51,7 @@ namespace SORE_Graphics
         unsigned int GetWidth() const;
         unsigned int GetHeight() const;
 
-		//returns number of characters in text
+        //returns number of characters in text
         size_t GetLength() const;
         size_t GetIndex(float xpos) const;
         const std::string& GetText() const;

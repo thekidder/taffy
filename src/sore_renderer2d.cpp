@@ -177,7 +177,8 @@ namespace SORE_Graphics
                         it->first, it->second->TexCoords(), NULL,
                         it->second->Colors());
                     if(!newBatch.first.size() ||
-                         newBatch.first.back().tex->GetHandle() != it->second->GetTexture()->GetHandle())
+                       newBatch.first.back().tex->GetHandle() !=
+                       it->second->GetTexture()->GetHandle())
                     {
                         if(newBatch.first.size()>0)
                         {
@@ -199,18 +200,24 @@ namespace SORE_Graphics
 
     void Renderer2D::RenderBatch(batch& b)
     {
+        SORE_Resource::Texture2D* missing = rm.GetResource<SORE_Resource::Texture2D>
+            ("data/Textures/missing.tga");
         if(!b.second->Empty())
         {
             shad->Bind();
             b.second->BeginDraw();
+            ENGINE_LOG(SORE_Logging::LVL_INFO, "---START---");
             for(std::vector<vbo_tex_order>::iterator it=b.first.begin();it!=b.first.end();++it)
             {
-                glActiveTexture(GL_TEXTURE0);
+                //missing->Bind();
                 it->tex->Bind();
+                ENGINE_LOG(SORE_Logging::LVL_INFO,
+                           boost::format("drawing %d from %d") % it->triLen %it->triStart);
                 b.second->DrawElements(it->triLen, it->triStart);
                 numPolys += it->triLen;
                 drawCalls++;
             }
+            ENGINE_LOG(SORE_Logging::LVL_INFO, "---END---");
             b.second->EndDraw();
         }
     }
@@ -315,14 +322,13 @@ namespace SORE_Graphics
         else return SORT_GREATER;
     }
 
-    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one, std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two)
+    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one,
+                      std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two)
     {
-        //ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("one: %d two: %d") % one.second->IsOpaque() % two.second->IsOpaque());
         if( !one.second->IsOpaque() && two.second->IsOpaque()) return true;
         if( !two.second->IsOpaque() && one.second->IsOpaque()) return false;
         if(!one.second->IsOpaque())
         {
-            //ENGINE_LOG(SORE_Logging::LVL_DEBUG3, boost::format("z1: %f z2: %f") % one.first->GetData()[14] % two.first->GetData()[14]);
             if(one.first->GetData()[14] < two.first->GetData()[14])
                 return true;
             else if(two.first->GetData()[14] < one.first->GetData()[14])

@@ -28,6 +28,6 @@ namespace SORE_Graphics
 
     void* VertexArray::GetOffset(void* pointer, unsigned int offset)
     {
-        return (char*)pointer + (offset*sizeof(unsigned short));
+        return (char*)pointer + offset;
     }
 }
