@@ -46,7 +46,7 @@ namespace SORE_Graphics
         virtual void BeginDrawHook();
         virtual void* GetOffset(void* pointer, unsigned int offset);
 
-        GLuint vbo, vboIndices, vboTexCoords, vboColors, vboNormals;
+        GLuint vbo, vboIndices;
     };
 }
 
