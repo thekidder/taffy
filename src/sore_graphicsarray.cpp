@@ -130,8 +130,10 @@ namespace SORE_Graphics
 
     void GraphicsArray::DrawElements(unsigned int numTris, unsigned short triOffset)
     {
-        glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
-                       GetOffset(&(indices[0]), triOffset*3));
+        /*glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
+          GetOffset(&(indices[0]), triOffset*3));*/
+        glDrawRangeElements(GL_TRIANGLES, triOffset*3, indices.size(), numTris*3, GL_UNSIGNED_SHORT,
+                            GetOffset(&(indices[0]), triOffset*3));
     }
 
     bool GraphicsArray::Empty() const

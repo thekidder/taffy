@@ -43,13 +43,13 @@ namespace SORE_Graphics
 
     void VBO::BeginDrawHook()
     {
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
+        //glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
     }
 
     void* VBO::GetOffset(void* pointer, unsigned int offset)
     {
-        return (char*)NULL + offset;
+        return ((char*)NULL + (offset));
     }
 
     void VBO::Build()

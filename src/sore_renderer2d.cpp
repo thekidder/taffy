@@ -210,6 +210,7 @@ namespace SORE_Graphics
             for(std::vector<vbo_tex_order>::iterator it=b.first.begin();it!=b.first.end();++it)
             {
                 //missing->Bind();
+                glClientActiveTexture(GL_TEXTURE0);
                 it->tex->Bind();
                 ENGINE_LOG(SORE_Logging::LVL_INFO,
                            boost::format("drawing %d from %d") % it->triLen %it->triStart);

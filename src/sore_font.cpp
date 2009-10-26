@@ -164,9 +164,9 @@ namespace SORE_Font
         unsigned int index = static_cast<unsigned int>(ch);
         if(x != 0 && y != 0)
         {
-            //c[index].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA,
-            //                                            GL_LUMINANCE_ALPHA, width, height);
-            c[index].tex = rm->GetResource<SORE_Resource::Texture2D>("data/Textures/missing.tga");
+            c[index].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA,
+                                                        GL_LUMINANCE_ALPHA, width, height);
+            //c[index].tex = rm->GetResource<SORE_Resource::Texture2D>("data/Textures/missing.tga");
 
             c[index].transform = SORE_Math::Matrix4<float>::GetTranslation(
                 static_cast<float>(face->glyph->bitmap_left),
