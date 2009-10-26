@@ -44,12 +44,12 @@ namespace SORE_Math
 	typedef Vector2<float>  Vector2f;
 	typedef Vector2<int>    Vector2i;
 	
-	float  Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
-	float  Distance2D(float x1, float y1, float x2, float y2);
-	float  Distance2DS(float x1, float y1, float x2, float y2); //distance squared
-	double Distance2DS(double x1, double y1, double x2, double y2);
+	float  SORE_EXPORT Distance3D(float x1, float y1, float z1, float x2, float y2, float z2);
+	float  SORE_EXPORT Distance2D(float x1, float y1, float x2, float y2);
+	float  SORE_EXPORT Distance2DS(float x1, float y1, float x2, float y2); //distance squared
+	double SORE_EXPORT Distance2DS(double x1, double y1, double x2, double y2);
 	
-	bool   DoubleEquals(double value, double compare, double epsilon);
+	bool   SORE_EXPORT DoubleEquals(double value, double compare, double epsilon);
 }
 
 #endif

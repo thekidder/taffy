@@ -34,7 +34,7 @@ namespace SORE_Math
 	const unsigned int AXIS_Z = 2;
 	
 	template<typename T>
-			class SORE_EXPORT Matrix4
+	class  Matrix4
 	{
 		public:
 			Matrix4()

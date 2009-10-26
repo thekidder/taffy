@@ -29,7 +29,7 @@
 namespace SORE_Math
 {
 	template<typename T>
-	class SORE_EXPORT Vector2
+	class Vector2
 	{
 	public:
 		Vector2()
@@ -146,7 +146,7 @@ namespace SORE_Math
 			return sqrt(value[0]*value[0]+value[1]*value[1]);
 		}
 			
-		Vector2 Normalize()
+		Vector2<T> Normalize()
 		{
 			T mag = Magnitude();
 			if(mag==0.0) return Vector2(0.0,0.0);

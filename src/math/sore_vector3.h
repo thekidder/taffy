@@ -26,7 +26,7 @@
 namespace SORE_Math
 {
 	template<typename T>
-			class SORE_EXPORT Vector3
+	class  Vector3
 	{
 		public:
 			Vector3()

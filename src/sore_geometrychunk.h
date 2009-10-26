@@ -92,8 +92,8 @@ namespace SORE_Graphics
 	typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> > 
 		render_list_owned;
 
-	void ApplyTransform(const SORE_Math::Matrix4<float>& transform, render_list_owned& list);
-	render_list GetRenderList(render_list_owned& list);
+	void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform, render_list_owned& list);
+	render_list SORE_EXPORT GetRenderList(render_list_owned& list);
 
 	const int SORT_LESS    = -1;
 	const int SORT_EQUAL   =  0;
