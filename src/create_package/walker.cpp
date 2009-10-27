@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     * 
+ *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -50,7 +50,7 @@ unsigned short int AddFile(boost::filesystem::path p, unsigned short int top, st
 void Walk(boost::filesystem::path p, unsigned short int top, std::string prefix, file_list& files)
 {
     boost::filesystem::directory_iterator end;
-	if(!boost::filesystem::exists(p)) 
+    if(!boost::filesystem::exists(p))
     {
         std::cerr << "Could not open " << p.string() << std::endl;
         return;
@@ -61,7 +61,7 @@ void Walk(boost::filesystem::path p, unsigned short int top, std::string prefix,
     for(boost::filesystem::directory_iterator it(p); it != end; ++it)
     {
         if(!boost::filesystem::is_directory(it->status()))
-            unsigned short int id = AddFile(it->path(), top, prefix, files);
+            AddFile(it->path(), top, prefix, files);
         else
         {
             char* dirname;

@@ -26,10 +26,10 @@
 namespace SORE_Graphics
 {
     GeometryChunk::GeometryChunk(SORE_Resource::Texture2D* texture,
-        SORE_Math::Rect<float> bounds,
-        SORE_Math::Rect<float> texCoords,
-        const Color& color) :
-        colors(0), opaque(false), tex(0), vertices(0), texCoords(0), c(color)
+                                 SORE_Math::Rect<float> bounds,
+                                 SORE_Math::Rect<float> texCoords,
+                                 const Color& color)
+        : vertices(0), texCoords(0), colors(0), opaque(false), tex(0), c(color)
     {
         sharedColors = false;
         setup(bounds, texCoords);

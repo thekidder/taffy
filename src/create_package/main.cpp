@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     * 
+ *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -45,7 +45,7 @@ void showHelp(const char* program_name, boost::program_options::options_descript
 }
 
 int main(int argc, char** argv)
-{	
+{
     boost::program_options::options_description generic("Generic Options");
     generic.add_options()
         ("help,h", "Show help");
@@ -53,7 +53,8 @@ int main(int argc, char** argv)
     boost::program_options::options_description config("Configuration");
     config.add_options()
         ("compression,c", "Compress output")
-        ("prefix,p", boost::program_options::value< std::string >(), "Folder prefix for archived files");
+        ("prefix,p", boost::program_options::value< std::string >(),
+         "Folder prefix for archived files");
 
     boost::program_options::options_description hidden("Hidden");
     hidden.add_options()
@@ -76,14 +77,14 @@ int main(int argc, char** argv)
     boost::program_options::notify(vm);
 
 
-	if(!vm.count("files") || !vm.count("archive-name")) 
+    if(!vm.count("files") || !vm.count("archive-name"))
     {
         showHelp(argv[0], visible);
         return -1;
     }
-   
+
     unsigned short int top = 65535;
-	file_list files;
+    file_list files;
     std::string prefix;
 
     if(vm.count("prefix"))
@@ -103,8 +104,7 @@ int main(int argc, char** argv)
 
     }
 
-	
-	cout << "Creating file list...\n";
+    cout << "Creating file list...\n";
 
     std::vector<std::string> inputFiles = vm["files"].as<std::vector<std::string> >();
 
@@ -117,8 +117,8 @@ int main(int argc, char** argv)
             Walk(p, top, prefix, files);
         else
             AddFile(p, top, prefix, files);
-    }	
-	/*for(int i=0;i<files.size();i++)
+    }
+    /*for(int i=0;i<files.size();i++)
       {
       if(files[i].file)
       cout << "File Entry\n";
@@ -129,48 +129,49 @@ int main(int argc, char** argv)
       cout << "Name: \t\t" << files[i].filename <<"\n";
       cout << "Full name:\t" << files[i].fullname << "\n\n";
       }*/
-	if(files.size()>65534)
+    if(files.size()>65534)
     {
-        cerr << "Too many files in selected directory.\nSDP format 0.1 can only handle 65,534 files and directories.\n";
+        cerr << "Too many files in selected directory." << endl;
+        cerr << "SDP format 0.1 can only handle 65,534 files and directories." << endl;
         return -1;
     }
-	
-	cout << "Finished creating file list, now writing file table...\n";
-	
-	FILE* out;
-		
-	const int minor = 2;
-	const int major = 0;
-	
-	unsigned short int numFiles = files.size();
-	unsigned int fileSize;
-	unsigned int fileSizeRaw; //size of file compressed (only present in compressed files)
-	unsigned int filePos;
-	
-	out = fopen(vm["archive-name"].as<string>().c_str(), "wb");
-	
-	fputs("SDP", out);
-	fputc(major, out);
-	fputc(minor, out);
-	
-	fwrite(&numFiles, sizeof(short int), 1, out);
-	
-	file_list::iterator it;
-	
-	for(it=files.begin();it!=files.end();it++)
+
+    cout << "Finished creating file list, now writing file table...\n";
+
+    FILE* out;
+
+    const int minor = 2;
+    const int major = 0;
+
+    unsigned short int numFiles = files.size();
+    unsigned int fileSize;
+    unsigned int fileSizeRaw; //size of file compressed (only present in compressed files)
+    unsigned int filePos;
+
+    out = fopen(vm["archive-name"].as<string>().c_str(), "wb");
+
+    fputs("SDP", out);
+    fputc(major, out);
+    fputc(minor, out);
+
+    fwrite(&numFiles, sizeof(short int), 1, out);
+
+    file_list::iterator it;
+
+    for(it=files.begin();it!=files.end();it++)
     {
         fwrite(&it->fileID, sizeof(short int), 1, out);
-		
+
         unsigned char flags;
         flags = 0;
         if(!it->file)
             flags |= 0x01;
-        if(compress)
+        if(vm.count("compression"))
             flags |= 0x02;
         fputc((int)flags, out);
-		
+
         fwrite(&it->parentID, sizeof(short int), 1, out);
-		
+
         fputs(it->filename, out);
         fputc((int)'\0', out);
         if(it->file)
@@ -179,21 +180,21 @@ int main(int argc, char** argv)
             filePos = 0;
             fwrite(&filePos, sizeof(int), 1, out);
             fwrite(&fileSize, sizeof(int), 1, out);
-            if(compress)
+            if(vm.count("compression"))
                 fwrite(&fileSizeRaw, sizeof(int), 1, out);
         }
     }
-	
-	cout << "Finished writing file table, now copying data...\n";
-	if(vm.count("compression"))
-		cout << "Using DEFLATE compression mode\n";
-	
-	const int CHUNK = 131072;
-	
-	unsigned char in_buf[CHUNK];
-	unsigned char out_buf[CHUNK];
-	
-	for(it=files.begin();it!=files.end();it++)
+
+cout << "Finished writing file table, now copying data...\n";
+    if(vm.count("compression"))
+        cout << "Using DEFLATE compression mode\n";
+
+    const int CHUNK = 131072;
+
+    unsigned char in_buf[CHUNK];
+    unsigned char out_buf[CHUNK];
+
+    for(it=files.begin();it!=files.end();it++)
     {
         if(!it->file)
             continue;
@@ -204,7 +205,7 @@ int main(int argc, char** argv)
         it->pos = ftell(out);
         if(!vm.count("compression"))
         {
-			
+
             int c;
             while((c=fread(in_buf, sizeof(char), CHUNK, in))>0)
             {
@@ -230,7 +231,7 @@ int main(int argc, char** argv)
             {
                 strm.avail_in = fread(in_buf, 1, CHUNK, in);
                 it->size+=strm.avail_in;
-                if (ferror(in)) 
+                if (ferror(in))
                 {
                     deflateEnd(&strm);
                     return Z_ERRNO;
@@ -244,7 +245,7 @@ int main(int argc, char** argv)
                     ret = deflate(&strm, flush);    /* no bad return value */
                     assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
                     have = CHUNK - strm.avail_out;
-                    if (fwrite(out_buf, 1, have, out) != have || ferror(out)) 
+                    if (fwrite(out_buf, 1, have, out) != have || ferror(out))
                     {
                         deflateEnd(&strm);
                         return Z_ERRNO;
@@ -258,18 +259,18 @@ int main(int argc, char** argv)
             deflateEnd(&strm);
         }
     }
-	
-	fclose(out);
-	
-	cout << "Finished copying data, now updating file table...\n";
-	
-	out = fopen(vm["archive-name"].as<std::string>().c_str(), "rb+");
-	
-	fseek(out, 7, SEEK_SET);
-	
-	int seek;
-	
-	for(it=files.begin();it!=files.end();it++)
+
+    fclose(out);
+
+    cout << "Finished copying data, now updating file table...\n";
+
+    out = fopen(vm["archive-name"].as<std::string>().c_str(), "rb+");
+
+    fseek(out, 7, SEEK_SET);
+
+    int seek;
+
+    for(it=files.begin();it!=files.end();it++)
     {
         seek = 5;
         seek += strlen(it->filename) + 1;
@@ -278,15 +279,15 @@ int main(int argc, char** argv)
         {
             fwrite(&it->pos, sizeof(int), 1, out);
             fwrite(&it->size, sizeof(int), 1, out);
-            if(compress)
+            if(vm.count("compression"))
                 fwrite(&it->sizeRaw, sizeof(int), 1, out);
         }
     }
-	
-	fclose(out);
-	
-	cout << "Wrote " << vm["archive-name"].as<std::string>() << " successfully ";
-	cout << "with " << numFiles << " files and directories\n";
-	
-	return 0;
+
+    fclose(out);
+
+    cout << "Wrote " << vm["archive-name"].as<std::string>() << " successfully ";
+    cout << "with " << numFiles << " files and directories\n";
+
+    return 0;
 }

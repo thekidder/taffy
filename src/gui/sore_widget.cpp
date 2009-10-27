@@ -23,7 +23,7 @@
 namespace SORE_GUI
 {
     Widget::Widget(SVec s, SVec p, Widget* par)
-        : size(s), position(p), parent(par), focus(0), oldFocus(0), highestLayer(0.0f)
+        : parent(par), position(p), size(s), focus(0), oldFocus(0), highestLayer(0.0f)
     {
         if(parent)
         {

@@ -31,51 +31,51 @@
 
 namespace SORE_Network
 {
-	std::vector<ENetAddress> GetHostAddresses()
-	{
-		const unsigned int len = 1024;
+    std::vector<ENetAddress> GetHostAddresses()
+    {
+        const unsigned int len = 1024;
 
-		std::vector<ENetAddress> addresses;
-		char hostname[len];// = "localhost";
-		gethostname(hostname, len);
+        std::vector<ENetAddress> addresses;
+        char hostname[len];// = "localhost";
+        gethostname(hostname, len);
 
-		addrinfo hints, *result;
+        addrinfo hints, *result;
 
-		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = AF_INET;
-		hints.ai_protocol = IPPROTO_UDP;
-		ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("Hostname is ") + hostname);
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET;
+        hints.ai_protocol = IPPROTO_UDP;
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("Hostname is ") + hostname);
 
-		int error = getaddrinfo(hostname, NULL, &hints, &result);
-		//hostent* h = gethostbyname(hostname);
+        getaddrinfo(hostname, NULL, &hints, &result);
+        //hostent* h = gethostbyname(hostname);
 
-		//in_addr** addr_list = reinterpret_cast<in_addr**>(h->h_addr_list);
+        //in_addr** addr_list = reinterpret_cast<in_addr**>(h->h_addr_list);
 
-		//for(int i=0; addr_list[i] != NULL; ++i)
-		for(addrinfo* i=result; i!=NULL; i = i->ai_next)
-		{
-			if(i->ai_addr->sa_family == AF_INET)
-			{
-				sockaddr_in* socket = reinterpret_cast<sockaddr_in*>(i->ai_addr);
+        //for(int i=0; addr_list[i] != NULL; ++i)
+        for(addrinfo* i=result; i!=NULL; i = i->ai_next)
+        {
+            if(i->ai_addr->sa_family == AF_INET)
+            {
+                sockaddr_in* socket = reinterpret_cast<sockaddr_in*>(i->ai_addr);
 
-				//in_addr* addr = addr_list[i];
+                //in_addr* addr = addr_list[i];
 
-				ENetAddress temp;
-				temp.host = socket->sin_addr.s_addr;//addr->s_addr
-				addresses.push_back(temp);
+                ENetAddress temp;
+                temp.host = socket->sin_addr.s_addr;//addr->s_addr
+                addresses.push_back(temp);
 
-				//char* ip = inet_ntoa(*addr);
-				//ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("IP is: ") + ip);
+                //char* ip = inet_ntoa(*addr);
+                //ENGINE_LOG(SORE_Logging::LVL_DEBUG2, std::string("IP is: ") + ip);
 
-				//char hostname[1025];
-				//getnameinfo(i->ai_addr, i->ai_addrlen, hostname, 1025, NULL, 0, NI_NUMERICHOST);
-				//if(*hostname)
-				//	ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Found hostname: %s") % hostname);
-			}
-		}
+                //char hostname[1025];
+                //getnameinfo(i->ai_addr, i->ai_addrlen, hostname, 1025, NULL, 0, NI_NUMERICHOST);
+                //if(*hostname)
+                //  ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Found hostname: %s") % hostname);
+            }
+        }
 
-		freeaddrinfo(result);
+        freeaddrinfo(result);
 
-		return addresses;
-	}
+        return addresses;
+    }
 }

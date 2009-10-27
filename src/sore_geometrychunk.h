@@ -34,69 +34,70 @@
 */
 namespace SORE_Graphics
 {
-	static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
+    static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
-	class SORE_EXPORT GeometryChunk
-	{
-	public:
-		GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
-									SORE_Math::Rect<float> texCoords = defaultTexCoords,
-									const Color& color = White);
-		GeometryChunk();
-		//produces a shallow copy
-		GeometryChunk(const GeometryChunk& gc);
-		~GeometryChunk();
-		
-		const Color& GetColor() const;
-		void SetColor(const Color& color);
+    class SORE_EXPORT GeometryChunk
+    {
+    public:
+        GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
+                                    SORE_Math::Rect<float> texCoords = defaultTexCoords,
+                                    const Color& color = White);
+        GeometryChunk();
+        //produces a shallow copy
+        GeometryChunk(const GeometryChunk& gc);
+        ~GeometryChunk();
 
-		const float* TexCoords() const;
-		void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
+        const Color& GetColor() const;
+        void SetColor(const Color& color);
 
-		bool HasTexture() const;
-		bool HasColor() const;
-		bool IsOpaque() const;		
-		const float* Vertices() const;
-		const float* Colors() const;
-		const unsigned short* Indices() const;
-		
-		unsigned int NumVertices() const;
-		unsigned int NumIndices() const;
-		
-		const SORE_Resource::Texture2D* GetTexture() const;
-		void SetTexture(SORE_Resource::Texture2D* texture);
+        const float* TexCoords() const;
+        void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
 
-	private:
-		void setup(SORE_Math::Rect<float> bounds,
-			SORE_Math::Rect<float> texCoordRect);
+        bool HasTexture() const;
+        bool HasColor() const;
+        bool IsOpaque() const;
+        const float* Vertices() const;
+        const float* Colors() const;
+        const unsigned short* Indices() const;
 
-		//geometry
-		float* vertices;
-		float* texCoords;
-		float* colors;
-		bool sharedVertices, sharedTexCoords, sharedColors, sharedIndices;
-		
-		unsigned short* indices;
-		bool opaque;
-		
-		unsigned int numVertices, numIndices;
-		
-		SORE_Resource::Texture2D* tex;
-		Color c;
-		unsigned int primitiveType;
+        unsigned int NumVertices() const;
+        unsigned int NumIndices() const;
+
+        const SORE_Resource::Texture2D* GetTexture() const;
+        void SetTexture(SORE_Resource::Texture2D* texture);
+
+    private:
+        void setup(SORE_Math::Rect<float> bounds,
+            SORE_Math::Rect<float> texCoordRect);
+
+        //geometry
+        float* vertices;
+        float* texCoords;
+        float* colors;
+        bool sharedVertices, sharedTexCoords, sharedColors, sharedIndices;
+
+        unsigned short* indices;
+        bool opaque;
+
+        unsigned int numVertices, numIndices;
+
+        SORE_Resource::Texture2D* tex;
+        Color c;
+        unsigned int primitiveType;
   };
 
-	typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> > 
-		render_list;
+    typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> >
+        render_list;
 
-	typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> > 
-		render_list_owned;
+    typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> >
+        render_list_owned;
 
-	void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform, render_list_owned& list);
-	render_list SORE_EXPORT GetRenderList(render_list_owned& list);
+    void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform,
+                                    render_list_owned& list);
+    render_list SORE_EXPORT GetRenderList(render_list_owned& list);
 
-	const int SORT_LESS    = -1;
-	const int SORT_EQUAL   =  0;
-	const int SORT_GREATER =  1;
+    const int SORT_LESS    = -1;
+    const int SORT_EQUAL   =  0;
+    const int SORT_GREATER =  1;
 }
 #endif
