@@ -100,6 +100,7 @@ namespace SORE_Graphics
 
         //Rendering Statistics
         float GetFPS() const;
+        float GetFrameMS() const;
         unsigned int GetDrawCalls() const;
         unsigned int GetNumPolys() const;
 
@@ -128,6 +129,7 @@ namespace SORE_Graphics
 
         //statistics: get info about current rendering
         float fps;
+        float ms;
         unsigned int drawCalls;
         unsigned int numPolys;
     };

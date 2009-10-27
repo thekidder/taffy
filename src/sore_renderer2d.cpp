@@ -256,17 +256,21 @@ namespace SORE_Graphics
 
         static int frames = 0;
         static int T0 = SORE_Timing::GetGlobalTicks();
+        static int last;
         frames++;
+
+        GLint t = SORE_Timing::GetGlobalTicks();
+
+        ms = (static_cast<float>(t) - static_cast<float>(last)) / 10.0f;
+
+        if (t - T0 >= 500) //calculate FPS every 50 milliseconds
         {
-            GLint t = SORE_Timing::GetGlobalTicks();
-            if (t - T0 >= 500) //calculate FPS every 50 milliseconds
-            {
-                GLfloat seconds = (GLfloat)((t - T0) / 10000.0);
-                fps = frames / seconds;
-                T0 = t;
-                frames = 0;
-            }
+            GLfloat seconds = (GLfloat)((t - T0) / 10000.0);
+            fps = frames / seconds;
+            T0 = t;
+            frames = 0;
         }
+        last = t;
 
         PrintGLErrors(SORE_Logging::LVL_ERROR);
     }
@@ -274,6 +278,11 @@ namespace SORE_Graphics
     float Renderer2D::GetFPS() const
     {
         return fps;
+    }
+
+    float Renderer2D::GetFrameMS() const
+    {
+        return ms;
     }
 
     unsigned int Renderer2D::GetDrawCalls() const
