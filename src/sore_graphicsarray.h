@@ -35,7 +35,6 @@ namespace SORE_Graphics
         GLfloat texi, texj;
         GLfloat normx, normy, normz;
         GLfloat r, g, b, a;
-        GLfloat padding[4]; //multiple of 64
     };
 
     /**

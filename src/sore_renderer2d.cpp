@@ -200,25 +200,18 @@ namespace SORE_Graphics
 
     void Renderer2D::RenderBatch(batch& b)
     {
-        SORE_Resource::Texture2D* missing = rm.GetResource<SORE_Resource::Texture2D>
-            ("data/Textures/missing.tga");
         if(!b.second->Empty())
         {
             shad->Bind();
             b.second->BeginDraw();
-            ENGINE_LOG(SORE_Logging::LVL_INFO, "---START---");
             for(std::vector<vbo_tex_order>::iterator it=b.first.begin();it!=b.first.end();++it)
             {
-                //missing->Bind();
                 glClientActiveTexture(GL_TEXTURE0);
                 it->tex->Bind();
-                ENGINE_LOG(SORE_Logging::LVL_INFO,
-                           boost::format("drawing %d from %d") % it->triLen %it->triStart);
                 b.second->DrawElements(it->triLen, it->triStart);
                 numPolys += it->triLen;
                 drawCalls++;
             }
-            ENGINE_LOG(SORE_Logging::LVL_INFO, "---END---");
             b.second->EndDraw();
         }
     }

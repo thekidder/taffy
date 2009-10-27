@@ -87,6 +87,21 @@ namespace SORE_Graphics
     {
         BeginDrawHook();
 
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 0));
+        if(hasTexCoords)
+        {
+            glClientActiveTexture(GL_TEXTURE0);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 12));
+        }
+        if(hasNormals)
+        {
+            glNormalPointer(GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 20));
+        }
+        if(hasColors)
+        {
+            glColorPointer(4, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 32));
+        }
+
         glEnableClientState(GL_VERTEX_ARRAY);
         if(hasColors)
           glEnableClientState(GL_COLOR_ARRAY);
@@ -95,20 +110,6 @@ namespace SORE_Graphics
         if(hasNormals)
             glEnableClientState(GL_NORMAL_ARRAY);
 
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0].x), 0));
-        if(hasTexCoords)
-        {
-            glClientActiveTexture(GL_TEXTURE0);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0].x), 12));
-        }
-        if(hasNormals)
-        {
-            glNormalPointer(GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0].x), 20));
-        }
-        if(hasColors)
-        {
-            glColorPointer(4, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0].x), 32));
-        }
     }
 
     void GraphicsArray::EndDraw()
@@ -130,10 +131,8 @@ namespace SORE_Graphics
 
     void GraphicsArray::DrawElements(unsigned int numTris, unsigned short triOffset)
     {
-        /*glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
-          GetOffset(&(indices[0]), triOffset*3));*/
-        glDrawRangeElements(GL_TRIANGLES, triOffset*3, indices.size(), numTris*3, GL_UNSIGNED_SHORT,
-                            GetOffset(&(indices[0]), triOffset*3));
+        glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
+                       GetOffset(&(indices[0]), triOffset*3*sizeof(unsigned short)));
     }
 
     bool GraphicsArray::Empty() const

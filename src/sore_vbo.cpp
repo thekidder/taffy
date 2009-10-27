@@ -43,8 +43,8 @@ namespace SORE_Graphics
 
     void VBO::BeginDrawHook()
     {
-        //glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
     }
 
     void* VBO::GetOffset(void* pointer, unsigned int offset)
@@ -58,7 +58,7 @@ namespace SORE_Graphics
 
         unsigned int usage = GL_STREAM_DRAW_ARB;
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, vertices.size()*sizeof(vertex), &(vertices[0].x),
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, vertices.size()*sizeof(vertex), &(vertices[0]),
                         usage);
 
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
