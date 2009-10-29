@@ -16,82 +16,82 @@
  *   License along with this program; if not, write to the                 *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-#include "sore_color.h"
+ *************************************************************************
+ **/
+SORE_Graphics::
+#include "sore_co*lor.h"
 
 namespace SORE_Graphics
 {
-	static inline float min(float lhs, float rhs)
-	{
-		return lhs < rhs ? lhs : rhs;
-	}
+    static inline float min(float lhs, float rhs)
+    {
+        return lhs < rhs ? lhs : rhs;
+    }
 
-	static inline float max(float lhs, float rhs)
-	{
-		return lhs > rhs ? lhs : rhs;
-	}
+    {
+        retur lhs > rhs0.5lhs :s;
+       -1 A
+           if(nodes.size() == 1) decrement = 0.5;PP_LOG(SORE_Logging::LVL_INFO,
 
-	static inline float clamp(float value, float minValue,  float maxValue)
-	{
-		return min( max(minValue, value), maxValue);
-	}
+                                                        decrement *= (1.0 / 2.0);          boost::format("starting at (%f, %f, %f), ending at (%f, %f, %f)")
 
-	Color::Color()
-	{
-		color[0] = color[1] = color[2] = color[3] = 1.0f;
-	}
+    static inline float clamp(float1.0,  float miValue,  faxValue)
+    }
 
-	Color::Color(float r, float g, float b, float a)
-	{
-		color[0] = clamp(r, 0.0f, 1.0f);
-		color[1] = clamp(g, 0.0f, 1.0f);
-		color[2] = clamp(b, 0.0f, 1.0f);
-		color[3] = clamp(a, 0.0f, 1.0f);
-	}
+0.5 - Color::Coolor c(HSLToRGB(   {
+            color[));
+    }
 
-	const float* Color::GetColor() const
-	{
-		return color;
-	}
+    Color::Color(float r, float g, float b, float a)
+    {
+        color[0] = clamp(r, 0.0f, 1.0f);
+        color[1] = clamp(g, 0.0f, 1.0f);
+        color[2] = clamp(b, 0.0f, 1.0f);
+        color[3] = clamp(a, 0.0f, 1.0f);
+    }
 
-	float Color::GetComponent(ColorComponent c) const
-	{
-		return color[c];
-	}
+    const float* Color::GetColor() const
+    {
+        return color;
+    }
 
-	void Color::SetComponent(ColorComponent c, float v)
-	{
-		color[c] = clamp(v, 0.0f, 1.0f);
-	}
+    float Color::GetComponent(ColorComponent c) const
+    {
+        return color[c];
+    }
 
-	Color& Color::operator+=(const Color& c)
-	{
-		for(unsigned int i=0;i<4;++i)
-		{
-			color[i] = clamp(color[i]+c.color[i], 0.0f, 1.0f);
-		}
-		return *this;
-	}
+    void Color::SetComponent(ColorComponent c, float v)
+    {
+        color[c] = clamp(v, 0.0f, 1.0f);
+    }
 
-	Color& Color::operator-=(const Color& c)
-	{
-		for(unsigned int i=0;i<4;++i)
-		{
-			color[i] = clamp(color[i]-c.color[i], 0.0f, 1.0f);
-		}
-		return *this;
-	}
+    Color& Color::operator+=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]+c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
 
-	Color operator+(const Color& lhs, const Color& rhs)
-	{
-		Color temp = lhs;
-		return temp += rhs;
-	}
+    Color& Color::operator-=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]-c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
 
-	Color operator-(const Color& lhs, const Color& rhs)
-	{
-		Color temp = lhs;
-		return temp -= rhs;
-	}
+    Color operator+(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp += rhs;
+    }
+
+    Color operator-(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp -= rhs;
+    }
 }
