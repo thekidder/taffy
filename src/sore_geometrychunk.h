@@ -89,7 +89,7 @@ namespace SORE_Graphics
     typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> >
         render_list;
 
-    typedef std::vector<std::pair<SORE_Math::Matrix4<float>, const GeometryChunk *> >
+    typedef std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk *> >
         render_list_owned;
 
     void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform,
