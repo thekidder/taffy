@@ -40,53 +40,57 @@
 
 namespace SORE_Kernel
 {
-	class SORE_EXPORT Screen : public Task
-	{
-	public:
-		Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-					 std::string windowTitle="SORE App", SORE_Utility::SettingsManager* _sm=NULL);
-		~Screen();
-		
-		void Frame(int elapsedTime);
-		
-		const char* GetName() const {return "Screen";}
-			
-		void SetRenderer(SORE_Graphics::IRenderer* _renderer);
-			
-		void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
-		std::vector<SORE_Math::Vector2<unsigned int> > ListModes();
-			
-		bool OnResize(Event* event=NULL);
-			
-		const GLint* GetViewport() const; 
-		SORE_Graphics::ScreenInfo GetScreen() const;
-			
-	private:
-		int  InitializeSDL(std::string windowTitle);
-		int  InitializeGL();
-		void InitExtensions();
-			
+    class SORE_EXPORT Screen : public Task
+    {
+    public:
+        Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
+               std::string windowTitle="SORE App", SORE_Utility::SettingsManager* _sm=NULL);
+        ~Screen();
 
-		void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
-		void ChangeScreenOnSettingsChange(); 
-			
-		void Resize(int width, int height); //does the actual resizing
-		
-		InputTask& input; //for injecting resize events
+        void Frame(int elapsedTime);
 
-		SDL_Surface* drawContext;
-		int width, height; //user's previous width and height so we can reset their screen after fullscreen mode
-		Uint32 videoFlags;
-			
-		SORE_Graphics::IRenderer* renderer;
-		SORE_Graphics::ProjectionInfo proj;
-		SORE_Graphics::ScreenInfo screen;
-		SORE_Utility::SettingsManager* sm;
-			
-		GLint viewport[4];
-			
-		std::string uiDataPath;
-	};
+        const char* GetName() const {return "Screen";}
+
+        void SetRenderer(SORE_Graphics::IRenderer* _renderer);
+
+        void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
+        std::vector<SORE_Math::Vector2<unsigned int> > ListModes();
+
+        bool OnResize(Event* event=NULL);
+
+        const GLint* GetViewport() const;
+        SORE_Graphics::ScreenInfo GetScreen() const;
+
+    private:
+        int  InitializeSDL(std::string windowTitle);
+        int  InitializeGL();
+        void InitExtensions();
+
+        void SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen);
+
+        void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
+        void ChangeScreenOnSettingsChange();
+
+        void Resize(int width, int height); //does the actual resizing
+
+        InputTask& input; //for injecting resize events
+
+        SDL_Surface* drawContext;
+        //user's previous width and height so we can reset their screen after fullscreen mode
+        int width, height;
+        Uint32 videoFlags;
+
+        SORE_Graphics::IRenderer* renderer;
+        SORE_Graphics::ProjectionInfo proj;
+        SORE_Graphics::ScreenInfo screen;
+        SORE_Utility::SettingsManager* sm;
+
+        GLint viewport[4];
+
+        std::string uiDataPath;
+
+        int best_w, best_h;
+    };
 }
 
 #ifdef _MSC_VER

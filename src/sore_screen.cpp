@@ -45,19 +45,41 @@ namespace SORE_Kernel
         screen.ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
         if(InitializeSDL(windowTitle)!=0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_CRITICAL, boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
+            ENGINE_LOG(SORE_Logging::LVL_CRITICAL,
+                       boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
             quitFlag = true;
         }
         SDL_EnableUNICODE(1);
         SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
         if(sm!=NULL)
         {
-            screen.width      = sm->WatchVariable("screen", "width",      boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
-            screen.height     = sm->WatchVariable("screen", "height",     boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
-            screen.fullscreen = sm->WatchVariable("screen", "fullscreen", boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
-            screen.resizable  = sm->WatchVariable("screen", "resizable",  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
-            screen.showCursor = sm->WatchVariable("screen", "showcursor", boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),this));
+            screen.width =
+                sm->WatchVariable("screen", "width",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
+            screen.height =
+                sm->WatchVariable("screen", "height",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
+            screen.fullscreen =
+                sm->WatchVariable("screen", "fullscreen",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
+            screen.resizable  =
+                sm->WatchVariable("screen", "resizable",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
+            screen.showCursor =
+                sm->WatchVariable("screen", "showcursor",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
+            screen.useNativeResolution  =
+                sm->WatchVariable("screen", "native",
+                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                                              this));
         }
+        best_w = SDL_GetVideoInfo()->current_w;
+        best_h = SDL_GetVideoInfo()->current_h;
         SDLScreenChange(screen);
         if(InitializeGL()!=0)
         {
@@ -68,6 +90,7 @@ namespace SORE_Kernel
 
     void Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
     {
+        SetupScreenInfo(_screen);
         screen.fullscreen = _screen.fullscreen;
         screen.showCursor = _screen.showCursor;
         screen.resizable  = _screen.resizable;
@@ -113,7 +136,9 @@ namespace SORE_Kernel
         for(unsigned int i=0;modes[i];++i)
         {
             if(modes[i]->x || modes[i]->y)
-                ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("ListModes returned invalid Rect: x: %d, y: %d") % modes[i]->x % modes[i]->y);
+                ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                           boost::format("ListModes returned invalid Rect: x: %d, y: %d")
+                           % modes[i]->x % modes[i]->y);
             if(modes[i]->w >= 640 && modes[i]->h >= 480)
             {
                 SORE_Math::Vector2<unsigned int> m(modes[i]->w, modes[i]->h);
@@ -125,8 +150,6 @@ namespace SORE_Kernel
 
     Screen::~Screen()
     {
-        //if(videoFlags & SDL_FULLSCREEN)
-        //  SDL_SetVideoMode(width, height, 0, videoFlags);
         SDL_ShowCursor(SDL_ENABLE);
         SDL_FreeSurface(drawContext);
         SDL_Quit();
@@ -166,13 +189,20 @@ namespace SORE_Kernel
         return true;
     }
 
+    void Screen::SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen)
+    {
+        if(_screen.useNativeResolution)
+        {
+            _screen.width = best_w;
+            _screen.height = best_h;
+        }
+        _screen.ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
+    }
+
     void Screen::Resize(int width, int height)
     {
         ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("resizing from (%d, %d) to (%d, %d)")
                    % screen.width % screen.height % width % height);
-        screen.width = width;
-        screen.height = height;
-        screen.ratio = static_cast<GLfloat>(screen.width) / static_cast<GLfloat>(screen.height);
         if(renderer)
         {
             renderer->SetScreenInfo(screen);
@@ -238,7 +268,11 @@ namespace SORE_Kernel
         glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
         glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
         InitExtensions();
-        ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Rendering information\nRenderer   : %s\nVender     : %s\nAPI Version: %s")
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("OpenGL Rendering information\n"
+                                 "Renderer   : %s\n"
+                                 "Vender     : %s\n"
+                                 "API Version: %s")
                    % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR)
                    % (char*)glGetString(GL_VERSION));
         char* glExtensions = (char*)glGetString(GL_EXTENSIONS);
@@ -294,12 +328,14 @@ namespace SORE_Kernel
         bool bFull   = (bool)sm->GetVariable("screen", "fullscreen");
         bool bResize = (bool)sm->GetVariable("screen", "resizable");
         bool bCursor = (bool)sm->GetVariable("screen", "showcursor");
+        bool native  = (bool)sm->GetVariable("screen", "native");
         static SORE_Graphics::ScreenInfo screen;
         screen.width=iWidth;
         screen.height=iHeight;
         screen.fullscreen=bFull;
         screen.resizable=bResize;
         screen.showCursor=bCursor;
+        screen.useNativeResolution = native;
         ChangeScreen(screen);
     }
 }
