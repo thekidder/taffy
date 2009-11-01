@@ -37,87 +37,92 @@
 
 namespace SORE_GUI
 {
-	const static float LAYER_SEPARATION = 0.0001f;
+    const static float LAYER_SEPARATION = 0.0001f;
 
-	enum unit_type {HORIZONTAL, VERTICAL};
+    enum unit_type {HORIZONTAL, VERTICAL};
 
-	class SORE_EXPORT Widget
-	{
-	public:
-		Widget(SVec s, SVec p, Widget* par=NULL);
-		~Widget();
+    class SORE_EXPORT Widget
+    {
+    public:
+        Widget(SVec s, SVec p, Widget* par=NULL);
+        ~Widget();
 
-		SORE_Graphics::render_list GetRenderList();
-		bool PropagateEvents(SORE_Kernel::Event* e);
+        SORE_Graphics::render_list GetRenderList();
+        bool PropagateEvents(SORE_Kernel::Event* e);
 
-		int GetSize(unit_type type) const;
-		int GetPosition(unit_type type) const;
+        int GetSize(unit_type type) const;
+        int GetPosition(unit_type type) const;
 
-		bool HasFocus() const;
+        bool HasFocus() const;
 
         static void SetStyle(std::string style);
         static std::string GetStyle();
-	protected:
-		//returns true if inside widget area
-		bool InBounds(unsigned int x, unsigned int y);
-		//returns total size of area for child widgets
- 		virtual unsigned int GetClientSize(unit_type type) const {return GetSize(type); };
-		//returns position of area for child widgets
-		virtual unsigned int GetClientPosition(unit_type type) const {return 0; };
 
-		const SVec& GetPosition() const;
-		void SetPosition(const SVec& p);
+        void SetVisible(bool visible = true);
+    protected:
+        //returns true if inside widget area
+        bool InBounds(unsigned int x, unsigned int y);
+        //returns total size of area for child widgets
+        virtual unsigned int GetClientSize(unit_type type) const {return GetSize(type); };
+        //returns position of area for child widgets
+        virtual unsigned int GetClientPosition(unit_type type) const {return 0; };
 
-		const SVec& GetSize() const;
-		void SetSize(const SVec& s);
+        const SVec& GetPosition() const;
+        void SetPosition(const SVec& p);
 
-		int GetPixels(unit_type type, SUnit unit) const; //translate an SVec into pixels
-		float GetLayer() const; //used for child widgets to determine their layer
-		const SORE_Math::Matrix4<float>& GetPositionMatrix() const;
+        const SVec& GetSize() const;
+        void SetSize(const SVec& s);
 
-		void ClearFocus();
-		float GetTopLayer();
-	private:
-		//these events are preprocessed: mouse coordinates are relative to the widget, 
-		//not absolute
-		virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0; 
-		//child widgets ARE responsible to transforming their geometry via GetPositionMatrix()
-		virtual SORE_Graphics::render_list GetThisRenderList() = 0;
-		//gets called when the parent's position is updated; overload if we need to do
-		//processing on a position change
-		virtual void UpdatePosition() {} 
-		//gets called when the widget loses focus
-		virtual void FocusLost() {}
-		//overload to perform any processing on GL context reload (reload textures etc)
-		virtual void OnGLReload() {}
-		bool PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p);
-		void PropagateGLReload();
-		void AddChild(Widget* c);
-		void RemoveChild(Widget* c);
-		void UpdatePositionMatrix();
+        int GetPixels(unit_type type, SUnit unit) const; //translate an SVec into pixels
+        float GetLayer() const; //used for child widgets to determine their layer
+        const SORE_Math::Matrix4<float>& GetPositionMatrix() const;
 
-		SORE_Kernel::Event prev;
+        void ClearFocus();
+        float GetTopLayer();
+    private:
+        //these events are preprocessed: mouse coordinates are relative to the widget,
+        //not absolute
+        virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
+        //child widgets ARE responsible to transforming their geometry via GetPositionMatrix()
+        virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        //gets called when the parent's position is updated; overload if we need to do
+        //processing on a position change
+        virtual void UpdatePosition() {}
+        //gets called when the widget loses focus
+        virtual void FocusLost() {}
+        //overload to perform any processing on GL context reload (reload textures etc)
+        virtual void OnGLReload() {}
+        bool PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p);
+        void PropagateGLReload();
+        void AddChild(Widget* c);
+        void RemoveChild(Widget* c);
+        void UpdatePositionMatrix();
 
-		//position matrix
-		SORE_Math::Matrix4<float> mat;
-		float layer;
-		std::vector<Widget*> children;
-		Widget* parent;
-		SVec position;
-		SVec size;
+        SORE_Kernel::Event prev;
 
-		const Widget* Focus() const;
-		Widget*& Focus();
-		Widget*& OldFocus();
-		void ChangeFocus(Widget* w);
-		Widget* focus;
-		Widget* oldFocus;
+        //position matrix
+        SORE_Math::Matrix4<float> mat;
+        float layer;
+        std::vector<Widget*> children;
+        Widget* parent;
+        SVec position;
+        SVec size;
 
-		float& HighestLayer();
-		float highestLayer;
+        const Widget* Focus() const;
+        Widget*& Focus();
+        Widget*& OldFocus();
+        void ChangeFocus(Widget* w);
+        Widget* focus;
+        Widget* oldFocus;
+
+        float& HighestLayer();
+        float highestLayer;
 
         static std::string style;
-	};
+
+        //render/process inputs from this widget?
+        bool isVisible;
+    };
 }
 
 #ifdef _MSC_VER

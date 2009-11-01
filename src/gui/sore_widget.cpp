@@ -23,7 +23,8 @@
 namespace SORE_GUI
 {
     Widget::Widget(SVec s, SVec p, Widget* par)
-        : parent(par), position(p), size(s), focus(0), oldFocus(0), highestLayer(0.0f)
+        : parent(par), position(p), size(s), focus(0), oldFocus(0), highestLayer(0.0f),
+          isVisible(true)
     {
         if(parent)
         {
@@ -90,12 +91,16 @@ namespace SORE_GUI
 
     SORE_Graphics::render_list Widget::GetRenderList()
     {
-        SORE_Graphics::render_list all = GetThisRenderList();
-
-        for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+        SORE_Graphics::render_list all;
+        if(isVisible)
         {
-            SORE_Graphics::render_list child = (*it)->GetRenderList();
-            all.insert(all.begin(), child.begin(), child.end());
+            all = GetThisRenderList();
+
+            for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+            {
+                SORE_Graphics::render_list child = (*it)->GetRenderList();
+                all.insert(all.begin(), child.begin(), child.end());
+            }
         }
         return all;
     }
@@ -110,7 +115,9 @@ namespace SORE_GUI
             return true;
         }
         else
+        {
             return PropagateEventHelper(e, &previous);
+        }
     }
 
     void Widget::PropagateGLReload()
@@ -137,6 +144,8 @@ namespace SORE_GUI
 
     bool Widget::PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p)
     {
+        if(!isVisible)
+            return false;
         if(Focus() && Focus()->InBounds(e->mouse.x, e->mouse.y))
         {
             SORE_Kernel::Event relative = *e;
@@ -233,7 +242,9 @@ namespace SORE_GUI
             }
             return static_cast<unsigned int>(thisSize);
         }
-        else return static_cast<int>(parent->GetClientSize(type)*lSize.GetRelative()) + lSize.GetAbsolute();
+        else
+            return static_cast<int>(parent->GetClientSize(type)*lSize.GetRelative()) +
+                lSize.GetAbsolute();
     }
 
     int Widget::GetPosition(unit_type type) const
@@ -326,5 +337,10 @@ namespace SORE_GUI
     std::string Widget::GetStyle()
     {
         return style;
+    }
+
+    void Widget::SetVisible(bool visible)
+    {
+        isVisible = visible;
     }
 }
