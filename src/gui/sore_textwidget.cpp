@@ -26,13 +26,13 @@ namespace SORE_GUI
                                                  const SORE_Graphics::Color& c, Widget* parent)
         : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h), text(f, h, t, c), color(c)
     {
-        SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
-        UpdateCache();
+        UpdateText(t);
     }
 
     void TextWidget::UpdateText(const std::string& t)
     {
         text.UpdateText(t, color);
+        SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
         UpdateCache();
     }
 
