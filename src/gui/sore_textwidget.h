@@ -27,29 +27,29 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT TextWidget : public Widget
-	{
-	public:
-		TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t, 
-							 const SORE_Graphics::Color& c = SORE_Graphics::White, Widget* parent=NULL);
+    class SORE_EXPORT TextWidget : public Widget
+    {
+    public:
+        TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
+                   const SORE_Graphics::Color& c = SORE_Graphics::White, Widget* parent=NULL);
 
-		void UpdateText(const std::string& t);
-		void SetColor(const SORE_Graphics::Color& c);
-	private:
-		void UpdatePosition();
-		void OnGLReload();
-		SORE_Graphics::render_list GetThisRenderList();
-		bool ProcessEvents(SORE_Kernel::Event* e);
-		void UpdateCache();
+        void UpdateText(const std::string& t);
+        void SetColor(const SORE_Graphics::Color& c);
+    private:
+        void UpdatePosition();
+        void OnGLReload();
+        SORE_Graphics::render_list GetThisRenderList();
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        void UpdateCache();
 
-		SORE_Font::Font& face;
-		unsigned int height;
-		SORE_Graphics::Text text;
-		SORE_Graphics::Color color;
-		std::vector<SORE_Math::Matrix4<float> >transforms;
+        SORE_Font::Font& face;
+        unsigned int height;
+        SORE_Graphics::Text text;
+        SORE_Graphics::Color color;
+        std::vector<SORE_Math::Matrix4<float> >transforms;
 
-		SORE_Graphics::render_list all;
-	};
+        SORE_Graphics::render_list all;
+    };
 }
 
 #endif
