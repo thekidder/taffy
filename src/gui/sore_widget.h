@@ -53,6 +53,8 @@ namespace SORE_GUI
         int GetSize(unit_type type) const;
         int GetPosition(unit_type type) const;
 
+        void SetPosition(const SVec& p);
+
         bool HasFocus() const;
 
         static void SetStyle(std::string style);
@@ -68,7 +70,6 @@ namespace SORE_GUI
         virtual unsigned int GetClientPosition(unit_type type) const {return 0; };
 
         const SVec& GetPosition() const;
-        void SetPosition(const SVec& p);
 
         const SVec& GetSize() const;
         void SetSize(const SVec& s);
