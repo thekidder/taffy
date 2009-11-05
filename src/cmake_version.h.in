@@ -1,0 +1,14 @@
+/*
+ * Creates a header using CMake containing the version information in the root CMakeLists
+ */
+
+#ifndef CMAKE_VERSION_H
+#define CMAKE_VERSION_H
+
+const char*        VERSION_NAME  = "${CPACK_PACKAGE_NAME}";
+
+const unsigned int VERSION_MAJOR = ${CPACK_PACKAGE_VERSION_MAJOR};
+const unsigned int VERSION_MINOR = ${CPACK_PACKAGE_VERSION_MINOR};
+const unsigned int VERSION_PATCH = ${CPACK_PACKAGE_VERSION_PATCH};
+
+#endif

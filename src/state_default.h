@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef STATE_DEFAULT
 #define STATE_DEFAULT
 

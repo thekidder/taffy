@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef  APP_LOG_H
 #define  APP_LOG_H
 
@@ -13,6 +11,14 @@
 
 extern SORE_Logging::Logger* mainLog;
 
-void PrintVersionInfo();
+//version info
+std::string  GetVersionString();
+
+unsigned int GetVersionMajor();
+unsigned int GetVersionMinor();
+unsigned int GetVersionPatch();
+
+std::string  GetVersionName();
+std::string  GetVersionDesc();
 
 #endif //APP_LOG_H
