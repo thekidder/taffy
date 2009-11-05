@@ -1,0 +1,5 @@
+{template} is propriety software by kidawi! games. This software is provided without any warranty.
+
+Some parts of this program are licensed under different terms. See info.txt for more details.
+
+Copyright kidawi! games 2009.

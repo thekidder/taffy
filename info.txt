@@ -1,3 +1,7 @@
+{template} is proprietary software.
+
+This software makes use of third part libraries. The following is a list of all third-party components used.
+
 This software makes use of several third-party libraries:
 Boost (http://www.boost.org/): Licensed under the Boost Software License (boost.txt).
 ENet (http://enet.bespin.org/): Licensed under a liberal license (enet.txt)
