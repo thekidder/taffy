@@ -251,9 +251,6 @@ namespace SORE_FileIO
 
             if(reassignedIDs.find(temp.parentID)!=reassignedIDs.end())
             {
-                ENGINE_LOG_M(SORE_Logging::LVL_DEBUG2,
-                             boost::format("Reassigning parent for %s to %d")
-                             % temp.filename % reassignedIDs[temp.parentID], MODULE_FILEIO);
                 temp.parentID = reassignedIDs[temp.parentID];
             }
 
