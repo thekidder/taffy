@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     APP_LOG(SORE_Logging::LVL_INFO, "DEBUG BUILD");
 #endif
 
-    APP_LOG(SORELogging::LVL_INFO, GetVersionString());
+    APP_LOG(SORE_Logging::LVL_INFO, GetVersionString());
 
     //we need a gamekernel to run all the tasks in
     SORE_Kernel::GameKernel gk;
