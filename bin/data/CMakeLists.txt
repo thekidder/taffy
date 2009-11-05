@@ -5,5 +5,7 @@ ADD_SUBDIRECTORY(Shaders)
 
 #should be in prefix path - installed by SORE
 FIND_FILE(IX_STYLE ix_style.sdp)
+FIND_FILE(DEFAULT_SHADERS default_shaders.sdp)
 
-INSTALL(FILES ${IX_STYLE} DESTINATION .)
+INSTALL(FILES ${IX_STYLE} ${DEFAULT_SHADERS} DESTINATION .)
+INSTALL(FILES app.ico DESTINATION data/)
