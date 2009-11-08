@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "cmake_version.h"
+#include "sore_cmake_version.h"
 #include "sore_logger.h"
 #include "sore_logginginit.h"
 
