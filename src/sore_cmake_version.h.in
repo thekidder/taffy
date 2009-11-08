@@ -5,12 +5,12 @@
 #ifndef CMAKE_VERSION_H
 #define CMAKE_VERSION_H
 
-const char*        VERSION_NAME  = "SORE";
+const char*        SORE_VERSION_NAME  = "SORE";
 
-const unsigned int VERSION_MAJOR  = ${VERSION_MAJOR};
-const unsigned int VERSION_MINOR  = ${VERSION_MINOR};
-const unsigned int VERSION_PATCH  = ${VERSION_PATCH};
+const unsigned int SORE_VERSION_MAJOR  = ${VERSION_MAJOR};
+const unsigned int SORE_VERSION_MINOR  = ${VERSION_MINOR};
+const unsigned int SORE_VERSION_PATCH  = ${VERSION_PATCH};
 
-const char*        VERSION_BRANCH = "${VERSION_BRANCH}";
+const char*        SORE_VERSION_BRANCH = "${VERSION_BRANCH}";
 
 #endif

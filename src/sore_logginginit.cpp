@@ -28,6 +28,7 @@ namespace SORE_Logging
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO,
                    boost::format("%s version %d.%d.%d (%s)")
-                   % VERSION_NAME % VERSION_MAJOR % VERSION_MINOR % VERSION_PATCH % VERSION_BRANCH);
+                   % SORE_VERSION_NAME % SORE_VERSION_MAJOR % SORE_VERSION_MINOR %
+                   SORE_VERSION_PATCH % SORE_VERSION_BRANCH);
     }
 }
