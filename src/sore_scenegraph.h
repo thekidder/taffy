@@ -29,21 +29,21 @@
 
 namespace SORE_Graphics
 {
-  class SORE_EXPORT SceneGraph
-  {
-  public:
-    SceneGraph();
-    ~SceneGraph();
-		
-		node_list::iterator AddNode(GeometryChunk* gc = NULL, 
-																SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+    class SORE_EXPORT SceneGraph
+    {
+    public:
+        SceneGraph();
+        ~SceneGraph();
 
-		SceneNode& GetParent();
-		
-    render_list GetRenderList();
-  protected:
-  private:
-    SceneNode* parent;
-  };
+        node_list::iterator AddNode(GeometryChunk* gc = NULL,
+                                    SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+
+        SceneNode& GetParent();
+
+        render_list GetRenderList();
+    protected:
+    private:
+        SceneNode* parent;
+    };
 }
 #endif

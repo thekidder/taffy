@@ -23,103 +23,103 @@
 
 namespace SORE_Graphics
 {
-	SceneNode::SceneNode(GeometryChunk* g) : geometry(g)
-	{
-	}
+    SceneNode::SceneNode(GeometryChunk* g) : geometry(g)
+    {
+    }
 
-	SceneNode::~SceneNode()
-	{
-	}
+    SceneNode::~SceneNode()
+    {
+    }
 
-	void SceneNode::RemoveChild(node_list::iterator it)
-	{
-		SceneNode* s = *it;
-		delete s;
-		*it = 0;
-		children.erase(it);
-	}
+    void SceneNode::RemoveChild(node_list::iterator it)
+    {
+        SceneNode* s = *it;
+        delete s;
+        *it = 0;
+        children.erase(it);
+    }
 
-	const GeometryChunk * SceneNode::GetChunk() const
-	{
-		return geometry;
-	}
+    const GeometryChunk * SceneNode::GetChunk() const
+    {
+        return geometry;
+    }
 
-	const node_list & SceneNode::GetChildren() const
-	{
-		return children;
-	}
+    const node_list & SceneNode::GetChildren() const
+    {
+        return children;
+    }
 
-	const SORE_Math::Matrix4< float > & SceneNode::GetTransform() const
-	{
-		return mat;
-	}
+    const SORE_Math::Matrix4< float > & SceneNode::GetTransform() const
+    {
+        return mat;
+    }
 
-	void SceneNode::SetGeometry(GeometryChunk* g)
-	{
-		geometry = g;
-	}
+    void SceneNode::SetGeometry(GeometryChunk* g)
+    {
+        geometry = g;
+    }
 
-	void SceneNode::Translate(float x, float y, float z)
-	{
-		mat.Translate(x, y, z);
-		InvalidateCache();
-	}
+    void SceneNode::Translate(float x, float y, float z)
+    {
+        mat.Translate(x, y, z);
+        InvalidateCache();
+    }
 
-	void SceneNode::Rotate(float rad, unsigned int axis)
-	{
-		mat.Rotate(rad, axis);
-		InvalidateCache();
-	}
+    void SceneNode::Rotate(float rad, unsigned int axis)
+    {
+        mat.Rotate(rad, axis);
+        InvalidateCache();
+    }
 
-	void SceneNode::SetIdentity()
-	{
-		mat.SetIdentity();
-		InvalidateCache();
-	}
+    void SceneNode::SetIdentity()
+    {
+        mat.SetIdentity();
+        InvalidateCache();
+    }
 
-	node_list::iterator SceneNode::AddChild(GeometryChunk* gc, SORE_Math::Vector3<float> pos)
-	{
-		SceneNode* c = new SceneNode(gc);
-		c->Translate(pos[0], pos[1], pos[2]);
-		return children.insert(children.end(), c);
-	}
+    node_list::iterator SceneNode::AddChild(GeometryChunk* gc, SORE_Math::Vector3<float> pos)
+    {
+        SceneNode* c = new SceneNode(gc);
+        c->Translate(pos[0], pos[1], pos[2]);
+        return children.insert(children.end(), c);
+    }
 
-	void SceneNode::InvalidateCache()
-	{
-		cacheUpdated = false;
-		for(node_list::iterator it=children.begin();it!=children.end();++it)
-			(*it)->InvalidateCache();
-	}
+    void SceneNode::InvalidateCache()
+    {
+        cacheUpdated = false;
+        for(node_list::iterator it=children.begin();it!=children.end();++it)
+            (*it)->InvalidateCache();
+    }
 
-	void SceneNode::UpdateCache(SceneNode* parent)
-  {
-		if(!cacheUpdated)
-		{
-			if(parent)
-			{
-				if(!parent->cacheUpdated)
-					ENGINE_LOG(SORE_Logging::LVL_WARNING, 
-										 "Trying to update node with out-of-date parent");
-				
-				cachedAbsoluteTransform = parent->cachedAbsoluteTransform * mat;
-			}
-			else
-			{
-				cachedAbsoluteTransform = mat;
-			}
-			cacheUpdated = true;
-		}
-		for(node_list::iterator it=children.begin();it!=children.end();++it)
-			(*it)->UpdateCache(this);
-	}
+    void SceneNode::UpdateCache(SceneNode* parent)
+    {
+        if(!cacheUpdated)
+        {
+            if(parent)
+            {
+                if(!parent->cacheUpdated)
+                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                               "Trying to update node with out-of-date parent");
 
-	void SceneNode::AddToRenderList(render_list & list)
-	{
-		if(geometry)
-		{
-			list.push_back(std::make_pair(&cachedAbsoluteTransform, geometry));
-		}
-		for(node_list::iterator it=children.begin();it!=children.end();++it)
-			(*it)->AddToRenderList(list);
-	}
+                cachedAbsoluteTransform = parent->cachedAbsoluteTransform * mat;
+            }
+            else
+            {
+                cachedAbsoluteTransform = mat;
+            }
+            cacheUpdated = true;
+        }
+        for(node_list::iterator it=children.begin();it!=children.end();++it)
+            (*it)->UpdateCache(this);
+    }
+
+    void SceneNode::AddToRenderList(render_list & list)
+    {
+        if(geometry)
+        {
+            list.push_back(std::make_pair(&cachedAbsoluteTransform, geometry));
+        }
+        for(node_list::iterator it=children.begin();it!=children.end();++it)
+            (*it)->AddToRenderList(list);
+    }
 }

@@ -33,46 +33,46 @@
 
 namespace SORE_Graphics
 {
-	class SORE_EXPORT SceneNode;
+    class SORE_EXPORT SceneNode;
 
-	typedef std::list<SceneNode*> node_list;
+    typedef std::list<SceneNode*> node_list;
 
-  /**
-     @author Adam Kidder <thekidder@gmail.com>
-  */
-  class SORE_EXPORT SceneNode
-  {
-  public:
-    SceneNode(GeometryChunk* g = NULL);
-    ~SceneNode();
-		
-    const GeometryChunk* GetChunk() const;
-    const node_list& GetChildren() const;
-		node_list::iterator AddChild(GeometryChunk* gc = NULL, 
-																 SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
-		void RemoveChild(node_list::iterator it);
+    /**
+       @author Adam Kidder <thekidder@gmail.com>
+    */
+    class SORE_EXPORT SceneNode
+    {
+    public:
+        SceneNode(GeometryChunk* g = NULL);
+        ~SceneNode();
 
-    const SORE_Math::Matrix4<float>& GetTransform() const;
-		
-		void SetGeometry(GeometryChunk* g);
+        const GeometryChunk* GetChunk() const;
+        const node_list& GetChildren() const;
+        node_list::iterator AddChild(GeometryChunk* gc = NULL,
+                                     SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+        void RemoveChild(node_list::iterator it);
 
-    void Translate(float x, float y, float z);
-    void Rotate(float rad, unsigned int axis);
-		void SetIdentity();
-		
-    void UpdateCache(SceneNode* parent);
-    void AddToRenderList(render_list& list);
-  protected:
-    void InvalidateCache();
-  private:
-    GeometryChunk* geometry;
-    node_list children;
-		
-    //transformations
-    SORE_Math::Matrix4<float> mat;
-    SORE_Math::Matrix4<float> cachedAbsoluteTransform;
-    bool cacheUpdated;
-  };
+        const SORE_Math::Matrix4<float>& GetTransform() const;
+
+        void SetGeometry(GeometryChunk* g);
+
+        void Translate(float x, float y, float z);
+        void Rotate(float rad, unsigned int axis);
+        void SetIdentity();
+
+        void UpdateCache(SceneNode* parent);
+        void AddToRenderList(render_list& list);
+    protected:
+        void InvalidateCache();
+    private:
+        GeometryChunk* geometry;
+        node_list children;
+
+        //transformations
+        SORE_Math::Matrix4<float> mat;
+        SORE_Math::Matrix4<float> cachedAbsoluteTransform;
+        bool cacheUpdated;
+    };
 }
 
 #ifdef _MSC_VER
