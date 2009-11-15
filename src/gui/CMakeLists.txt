@@ -9,7 +9,7 @@ set(SORE_GUI_SRCS gui/sore_button.cpp gui/sore_dropdown.cpp
 
 set(SORE_GUI_HEADERS gui/sore_button.h
   gui/sore_dropdown.h gui/sore_framewidget.h gui/sore_framewindow.h
-  gui/sore_renderstats.g gui/sore_sliderwidget.h gui/sore_textfield.h
+  gui/sore_renderstats.h gui/sore_sliderwidget.h gui/sore_textfield.h
   gui/sore_textwidget.h gui/sore_topwidget.h gui/sore_widget.h
   gui/sore_units.h 
   PARENT_SCOPE)
