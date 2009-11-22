@@ -228,9 +228,14 @@ namespace SORE_Graphics
         LoadFromData(data, internalFormat, format, width, height);
     }
 
-    GLuint Texture2D::GetHandle() const
+    bool Texture2D::operator<(const Texture2D& o) const
     {
-        return handle;
+        return handle < o.handle;
+    }
+
+    bool Texture2D::operator==(const Texture2D& o) const
+    {
+        return handle == o.handle;
     }
 
     void Texture2D::Bind() const
@@ -244,4 +249,8 @@ namespace SORE_Graphics
         handle = 0;
     }
 
+    bool operator!=(const Texture2D& one, const Texture2D& two)
+    {
+        return !(one == two);
+    }
 }

@@ -32,12 +32,14 @@ namespace SORE_Graphics
         Texture2D(std::string filename, SORE_FileIO::PackageCache* pc = NULL);
         Texture2D(const unsigned char* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
-        GLuint GetHandle() const;
         void Bind() const;
         const char* Type() const {return "2D texture";}
 
         void SaveTGA(const char* filename);
         bool GLContextDependent() const {return true;}
+
+        bool operator<(const Texture2D& o) const;
+        bool operator==(const Texture2D& o) const;
     protected:
         void Load();
         void LoadTGA(const char* filename);
@@ -49,6 +51,8 @@ namespace SORE_Graphics
     private:
         unsigned int w, h;
     };
+
+    bool operator!=(const Texture2D& one, const Texture2D& two);
 }
 
 #endif

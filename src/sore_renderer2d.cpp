@@ -172,26 +172,30 @@ namespace SORE_Graphics
                 render_list::iterator it;
                 for(it=geometry.begin();it!=geometry.end();++it)
                 {
-                    newBatch.second->AddObject(it->second->Vertices(), it->second->Indices(),
-                        it->second->NumVertices(), it->second->NumIndices(),
-                        it->first, it->second->TexCoords(), NULL,
-                        it->second->Colors());
+                    newBatch.second->AddObject(it->second->Vertices(),
+                                               it->second->Indices(),
+                                               it->second->NumVertices(),
+                                               it->second->NumIndices(),
+                                               it->first, it->second->TexCoords(),
+                                               NULL,
+                                               it->second->Colors());
                     if(!newBatch.first.size() ||
-                       newBatch.first.back().tex->GetHandle() !=
-                       it->second->GetTexture()->GetHandle())
+                       *(newBatch.first.back().tex) != *(it->second->GetTexture()))
                     {
                         if(newBatch.first.size()>0)
                         {
                             newBatch.first.back().triLen = numIndices/3;
                         }
-                        newBatch.first.push_back(
-                            vbo_tex_order(it->second->GetTexture(), totalIndices/3, 0));
+                        newBatch.first.push_back
+                            (vbo_tex_order(it->second->GetTexture(),
+                                           totalIndices/3, 0));
                         numIndices = 0;
                     }
                     numIndices+=it->second->NumIndices();
                     totalIndices+=it->second->NumIndices();
                 }
-                newBatch.first.back().triLen = totalIndices/3 - newBatch.first.back().triStart;
+                newBatch.first.back().triLen =
+                    totalIndices/3 - newBatch.first.back().triStart;
             }
             batches.push_back(newBatch);
             batches.back().second->Build();
@@ -320,9 +324,9 @@ namespace SORE_Graphics
 
     inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two)
     {
-        if(one->GetTexture()->GetHandle() < two->GetTexture()->GetHandle())
+        if(*one->GetTexture() < *two->GetTexture())
             return SORT_LESS;
-        else if(one->GetTexture() == two->GetTexture()) return SORT_EQUAL;
+        else if(*one->GetTexture() == *two->GetTexture()) return SORT_EQUAL;
         else return SORT_GREATER;
     }
 
