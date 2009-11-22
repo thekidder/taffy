@@ -24,27 +24,30 @@
 
 namespace SORE_Graphics
 {
-	ExplosionParticle::ExplosionParticle(SORE_Math::Matrix4<float> initial, const Color& c, SORE_Resource::Texture2D* tex) : Particle(initial, c), alpha(c.GetColor()[3])
-	{
-		angle = SORE_Utility::getRandomMinMax(0.0f, 2.0f*static_cast<float>(M_PI));
-		alphaSpeed = SORE_Utility::getRandomMinMax(-0.00005f, 0.00005f) + 0.0003f;
-		speed = SORE_Utility::getRandomMinMax(-0.0015f, 0.0015f) + 0.01f;
-		transform *= SORE_Math::Matrix4<float>::GetScale(1.0f/20.0f, 1.0f/20.0f, 0.0f);
-		transform *= SORE_Math::Matrix4<float>::GetRotation(angle, SORE_Math::AXIS_Z);
-		SORE_Math::Rect<float> bounds(-6.0f, 6.0f, -1.5f, 1.5f);
+    ExplosionParticle::ExplosionParticle(SORE_Math::Matrix4<float> initial,
+                                         const Color& c, SORE_Graphics::Texture2D* tex)
+        : Particle(initial, c), alpha(c.GetColor()[3])
+    {
+        angle = SORE_Utility::getRandomMinMax(0.0f, 2.0f*static_cast<float>(M_PI));
+        alphaSpeed = SORE_Utility::getRandomMinMax(-0.00005f, 0.00005f) + 0.0003f;
+        speed = SORE_Utility::getRandomMinMax(-0.0015f, 0.0015f) + 0.01f;
+        transform *= SORE_Math::Matrix4<float>::GetScale(1.0f/20.0f, 1.0f/20.0f, 0.0f);
+        transform *= SORE_Math::Matrix4<float>::GetRotation(angle, SORE_Math::AXIS_Z);
+        SORE_Math::Rect<float> bounds(-6.0f, 6.0f, -1.5f, 1.5f);
 
-		gc = new GeometryChunk(tex, bounds, defaultTexCoords, color);
-	}
+        gc = new GeometryChunk(tex, bounds, defaultTexCoords, color);
+    }
 
-	bool ExplosionParticle::IsActive() const
-	{
-		return alpha > 0.0f;
-	}
+    bool ExplosionParticle::IsActive() const
+    {
+        return alpha > 0.0f;
+    }
 
-	void ExplosionParticle::Frame(int elapsed)
-	{
-		transform *= SORE_Math::Matrix4<float>::GetTranslation(elapsed*speed, 0.0f, 0.0f);
-		alpha -= alphaSpeed * elapsed;
-		gc->SetColor(gc->GetColor() - Color(0.0f, 0.0f, 0.0f, alphaSpeed * elapsed));
-	}
+    void ExplosionParticle::Frame(int elapsed)
+    {
+        transform *=
+            SORE_Math::Matrix4<float>::GetTranslation(elapsed*speed, 0.0f, 0.0f);
+        alpha -= alphaSpeed * elapsed;
+        gc->SetColor(gc->GetColor() - Color(0.0f, 0.0f, 0.0f, alphaSpeed * elapsed));
+    }
 }

@@ -58,14 +58,15 @@ namespace SORE_GUI
             break;
         }
         default:
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unknown sizing mode selected for FrameWidget");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Unknown sizing mode selected for FrameWidget");
             break;
         };
         DestroyGeometry();
         BuildGeometry();
     }
 
-    void FrameWidget::SetTexture(SORE_Resource::Texture2D* tex)
+    void FrameWidget::SetTexture(SORE_Graphics::Texture2D* tex)
     {
         texture = tex;
         for(unsigned int i=0;i<9;++i)
@@ -97,9 +98,9 @@ namespace SORE_GUI
         {
             //center
             bounds = SORE_Math::Rect<float>(static_cast<float>(leftBorder),
-                static_cast<float>(width - leftBorder),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
+                                            static_cast<float>(width - leftBorder),
+                                            static_cast<float>(topBorder),
+                                            static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.25f, 0.75f);
 
             chunk[0] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -109,9 +110,9 @@ namespace SORE_GUI
         {
             //left border
             bounds = SORE_Math::Rect<float>(0.0f,
-                static_cast<float>(leftBorder),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
+                                            static_cast<float>(leftBorder),
+                                            static_cast<float>(topBorder),
+                                            static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.25f, 0.75f);
 
             chunk[1] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -121,8 +122,8 @@ namespace SORE_GUI
         {
             //top left corner
             bounds = SORE_Math::Rect<float>(0.0f,
-                static_cast<float>(leftBorder), 0.0f,
-                static_cast<float>(topBorder));
+                                            static_cast<float>(leftBorder), 0.0f,
+                                            static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.0f, 0.25f);
 
             chunk[2] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -132,8 +133,8 @@ namespace SORE_GUI
         {
             //top border
             bounds = SORE_Math::Rect<float>(static_cast<float>(leftBorder),
-                static_cast<float>(width - rightBorder), 0.0f,
-                static_cast<float>(topBorder));
+                                            static_cast<float>(width - rightBorder), 0.0f,
+                                            static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.0f, 0.25f);
 
             chunk[3] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -143,8 +144,8 @@ namespace SORE_GUI
         {
             //top right corner
             bounds = SORE_Math::Rect<float>(static_cast<float>(width - rightBorder),
-                static_cast<float>(width), 0.0f,
-                static_cast<float>(topBorder));
+                                            static_cast<float>(width), 0.0f,
+                                            static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.0f, 0.25f);
 
             chunk[4] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -154,9 +155,9 @@ namespace SORE_GUI
         {
             //right border
             bounds = SORE_Math::Rect<float>(static_cast<float>(width - rightBorder),
-                static_cast<float>(width),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
+                                            static_cast<float>(width),
+                                            static_cast<float>(topBorder),
+                                            static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.25f, 0.75f);
 
             chunk[5] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -179,9 +180,9 @@ namespace SORE_GUI
         {
             //bottom border
             bounds = SORE_Math::Rect<float>(static_cast<float>(leftBorder),
-                static_cast<float>(width - rightBorder),
-                static_cast<float>(height - bottomBorder),
-                static_cast<float>(height));
+                                            static_cast<float>(width - rightBorder),
+                                            static_cast<float>(height - bottomBorder),
+                                            static_cast<float>(height));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.75f, 1.0f);
 
             chunk[7] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);
@@ -191,9 +192,9 @@ namespace SORE_GUI
         {
             //bottom left corner
             bounds = SORE_Math::Rect<float>(0.0f,
-                static_cast<float>(leftBorder),
-                static_cast<float>(height - bottomBorder),
-                static_cast<float>(height));
+                                            static_cast<float>(leftBorder),
+                                            static_cast<float>(height - bottomBorder),
+                                            static_cast<float>(height));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.75f, 1.0f);
 
             chunk[8] = new SORE_Graphics::GeometryChunk(texture, bounds, texCoords);

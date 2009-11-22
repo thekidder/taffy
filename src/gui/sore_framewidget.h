@@ -25,32 +25,32 @@
 
 namespace SORE_GUI
 {
-	enum size_mode {SCALE_ALL, SCALE_CENTER};
+    enum size_mode {SCALE_ALL, SCALE_CENTER};
 
-	class SORE_EXPORT FrameWidget : public Widget
-	{
-	public:
-		FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);
-		~FrameWidget();
-	protected:
-		void SetBorderSizes(float l, float r, float t, float b);
-		void SetTexture(SORE_Resource::Texture2D* tex);
+    class SORE_EXPORT FrameWidget : public Widget
+    {
+    public:
+        FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);
+        ~FrameWidget();
+    protected:
+        void SetBorderSizes(float l, float r, float t, float b);
+        void SetTexture(SORE_Graphics::Texture2D* tex);
 
-		std::vector<SORE_Graphics::GeometryChunk*> GetChunks() const;
-	private:
-		virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
-		virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        std::vector<SORE_Graphics::GeometryChunk*> GetChunks() const;
+    private:
+        virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
+        virtual SORE_Graphics::render_list GetThisRenderList() = 0;
 
-		void BuildGeometry();
-		void DestroyGeometry();
+        void BuildGeometry();
+        void DestroyGeometry();
 
-		size_mode mode;
+        size_mode mode;
 
-		SORE_Resource::Texture2D* texture;
+        SORE_Graphics::Texture2D* texture;
 
-		SORE_Graphics::GeometryChunk* chunk[9];
-		unsigned int leftBorder, rightBorder, topBorder, bottomBorder;
-	};
+        SORE_Graphics::GeometryChunk* chunk[9];
+        unsigned int leftBorder, rightBorder, topBorder, bottomBorder;
+    };
 }
 
 #endif

@@ -25,17 +25,18 @@
 
 namespace SORE_Graphics
 {
-	class SORE_EXPORT CircleParticle : public Particle
-	{
-	public:
-		CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c, SORE_Resource::Texture2D* tex);
+    class SORE_EXPORT CircleParticle : public Particle
+    {
+    public:
+        CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c,
+                       SORE_Graphics::Texture2D* tex);
 
-		bool IsActive() const;
-		void Frame(int elapsed);
+        bool IsActive() const;
+        void Frame(int elapsed);
 
-	private:
-		float alpha;
-	};
+    private:
+        float alpha;
+    };
 }
 
 #endif

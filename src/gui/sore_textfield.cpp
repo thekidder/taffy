@@ -25,15 +25,17 @@
 
 namespace SORE_GUI
 {
-    TextField::TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par)
-        : FrameWidget(s, p, SCALE_CENTER, par), text(""), font(0), displayText(0), texture(0),
+    TextField::TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool,
+                         Widget* par)
+        : FrameWidget(s, p, SCALE_CENTER, par), text(""), font(0), displayText(0),
+          texture(0),
           caret(0), caretTex(0), pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        texture = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "textfield.tga");
-        caretTex = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "caret.tga");
+        texture = pool.GetResource<SORE_Graphics::Texture2D>(styleDir+"textfield.tga");
+        caretTex = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "caret.tga");
 
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(texture);
@@ -41,13 +43,16 @@ namespace SORE_GUI
         float height = GetSize(VERTICAL) - 16.0f;
         caretWidth = static_cast<unsigned int>(height/16.0f);
 
-        caret = new SORE_Graphics::GeometryChunk(caretTex, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth, 8.0f, 8.0f+height));
+        caret = new SORE_Graphics::GeometryChunk
+            (caretTex, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth,
+                                              8.0f, 8.0f+height));
 
         caretEnd = SORE_Timing::GetGlobalTicks();
 
         unsigned int textHeight = GetSize(VERTICAL) - 16;
 
-        font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
+        font = pool.GetResource<SORE_Font::Font>(styleDir +
+                                                 "LiberationSans-Regular.ttf");
         displayText = new SORE_Graphics::Text(*font, textHeight, text);
 
         UpdateText(0);
@@ -197,8 +202,12 @@ namespace SORE_GUI
 
     void TextField::UpdatePosition()
     {
-        displayText->SetTransform(GetPositionMatrix() *
-                                                            SORE_Math::Matrix4<float>::GetTranslation(8.0f, 8.0f, GetLayer() + LAYER_SEPARATION/2.0f));
-        caretMat = GetPositionMatrix() * SORE_Math::Matrix4<float>::GetTranslation(static_cast<float>(caretPos), 0.0f, GetLayer() + LAYER_SEPARATION/2.0f);
+        displayText->SetTransform
+            (GetPositionMatrix() *
+             SORE_Math::Matrix4<float>::GetTranslation(8.0f, 8.0f, GetLayer() +
+                                                       LAYER_SEPARATION/2.0f));
+        caretMat = GetPositionMatrix() *
+            SORE_Math::Matrix4<float>::GetTranslation
+            (static_cast<float>(caretPos), 0.0f, GetLayer() + LAYER_SEPARATION/2.0f);
     }
 }

@@ -39,43 +39,44 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT Dropdown : public FrameWidget
-	{
-	public:
-		Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-		~Dropdown();
+    class SORE_EXPORT Dropdown : public FrameWidget
+    {
+    public:
+        Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        ~Dropdown();
 
-		//add a new choice or update the one specified by id
-		void UpdateChoice(unsigned int id, std::string text, bool selected = false);
-		void ConnectChange(boost::function<void (unsigned int)> c);
-	private:
-		void OnGLReload();
-		virtual SORE_Graphics::render_list GetThisRenderList();
-		bool ProcessEvents(SORE_Kernel::Event* e);
-		void UpdatePosition();
-		void FocusLost();
-		void BuildGeometry();
-		void ChangeTexture();
-		unsigned int OrderToID(unsigned int order);
-		void SetCurrent(SORE_Graphics::Text* t);
+        //add a new choice or update the one specified by id
+        void UpdateChoice(unsigned int id, std::string text, bool selected = false);
+        void ConnectChange(boost::function<void (unsigned int)> c);
+    private:
+        void OnGLReload();
+        virtual SORE_Graphics::render_list GetThisRenderList();
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        void UpdatePosition();
+        void FocusLost();
+        void BuildGeometry();
+        void ChangeTexture();
+        unsigned int OrderToID(unsigned int order);
+        void SetCurrent(SORE_Graphics::Text* t);
 
-		SVec originalSize;
+        SVec originalSize;
 
-		SORE_Font::Font* font;
-		unsigned int textHeight;
-		SORE_Resource::Texture2D* normal, *active, *hover, *arrow, *menuBg;
-		SORE_Math::Matrix4<float> arrowMat;
-		SORE_Graphics::GeometryChunk* arrowChunk;
+        SORE_Font::Font* font;
+        unsigned int textHeight;
+        SORE_Graphics::Texture2D* normal, *active, *hover, *arrow, *menuBg;
+        SORE_Math::Matrix4<float> arrowMat;
+        SORE_Graphics::GeometryChunk* arrowChunk;
 
-		std::map<unsigned int, SORE_Graphics::Text*> choices;
-		SORE_Graphics::Text* curChoice;
-		std::vector<std::pair<SORE_Math::Matrix4<float>, SORE_Graphics::GeometryChunk*> > menu;
+        std::map<unsigned int, SORE_Graphics::Text*> choices;
+        SORE_Graphics::Text* curChoice;
+        std::vector<std::pair<SORE_Math::Matrix4<float>,
+            SORE_Graphics::GeometryChunk*> > menu;
 
-		boost::signal<void (unsigned int)> onChange;
+        boost::signal<void (unsigned int)> onChange;
 
-		bool pressed;
-		bool inArea;
-	};
+        bool pressed;
+        bool inArea;
+    };
 }
 
 #ifdef _MSC_VER

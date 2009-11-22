@@ -48,7 +48,7 @@ namespace SORE_Graphics
         bool useShader;
         virtual std::string ProcessFilename(std::string file) {return file;}
         std::string file;
-        std::map<std::string, std::pair<int, SORE_Resource::Texture2D*> > textureMap;
+        std::map<std::string, std::pair<int, SORE_Graphics::Texture2D*> > textureMap;
         std::vector<std::string> textureOrder;
         std::vector<std::string> flags;
     };

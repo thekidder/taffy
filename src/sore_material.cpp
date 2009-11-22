@@ -61,7 +61,8 @@ namespace SORE_Graphics
                 }
                 else if(section=="Textures")
                 {
-                    SORE_Resource::Texture2D* tex = rm->GetResource<SORE_Resource::Texture2D>(value);
+                    SORE_Graphics::Texture2D* tex =
+                        rm->GetResource<SORE_Graphics::Texture2D>(value);
                     if(tex!=NULL)
                     {
                         textureMap[name].second = tex;
@@ -74,11 +75,13 @@ namespace SORE_Graphics
                         if(rm)
                             shader = rm->GetResource<GLSLShader>(value);
                         else
-                            ENGINE_LOG(SORE_Logging::LVL_ERROR, "No resource manager set");
+                            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                                       "No resource manager set");
                     }
                     else if(name=="use_shader")
                     {
-                        std::transform(value.begin(),value.end(),value.begin(),::tolower);
+                        std::transform(value.begin(), value.end(),
+                                       value.begin(), ::tolower);
 
                         try
                         {
@@ -86,8 +89,8 @@ namespace SORE_Graphics
                             else if(value == "false")
                             {
                                 ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                                           "Not using shader: dropping back to incomplete FFP "
-                                           "pipeline");
+                                           "Not using shader: dropping back to"
+                                           " incomplete FF pipeline");
                                 useShader = false;
                             }
                             else useShader = boost::lexical_cast<bool>(value);
@@ -98,9 +101,11 @@ namespace SORE_Graphics
                         }
                         if(useShader && !GLSLShader::ShadersSupported())
                         {
-                            ENGINE_LOG(SORE_Logging::LVL_WARNING, "GLSL Shaders not supported");
-                            ENGINE_LOG(SORE_Logging::LVL_WARNING, "Not using shader: dropping back "
-                                       "to incomplete FFP pipeline");
+                            ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                                       "GLSL Shaders not supported");
+                            ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                                       "Not using shader: dropping back "
+                                       "to incomplete FF pipeline");
                             useShader = false;
                         }
                     }
@@ -128,14 +133,15 @@ namespace SORE_Graphics
                 else
                 {
                     ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                               boost::format("Invalid material heading: %s") % section);
+                               boost::format("Invalid material heading: %s") %section);
                 }
             }
         }
         GLenum error;
         while((error=glGetError())!=GL_NO_ERROR)
         {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Material: GL Error: %d") % error);
+            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
+                       boost::format("Material: GL Error: %d") % error);
         }
     }
 
@@ -148,11 +154,13 @@ namespace SORE_Graphics
         for(size_t i=0;i<textureOrder.size();i++)
         {
             if(( (GLSLShader::ShadersSupported() && shader && useShader) ||
-                 textureMap[textureOrder[i]].first!=-1) && textureMap[textureOrder[i]].second!=NULL)
+                 textureMap[textureOrder[i]].first!=-1) &&
+               textureMap[textureOrder[i]].second!=NULL)
             {
                 glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(i));
                 textureMap[textureOrder[i]].second->Bind();
-                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, textureMap[textureOrder[i]].first);
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+                          textureMap[textureOrder[i]].first);
                 if(shader && useShader)
                     shader->SetUniform1i(textureOrder[i], static_cast<GLuint>(i));
             }

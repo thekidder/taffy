@@ -25,7 +25,7 @@
 
 namespace SORE_Graphics
 {
-    GeometryChunk::GeometryChunk(SORE_Resource::Texture2D* texture,
+    GeometryChunk::GeometryChunk(SORE_Graphics::Texture2D* texture,
                                  SORE_Math::Rect<float> bounds,
                                  SORE_Math::Rect<float> texCoords,
                                  const Color& color)
@@ -183,12 +183,12 @@ namespace SORE_Graphics
         return numIndices;
     }
 
-    const SORE_Resource::Texture2D* GeometryChunk::GetTexture() const
+    const SORE_Graphics::Texture2D* GeometryChunk::GetTexture() const
     {
         return tex;
     }
 
-    void GeometryChunk::SetTexture(SORE_Resource::Texture2D* texture)
+    void GeometryChunk::SetTexture(SORE_Graphics::Texture2D* texture)
     {
         tex = texture;
     }

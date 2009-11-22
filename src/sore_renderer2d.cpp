@@ -320,13 +320,24 @@ namespace SORE_Graphics
 
     inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two)
     {
-        if(one->GetTexture()->GetHandle() < two->GetTexture()->GetHandle()) return SORT_LESS;
+        if(one->GetTexture()->GetHandle() < two->GetTexture()->GetHandle())
+            return SORT_LESS;
         else if(one->GetTexture() == two->GetTexture()) return SORT_EQUAL;
         else return SORT_GREATER;
     }
 
-    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one,
-                      std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two)
+    inline int ShaderSort(const GeometryChunk* one, const GeometryChunk* two)
+    {
+        //if(one->GetShader()->GetHandle() < two->GetShader()->GetHandle())
+            return SORT_LESS;
+            //else if(one->GetShader() == two->GetShader()) return SORT_EQUAL;
+            //else return SORT_GREATER;
+    }
+
+    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*,
+                      const GeometryChunk*> one,
+                      std::pair<const SORE_Math::Matrix4<float>*,
+                      const GeometryChunk*> two)
     {
         if( !one.second->IsOpaque() && two.second->IsOpaque()) return true;
         if( !two.second->IsOpaque() && one.second->IsOpaque()) return false;
@@ -337,6 +348,7 @@ namespace SORE_Graphics
             else if(two.first->GetData()[14] < one.first->GetData()[14])
                 return false;
         }
+        //if(ShaderSort(one.second, two.second) == SORT_LESS) return true;
         if(TextureSort(one.second, two.second) == SORT_LESS) return true;
         return false;
     }

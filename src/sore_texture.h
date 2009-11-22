@@ -24,9 +24,9 @@
 #include "sore_resource.h"
 #include "sore_allgl.h"
 
-namespace SORE_Resource
+namespace SORE_Graphics
 {
-    class SORE_EXPORT Texture2D : public Resource
+    class SORE_EXPORT Texture2D : public SORE_Resource::Resource
     {
     public:
         Texture2D(std::string filename, SORE_FileIO::PackageCache* pc = NULL);

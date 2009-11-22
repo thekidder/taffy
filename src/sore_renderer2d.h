@@ -46,9 +46,9 @@ namespace SORE_Graphics
 
     struct vbo_tex_order
     {
-        vbo_tex_order(const SORE_Resource::Texture2D* t, unsigned int s, unsigned int l)
+        vbo_tex_order(const SORE_Graphics::Texture2D* t, unsigned s, unsigned l)
             : tex(t), triStart(s), triLen(l) {}
-        const SORE_Resource::Texture2D* tex;
+        const SORE_Graphics::Texture2D* tex;
         unsigned int triStart;
         unsigned int triLen;
     };

@@ -37,28 +37,28 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT Button : public FrameWidget
-	{
-	public:
-		Button(SVec s, SVec p, const std::string& text,
-					 SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-		~Button();
+    class SORE_EXPORT Button : public FrameWidget
+    {
+    public:
+        Button(SVec s, SVec p, const std::string& text,
+                     SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        ~Button();
 
-		void ConnectPressed(boost::function<void ()> c);
-	private:
-		virtual SORE_Graphics::render_list GetThisRenderList();
-		bool ProcessEvents(SORE_Kernel::Event* e);
-		void UpdatePosition();
+        void ConnectPressed(boost::function<void ()> c);
+    private:
+        virtual SORE_Graphics::render_list GetThisRenderList();
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        void UpdatePosition();
 
-		SORE_Font::Font* font;
-		SORE_Graphics::Text* t;
-		SORE_Resource::Texture2D* normal, *active, *hover;
+        SORE_Font::Font* font;
+        SORE_Graphics::Text* t;
+        SORE_Graphics::Texture2D* normal, *active, *hover;
 
-		boost::signal<void ()> onRelease;
+        boost::signal<void ()> onRelease;
 
-		bool pressed;
-		bool inArea;
-	};
+        bool pressed;
+        bool inArea;
+    };
 }
 
 #ifdef _MSC_VER

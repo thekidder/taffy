@@ -112,7 +112,8 @@ namespace SORE_Font
             return;
         }
 
-        if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size), 0, &face ))!=0)
+        if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size),
+                                     0, &face ))!=0)
         {
             FT_Done_FreeType(library);
             ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
@@ -131,7 +132,8 @@ namespace SORE_Font
         int err;
         if((err = FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), mode ) ))
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error loading '%c' (error %d)")
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Error loading '%c' (error %d)")
                        % ch % err);
             //return;
         }
@@ -164,13 +166,13 @@ namespace SORE_Font
         unsigned int index = static_cast<unsigned int>(ch);
         if(x != 0 && y != 0)
         {
-            c[index].tex = new SORE_Resource::Texture2D(expanded_data, GL_RGBA,
-                                                        GL_LUMINANCE_ALPHA, width, height);
-            //c[index].tex = rm->GetResource<SORE_Resource::Texture2D>("data/Textures/missing.tga");
+            c[index].tex = new SORE_Graphics::Texture2D
+                (expanded_data, GL_RGBA, GL_LUMINANCE_ALPHA, width, height);
 
             c[index].transform = SORE_Math::Matrix4<float>::GetTranslation(
                 static_cast<float>(face->glyph->bitmap_left),
-                static_cast<float>(bitmap.rows-face->glyph->bitmap_top) + (h - bitmap.rows),
+                static_cast<float>(bitmap.rows-face->glyph->bitmap_top) +
+                (h - bitmap.rows),
                 0.0f);
 
             SORE_Math::Rect<float> bounds (0.0f,
@@ -178,7 +180,8 @@ namespace SORE_Font
                                            static_cast<float>(bitmap.rows));
             SORE_Math::Rect<float> texCoords(0.0f, x, 0.0f, y);
 
-            c[index].gc = new SORE_Graphics::GeometryChunk(c[index].tex, bounds, texCoords);
+            c[index].gc = new SORE_Graphics::GeometryChunk
+                (c[index].tex, bounds, texCoords);
         }
         else
         {
@@ -194,7 +197,8 @@ namespace SORE_Font
     {
         if(c > 127 && c < 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Attempted to get non-existent character");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Attempted to get non-existent character");
             return characters[height][0];
         }
         else

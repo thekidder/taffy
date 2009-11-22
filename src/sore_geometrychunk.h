@@ -40,7 +40,7 @@ namespace SORE_Graphics
     class SORE_EXPORT GeometryChunk
     {
     public:
-        GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
+        GeometryChunk(SORE_Graphics::Texture2D* texture, SORE_Math::Rect<float> bounds,
                       SORE_Math::Rect<float> texCoords = defaultTexCoords,
                       const Color& color = White);
         //produces a deep copy
@@ -63,9 +63,9 @@ namespace SORE_Graphics
         unsigned int NumVertices() const;
         unsigned int NumIndices() const;
 
-        const SORE_Resource::Texture2D* GetTexture() const;
+        const SORE_Graphics::Texture2D* GetTexture() const;
         const SORE_Graphics::GLSLShader* GetShader() const;
-        void SetTexture(SORE_Resource::Texture2D* texture);
+        void SetTexture(SORE_Graphics::Texture2D* texture);
         void SetShader(SORE_Graphics::GLSLShader* shad);
     private:
         void setup(SORE_Math::Rect<float> bounds,
@@ -83,7 +83,7 @@ namespace SORE_Graphics
         unsigned int primitiveType;
         unsigned int numVertices, numIndices;
 
-        SORE_Resource::Texture2D* tex;
+        SORE_Graphics::Texture2D* tex;
         SORE_Graphics::GLSLShader* shader;
 
   };

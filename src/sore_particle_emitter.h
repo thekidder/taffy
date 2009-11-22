@@ -30,115 +30,120 @@
 
 namespace SORE_Graphics
 {
-	template<typename T>
-	class SORE_EXPORT ParticleEmitter : public SORE_Kernel::Task
-	{
-	public:
-		ParticleEmitter(unsigned int numParticles, unsigned int spawnAmount, 
-										SORE_Math::Matrix4<float> pos, const Color& min, const Color& max, SORE_Resource::Texture2D* tex)
-                                        : particles(0), num(numParticles), spawn(spawnAmount), position(0), transform(pos), texture(tex), cMin(min), cMax(max)
-		{
-			if(num)
-			{
-				particles = new T*[numParticles];
-				Create(1);
-			}
-		}
+    template<typename T>
+    class SORE_EXPORT ParticleEmitter : public SORE_Kernel::Task
+    {
+    public:
+        ParticleEmitter(unsigned int numParticles, unsigned int spawnAmount,
+                        SORE_Math::Matrix4<float> pos, const Color& min,
+                        const Color& max, SORE_Graphics::Texture2D* tex)
+            : particles(0), num(numParticles), spawn(spawnAmount), position(0),
+            transform(pos), texture(tex), cMin(min), cMax(max)
+        {
+            if(num)
+            {
+                particles = new T*[numParticles];
+                Create(1);
+            }
+        }
 
-		~ParticleEmitter()
-		{
-			if(num)
-				{
-					Destroy();
-					delete[] particles;
-				}
-		}
+        ~ParticleEmitter()
+        {
+            if(num)
+            {
+                Destroy();
+                delete[] particles;
+            }
+        }
 
-		void Restart()
-		{
-			position = 0;
-			Destroy();
-			Create(1);
-		}
+        void Restart()
+        {
+            position = 0;
+            Destroy();
+            Create(1);
+        }
 
-		render_list GetGeometry()
-		{
-			render_list geometry;
-			for(unsigned int i=0;i<position;++i)
-				{
-					if(particles[i]->IsActive())
-						geometry.push_back(std::make_pair(particles[i]->GetTransform(), particles[i]->GetGeometry()));
-				}
-			return geometry;
-		}
+        render_list GetGeometry()
+        {
+            render_list geometry;
+            for(unsigned int i=0;i<position;++i)
+            {
+                if(particles[i]->IsActive())
+                    geometry.push_back(std::make_pair(particles[i]->GetTransform(), particles[i]->GetGeometry()));
+            }
+            return geometry;
+        }
 
-		bool IsActive() const
-		{
-			for(unsigned int i=0;i<position;++i)
-				{
-					if(particles[i]->IsActive())
-						return true;
-				}
-			return false;
-		}
+        bool IsActive() const
+        {
+            for(unsigned int i=0;i<position;++i)
+            {
+                if(particles[i]->IsActive())
+                    return true;
+            }
+            return false;
+        }
 
-		void SetMinColor(const Color& c)
-		{
-			cMin = c;
-		}
+        void SetMinColor(const Color& c)
+        {
+            cMin = c;
+        }
 
-		void SetMaxColor(const Color& c)
-		{
-			cMax = c;
-		}
+        void SetMaxColor(const Color& c)
+        {
+            cMax = c;
+        }
 
-		void Frame(int elapsed)
-		{
-			if(position < num)
-				{
-					float secs = elapsed / 10000.0f;
-					unsigned int n = static_cast<unsigned int>(secs*spawn);
-					if(n+position > num) n = num - position;
-					Create(n);
-				}
-			for(unsigned int i=0;i<position;++i)
-				{
-					if(particles[i]->IsActive())
-						particles[i]->Frame(elapsed);
-				}
-		}
-		const char* GetName() const { return "Particle Emitter";}
-	private:
-		void Destroy()
-		{
-			for(unsigned int i=0;i<position;++i)
-				{
-					delete particles[i];
-				}
-		}
+        void Frame(int elapsed)
+        {
+            if(position < num)
+            {
+                float secs = elapsed / 10000.0f;
+                unsigned int n = static_cast<unsigned int>(secs*spawn);
+                if(n+position > num) n = num - position;
+                Create(n);
+            }
+            for(unsigned int i=0;i<position;++i)
+            {
+                if(particles[i]->IsActive())
+                    particles[i]->Frame(elapsed);
+            }
+        }
+        const char* GetName() const { return "Particle Emitter";}
+    private:
+        void Destroy()
+        {
+            for(unsigned int i=0;i<position;++i)
+            {
+                delete particles[i];
+            }
+        }
 
-		void Create(unsigned int n)
-		{
-			for(unsigned int i=position; i<n+position;i++)
-			{
-				float r = SORE_Utility::getRandomMinMax(cMin.GetColor()[0], cMax.GetColor()[0]);
-				float g = SORE_Utility::getRandomMinMax(cMin.GetColor()[1], cMax.GetColor()[1]);
-				float b = SORE_Utility::getRandomMinMax(cMin.GetColor()[2], cMax.GetColor()[2]);
+        void Create(unsigned int n)
+        {
+            for(unsigned int i=position; i<n+position;i++)
+            {
+                float r = SORE_Utility::getRandomMinMax(cMin.GetColor()[0],
+                                                        cMax.GetColor()[0]);
+                float g = SORE_Utility::getRandomMinMax(cMin.GetColor()[1],
+                                                        cMax.GetColor()[1]);
+                float b = SORE_Utility::getRandomMinMax(cMin.GetColor()[2],
+                                                        cMax.GetColor()[2]);
 
-				Color c(r, g, b, 1.0f);
+                Color c(r, g, b, 1.0f);
 
-				particles[i] = new T(transform, c, texture);
-			}
-			position += n;
-		}
+                particles[i] = new T(transform, c, texture);
+            }
+            position += n;
+        }
 
-		T** particles;
-		unsigned int num, spawn, position;
-		SORE_Math::Matrix4<float> transform;
-		SORE_Resource::Texture2D* texture;
+        T** particles;
+        unsigned int num, spawn, position;
+        SORE_Math::Matrix4<float> transform;
+        SORE_Graphics::Texture2D* texture;
 
-		Color cMin, cMax;
-	};
+        Color cMin, cMax;
+    };
 }
 
 #endif

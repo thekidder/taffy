@@ -63,7 +63,7 @@ namespace SORE_Font
 
     struct CharInfo
     {
-        SORE_Resource::Texture2D* tex;
+        SORE_Graphics::Texture2D* tex;
         SORE_Graphics::GeometryChunk* gc;
         SORE_Math::Matrix4<float> transform;
         float advance;

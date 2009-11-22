@@ -26,7 +26,7 @@
 #include "sore_allgl.h"
 #include "sore_logger.h"
 
-namespace SORE_Resource
+namespace SORE_Graphics
 {
 
     void Texture2D::Load()
@@ -41,7 +41,8 @@ namespace SORE_Resource
         }
         else
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Unknown file format %s") % ext);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Unknown file format %s") % ext);
         }
     }
 
@@ -61,16 +62,17 @@ namespace SORE_Resource
         file.strm().read(reinterpret_cast<char*>(header), 18);
         if(file.strm().gcount() < 18)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read header...corrupted file?");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Could not read header...corrupted file?");
             return;
         }
 
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Loaded header");
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Name: %s") % filename);
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Width: %d Height: %d")
-                             % int(header[12]+header[13]*256) % int(header[14]+header[15]*256));
+                   % int(header[12]+header[13]*256) % int(header[14]+header[15]*256));
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("BPP: %d Image type: %d")
-                             % (int)header[16] % (int)header[2]);
+                   % (int)header[16] % (int)header[2]);
 
         //do some basic checks to make sure we can handle the file
 
@@ -102,7 +104,8 @@ namespace SORE_Resource
         file.strm().read(filler, static_cast<int>(header[0]));
         if(file.strm().gcount()!=static_cast<int>(header[0]))
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read filler...corrupted file?");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Could not read filler...corrupted file?");
             return;
         }
 
@@ -117,7 +120,8 @@ namespace SORE_Resource
         if(file.strm().gcount()!=dataSize)
         {
             delete[] imgData;
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read image data...corrupted file?");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Could not read image data...corrupted file?");
             return;
         }
 
@@ -140,7 +144,8 @@ namespace SORE_Resource
             break;
         default:
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Unrecognized image type - only supports 24 or 32 bit (uncompressed) TGAs");
+                       "Unrecognized image type - only supports 24 or 32 bit "
+                       "(uncompressed) TGAs");
             delete[] imgData;
             return;
         }
@@ -192,7 +197,7 @@ namespace SORE_Resource
     }
 
     void Texture2D::LoadFromData(const unsigned char* data, GLint internalFormat,
-                                 GLenum format, unsigned int width, unsigned int height)
+                                 GLenum format, unsigned int width, unsigned height)
     {
         w = width;
         h = height;

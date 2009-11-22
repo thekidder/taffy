@@ -35,34 +35,35 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT SliderWidget : public FrameWidget
-	{
-	public:
-		SliderWidget(SVec s, SVec p, int min, int max, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-		~SliderWidget();
+    class SORE_EXPORT SliderWidget : public FrameWidget
+    {
+    public:
+        SliderWidget(SVec s, SVec p, int min, int max,
+                     SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        ~SliderWidget();
 
-		void ConnectChange(boost::function<void (int)> c);
+        void ConnectChange(boost::function<void (int)> c);
 
-		int GetValue() const;
-		void SetValue(int value);
-	private:
-		SORE_Graphics::render_list GetThisRenderList();
-		bool ProcessEvents(SORE_Kernel::Event* e);
-		void UpdatePosition();
-		void UpdateSlider();
+        int GetValue() const;
+        void SetValue(int value);
+    private:
+        SORE_Graphics::render_list GetThisRenderList();
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        void UpdatePosition();
+        void UpdateSlider();
 
-		float ValueToX(int value) const;
-		int XToValue(float x) const;
+        float ValueToX(int value) const;
+        int XToValue(float x) const;
 
-		SORE_Resource::Texture2D* bg, *slider;
-		SORE_Graphics::GeometryChunk* sliderChunk;
-		SORE_Math::Matrix4<float> sliderMat;
+        SORE_Graphics::Texture2D* bg, *slider;
+        SORE_Graphics::GeometryChunk* sliderChunk;
+        SORE_Math::Matrix4<float> sliderMat;
 
-		boost::signal<void (int)> onChange;
-		bool dragged;
+        boost::signal<void (int)> onChange;
+        bool dragged;
 
-		int minimum, maximum, current;
-	};
+        int minimum, maximum, current;
+    };
 }
 
 #ifdef _MSC_VER

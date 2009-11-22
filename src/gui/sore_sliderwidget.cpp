@@ -31,8 +31,8 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        bg = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "slider_bg.tga");
-        slider = pool.GetResource<SORE_Resource::Texture2D>(styleDir + "slider.tga");
+        bg = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "slider_bg.tga");
+        slider = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "slider.tga");
 
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
@@ -122,20 +122,26 @@ namespace SORE_GUI
     void SliderWidget::UpdateSlider()
     {
         float pos = ValueToX(current);
-        sliderMat = GetPositionMatrix() * SORE_Math::Matrix4<float>::GetTranslation(pos, 0.0f, GetLayer() + LAYER_SEPARATION/2.0f);
+        sliderMat = GetPositionMatrix() *
+            SORE_Math::Matrix4<float>::GetTranslation(pos, 0.0f,
+                                                      GetLayer() +
+                                                      LAYER_SEPARATION/2.0f);
     }
 
     float SliderWidget::ValueToX(int value) const
     {
         value = value < minimum ? minimum : value;
         value = value > maximum ? maximum : value;
-        return static_cast<float>(value - minimum) / static_cast<float>(maximum - minimum) * (GetSize(HORIZONTAL) - 32.0f) + 16.0f;
+        return static_cast<float>(value - minimum) /
+            static_cast<float>(maximum - minimum) *
+            (GetSize(HORIZONTAL) - 32.0f) + 16.0f;
     }
 
     int SliderWidget::XToValue(float x) const
     {
         int range = maximum - minimum;
-        int value =  static_cast<int>( (x - 16.0f) / (GetSize(HORIZONTAL) - 32.0f) * range - minimum);
+        int value =  static_cast<int>( (x - 16.0f) /
+                                       (GetSize(HORIZONTAL)-32.0f) * range - minimum);
         value = value < minimum ? minimum : value;
         value = value > maximum ? maximum : value;
         return value;

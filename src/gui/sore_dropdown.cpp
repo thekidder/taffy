@@ -23,24 +23,26 @@
 namespace SORE_GUI
 {
     Dropdown::Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par)
-        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s), font(0), normal(0), active(0),
-          hover(0), arrow(0), menuBg(0), arrowChunk(0), curChoice(0), pressed(false), inArea(false)
+        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s), font(0), normal(0),
+          active(0), hover(0), arrow(0), menuBg(0), arrowChunk(0), curChoice(0),
+          pressed(false), inArea(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        font = pool.GetResource<SORE_Font::Font>(styleDir + "LiberationSans-Regular.ttf");
+        font = pool.GetResource<SORE_Font::Font>(styleDir +
+                                                 "LiberationSans-Regular.ttf");
 
-        normal =
-            pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_normal.tga");
-        active =
-            pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_active.tga");
-        hover =
-            pool.GetResource<SORE_Resource::Texture2D>(styleDir + "button_sheet_hover.tga");
+        normal = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
+                                                            "button_sheet_normal.tga");
+        active = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
+                                                            "button_sheet_active.tga");
+        hover = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
+                                                           "button_sheet_hover.tga");
         arrow =
-            pool.GetResource<SORE_Resource::Texture2D>(styleDir + "arrow.tga");
+            pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "arrow.tga");
         menuBg =
-            pool.GetResource<SORE_Resource::Texture2D>(styleDir + "dropdown_bg.tga");
+            pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "dropdown_bg.tga");
 
         textHeight = GetSize(VERTICAL) / 2;
         if(textHeight < 16) textHeight = 16;
@@ -57,7 +59,8 @@ namespace SORE_GUI
 
     Dropdown::~Dropdown()
     {
-        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();it!=choices.end();++it)
+        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
+            it!=choices.end();++it)
         {
             delete it->second;
         }
@@ -90,24 +93,33 @@ namespace SORE_GUI
 
     void Dropdown::BuildGeometry()
     {
-        for(std::vector<std::pair<SORE_Math::Matrix4<float>, SORE_Graphics::GeometryChunk*> >::iterator it=menu.begin();it!=menu.end();++it)
+        std::vector<std::pair<SORE_Math::Matrix4<float>,
+            SORE_Graphics::GeometryChunk*> >::iterator it;
+        for(it=menu.begin();it!=menu.end();++it)
         {
             SORE_Graphics::GeometryChunk* g = it->second;
             delete g;
         }
         menu.clear();
         unsigned int currHeight = GetPixels(VERTICAL, originalSize.GetVertical());
-        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();it!=choices.end();++it)
+        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
+            it!=choices.end();++it)
         {
-            SORE_Math::Rect<float> bounds(0.0f, static_cast<float>(GetSize(HORIZONTAL)),
-                                                                                     static_cast<float>(currHeight),
-                                                                                     static_cast<float>(currHeight + textHeight*2));
-            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(menuBg, bounds);
-            SORE_Math::Matrix4<float> m = SORE_Math::Matrix4<float>::GetTranslation(0.0f, 0.0f, GetTopLayer() + 0.0009f) * GetPositionMatrix();
+            SORE_Math::Rect<float> bounds(0.0f,
+                                          static_cast<float>(GetSize(HORIZONTAL)),
+                                          static_cast<float>(currHeight),
+                                          static_cast<float>(currHeight+textHeight*2));
+            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(menuBg,
+                                                                               bounds);
+            SORE_Math::Matrix4<float> m =
+                SORE_Math::Matrix4<float>::GetTranslation(0.0f, 0.0f,
+                                                          GetTopLayer() + 0.0009f) *
+                GetPositionMatrix();
             menu.push_back(std::make_pair(m, g));
-            it->second->SetTransform(GetPositionMatrix() *
-                                                             SORE_Math::Matrix4<float>::GetTranslation(8.0f,
-                                                             static_cast<float>(currHeight + 0.5*textHeight), GetTopLayer() + 0.001f));
+            it->second->SetTransform(
+                GetPositionMatrix() *
+                SORE_Math::Matrix4<float>::GetTranslation(8.0f,
+                                                          static_cast<float>(currHeight + 0.5*textHeight), GetTopLayer() + 0.001f));
             it->second->TrimToWidth(GetSize(HORIZONTAL) - 16, 0);
             currHeight += textHeight*2;
         }
@@ -133,7 +145,8 @@ namespace SORE_GUI
 
         if(HasFocus())
         {
-            std::vector<std::pair<SORE_Math::Matrix4<float>, SORE_Graphics::GeometryChunk*> >::iterator mit;
+            std::vector<std::pair<SORE_Math::Matrix4<float>,
+                SORE_Graphics::GeometryChunk*> >::iterator mit;
             for(mit = menu.begin();mit!=menu.end();++mit)
                 list.push_back(std::make_pair(&mit->first, mit->second));
             std::map<unsigned int, SORE_Graphics::Text*>::iterator it2;
@@ -171,7 +184,8 @@ namespace SORE_GUI
         {
             pressed = true;
             ChangeTexture();
-            SetSize(GetSize() + SVec(SUnit(0.0, 0), SUnit(0.0, choices.size()*textHeight*2)));
+            SetSize(GetSize() + SVec(SUnit(0.0, 0),
+                                     SUnit(0.0, choices.size()*textHeight*2)));
             return true;
         }
         else if(e->type == SORE_Kernel::MOUSEBUTTONUP)
@@ -200,24 +214,30 @@ namespace SORE_GUI
         if(!curChoice)
         {
             curChoice = new SORE_Graphics::Text(*font, textHeight, t->GetText());
-            curChoice->TrimToWidth(GetPixels(HORIZONTAL, originalSize.GetHorizontal()) - 16 - 2*textHeight, 0);
+            curChoice->TrimToWidth(
+                GetPixels(HORIZONTAL,
+                          originalSize.GetHorizontal()) - 16 - 2*textHeight, 0);
             UpdatePosition();
         }
         else
         {
             curChoice->UpdateText(t->GetText());
-            curChoice->TrimToWidth(GetPixels(HORIZONTAL, originalSize.GetHorizontal()) - 16 - 2*textHeight, 0);
+            curChoice->TrimToWidth(
+                GetPixels(HORIZONTAL,
+                          originalSize.GetHorizontal()) - 16 - 2*textHeight, 0);
         }
     }
 
     unsigned int Dropdown::OrderToID(unsigned int order)
     {
         unsigned int id = 0;
-        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();it!=choices.end();++it,++id)
+        for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
+            it!=choices.end();++it,++id)
         {
             if(id == order) return it->first;
         }
-        ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Could not find ID for menu item %d") % order);
+        ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                   boost::format("Could not find ID for menu item %d") % order);
         return 0;
     }
 
@@ -242,9 +262,10 @@ namespace SORE_GUI
         if(curChoice)
             curChoice->SetTransform(
                 GetPositionMatrix() *
-                SORE_Math::Matrix4<float>::GetTranslation(16.0f,
-                                                                                                    (GetPixels(VERTICAL, originalSize.GetVertical()) - textHeight)/2.0f,
-                                                                                                    GetLayer() + LAYER_SEPARATION/2.0f));
+                SORE_Math::Matrix4<float>::GetTranslation
+                (16.0f,
+                 (GetPixels(VERTICAL, originalSize.GetVertical()) - textHeight)/2.0f,
+                 GetLayer() + LAYER_SEPARATION/2.0f));
         arrowMat = SORE_Math::Matrix4<float>::GetTranslation(
             GetPixels(HORIZONTAL, originalSize.GetHorizontal()) - 16.0f - textHeight,
             (GetPixels(VERTICAL, originalSize.GetVertical()) - textHeight)/2.0f,
