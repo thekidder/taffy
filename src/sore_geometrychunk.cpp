@@ -29,9 +29,9 @@ namespace SORE_Graphics
                                  SORE_Math::Rect<float> bounds,
                                  SORE_Math::Rect<float> texCoords,
                                  const Color& color)
-        : vertices(0), texCoords(0), colors(0), opaque(false), tex(0), c(color)
+        : vertices(0), texCoords(0), colors(0), opaque(false), c(color), tex(0),
+          shader(0)
     {
-        sharedColors = false;
         setup(bounds, texCoords);
         tex = texture;
     }
@@ -83,42 +83,30 @@ namespace SORE_Graphics
 
         numVertices = 4;
         numIndices = 6;
-
-        sharedTexCoords = false;
-        sharedVertices  = false;
-        sharedColors    = false;
-        sharedIndices   = false;
-    }
-
-    GeometryChunk::GeometryChunk() :
-        vertices(0), texCoords(0), colors(0), indices(0), opaque(false), numVertices(0), numIndices(0), tex(0)
-    {
-        sharedTexCoords = false;
-        sharedVertices  = false;
-        sharedColors    = false;
-        sharedIndices   = false;
     }
 
     GeometryChunk::GeometryChunk(const GeometryChunk& gc) :
-        vertices(gc.vertices), texCoords(gc.texCoords), colors(gc.colors), indices(gc.indices), opaque(gc.opaque),
-        numVertices(gc.numVertices), numIndices(gc.numIndices), tex(gc.tex)
+        vertices(0), texCoords(0), colors(0), indices(0), opaque(gc.opaque),
+        c(gc.c), primitiveType(gc.primitiveType), numVertices(gc.numVertices),
+        numIndices(gc.numIndices), tex(gc.tex), shader(gc.shader)
     {
-        sharedTexCoords = true;
-        sharedVertices  = true;
-        sharedColors    = true;
-        sharedIndices   = true;
+        vertices = new float[numVertices*3];
+        texCoords = new float[numVertices*2];
+        colors = new float[numVertices*4];
+        indices = new unsigned short[numIndices];
+
+        memcpy(vertices, gc.vertices, numVertices*3*sizeof(float));
+        memcpy(texCoords, gc.texCoords, numVertices*2*sizeof(float));
+        memcpy(colors, gc.colors, numVertices*4*sizeof(float));
+        memcpy(indices, gc.indices, numIndices*sizeof(unsigned short));
     }
 
     GeometryChunk::~GeometryChunk()
     {
-        if(!sharedVertices)
-            delete[] vertices;
-        if(!sharedTexCoords)
-            delete[] texCoords;
-        if(!sharedColors)
-            delete[] colors;
-        if(!sharedIndices)
-            delete[] indices;
+        delete[] vertices;
+        delete[] texCoords;
+        delete[] colors;
+        delete[] indices;
     }
 
     const Color& GeometryChunk::GetColor() const
@@ -129,11 +117,6 @@ namespace SORE_Graphics
     void GeometryChunk::SetColor(const Color& color)
     {
         c = color;
-        if(sharedColors)
-        {
-            sharedColors = false;
-            colors = new float[4*4];
-        }
         for(unsigned int i=0;i<4*4;i+=4)
         {
             memcpy(colors + i, color.GetColor(), 4 * sizeof(float));
@@ -142,12 +125,6 @@ namespace SORE_Graphics
 
     void GeometryChunk::SetTexCoords(SORE_Math::Rect<float> texCoordRect)
     {
-        if(sharedTexCoords)
-        {
-            sharedTexCoords = false;
-            texCoords = new float[8];
-        }
-
         texCoords[0] = texCoordRect.topLeft[0];
         texCoords[1] = texCoordRect.topLeft[1];
 
@@ -214,6 +191,16 @@ namespace SORE_Graphics
     void GeometryChunk::SetTexture(SORE_Resource::Texture2D* texture)
     {
         tex = texture;
+    }
+
+    const SORE_Graphics::GLSLShader* GeometryChunk::GetShader() const
+    {
+        return shader;
+    }
+
+    void GeometryChunk::SetShader(SORE_Graphics::GLSLShader* shad)
+    {
+        shader = shad;
     }
 
     void ApplyTransform(const SORE_Math::Matrix4<float>& transform,

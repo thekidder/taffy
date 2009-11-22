@@ -25,6 +25,7 @@
 
 #include <map>
 #include "sore_color.h"
+#include "sore_shaders.h"
 #include "sore_texture.h"
 #include "math/sore_matrix4x4.h"
 #include "math/sore_geometry.h"
@@ -40,10 +41,9 @@ namespace SORE_Graphics
     {
     public:
         GeometryChunk(SORE_Resource::Texture2D* texture, SORE_Math::Rect<float> bounds,
-                                    SORE_Math::Rect<float> texCoords = defaultTexCoords,
-                                    const Color& color = White);
-        GeometryChunk();
-        //produces a shallow copy
+                      SORE_Math::Rect<float> texCoords = defaultTexCoords,
+                      const Color& color = White);
+        //produces a deep copy
         GeometryChunk(const GeometryChunk& gc);
         ~GeometryChunk();
 
@@ -64,8 +64,9 @@ namespace SORE_Graphics
         unsigned int NumIndices() const;
 
         const SORE_Resource::Texture2D* GetTexture() const;
+        const SORE_Graphics::GLSLShader* GetShader() const;
         void SetTexture(SORE_Resource::Texture2D* texture);
-
+        void SetShader(SORE_Graphics::GLSLShader* shad);
     private:
         void setup(SORE_Math::Rect<float> bounds,
             SORE_Math::Rect<float> texCoordRect);
@@ -74,16 +75,17 @@ namespace SORE_Graphics
         float* vertices;
         float* texCoords;
         float* colors;
-        bool sharedVertices, sharedTexCoords, sharedColors, sharedIndices;
 
         unsigned short* indices;
         bool opaque;
+        Color c;
 
+        unsigned int primitiveType;
         unsigned int numVertices, numIndices;
 
         SORE_Resource::Texture2D* tex;
-        Color c;
-        unsigned int primitiveType;
+        SORE_Graphics::GLSLShader* shader;
+
   };
 
     typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> >
