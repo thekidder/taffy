@@ -37,7 +37,7 @@ namespace SORE_Graphics
     }
 
     void GeometryChunk::setup(SORE_Math::Rect<float> bounds,
-        SORE_Math::Rect<float> texCoordRect)
+                              SORE_Math::Rect<float> texCoordRect)
     {
         vertices = new float[3 * 4];
         texCoords = new float[2 * 4];
@@ -204,7 +204,7 @@ namespace SORE_Graphics
     }
 
     void ApplyTransform(const SORE_Math::Matrix4<float>& transform,
-                                            render_list_owned& list)
+                        render_list_owned& list)
     {
         render_list_owned::iterator it;
         for(it = list.begin(); it != list.end(); ++it)

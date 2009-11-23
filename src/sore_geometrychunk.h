@@ -69,7 +69,7 @@ namespace SORE_Graphics
         void SetShader(SORE_Graphics::GLSLShader* shad);
     private:
         void setup(SORE_Math::Rect<float> bounds,
-            SORE_Math::Rect<float> texCoordRect);
+                   SORE_Math::Rect<float> texCoordRect);
 
         //geometry
         float* vertices;
@@ -86,13 +86,14 @@ namespace SORE_Graphics
         SORE_Graphics::Texture2D* tex;
         SORE_Graphics::GLSLShader* shader;
 
-  };
+    };
 
-    typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk *> >
-        render_list;
+    typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*,
+                                  const GeometryChunk *> >
+    render_list;
 
     typedef std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk *> >
-        render_list_owned;
+    render_list_owned;
 
     void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform,
                                     render_list_owned& list);
