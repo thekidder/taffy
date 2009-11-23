@@ -39,88 +39,88 @@
 #include "sore_fileio.h"
 #include "sore_logger.h"
 
-namespace SORE_Resource
+class SORE_EXPORT SORE_Resource::ResourcePool;
+
+/*
+  As a little bit of a hack, we will put the logic for reloading textures
+  into ResourcePool.
+  To do this, we add a new field to Resource: GLContextDependent, which
+  returns true if we need to reload on GL context change
+*/
+
+class SORE_EXPORT SORE_Resource::Resource
 {
-    class SORE_EXPORT ResourcePool;
+public:
+    Resource(std::string file, SORE_FileIO::PackageCache* pc = NULL,
+             std::string info = "", bool delayedNotify = false);
+    Resource(SORE_FileIO::PackageCache* pc = NULL);
+    virtual ~Resource();
+    virtual const char* Type() const {return "generic resource";}
 
-    //as a little bit of a hack, we will put the logic for reloading textures into ResourcePool
-    //to do this, we add a new field to Resource: GLContextDependent, which returns true if we
-    //need to reload on GL context change
+    std::string GetFilename() const {return filename;}
 
-    class SORE_EXPORT Resource
+    static void SetRM(ResourcePool* _rm) {rm = _rm;}
+
+    virtual void Reload() {Load();}
+    virtual bool GLContextDependent() const {return false;}
+protected:
+    virtual void Load() = 0;
+    void OnNotify(std::string file);
+
+    //used for file notification - for example, a shader is made up of
+    //multiple files, we want to reload it if the shader files are changed
+    void AddDependentFile(std::string file);
+    void SetFilename(std::string file);
+    bool IsDependent(std::string file);
+    std::string additionalInfo;
+    SORE_FileIO::PackageCache* packageCache;
+    std::vector<std::string> dependentFiles;
+    static ResourcePool* rm;
+private:
+    void SetupNotify(std::string filename);
+
+    std::string filename;
+};
+
+class SORE_EXPORT SORE_Resource::ResourcePool
+{
+public:
+    ResourcePool(SORE_FileIO::PackageCache* pc = NULL);
+    ~ResourcePool();
+
+    template<typename T>
+        T* GetResource(std::string filename)
     {
-    public:
-        Resource(std::string file, SORE_FileIO::PackageCache* pc = NULL, std::string info = "",
-                 bool delayedNotify = false);
-        Resource(SORE_FileIO::PackageCache* pc = NULL);
-        virtual ~Resource();
-        virtual const char* Type() const {return "generic resource";}
-
-        std::string GetFilename() const {return filename;}
-
-        static void SetRM(ResourcePool* _rm) {rm = _rm;}
-
-        virtual void Reload() {Load();}
-        virtual bool GLContextDependent() const {return false;}
-    protected:
-        virtual void Load() = 0;
-        void OnNotify(std::string file);
-
-        //used for file notification - for example, a shader is made up of multiple files,
-        //we want to reload it if the shader files are changed
-        void AddDependentFile(std::string file);
-        void SetFilename(std::string file);
-        bool IsDependent(std::string file);
-        std::string additionalInfo;
-        SORE_FileIO::PackageCache* packageCache;
-        std::vector<std::string> dependentFiles;
-        static ResourcePool* rm;
-    private:
-        void SetupNotify(std::string filename);
-
-        std::string filename;
-    };
-
-    class SORE_EXPORT ResourcePool
-    {
-    public:
-        ResourcePool(SORE_FileIO::PackageCache* pc = NULL);
-        ~ResourcePool();
-
-        template<typename T>
-            T* GetResource(std::string filename)
+        std::size_t hash = string_hash(filename);
+        if(resources.find(hash)==resources.end())
         {
-            std::size_t hash = string_hash(filename);
-            if(resources.find(hash)==resources.end())
-            {
-                T* temp = new T(filename, packageCache);
-                resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
-                return temp;
-            }
-            else
-            {
-                Resource* r = resources.find(hash)->second;
-                T* resource = dynamic_cast<T*>(r);
-                if(resource==NULL)
-                    ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                               boost::format("Could not downcast resource for filename %s")
-                               % filename);
-                return resource;
-            }
+            T* temp = new T(filename, packageCache);
+            resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
+            return temp;
         }
-        //searchs for r in resource map, then unloads it. returns true if it was unloaded,
-        //false if not found
-        bool UnloadResource(Resource* r);
+        else
+        {
+            Resource* r = resources.find(hash)->second;
+            T* resource = dynamic_cast<T*>(r);
+            if(resource==NULL)
+                ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                           boost::format("Could not downcast resource for filename %s")
+                           % filename);
+            return resource;
+        }
+    }
+    //searchs for r in resource map, then unloads it. returns true if it was unloaded,
+    //false if not found
+    bool UnloadResource(Resource* r);
 
-        void for_each(boost::function<void (Resource*)> func);
-        bool OnResize(SORE_Kernel::Event* e);
-    protected:
-        std::map<std::size_t, Resource*> resources;
-    private:
-        boost::hash<std::string> string_hash;
-        SORE_FileIO::PackageCache* packageCache;
-    };
-}
+    void for_each(boost::function<void (Resource*)> func);
+    bool OnResize(SORE_Kernel::Event* e);
+protected:
+    std::map<std::size_t, Resource*> resources;
+private:
+    boost::hash<std::string> string_hash;
+    SORE_FileIO::PackageCache* packageCache;
+};
 
 #ifdef _MSC_VER
 #pragma warning( pop )
