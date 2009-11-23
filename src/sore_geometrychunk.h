@@ -54,6 +54,7 @@ namespace SORE_Graphics
         const float* TexCoords() const;
         void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
 
+        float GetDepth() const;
         bool HasTexture() const;
         bool HasColor() const;
         bool IsOpaque() const;

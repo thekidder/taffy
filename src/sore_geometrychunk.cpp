@@ -142,6 +142,13 @@ namespace SORE_Graphics
         return opaque;
     }
 
+    float GeometryChunk::GetDepth() const
+    {
+        //FIXME: use an average across all vertices or midpoint or closest-Z
+        //or something better
+        return vertices[2];
+    }
+
     bool GeometryChunk::HasTexture() const
     {
         return texCoords!=0;
