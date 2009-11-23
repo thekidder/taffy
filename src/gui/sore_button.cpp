@@ -38,7 +38,8 @@ namespace SORE_GUI
                                                             "button_sheet_active.tga");
         hover = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
                                                            "button_sheet_hover.tga");
-
+        SORE_Graphics::GLSLShader* shad =
+            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         unsigned int height = GetSize(VERTICAL);
         unsigned int width = GetSize(HORIZONTAL);
 
@@ -62,6 +63,7 @@ namespace SORE_GUI
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
+        SetShader(shad);
     }
 
     void Button::UpdatePosition()

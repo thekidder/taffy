@@ -56,6 +56,7 @@ namespace SORE_GUI
         int XToValue(float x) const;
 
         SORE_Graphics::Texture2D* bg, *slider;
+        SORE_Graphics::GLSLShader* shader;
         SORE_Graphics::GeometryChunk* sliderChunk;
         SORE_Math::Matrix4<float> sliderMat;
 

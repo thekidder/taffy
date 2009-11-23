@@ -34,6 +34,8 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
+        SORE_Graphics::GLSLShader* shad = pool.GetResource<SORE_Graphics::GLSLShader>
+            ("data/Shaders/default.shad");
         texture = pool.GetResource<SORE_Graphics::Texture2D>(styleDir+"textfield.tga");
         caretTex = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "caret.tga");
 
@@ -44,8 +46,8 @@ namespace SORE_GUI
         caretWidth = static_cast<unsigned int>(height/16.0f);
 
         caret = new SORE_Graphics::GeometryChunk
-            (caretTex, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth,
-                                              8.0f, 8.0f+height));
+            (caretTex, shad, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth,
+                                                    8.0f, 8.0f+height));
 
         caretEnd = SORE_Timing::GetGlobalTicks();
 

@@ -31,6 +31,8 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
+        shader =
+            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         bg = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "slider_bg.tga");
         slider = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "slider.tga");
 
@@ -113,8 +115,9 @@ namespace SORE_GUI
         float sliderHeight = static_cast<float>(GetSize(VERTICAL));
         float sliderWidth = sliderHeight / 8.0f;
 
-        SORE_Math::Rect<float> sliderBounds(-sliderWidth, sliderWidth, 0, sliderHeight);
-        sliderChunk = new SORE_Graphics::GeometryChunk(slider, sliderBounds);
+        SORE_Math::Rect<float> sliderBounds
+            (-sliderWidth, sliderWidth, 0, sliderHeight);
+        sliderChunk = new SORE_Graphics::GeometryChunk(slider, shader, sliderBounds);
 
         UpdateSlider();
     }

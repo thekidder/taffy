@@ -50,8 +50,9 @@ namespace SORE_GUI
         SORE_Math::Rect<float> arrowSize(0.0f,
             static_cast<float>(textHeight), 0.0f,
             static_cast<float>(textHeight));
-
-        arrowChunk = new SORE_Graphics::GeometryChunk(arrow, arrowSize);
+        shad = pool.GetResource<SORE_Graphics::GLSLShader>
+            ("data/Shaders/default.shad");
+        arrowChunk = new SORE_Graphics::GeometryChunk(arrow, shad, arrowSize);
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
@@ -109,8 +110,8 @@ namespace SORE_GUI
                                           static_cast<float>(GetSize(HORIZONTAL)),
                                           static_cast<float>(currHeight),
                                           static_cast<float>(currHeight+textHeight*2));
-            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(menuBg,
-                                                                               bounds);
+            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk
+                (menuBg, shad, bounds);
             SORE_Math::Matrix4<float> m =
                 SORE_Math::Matrix4<float>::GetTranslation(0.0f, 0.0f,
                                                           GetTopLayer() + 0.0009f) *
@@ -118,8 +119,10 @@ namespace SORE_GUI
             menu.push_back(std::make_pair(m, g));
             it->second->SetTransform(
                 GetPositionMatrix() *
-                SORE_Math::Matrix4<float>::GetTranslation(8.0f,
-                                                          static_cast<float>(currHeight + 0.5*textHeight), GetTopLayer() + 0.001f));
+                SORE_Math::Matrix4<float>::GetTranslation
+                (8.0f,
+                 static_cast<float>(currHeight + 0.5*textHeight),
+                 GetTopLayer() + 0.001f));
             it->second->TrimToWidth(GetSize(HORIZONTAL) - 16, 0);
             currHeight += textHeight*2;
         }

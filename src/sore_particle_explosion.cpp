@@ -25,7 +25,9 @@
 namespace SORE_Graphics
 {
     ExplosionParticle::ExplosionParticle(SORE_Math::Matrix4<float> initial,
-                                         const Color& c, SORE_Graphics::Texture2D* tex)
+                                         const Color& c,
+                                         SORE_Graphics::Texture2D* tex,
+                                         SORE_Graphics::GLSLShader* shad)
         : Particle(initial, c), alpha(c.GetColor()[3])
     {
         angle = SORE_Utility::getRandomMinMax(0.0f, 2.0f*static_cast<float>(M_PI));
@@ -35,7 +37,7 @@ namespace SORE_Graphics
         transform *= SORE_Math::Matrix4<float>::GetRotation(angle, SORE_Math::AXIS_Z);
         SORE_Math::Rect<float> bounds(-6.0f, 6.0f, -1.5f, 1.5f);
 
-        gc = new GeometryChunk(tex, bounds, defaultTexCoords, color);
+        gc = new GeometryChunk(tex, shad, bounds, defaultTexCoords, color);
     }
 
     bool ExplosionParticle::IsActive() const

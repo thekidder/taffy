@@ -62,6 +62,7 @@ namespace SORE_GUI
         SVec originalSize;
 
         SORE_Font::Font* font;
+        SORE_Graphics::GLSLShader* shad;
         unsigned int textHeight;
         SORE_Graphics::Texture2D* normal, *active, *hover, *arrow, *menuBg;
         SORE_Math::Matrix4<float> arrowMat;

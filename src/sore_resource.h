@@ -39,7 +39,11 @@
 #include "sore_fileio.h"
 #include "sore_logger.h"
 
-class SORE_EXPORT SORE_Resource::ResourcePool;
+namespace SORE_Resource
+{
+    class SORE_EXPORT ResourcePool;
+    class SORE_EXPORT Resource;
+}
 
 /*
   As a little bit of a hack, we will put the logic for reloading textures

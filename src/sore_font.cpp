@@ -18,11 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_font.h"
 #include "sore_fileio.h"
-#include "sore_logger.h"
-
+#include "sore_font.h"
 #include "sore_geometrychunk.h"
+#include "sore_logger.h"
+#include "sore_shaders.h"
 #include "sore_texture.h"
 
 #include <vector>
@@ -180,8 +180,11 @@ namespace SORE_Font
                                            static_cast<float>(bitmap.rows));
             SORE_Math::Rect<float> texCoords(0.0f, x, 0.0f, y);
 
+            SORE_Graphics::GLSLShader* shader =
+                rm->GetResource<SORE_Graphics::GLSLShader>
+                ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk
-                (c[index].tex, bounds, texCoords);
+                (c[index].tex, shader, bounds, texCoords);
         }
         else
         {

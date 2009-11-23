@@ -23,12 +23,13 @@
 namespace SORE_Graphics
 {
     CircleParticle::CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                                   SORE_Graphics::Texture2D* tex)
+                                   SORE_Graphics::Texture2D* tex,
+                                   SORE_Graphics::GLSLShader* shad)
   : Particle(initial, c), alpha(1.0f)
     {
         transform *= SORE_Math::Matrix4<float>::GetScale(1.0f/20.0f, 1.0f/20.0f, 0.0f);
         SORE_Math::Rect<float> bounds(-1.0f, 1.0f, -1.0f, 1.0f);
-        gc = new GeometryChunk(tex, bounds, defaultTexCoords, color);
+        gc = new GeometryChunk(tex, shad, bounds, defaultTexCoords, color);
     }
 
     bool CircleParticle::IsActive() const
@@ -38,7 +39,8 @@ namespace SORE_Graphics
 
     void CircleParticle::Frame(int elapsed)
     {
-        transform *= SORE_Math::Matrix4<float>::GetScale(1.0f+elapsed*0.0006f, 1.0f+elapsed*0.0006f, 0.0f);
+        transform *= SORE_Math::Matrix4<float>::GetScale
+            (1.0f+elapsed*0.0006f, 1.0f+elapsed*0.0006f, 0.0f);
         alpha -= 0.00015f * elapsed;
         gc->SetColor(Color(1.0f, 0.0f, 0.0f, alpha));
     }

@@ -40,7 +40,8 @@ namespace SORE_Graphics
     class SORE_EXPORT GeometryChunk
     {
     public:
-        GeometryChunk(SORE_Graphics::Texture2D* texture, SORE_Math::Rect<float> bounds,
+        GeometryChunk(Texture2D* texture, GLSLShader* shad,
+                      SORE_Math::Rect<float> bounds,
                       SORE_Math::Rect<float> texCoords = defaultTexCoords,
                       const Color& color = White);
         //produces a deep copy

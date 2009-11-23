@@ -25,15 +25,14 @@
 
 namespace SORE_Graphics
 {
-    GeometryChunk::GeometryChunk(SORE_Graphics::Texture2D* texture,
+    GeometryChunk::GeometryChunk(Texture2D* texture, GLSLShader* shad,
                                  SORE_Math::Rect<float> bounds,
                                  SORE_Math::Rect<float> texCoords,
                                  const Color& color)
-        : vertices(0), texCoords(0), colors(0), opaque(false), c(color), tex(0),
-          shader(0)
+        : vertices(0), texCoords(0), colors(0), opaque(false), c(color), tex(texture),
+          shader(shad)
     {
         setup(bounds, texCoords);
-        tex = texture;
     }
 
     void GeometryChunk::setup(SORE_Math::Rect<float> bounds,

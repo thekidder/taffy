@@ -173,7 +173,7 @@ namespace SORE_Graphics
         glDeleteObjectARB(program);
     }
 
-    bool GLSLShader::Ready()
+    bool GLSLShader::Ready() const
     {
         return ok && linked && ShadersSupported() && program!=0;
     }
@@ -360,7 +360,7 @@ namespace SORE_Graphics
         return AddShader(GL_FRAGMENT_SHADER, fragment);
     }
 
-    void GLSLShader::Bind()
+    void GLSLShader::Bind() const
     {
         if(!ShadersSupported() || program==0)
         {

@@ -42,13 +42,17 @@
 */
 namespace SORE_Graphics
 {
-    typedef std::pair<proj_callback, boost::function<render_list ()> > geometry_callback;
+    typedef std::pair<proj_callback, boost::function<render_list ()> >
+    geometry_callback;
 
     struct vbo_tex_order
     {
-        vbo_tex_order(const SORE_Graphics::Texture2D* t, unsigned s, unsigned l)
-            : tex(t), triStart(s), triLen(l) {}
+        vbo_tex_order(const SORE_Graphics::Texture2D* t,
+                      const SORE_Graphics::GLSLShader* sh,
+                      unsigned s, unsigned l)
+            : tex(t), shad(sh), triStart(s), triLen(l) {}
         const SORE_Graphics::Texture2D* tex;
+        const SORE_Graphics::GLSLShader* shad;
         unsigned int triStart;
         unsigned int triLen;
     };

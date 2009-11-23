@@ -57,9 +57,8 @@ namespace SORE_Graphics
         int  AddFragmentString(const char* fragment);
 
         void Link();
-        void Bind();
-
-        bool Ready();
+        void Bind() const;
+        bool Ready() const;
 
         const char* Type() const {return "GLSL shader";}
         bool GLContextDependent() const {return true;}

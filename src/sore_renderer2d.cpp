@@ -188,6 +188,7 @@ void SORE_Graphics::Renderer2D::Build()
                     }
                     newBatch.first.push_back
                         (vbo_tex_order(it->second->GetTexture(),
+                                       it->second->GetShader(),
                                        totalIndices/3, 0));
                     numIndices = 0;
                 }
@@ -206,11 +207,11 @@ void SORE_Graphics::Renderer2D::RenderBatch(batch& b)
 {
     if(!b.second->Empty())
     {
-        shad->Bind();
         b.second->BeginDraw();
         for(std::vector<vbo_tex_order>::iterator it = b.first.begin();
             it != b.first.end(); ++it)
         {
+            it->shad->Bind();
             glClientActiveTexture(GL_TEXTURE0);
             it->tex->Bind();
             b.second->DrawElements(it->triLen, it->triStart);
