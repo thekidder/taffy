@@ -37,16 +37,19 @@ namespace SORE_Graphics
         }
         else
         {
-            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL Shading language version: %s")
+            ENGINE_LOG(SORE_Logging::LVL_INFO,
+                       boost::format("OpenGL Shading language version: %s")
                        % version);
             supported = true;
         }
         if(supported)
         {
-            if(!(GLEW_VERSION_2_0 || (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
+            if(!(GLEW_VERSION_2_0 ||
+                 (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)))
             {
                 ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           "No shader support - check OpenGL version and extensions string");
+                           "No shader support - check OpenGL version and extensions "
+                           "string");
                 supported = false;
             }
             else
@@ -77,7 +80,8 @@ namespace SORE_Graphics
         glUseProgramObjectARB(0);
     }
 
-    GLSLShader::GLSLShader(const char* vertex, const char* fragment, SORE_FileIO::PackageCache* pc)
+    GLSLShader::GLSLShader(const char* vertex, const char* fragment,
+                           SORE_FileIO::PackageCache* pc)
         : Resource(pc)
     {
         ok = false;
@@ -143,7 +147,8 @@ namespace SORE_Graphics
         GLenum error;
         while((error=glGetError())!=GL_NO_ERROR)
         {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Shader: GL Error: %d") % error);
+            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
+                       boost::format("Shader: GL Error: %d") % error);
         }
     }
 
@@ -190,13 +195,15 @@ namespace SORE_Graphics
             int charsWritten  = 0;
             char *infoLog;
 
-            glGetObjectParameterivARB(program, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
+            glGetObjectParameterivARB(program, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+                                      &infologLength);
 
             if (infologLength > 0)
             {
                 infoLog = new char[infologLength];
                 glGetInfoLogARB(program, infologLength, &charsWritten, infoLog);
-                ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Info log:\n%s") % infoLog);
+                ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                           boost::format("Info log:\n%s") % infoLog);
                 delete[] infoLog;
             }
         }
@@ -213,7 +220,8 @@ namespace SORE_Graphics
         {
             program = 0;
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Error creating shader program (shaders are not supported on this system)");
+                       "Error creating shader program (shaders are not "
+                       "supported on this system)");
             return 1;
         }
         uniforms.clear();
@@ -232,8 +240,8 @@ namespace SORE_Graphics
         if(!(type==GL_VERTEX_SHADER || type==GL_FRAGMENT_SHADER))
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Attempted to create shader of unknown type (type given: %u)")
-                       % type);
+                       boost::format("Attempted to create shader of unknown "
+                                     "type (type given: %u)") % type);
             return 1;
         }
         if(!ShadersSupported() || program==0)
@@ -248,7 +256,8 @@ namespace SORE_Graphics
         else if(type==GL_FRAGMENT_SHADER) shaderType = "fragment";
         if(shader==0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error creating %s shader object.")
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Error creating %s shader object.")
                        % shaderType.c_str());
             return 1;
         }
@@ -260,27 +269,32 @@ namespace SORE_Graphics
         glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &compile);
         if(compile!=GL_TRUE)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Failed to compile %s shader")
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Failed to compile %s shader")
                        % shaderType.c_str());
 
             int infologLength = 0;
             int charsWritten  = 0;
             char *infoLog;
 
-            glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
+            glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+                                      &infologLength);
             if (infologLength > 0)
             {
                 infoLog = new char[infologLength];
                 glGetInfoLogARB(shader, infologLength, &charsWritten, infoLog);
-                ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Info log:\n%s") % infoLog);
+                ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                           boost::format("Info log:\n%s") % infoLog);
                 delete[] infoLog;
             }
             else
-                ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("No info log for %s shader")
+                ENGINE_LOG(SORE_Logging::LVL_INFO,
+                           boost::format("No info log for %s shader")
                            % shaderType.c_str());
             return 1;
         }
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Compiling %s shader successful")
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
+                   boost::format("Compiling %s shader successful")
                    % shaderType.c_str());
         glAttachObjectARB(program, shader);
         if(type==GL_VERTEX_SHADER)
@@ -356,6 +370,21 @@ namespace SORE_Graphics
         glUseProgramObjectARB(program);
     }
 
+    bool GLSLShader::operator<(const GLSLShader& o) const
+    {
+        return program < o.program;
+    }
+
+    bool GLSLShader::operator==(const GLSLShader& o) const
+    {
+        return program == o.program;
+    }
+
+    bool operator!=(const GLSLShader& one, const GLSLShader& two)
+    {
+        return !(one == two);
+    }
+
     GLint GLSLShader::GetUniformLocation(std::string name)
     {
         std::map<std::string, GLint>::iterator it;
@@ -365,7 +394,10 @@ namespace SORE_Graphics
             location = glGetUniformLocationARB(program, name.c_str());
             if(location==-1)
             {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL uniform '%s'. Variable name probably does not exist") % name);
+                ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                           boost::format("Error getting location of GLSL "
+                                         "uniform '%s'. Variable name probably "
+                                         "does not exist") % name);
                 return -1; //don't insert into uniforms database
             }
             uniforms.insert(std::pair<std::string,GLint>(name,location));
@@ -384,7 +416,11 @@ namespace SORE_Graphics
             location = glGetAttribLocationARB(program, name.c_str());
             if(location==-1)
             {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Error getting location of GLSL attribute '%s'. Variable name probably does not exist") % name);
+                ENGINE_LOG
+                    (SORE_Logging::LVL_ERROR,
+                     boost::format("Error getting location of GLSL attribute "
+                                   "'%s'. Variable name probably does not exist")
+                     % name);
                 return -1; //don't insert into uniforms database
             }
             attributes.insert(std::pair<std::string,GLint>(name,location));
@@ -406,7 +442,8 @@ namespace SORE_Graphics
             glUniform3fARB(location,v0,v1,v2);
     }
 
-    void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+    void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1,
+                                  GLfloat v2, GLfloat v3)
     {
         if(!ShadersSupported() || program==0)
         {
@@ -454,7 +491,8 @@ namespace SORE_Graphics
             glUniform2fARB(location,v0,v1);
     }
 
-    void GLSLShader::SetUniform1fv(std::string name, unsigned int count, GLfloat * values)
+    void GLSLShader::SetUniform1fv(std::string name, unsigned int count,
+                                   GLfloat * values)
     {
         if(!ShadersSupported() || program==0)
         {

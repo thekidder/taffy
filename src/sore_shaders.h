@@ -37,14 +37,15 @@
 
 namespace SORE_Graphics
 {
-  class SORE_EXPORT GLSLShader : public SORE_Resource::Resource
+    class SORE_EXPORT GLSLShader : public SORE_Resource::Resource
     {
     public:
         static int  InitShaders();
         static void UnbindShaders();
         static bool ShadersSupported();
 
-        GLSLShader(const char* vertex, const char* fragment, SORE_FileIO::PackageCache* pc = NULL);
+        GLSLShader(const char* vertex, const char* fragment,
+                   SORE_FileIO::PackageCache* pc = NULL);
         //loads shader as a INI file specifying vertex/shader files
         GLSLShader(std::string shaderFile, SORE_FileIO::PackageCache* pc = NULL);
         ~GLSLShader();
@@ -68,13 +69,17 @@ namespace SORE_Graphics
         void SetUniform1f(std::string name, GLfloat f0);
         void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
         void SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2);
-        void SetUniform4f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+        void SetUniform4f(std::string name,
+                          GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
         void SetUniform1fv(std::string name, unsigned int count, GLfloat* values);
 
         GLint GetAttributeLocation(std::string name);
 
-    protected:
+        //for sorting
+        bool operator<(const GLSLShader& o) const;
+        bool operator==(const GLSLShader& o) const;
+    private:
         char* LoadFile(const char* filename);
         void Load(); //load from *.shad file
         int  Init();
@@ -89,6 +94,8 @@ namespace SORE_Graphics
         static bool initCalled;
         static bool supported;
     };
+
+    bool operator!=(const GLSLShader& one, const GLSLShader& two);
 }
 
 #ifdef _MSC_VER

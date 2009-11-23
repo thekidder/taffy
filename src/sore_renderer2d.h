@@ -124,7 +124,6 @@ namespace SORE_Graphics
 
         std::vector<std::vector<geometry_provider> >::iterator currentProvider;
 
-        SORE_Graphics::GLSLShader* shad;
         std::vector<batch> batches;
 
         //statistics: get info about current rendering
@@ -134,9 +133,10 @@ namespace SORE_Graphics
         unsigned int numPolys;
     };
 
-    inline int TextureSort(const GeometryChunk* one, const GeometryChunk* two);
-    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> one,
-                      std::pair<const SORE_Math::Matrix4<float>*, const GeometryChunk*> two);
+    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*,
+                      const GeometryChunk*> one,
+                      std::pair<const SORE_Math::Matrix4<float>*,
+                      const GeometryChunk*> two);
 }
 
 #endif
