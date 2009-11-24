@@ -25,12 +25,13 @@
 
 namespace SORE_Graphics
 {
-    GeometryChunk::GeometryChunk(Texture2D* texture, GLSLShader* shad,
+    GeometryChunk::GeometryChunk(Texture2D* texture, GLSLShader* shader,
                                  SORE_Math::Rect<float> bounds,
+                                 geometry_layer l, blend_mode blend,
                                  SORE_Math::Rect<float> texCoords,
                                  const Color& color)
-        : vertices(0), texCoords(0), colors(0), opaque(false), c(color), tex(texture),
-          shader(shad)
+        : layer(l), blending(blend), vertices(0), texCoords(0), colors(0),
+          c(color), tex(texture), shad(shader)
     {
         setup(bounds, texCoords);
     }
@@ -85,9 +86,9 @@ namespace SORE_Graphics
     }
 
     GeometryChunk::GeometryChunk(const GeometryChunk& gc) :
-        vertices(0), texCoords(0), colors(0), indices(0), opaque(gc.opaque),
-        c(gc.c), primitiveType(gc.primitiveType), numVertices(gc.numVertices),
-        numIndices(gc.numIndices), tex(gc.tex), shader(gc.shader)
+        layer(gc.layer), blending(gc.blending), vertices(0), texCoords(0),
+        colors(0), indices(0), c(gc.c), numVertices(gc.numVertices),
+        numIndices(gc.numIndices), tex(gc.tex), shad(gc.shad)
     {
         vertices = new float[numVertices*3];
         texCoords = new float[numVertices*2];
@@ -108,7 +109,7 @@ namespace SORE_Graphics
         delete[] indices;
     }
 
-    const Color& GeometryChunk::GetColor() const
+    const Color& GeometryChunk::color() const
     {
         return c;
     }
@@ -137,21 +138,11 @@ namespace SORE_Graphics
         texCoords[7] = texCoordRect.bottomRight[1];
     }
 
-    bool GeometryChunk::IsOpaque() const
-    {
-        return opaque;
-    }
-
-    float GeometryChunk::GetDepth() const
+    float GeometryChunk::depth() const
     {
         //FIXME: use an average across all vertices or midpoint or closest-Z
         //or something better
         return vertices[2];
-    }
-
-    bool GeometryChunk::HasTexture() const
-    {
-        return texCoords!=0;
     }
 
     bool GeometryChunk::HasColor() const
@@ -159,37 +150,37 @@ namespace SORE_Graphics
         return colors!=0;
     }
 
-    const float * GeometryChunk::Vertices() const
+    const float * GeometryChunk::verticesPtr() const
     {
         return vertices;
     }
 
-    const float * GeometryChunk::Colors() const
+    const float * GeometryChunk::colorsPtr() const
     {
         return colors;
     }
 
-    const unsigned short * GeometryChunk::Indices() const
+    const unsigned short * GeometryChunk::indicesPtr() const
     {
         return indices;
     }
 
-    const float* GeometryChunk::TexCoords() const
+    const float* GeometryChunk::texCoordsPtr() const
     {
         return texCoords;
     }
 
-    unsigned int GeometryChunk::NumVertices() const
+    unsigned int GeometryChunk::getNumVertices() const
     {
         return numVertices;
     }
 
-    unsigned int GeometryChunk::NumIndices() const
+    unsigned int GeometryChunk::getNumIndices() const
     {
         return numIndices;
     }
 
-    const SORE_Graphics::Texture2D* GeometryChunk::GetTexture() const
+    const SORE_Graphics::Texture2D* GeometryChunk::texture() const
     {
         return tex;
     }
@@ -199,14 +190,34 @@ namespace SORE_Graphics
         tex = texture;
     }
 
-    const SORE_Graphics::GLSLShader* GeometryChunk::GetShader() const
+    const SORE_Graphics::GLSLShader* GeometryChunk::shader() const
     {
-        return shader;
+        return shad;
     }
 
-    void GeometryChunk::SetShader(SORE_Graphics::GLSLShader* shad)
+    void GeometryChunk::SetShader(GLSLShader* shader)
     {
-        shader = shad;
+        shad = shader;
+    }
+
+    blend_mode GeometryChunk::blendMode() const
+    {
+        return blending;
+    }
+
+    void GeometryChunk::SetBlendMode(blend_mode blend)
+    {
+        blending = blend;
+    }
+
+    geometry_layer GeometryChunk::geometryLayer() const
+    {
+        return layer;
+    }
+
+    void GeometryChunk::SetGeometryLayer(geometry_layer l)
+    {
+        layer = l;
     }
 
     void ApplyTransform(const SORE_Math::Matrix4<float>& transform,

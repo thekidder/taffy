@@ -172,28 +172,28 @@ void SORE_Graphics::Renderer2D::Build()
             render_list::iterator it;
             for(it=geometry.begin();it!=geometry.end();++it)
             {
-                newBatch.second->AddObject(it->second->Vertices(),
-                                           it->second->Indices(),
-                                           it->second->NumVertices(),
-                                           it->second->NumIndices(),
-                                           it->first, it->second->TexCoords(),
+                newBatch.second->AddObject(it->second->verticesPtr(),
+                                           it->second->indicesPtr(),
+                                           it->second->getNumVertices(),
+                                           it->second->getNumIndices(),
+                                           it->first, it->second->texCoordsPtr(),
                                            NULL,
-                                           it->second->Colors());
+                                           it->second->colorsPtr());
                 if(!newBatch.first.size() ||
-                   *(newBatch.first.back().tex) != *(it->second->GetTexture()))
+                   *(newBatch.first.back().tex) != *(it->second->texture()))
                 {
                     if(newBatch.first.size()>0)
                     {
                         newBatch.first.back().triLen = numIndices/3;
                     }
                     newBatch.first.push_back
-                        (vbo_tex_order(it->second->GetTexture(),
-                                       it->second->GetShader(),
+                        (vbo_tex_order(it->second->texture(),
+                                       it->second->shader(),
                                        totalIndices/3, 0));
                     numIndices = 0;
                 }
-                numIndices+=it->second->NumIndices();
-                totalIndices+=it->second->NumIndices();
+                numIndices+=it->second->getNumIndices();
+                totalIndices+=it->second->getNumIndices();
             }
             newBatch.first.back().triLen =
                 totalIndices/3 - newBatch.first.back().triStart;
@@ -327,9 +327,9 @@ void SORE_Graphics::Renderer2D::PopState()
 inline int TextureSort(const SORE_Graphics::GeometryChunk* one,
                        const SORE_Graphics::GeometryChunk* two)
 {
-    if(*one->GetTexture() < *two->GetTexture())
+    if(*one->texture() < *two->texture())
         return SORE_Graphics::SORT_LESS;
-    else if(*one->GetTexture() == *two->GetTexture())
+    else if(*one->texture() == *two->texture())
         return SORE_Graphics::SORT_EQUAL;
     else
         return SORE_Graphics::SORT_GREATER;
@@ -338,9 +338,9 @@ inline int TextureSort(const SORE_Graphics::GeometryChunk* one,
 inline int ShaderSort(const SORE_Graphics::GeometryChunk* one,
                       const SORE_Graphics::GeometryChunk* two)
 {
-    if(*(one->GetShader()) < *(two->GetShader()))
+    if(*one->shader() < *two->shader())
         return SORE_Graphics::SORT_LESS;
-    else if(*one->GetShader() == *two->GetShader())
+    else if(*one->shader() == *two->shader())
         return SORE_Graphics::SORT_EQUAL;
     else
         return SORE_Graphics::SORT_GREATER;
@@ -351,16 +351,22 @@ bool SORE_Graphics::GeometrySort(std::pair<const SORE_Math::Matrix4<float>*,
                                  std::pair<const SORE_Math::Matrix4<float>*,
                                  const SORE_Graphics::GeometryChunk*> two)
 {
-    if( !one.second->IsOpaque() && two.second->IsOpaque()) return true;
-    if( !two.second->IsOpaque() && one.second->IsOpaque()) return false;
-    if(!one.second->IsOpaque())
+    if( one.second->blendMode() != OPAQUE &&
+        two.second->blendMode() == OPAQUE)
+        return true;
+    if( two.second->blendMode() != OPAQUE &&
+        one.second->blendMode() == OPAQUE)
+        return false;
+    if(one.second->blendMode() != OPAQUE)
     {
         if(one.first->GetData()[14] < two.first->GetData()[14])
             return true;
         else if(two.first->GetData()[14] < one.first->GetData()[14])
             return false;
     }
-    if(ShaderSort(one.second, two.second) == SORT_LESS) return true;
-    if(TextureSort(one.second, two.second) == SORT_LESS) return true;
+    if(ShaderSort(one.second, two.second) == SORT_LESS)
+        return true;
+    if(TextureSort(one.second, two.second) == SORT_LESS)
+        return true;
     return false;
 }

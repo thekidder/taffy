@@ -35,59 +35,86 @@
 */
 namespace SORE_Graphics
 {
+    enum geometry_layer
+    {
+        LAYER0,
+        LAYER1,
+        LAYER2,
+        LAYER3,
+        LAYER4,
+        LAYER5,
+        LAYER6,
+        LAYER7
+    };
+
+    enum blend_mode
+    {
+        OPAQUE,
+        ADDITIVE,
+        SUBTRACTIVE,
+        UNUSED
+    };
+
     static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
     class SORE_EXPORT GeometryChunk
     {
     public:
-        GeometryChunk(Texture2D* texture, GLSLShader* shad,
+        GeometryChunk(Texture2D* texture, GLSLShader* shader,
                       SORE_Math::Rect<float> bounds,
+                      geometry_layer l = LAYER4, blend_mode blend = SUBTRACTIVE,
                       SORE_Math::Rect<float> texCoords = defaultTexCoords,
                       const Color& color = White);
         //produces a deep copy
         GeometryChunk(const GeometryChunk& gc);
         ~GeometryChunk();
 
-        const Color& GetColor() const;
+        const Color& color() const;
         void SetColor(const Color& color);
 
-        const float* TexCoords() const;
         void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
 
-        float GetDepth() const;
-        bool HasTexture() const;
+        blend_mode blendMode() const;
+        void SetBlendMode(blend_mode blend);
+
+        geometry_layer geometryLayer() const;
+        void SetGeometryLayer(geometry_layer l);
+
+        float depth() const;
         bool HasColor() const;
-        bool IsOpaque() const;
-        const float* Vertices() const;
-        const float* Colors() const;
-        const unsigned short* Indices() const;
 
-        unsigned int NumVertices() const;
-        unsigned int NumIndices() const;
+        const float* verticesPtr() const;
+        const float* colorsPtr() const;
+        const float* texCoordsPtr() const;
+        const unsigned short* indicesPtr() const;
 
-        const SORE_Graphics::Texture2D* GetTexture() const;
-        const SORE_Graphics::GLSLShader* GetShader() const;
+        unsigned int getNumVertices() const;
+        unsigned int getNumIndices() const;
+
+        const SORE_Graphics::Texture2D* texture() const;
+        const SORE_Graphics::GLSLShader* shader() const;
         void SetTexture(SORE_Graphics::Texture2D* texture);
-        void SetShader(SORE_Graphics::GLSLShader* shad);
+        void SetShader(SORE_Graphics::GLSLShader* shader);
     private:
         void setup(SORE_Math::Rect<float> bounds,
                    SORE_Math::Rect<float> texCoordRect);
+
+        geometry_layer layer;
+        blend_mode blending;
 
         //geometry
         float* vertices;
         float* texCoords;
         float* colors;
-
         unsigned short* indices;
-        bool opaque;
+
+        //color
         Color c;
 
-        unsigned int primitiveType;
         unsigned int numVertices, numIndices;
 
         SORE_Graphics::Texture2D* tex;
-        SORE_Graphics::GLSLShader* shader;
-
+        SORE_Graphics::GLSLShader* shad;
     };
 
     typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*,

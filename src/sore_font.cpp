@@ -184,7 +184,8 @@ namespace SORE_Font
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk
-                (c[index].tex, shader, bounds, texCoords);
+                (c[index].tex, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
         else
         {

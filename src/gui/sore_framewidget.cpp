@@ -114,7 +114,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.25f, 0.75f);
 
             chunk[0] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(leftBorder && bottomBorder + topBorder < height)
@@ -127,7 +128,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.25f, 0.75f);
 
             chunk[1] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(leftBorder && topBorder)
@@ -139,7 +141,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.0f, 0.25f);
 
             chunk[2] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(leftBorder + rightBorder < width && topBorder)
@@ -152,7 +155,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.0f, 0.25f);
 
             chunk[3] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(rightBorder && topBorder)
@@ -164,7 +168,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.0f, 0.25f);
 
             chunk[4] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(rightBorder && topBorder + bottomBorder < height)
@@ -177,8 +182,9 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.25f, 0.75f);
 
             chunk[5] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
-        }
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
+                }
 
         if(rightBorder && bottomBorder)
         {
@@ -191,7 +197,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.75f, 1.0f);
 
             chunk[6] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(bottomBorder && rightBorder + leftBorder < width)
@@ -204,7 +211,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.75f, 1.0f);
 
             chunk[7] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
 
         if(leftBorder && bottomBorder)
@@ -217,7 +225,8 @@ namespace SORE_GUI
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.75f, 1.0f);
 
             chunk[8] = new SORE_Graphics::GeometryChunk
-                (texture, shader, bounds, texCoords);
+                (texture, shader, bounds,
+                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
     }
 

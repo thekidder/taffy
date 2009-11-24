@@ -61,8 +61,6 @@ namespace SORE_Graphics
 
     typedef std::vector<vbo_tex_order> texture_stack;
 
-    enum blend_mode {ADDITIVE, SUBTRACTIVE};
-
     struct geometry_provider
     {
         boost::function<render_list ()> geometryCallback;
