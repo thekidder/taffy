@@ -1,3 +1,29 @@
+Renderer design:
+Buffer: 
+  Contains a (possibly shared) chunk of geometry or index information.
+GeometryChunk:
+  Contains multiple Buffers
+Renderable:
+  Composed of a GeometryChunk, shader, textures, and transformation.
+  Is sortable -  contains a key that implements sorting (see below)
+
+GeometryProvider:
+  Object that defines: 
+    Projection for the geometry to be rendered
+    Callbacks for added, removed, changed objects
+
+Renderer:
+  On a GeometryProvider callback:
+    Rebuild or refresh affected VBOs
+    Two options: 
+     Do a complete rebuild each time, or:
+     Find the minimum that has to be changed, and change it
+  Per Frame:
+    For the current state: render all VBOs
+      
+      
+
+
 Renderer sorting:
 
 key: 32-bits
