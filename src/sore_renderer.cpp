@@ -24,14 +24,14 @@
 
 namespace SORE_Graphics
 {
-  void IRenderer::SetScreenInfo(ScreenInfo _screen)
-  {
-    screen = _screen;
-    OnScreenChange();
-  }
+    void IRenderer::SetScreenInfo(ScreenInfo _screen)
+    {
+        screen = _screen;
+        OnScreenChange();
+    }
 
-	ScreenInfo IRenderer::GetScreenInfo() const
-	{
-		return screen;
-	}
+    ScreenInfo IRenderer::GetScreenInfo() const
+    {
+        return screen;
+    }
 }
