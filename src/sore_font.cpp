@@ -80,9 +80,10 @@ namespace SORE_Font
     void Font::LoadFace(unsigned int height)
     {
         ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
-                   boost::format("Loading face for %d px %s") % height % GetFilename());
-        FT_Set_Pixel_Sizes( face, 0, height);
+                   boost::format("Loading face for %d px %s") %
+                   height % GetFilename());
 
+        FT_Set_Pixel_Sizes( face, 0, height);
         characters[height] = new CharInfo[NUM_CHARACTERS];
 
         for(unsigned char i=0;i<128;i++)
