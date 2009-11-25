@@ -23,21 +23,37 @@
 
 namespace SORE_Game
 {
-    static SORE_Graphics::ScreenInfo screenInfo = {1024, 768, 1024.0f/768.0f, true, false, false};
+    static SORE_Graphics::ScreenInfo screenInfo =
+    {
+        1024,
+        768,
+        1024.0f/768.0f,
+        true,
+        false,
+        false
+    };
 
-    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk, SORE_FileIO::PackageCache* pc,
-                                       std::string windowTitle, std::string settingsFile)
-        : kernel(gk), pool(pc), ini(settingsFile), sm(&ini), screen(screenInfo, input, windowTitle, &sm), popFlag(false)
+    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk,
+                                       SORE_FileIO::PackageCache* pc,
+                                       std::string windowTitle,
+                                       std::string settingsFile)
+        : kernel(gk), pool(pc), ini(settingsFile), sm(&ini),
+          screen(screenInfo, input, windowTitle, &sm), popFlag(false)
     {
         curr = gk.end();
 
         gk.AddTask(0, &input);
         gk.AddTask(10, &screen);
         SORE_Resource::Resource::SetRM(&pool);
-        renderer = new SORE_Graphics::Renderer2D(pool);
+        renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
-        input.AddListener(SORE_Kernel::WINDOWRESIZE, std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-        input.AddListener(SORE_Kernel::RESIZE, std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize), &pool));
+        input.AddListener
+            (SORE_Kernel::WINDOWRESIZE,
+             std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
+        input.AddListener
+            (SORE_Kernel::RESIZE,
+             std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
+                          &pool));
     }
 
     GamestateManager::~GamestateManager()
@@ -83,7 +99,7 @@ namespace SORE_Game
         states.push_back(std::make_pair(curr, newState));
     }
 
-    SORE_Graphics::Renderer2D* GamestateManager::GetRenderer()
+    SORE_Graphics::Renderer* GamestateManager::GetRenderer()
     {
         return renderer;
     }
@@ -107,11 +123,12 @@ namespace SORE_Game
     {
         if(kernel.ShouldQuit())
         {
-            ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize one or more subsystems - now exiting");
+            ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize one "
+                       "or more subsystems - now exiting");
             return 1;
         }
 
-        unsigned int maxfps = 100;
+        unsigned int maxfps = 1000;
         unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
         while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
         {
@@ -127,8 +144,8 @@ namespace SORE_Game
 
             kernel.Frame();
 
-            //if a PopState is requested, we delay it until the end of the frame, to make sure no invalid
-            //memory accessed are performed
+            //if a PopState is requested, we delay it until the end of the
+            //frame, to make sure no invalid memory accessed are performed
             if(popFlag)
                 Pop();
         }

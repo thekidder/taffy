@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "sore_renderer2d.h"
+#include "sore_renderer_std.h"
 #include "sore_input.h"
 #include "sore_resource.h"
 #include "sore_screen.h"
@@ -35,7 +35,8 @@ namespace SORE_Game
     class SORE_EXPORT GamestateManager
     {
     public:
-        GamestateManager(SORE_Kernel::GameKernel& gk, SORE_FileIO::PackageCache* pc = NULL,
+        GamestateManager(SORE_Kernel::GameKernel& gk,
+                         SORE_FileIO::PackageCache* pc = NULL,
                          std::string windowTitle = "SORE Framework Application",
                          std::string settingsFile = "");
         ~GamestateManager();
@@ -46,7 +47,7 @@ namespace SORE_Game
         //run until a task requests exit or until there are no states left
         int Run();
 
-        SORE_Graphics::Renderer2D* GetRenderer();
+        SORE_Graphics::Renderer* GetRenderer();
         SORE_Kernel::InputTask* GetInputTask();
         SORE_Resource::ResourcePool& GetPool();
         SORE_Kernel::Screen* GetScreen();
@@ -54,13 +55,13 @@ namespace SORE_Game
         void Pop();
 
         SORE_Kernel::GameKernel& kernel;
-        SORE_Graphics::Renderer2D* renderer;
+        SORE_Graphics::Renderer* renderer;
         SORE_Kernel::InputTask input;
         SORE_Resource::ResourcePool pool;
-        
+
         SORE_Utility::IniSettingsBackend ini;
         SORE_Utility::SettingsManager sm;
-        
+
         SORE_Kernel::Screen screen;
 
         SORE_Kernel::task_ref curr;

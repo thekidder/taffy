@@ -48,35 +48,38 @@ SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h.in)
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
 set(SORE_SRCS
-  sore_color.cpp sore_fbo.cpp sore_fileio.cpp sore_font.cpp sore_gamekernel.cpp 
-  sore_gamestate.cpp sore_gamestate_manager.cpp
-  sore_geometrychunk.cpp sore_graphics.cpp sore_graphicsarray.cpp sore_input.cpp 
-  sore_interpolater.cpp
-  sore_logger.cpp sore_logginginit.cpp
-  sore_material.cpp sore_math.cpp sore_particle.cpp sore_particle_circle.cpp 
-  sore_particle_emitter.cpp sore_particle_explosion.cpp
-  sore_postprocess.cpp sore_profiler.cpp
-  sore_renderer.cpp sore_renderer2d.cpp sore_resource.cpp
-  sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp sore_screenglow.cpp
-  sore_screeninfo.cpp sore_settings.cpp sore_shaders.cpp sore_task.cpp
-  sore_text.cpp sore_texture.cpp sore_timing.cpp sore_util.cpp 
-  sore_vbo.cpp sore_vertexarray.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
+  sore_color.cpp sore_fbo.cpp sore_fileio.cpp sore_font.cpp
+  sore_gamekernel.cpp sore_gamestate.cpp sore_gamestate_manager.cpp
+  sore_geometrychunk.cpp sore_graphics.cpp sore_graphicsarray.cpp
+  sore_input.cpp sore_interpolater.cpp sore_logger.cpp
+  sore_logginginit.cpp sore_material.cpp sore_math.cpp
+  sore_particle.cpp sore_particle_circle.cpp sore_particle_emitter.cpp
+  sore_particle_explosion.cpp sore_postprocess.cpp sore_profiler.cpp
+  sore_renderer.cpp sore_renderer_std.cpp sore_resource.cpp
+  sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp
+  sore_screenglow.cpp sore_screeninfo.cpp sore_settings.cpp
+  sore_shaders.cpp sore_task.cpp sore_text.cpp sore_texture.cpp
+  sore_timing.cpp sore_util.cpp sore_vbo.cpp sore_vertexarray.cpp
+  ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
 
 set(SORE_HEADERS sore.h
-  sore_allgl.h sore_color.h sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
-  sore_gamestate.h sore_gamestate_manager.h
-  sore_gamekernel.h sore_geometrychunk.h sore_graphics.h sore_graphicsarray.h sore_input.h
-  sore_interpolater.h sore_logger.h sore_logginginit.h
-  sore_material.h sore_math.h 
-  sore_particle.h sore_particle_circle.h sore_particle_emitter.h sore_particle_explosion.h
-  sore_postprocess.h
-  sore_profiler.h sore_renderer.h sore_renderer2d.h sore_resource.h
-  sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h sore_screeninfo.h
-  sore_settings.h sore_shaders.h sore_task.h sore_text.h sore_texture.h
-  sore_timing.h sore_util.h sore_vbo.h sore_vertexarray.h ${CMAKE_VERSION_OUT} ${CMAKE_VERSION_IN})
+  sore_allgl.h sore_color.h sore_dll.h sore_defines.h sore_fbo.h
+  sore_fileio.h sore_font.h sore_gamestate.h sore_gamestate_manager.h
+  sore_gamekernel.h sore_geometrychunk.h sore_graphics.h
+  sore_graphicsarray.h sore_input.h sore_interpolater.h sore_logger.h
+  sore_logginginit.h sore_material.h sore_math.h sore_particle.h
+  sore_particle_circle.h sore_particle_emitter.h
+  sore_particle_explosion.h sore_postprocess.h sore_profiler.h
+  sore_renderer.h sore_renderer_std.h sore_resource.h
+  sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h
+  sore_screeninfo.h sore_settings.h sore_shaders.h sore_task.h
+  sore_text.h sore_texture.h sore_timing.h sore_util.h sore_vbo.h
+  sore_vertexarray.h ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS}
+  ${SORE_NETWORK_HEADERS} ${CMAKE_VERSION_OUT} ${CMAKE_VERSION_IN})
 
 ADD_LIBRARY(sore_lib SHARED ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
-  ${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS})
+  ${SORE_HEADERS})
+
 SET_TARGET_PROPERTIES(
 sore_lib
 PROPERTIES

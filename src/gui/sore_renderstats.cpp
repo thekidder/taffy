@@ -2,20 +2,21 @@
 
 #include "sore_framewindow.h"
 #include "sore_textwidget.h"
-#include "../sore_renderer2d.h"
+#include "../sore_renderer_std.h"
 
 #include "sore_renderstats.h"
 
 namespace SORE_GUI
 {
     RenderStats::RenderStats(SORE_Resource::ResourcePool& pool,
-                             SORE_Graphics::Renderer2D *r,
+                             SORE_Graphics::Renderer *r,
                              SORE_GUI::Widget *parent) :
         renderer(r), frame(0), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
         polys(0), polysLabel(0), ms(0), msLabel(0)
     {
         SORE_Font::Font* font =
-            pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
+            pool.GetResource<SORE_Font::Font>
+            ("data/ix_style/LiberationSans-Regular.ttf");
 
         frame = new SORE_GUI::FrameWindow(SVec(SUnit(0.0, 200), SUnit(0.0, 180)),
                                           SVec(SUnit(0.0, 10), SUnit(0.0, 10)),
@@ -35,13 +36,17 @@ namespace SORE_GUI
                                               SORE_Graphics::White, frame);
 
         fps        = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 0)),
-                                              *font, 16, "0", SORE_Graphics::White, frame);
+                                              *font, 16, "0", SORE_Graphics::White,
+                                              frame);
         draws      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 16)),
-                                              *font, 16, "0", SORE_Graphics::White, frame);
+                                              *font, 16, "0", SORE_Graphics::White,
+                                              frame);
         polys      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 32)),
-                                              *font, 16, "0", SORE_Graphics::White, frame);
+                                              *font, 16, "0", SORE_Graphics::White,
+                                              frame);
         ms         = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 48)),
-                                              *font, 16, "0", SORE_Graphics::White, frame);
+                                              *font, 16, "0", SORE_Graphics::White,
+                                              frame);
     }
 
     RenderStats::~RenderStats()

@@ -21,7 +21,7 @@
 #include <algorithm>
 
 #include "sore_allgl.h"
-#include "sore_renderer2d.h"
+#include "sore_renderer_std.h"
 #include "sore_shaders.h"
 
 inline int next_p2 (int a )
@@ -31,13 +31,13 @@ inline int next_p2 (int a )
     return rval;
 }
 
-SORE_Graphics::Renderer2D::Renderer2D(SORE_Resource::ResourcePool& _rm)
+SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _rm)
     : rm(_rm)
 {
     PushState();
 }
 
-SORE_Graphics::Renderer2D::~Renderer2D()
+SORE_Graphics::Renderer::~Renderer()
 {
     for(std::vector<batch>::iterator dit = batches.begin();dit!=batches.end();++dit)
     {
@@ -45,7 +45,7 @@ SORE_Graphics::Renderer2D::~Renderer2D()
     }
 }
 
-void SORE_Graphics::Renderer2D::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
+void SORE_Graphics::Renderer::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
 {
     switch(pi.type)
     {
@@ -89,7 +89,7 @@ void SORE_Graphics::Renderer2D::SetupProjection(SORE_Graphics::ProjectionInfo& p
     }
 }
 
-int SORE_Graphics::Renderer2D::ChangeProjectionMatrix
+int SORE_Graphics::Renderer::ChangeProjectionMatrix
 (SORE_Graphics::ProjectionInfo& projection)
 {
     SetupProjection(projection);
@@ -129,11 +129,11 @@ int SORE_Graphics::Renderer2D::ChangeProjectionMatrix
     return returnCode;
 }
 
-void SORE_Graphics::Renderer2D::OnScreenChange()
+void SORE_Graphics::Renderer::OnScreenChange()
 {
 }
 
-void SORE_Graphics::Renderer2D::Build()
+void SORE_Graphics::Renderer::Build()
 {
     if(!currentProvider->size())
         return;
@@ -203,7 +203,7 @@ void SORE_Graphics::Renderer2D::Build()
     }
 }
 
-void SORE_Graphics::Renderer2D::RenderBatch(batch& b)
+void SORE_Graphics::Renderer::RenderBatch(batch& b)
 {
     if(!b.second->Empty())
     {
@@ -222,7 +222,7 @@ void SORE_Graphics::Renderer2D::RenderBatch(batch& b)
     }
 }
 
-void SORE_Graphics::Renderer2D::Render()
+void SORE_Graphics::Renderer::Render()
 {
     Build();
 
@@ -281,44 +281,44 @@ void SORE_Graphics::Renderer2D::Render()
     PrintGLErrors(SORE_Logging::LVL_ERROR);
 }
 
-float SORE_Graphics::Renderer2D::GetFPS() const
+float SORE_Graphics::Renderer::GetFPS() const
 {
     return fps;
 }
 
-float SORE_Graphics::Renderer2D::GetFrameMS() const
+float SORE_Graphics::Renderer::GetFrameMS() const
 {
     return ms;
 }
 
-unsigned int SORE_Graphics::Renderer2D::GetDrawCalls() const
+unsigned int SORE_Graphics::Renderer::GetDrawCalls() const
 {
     return drawCalls;
 }
 
-unsigned int SORE_Graphics::Renderer2D::GetNumPolys() const
+unsigned int SORE_Graphics::Renderer::GetNumPolys() const
 {
     return numPolys;
 }
 
-void SORE_Graphics::Renderer2D::ClearGeometryProviders()
+void SORE_Graphics::Renderer::ClearGeometryProviders()
 {
     currentProvider->clear();
 }
 
-void SORE_Graphics::Renderer2D::AddGeometryProvider(geometry_provider c)
+void SORE_Graphics::Renderer::AddGeometryProvider(geometry_provider c)
 {
     currentProvider->push_back(c);
 }
 
-void SORE_Graphics::Renderer2D::PushState()
+void SORE_Graphics::Renderer::PushState()
 {
     std::vector<geometry_provider> temp;
     geometryProviders.push_back(temp);
     currentProvider = geometryProviders.end() - 1;
 }
 
-void SORE_Graphics::Renderer2D::PopState()
+void SORE_Graphics::Renderer::PopState()
 {
     geometryProviders.pop_back();
     currentProvider = geometryProviders.end() - 1;
