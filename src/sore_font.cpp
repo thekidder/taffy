@@ -83,11 +83,16 @@ namespace SORE_Font
                    boost::format("Loading face for %d px %s") %
                    height % GetFilename());
 
+        GLint texSize;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
+                   boost::format("Maximum texture size: %d") % texSize);
+
         FT_Set_Pixel_Sizes( face, 0, height);
         characters[height] = new CharInfo[NUM_CHARACTERS];
 
         for(unsigned char i=0;i<128;i++)
-            LoadCharacter(face,i, height);
+            LoadCharacter(i, height);
     }
 
     void Font::Load()
@@ -124,7 +129,7 @@ namespace SORE_Font
         return;
     }
 
-    void Font::LoadCharacter(FT_Face& face, char ch, unsigned int h)
+    void Font::LoadCharacter(char ch, unsigned int h)
     {
         FT_Render_Mode mode = FT_RENDER_MODE_NORMAL;
         if(h <= 24)

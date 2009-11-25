@@ -85,7 +85,7 @@ namespace SORE_Font
         //This loads our face, but no specific characters
         void Load();
     private:
-        void LoadCharacter(FT_Face& face, char ch, unsigned int h);
+        void LoadCharacter(char ch, unsigned int h);
 
         //(height, CharInfo[128])
         std::map<unsigned int, CharInfo*> characters;
