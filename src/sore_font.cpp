@@ -163,6 +163,7 @@ namespace SORE_Font
         }
 
         GLubyte* texture = new GLubyte[texWidth * texHeight * 4];
+        memset(texture, 0, texWidth * texHeight * 4);
 
         for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
         {
