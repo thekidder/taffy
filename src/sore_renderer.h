@@ -25,25 +25,26 @@
 
 namespace SORE_Graphics
 {
-	typedef unsigned int gc_id;
-	
-	class SORE_EXPORT IRenderer
-	{
-	public:
-		IRenderer() {}
-		virtual ~IRenderer() {}
-			
-		virtual void Render() = 0;
-		void SetScreenInfo(ScreenInfo _screen);
-		ScreenInfo GetScreenInfo() const;
+    typedef unsigned int gc_id;
 
-		//Renderer has a "state": used by Gamestate. Only geometry in the current state should be rendered
-		virtual void PushState() = 0;
-		virtual void PopState() = 0;
-	protected:
-		virtual void OnScreenChange() {}
-		ScreenInfo screen;
-	};
+    class SORE_EXPORT IRenderer
+    {
+    public:
+        IRenderer() {}
+        virtual ~IRenderer() {}
+
+        virtual void Render() = 0;
+        void SetScreenInfo(ScreenInfo _screen);
+        ScreenInfo GetScreenInfo() const;
+
+        //Renderer has a "state": used by Gamestate. Only geometry in the
+        //current state should be rendered
+        virtual void PushState() = 0;
+        virtual void PopState() = 0;
+    protected:
+        virtual void OnScreenChange() {}
+        ScreenInfo screen;
+    };
 }
 
 #endif
