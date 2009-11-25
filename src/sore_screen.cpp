@@ -31,8 +31,8 @@
 
 namespace SORE_Kernel
 {
-    Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i, std::string windowTitle,
-                   SORE_Utility::SettingsManager* _sm)
+    Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
+                   std::string windowTitle, SORE_Utility::SettingsManager* _sm)
         : input(i), drawContext(0), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
@@ -42,11 +42,13 @@ namespace SORE_Kernel
         proj.znear = 0.1f;
         proj.zfar  = 200.0f;
         proj.useScreenRatio = true;
-        screen.ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
+        screen.ratio = static_cast<GLfloat>(_screen.width) /
+            static_cast<GLfloat>(_screen.height);
         if(InitializeSDL(windowTitle)!=0)
         {
             ENGINE_LOG(SORE_Logging::LVL_CRITICAL,
-                       boost::format("Could not initialize SDL (SDL error %s)") % SDL_GetError());
+                       boost::format("Could not initialize SDL (SDL error %s)")
+                       % SDL_GetError());
             quitFlag = true;
         }
         SDL_EnableUNICODE(1);
@@ -54,29 +56,35 @@ namespace SORE_Kernel
         if(sm!=NULL)
         {
             screen.width =
-                sm->WatchVariable("screen", "width",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "width",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
             screen.height =
-                sm->WatchVariable("screen", "height",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "height",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
             screen.fullscreen =
-                sm->WatchVariable("screen", "fullscreen",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "fullscreen",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
             screen.resizable  =
-                sm->WatchVariable("screen", "resizable",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "resizable",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
             screen.showCursor =
-                sm->WatchVariable("screen", "showcursor",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "showcursor",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
             screen.useNativeResolution  =
-                sm->WatchVariable("screen", "native",
-                                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
-                                              this));
+                sm->WatchVariable
+                ("screen", "native",
+                 boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
+                             this));
         }
         best_w = SDL_GetVideoInfo()->current_w;
         best_h = SDL_GetVideoInfo()->current_h;
@@ -137,7 +145,8 @@ namespace SORE_Kernel
         {
             if(modes[i]->x || modes[i]->y)
                 ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                           boost::format("ListModes returned invalid Rect: x: %d, y: %d")
+                           boost::format("ListModes returned invalid Rect: x: "
+                                         "%d, y: %d")
                            % modes[i]->x % modes[i]->y);
             if(modes[i]->w >= 640 && modes[i]->h >= 480)
             {
@@ -196,12 +205,14 @@ namespace SORE_Kernel
             _screen.width = best_w;
             _screen.height = best_h;
         }
-        _screen.ratio = static_cast<GLfloat>(_screen.width) / static_cast<GLfloat>(_screen.height);
+        _screen.ratio = static_cast<GLfloat>(_screen.width) /
+            static_cast<GLfloat>(_screen.height);
     }
 
     void Screen::Resize(int width, int height)
     {
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("resizing from (%d, %d) to (%d, %d)")
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
+                   boost::format("resizing from (%d, %d) to (%d, %d)")
                    % screen.width % screen.height % width % height);
         if(renderer)
         {
@@ -225,7 +236,8 @@ namespace SORE_Kernel
 
         if ( !videoInfo )
         {
-            ENGINE_LOG(SORE_Logging::SHOW_CRITICAL, boost::format("Video query failed: %s")
+            ENGINE_LOG(SORE_Logging::SHOW_CRITICAL,
+                       boost::format("Video query failed: %s")
                        % SDL_GetError());
             return 1;
         }
@@ -306,7 +318,8 @@ namespace SORE_Kernel
         if(glewError != GLEW_OK)
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Failed to initialize OpenGL extensions. GLEW Error: %s")
+                       boost::format("Failed to initialize OpenGL extensions. "
+                                     "GLEW Error: %s")
                        % glewGetErrorString(glewError));
         }
     }
