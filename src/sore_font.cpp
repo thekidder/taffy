@@ -185,7 +185,7 @@ namespace SORE_Font
         textures[height] = new SORE_Graphics::Texture2D
             (texture, GL_RGBA, GL_RGBA, texWidth, texHeight);
 
-        for(char i = 0; i < NUM_CHARACTERS; ++i)
+        for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
         {
             if(characters[height][i].gc)
             {
@@ -267,9 +267,7 @@ namespace SORE_Font
             SORE_Math::Rect<float> bounds (0.0f,
                                            static_cast<float>(width), 0.0f,
                                            static_cast<float>(height));
-            //SORE_Math::Rect<float> bounds(0.0f, 512.0f, 0.0f, 256.0f);
             SORE_Math::Rect<float> texCoords(0.0f, 1.0f, 0.0f, 1.0f);
-            //SORE_Math::Rect<float> texCoords(0.0f, , 0.0f, y);
 
             SORE_Graphics::GLSLShader* shader =
                 rm->GetResource<SORE_Graphics::GLSLShader>
