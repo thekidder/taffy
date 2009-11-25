@@ -42,7 +42,7 @@
 
 namespace SORE_Font
 {
-  //let's define some nice error constants
+    //let's define some nice error constants
     const int LIBRARY_LOAD_FAILED    = 1;
     const int FONTCONFIG_LOAD_FAILED = 5;
     const int FONT_LOAD_FAILED       = 2;
@@ -56,7 +56,8 @@ namespace SORE_Font
     {
     public:
         static void InitPaths();
-        static std::string GetFontPath(std::string name, SORE_FileIO::PackageCache* pc = NULL);
+        static std::string GetFontPath(std::string name,
+                                       SORE_FileIO::PackageCache* pc = NULL);
     private:
         static std::vector<std::string> fontPaths;
     };
