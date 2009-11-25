@@ -5,7 +5,7 @@
 
 namespace SORE_Graphics
 {
-    class Renderer2D;
+    class Renderer;
 }
 
 namespace SORE_GUI
