@@ -157,7 +157,7 @@ namespace SORE_Font
                                      "%d x %d, which is larger than the maximum "
                                      "(%d)") % texWidth % texHeight % texSize);
             for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
-                delete buffers[i].data;
+                delete[] buffers[i].data;
             delete[] buffers;
             return;
         }
@@ -208,7 +208,7 @@ namespace SORE_Font
         }
 
         for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
-            delete buffers[i].data;
+            delete[] buffers[i].data;
         delete[] buffers;
         delete[] texture;
     }
