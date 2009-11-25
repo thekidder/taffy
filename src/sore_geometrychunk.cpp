@@ -60,18 +60,7 @@ namespace SORE_Graphics
         vertices[10] = bounds.bottomRight[1];
         vertices[11] = 0.0;
 
-        texCoords[0] = texCoordRect.topLeft[0];
-        texCoords[1] = texCoordRect.topLeft[1];
-
-        texCoords[2] = texCoordRect.topLeft[0];
-        texCoords[3] = texCoordRect.bottomRight[1];
-
-        texCoords[4] = texCoordRect.bottomRight[0];
-        texCoords[5] = texCoordRect.topLeft[1];
-
-        texCoords[6] = texCoordRect.bottomRight[0];
-        texCoords[7] = texCoordRect.bottomRight[1];
-
+        SetTexCoords(texCoordRect);
         SetColor(c);
 
         indices[0] = 0;
