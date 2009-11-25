@@ -20,7 +20,11 @@ Renderer:
      Find the minimum that has to be changed, and change it
   Per Frame:
     For the current state: render all VBOs
-      
+
+Current issues:
+  where to store transformations?
+    use a shared_ptr
+        
       
 
 
