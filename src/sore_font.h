@@ -64,10 +64,16 @@ namespace SORE_Font
 
     struct CharInfo
     {
-        SORE_Graphics::Texture2D* tex;
         SORE_Graphics::GeometryChunk* gc;
         SORE_Math::Matrix4<float> transform;
         float advance;
+    };
+
+    struct CharInfoInternal
+    {
+        GLubyte* data;
+        unsigned int height;
+        unsigned int width;
     };
 
     class SORE_EXPORT Font : public SORE_Resource::Resource
@@ -85,10 +91,17 @@ namespace SORE_Font
         //This loads our face, but no specific characters
         void Load();
     private:
-        void LoadCharacter(char ch, unsigned int h);
+        Font(const Font& o);
+        Font& operator=(const Font& o);
+        void LoadCharacter(char ch, unsigned int h,
+                           CharInfoInternal& info,
+                           unsigned int& width,
+                           unsigned int& height);
 
         //(height, CharInfo[128])
         std::map<unsigned int, CharInfo*> characters;
+        std::map<unsigned int, SORE_Graphics::Texture2D*>
+            textures;
         FT_Library library;
         FT_Face face;
         FT_Byte* fontInfo;

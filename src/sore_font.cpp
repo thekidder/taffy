@@ -65,34 +65,19 @@ namespace SORE_Font
         {
             for(unsigned int i=0;i<NUM_CHARACTERS;++i)
             {
-                if(it->second[i].tex)
-                    delete it->second[i].tex;
                 if(it->second[i].gc)
                     delete it->second[i].gc;
             }
             CharInfo* c = it->second;
             delete[] c;
         }
+        std::map<unsigned int, SORE_Graphics::Texture2D*>::iterator t_it;
+        for(t_it = textures.begin(); t_it!=textures.end(); ++t_it)
+        {
+            delete t_it->second;
+        }
         FT_Done_Face(face);
         FT_Done_FreeType(library);
-    }
-
-    void Font::LoadFace(unsigned int height)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
-                   boost::format("Loading face for %d px %s") %
-                   height % GetFilename());
-
-        GLint texSize;
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
-                   boost::format("Maximum texture size: %d") % texSize);
-
-        FT_Set_Pixel_Sizes( face, 0, height);
-        characters[height] = new CharInfo[NUM_CHARACTERS];
-
-        for(unsigned char i=0;i<128;i++)
-            LoadCharacter(i, height);
     }
 
     void Font::Load()
@@ -129,7 +114,108 @@ namespace SORE_Font
         return;
     }
 
-    void Font::LoadCharacter(char ch, unsigned int h)
+    void Font::LoadFace(unsigned int height)
+    {
+        ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
+                   boost::format("Loading face for %d px %s") %
+                   height % GetFilename());
+
+        FT_Set_Pixel_Sizes( face, 0, height);
+        characters[height] = new CharInfo[NUM_CHARACTERS];
+
+        unsigned int glyphWidth = 0;
+        unsigned int glyphHeight = 0;
+
+        CharInfoInternal* buffers = new CharInfoInternal[NUM_CHARACTERS];
+
+        for(unsigned char i=0; i<NUM_CHARACTERS; ++i)
+        {
+            unsigned int w, h;
+            LoadCharacter(i, height, buffers[i], w, h);
+            if(w > glyphWidth)
+                glyphWidth = w;
+            if(h > glyphHeight)
+                glyphHeight = h;
+        }
+
+        const unsigned int GLYPH_COLS = 16;
+        const unsigned int GLYPH_ROWS = 8;
+
+        assert(GLYPH_ROWS * GLYPH_COLS == NUM_CHARACTERS);
+
+        unsigned int texWidth = next_p2(GLYPH_COLS*glyphWidth);
+        unsigned int texHeight = next_p2(GLYPH_ROWS*glyphHeight);
+        glyphWidth = texWidth / GLYPH_COLS;
+        glyphHeight = texHeight / GLYPH_ROWS;
+
+        GLint texSize;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+        if(texWidth > texSize || texHeight > texSize)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Attempting to create font texture of size "
+                                     "%d x %d, which is larger than the maximum "
+                                     "(%d)") % texWidth % texHeight % texSize);
+            for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
+                delete buffers[i].data;
+            delete[] buffers;
+            return;
+        }
+
+        GLubyte* texture = new GLubyte[texWidth * texHeight * 4];
+
+        for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
+        {
+            unsigned int x = i % GLYPH_COLS;
+            unsigned int y = i / GLYPH_COLS;
+            x *= glyphWidth;
+            y *= glyphHeight;
+
+            for(unsigned int j = 0; j < buffers[i].height; ++j)
+            {
+                GLubyte* destIndex = texture + 4*((y + j) * texWidth + x);
+                GLubyte* srcIndex = buffers[i].data + 4*j*buffers[i].width;
+                assert(4*((y + j) * texWidth + x) + 4*buffers[i].width <
+                       4 * texWidth * texHeight);
+                memcpy(destIndex, srcIndex, 4*buffers[i].width);
+            }
+        }
+
+        textures[height] = new SORE_Graphics::Texture2D
+            (texture, GL_RGBA, GL_RGBA, texWidth, texHeight);
+
+        for(char i = 0; i < NUM_CHARACTERS; ++i)
+        {
+            if(characters[height][i].gc)
+            {
+                float xBlock = static_cast<float>(glyphWidth) / texWidth;
+                float yBlock = static_cast<float>(glyphHeight) / texHeight;
+                unsigned int x = i % GLYPH_COLS;
+                unsigned int y = i / GLYPH_COLS;
+
+                float xMin = x * xBlock;
+                float yMin = y * yBlock;
+                float xMax = xMin +
+                    static_cast<float>(buffers[i].width) / glyphWidth * xBlock;
+                float yMax = yMin +
+                    static_cast<float>(buffers[i].height) / glyphHeight * yBlock;
+
+                SORE_Math::Rect<float> texCoords(xMin, xMax, yMin, yMax);
+                characters[height][i].gc->SetTexture(textures[height]);
+                characters[height][i].gc->SetTexCoords(texCoords);
+            }
+        }
+
+        for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
+            delete buffers[i].data;
+        delete[] buffers;
+        delete[] texture;
+    }
+
+    void Font::LoadCharacter(char ch, unsigned int h,
+                             CharInfoInternal& info,
+                             unsigned int& width,
+                             unsigned int& height)
     {
         FT_Render_Mode mode = FT_RENDER_MODE_NORMAL;
         if(h <= 24)
@@ -141,40 +227,36 @@ namespace SORE_Font
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        boost::format("Error loading '%c' (error %d)")
                        % ch % err);
-            //return;
         }
 
         FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         FT_Bitmap& bitmap=face->glyph->bitmap;
 
-        int width = next_p2( bitmap.width );
-        int height = next_p2( bitmap.rows );
+        width = info.width = bitmap.width;
+        height = info.height = bitmap.rows;
 
-        GLubyte* expanded_data = new GLubyte[ 2 * width * height];
+        info.data = new GLubyte[ 4 * width * height];
 
-        for(int j=0; j<height;j++)
+        for(unsigned int j=0; j<height;j++)
         {
-            for(int i=0; i<width; i++)
+            for(unsigned int i=0; i<width; i++)
             {
-                //set alpha to the FreeType bitmap result, and luminance to max
-                expanded_data[2*(i+j*width)] = 255;
-                expanded_data[2*(i+j*width)+1] =
-                    (i>=bitmap.width || j>=bitmap.rows) ?
+                //(r, g, b, a) = (1.0f, 1.0f, 1.0f, v)
+                GLubyte value = (i>=bitmap.width || j>=bitmap.rows) ?
                     0 : bitmap.buffer[i + bitmap.width*j];
+                info.data[4*(i+j*width)+0] = 255;
+                info.data[4*(i+j*width)+1] = 255;
+                info.data[4*(i+j*width)+2] = 255;
+                info.data[4*(i+j*width)+3] = value;
+
             }
         }
-
-        float x = static_cast<float>(bitmap.width) / static_cast<float>(width),
-            y = static_cast<float>(bitmap.rows) / static_cast<float>(height);
 
         CharInfo* c = characters[h];
 
         unsigned int index = static_cast<unsigned int>(ch);
-        if(x != 0 && y != 0)
+        if(width && height)
         {
-            c[index].tex = new SORE_Graphics::Texture2D
-                (expanded_data, GL_RGBA, GL_LUMINANCE_ALPHA, width, height);
-
             c[index].transform = SORE_Math::Matrix4<float>::GetTranslation(
                 static_cast<float>(face->glyph->bitmap_left),
                 static_cast<float>(bitmap.rows-face->glyph->bitmap_top) +
@@ -182,25 +264,24 @@ namespace SORE_Font
                 0.0f);
 
             SORE_Math::Rect<float> bounds (0.0f,
-                                           static_cast<float>(bitmap.width), 0.0f,
-                                           static_cast<float>(bitmap.rows));
-            SORE_Math::Rect<float> texCoords(0.0f, x, 0.0f, y);
+                                           static_cast<float>(width), 0.0f,
+                                           static_cast<float>(height));
+            //SORE_Math::Rect<float> bounds(0.0f, 512.0f, 0.0f, 256.0f);
+            SORE_Math::Rect<float> texCoords(0.0f, 1.0f, 0.0f, 1.0f);
+            //SORE_Math::Rect<float> texCoords(0.0f, , 0.0f, y);
 
             SORE_Graphics::GLSLShader* shader =
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk
-                (c[index].tex, shader, bounds,
+                (0, shader, bounds,
                  SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
         else
         {
-            c[index].tex = NULL;
             c[index].gc = NULL;
         }
         c[index].advance = static_cast<float>(face->glyph->advance.x >> 6);
-
-        delete [] expanded_data;
     }
 
     const CharInfo& Font::GetCharacter(unsigned int height, char c)
@@ -245,7 +326,8 @@ namespace SORE_Font
         }
         else
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not find font %s") % name);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Could not find font %s") % name);
             return "";
         }
     }
