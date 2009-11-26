@@ -150,7 +150,8 @@ namespace SORE_Font
 
         GLint texSize;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
-        if(texWidth > texSize || texHeight > texSize)
+        unsigned int maxTex = texSize;
+        if(texWidth > maxTex || texHeight > maxTex)
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        boost::format("Attempting to create font texture of size "
@@ -243,8 +244,8 @@ namespace SORE_Font
             for(unsigned int i=0; i<width; i++)
             {
                 //(r, g, b, a) = (1.0f, 1.0f, 1.0f, v)
-                GLubyte value = (i>=bitmap.width || j>=bitmap.rows) ?
-                    0 : bitmap.buffer[i + bitmap.width*j];
+                GLubyte value = (i>=width || j>=height) ?
+                    0 : bitmap.buffer[i + width*j];
                 info.data[4*(i+j*width)+0] = 255;
                 info.data[4*(i+j*width)+1] = 255;
                 info.data[4*(i+j*width)+2] = 255;
