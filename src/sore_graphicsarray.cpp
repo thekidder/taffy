@@ -41,7 +41,8 @@ namespace SORE_Graphics
     {
         if( (hasNormals && !n) || (hasTexCoords && !t) || (hasColors && !c) )
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Invalid VBO format; check constructer");
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       "Invalid VBO format; check constructer");
         }
         size_t oldSize = vertices.size();
 
@@ -91,7 +92,8 @@ namespace SORE_Graphics
         if(hasTexCoords)
         {
             glClientActiveTexture(GL_TEXTURE0);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 12));
+            glTexCoordPointer(2, GL_FLOAT, sizeof(vertex),
+                              GetOffset(&(vertices[0]), 12));
         }
         if(hasNormals)
         {

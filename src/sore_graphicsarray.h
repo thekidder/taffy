@@ -50,9 +50,12 @@ namespace SORE_Graphics
         virtual void Build() = 0;
 
         void Clear();
-        void AddObject(const GLfloat* v, const unsigned short* ind, unsigned int numVertices,
-                       unsigned int numIndices, const SORE_Math::Matrix4<float>* transform = NULL,
-                       const GLfloat* t = NULL, const GLfloat* n = NULL, const GLfloat* c = NULL);
+        void AddObject(const GLfloat* v, const unsigned short* ind,
+                       unsigned int numVertices,
+                       unsigned int numIndices,
+                       const SORE_Math::Matrix4<float>* transform = NULL,
+                       const GLfloat* t = NULL, const GLfloat* n = NULL,
+                       const GLfloat* c = NULL);
 
         void BeginDraw();
         void EndDraw();
