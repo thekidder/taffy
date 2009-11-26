@@ -4,7 +4,7 @@ Buffer:
 GeometryChunk:
   Contains multiple Buffers
 Renderable:
-  Composed of a GeometryChunk, shader, textures, and transformation.
+  Composed of a GeometryChunk, shader, textures, blending mode, and transformation.
   Is sortable -  contains a key that implements sorting (see below)
 
 GeometryProvider:
