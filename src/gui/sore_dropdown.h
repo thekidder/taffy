@@ -64,7 +64,7 @@ namespace SORE_GUI
         SORE_Font::FontPtr font;
         boost::shared_ptr<SORE_Graphics::GLSLShader> shad;
         unsigned int textHeight;
-        boost::shared_ptr<SORE_Graphics::Texture2D>
+        SORE_Graphics::Texture2DPtr
             normal, active, hover, arrow, menuBg;
         SORE_Math::Matrix4<float> arrowMat;
         SORE_Graphics::GeometryChunk* arrowChunk;

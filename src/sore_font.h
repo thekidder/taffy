@@ -100,7 +100,7 @@ namespace SORE_Font
 
         //(height, CharInfo[128])
         std::map<unsigned int, CharInfo*> characters;
-        std::map<unsigned int, boost::shared_ptr<SORE_Graphics::Texture2D> >
+        std::map<unsigned int, SORE_Graphics::Texture2DPtr >
             textures;
         FT_Library library;
         FT_Face face;

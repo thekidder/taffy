@@ -23,7 +23,7 @@
 namespace SORE_Graphics
 {
     CircleParticle::CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                                   boost::shared_ptr<SORE_Graphics::Texture2D> tex,
+                                   SORE_Graphics::Texture2DPtr tex,
                                    boost::shared_ptr<SORE_Graphics::GLSLShader> shad)
   : Particle(initial, c), alpha(1.0f)
     {

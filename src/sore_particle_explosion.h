@@ -29,7 +29,7 @@ namespace SORE_Graphics
     {
     public:
         ExplosionParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                          boost::shared_ptr<Texture2D> tex,
+                          Texture2DPtr tex,
                           boost::shared_ptr<GLSLShader> shad);
 
         bool IsActive() const;

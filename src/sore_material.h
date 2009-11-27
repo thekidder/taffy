@@ -49,7 +49,7 @@ namespace SORE_Graphics
         virtual std::string ProcessFilename(std::string file) {return file;}
         std::string file;
         std::map<std::string, std::pair<int,
-            boost::shared_ptr<SORE_Graphics::Texture2D> > > textureMap;
+            SORE_Graphics::Texture2DPtr > > textureMap;
         std::vector<std::string> textureOrder;
         std::vector<std::string> flags;
     };

@@ -34,7 +34,7 @@ namespace SORE_GUI
         ~FrameWidget();
     protected:
         void SetBorderSizes(float l, float r, float t, float b);
-        void SetTexture(boost::shared_ptr<SORE_Graphics::Texture2D> tex);
+        void SetTexture(SORE_Graphics::Texture2DPtr tex);
         void SetShader(boost::shared_ptr<SORE_Graphics::GLSLShader> shad);
 
         std::vector<SORE_Graphics::GeometryChunk*> GetChunks() const;
@@ -47,7 +47,7 @@ namespace SORE_GUI
 
         size_mode mode;
 
-        boost::shared_ptr<SORE_Graphics::Texture2D> texture;
+        SORE_Graphics::Texture2DPtr texture;
         boost::shared_ptr<SORE_Graphics::GLSLShader> shader;
 
         SORE_Graphics::GeometryChunk* chunk[9];

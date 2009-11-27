@@ -29,7 +29,7 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        boost::shared_ptr<SORE_Graphics::Texture2D> tex =
+        SORE_Graphics::Texture2DPtr tex =
             pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "frame.tga");
         boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");

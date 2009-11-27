@@ -65,7 +65,7 @@ namespace SORE_GUI
         BuildGeometry();
     }
 
-    void FrameWidget::SetTexture(boost::shared_ptr<SORE_Graphics::Texture2D> tex)
+    void FrameWidget::SetTexture(SORE_Graphics::Texture2DPtr tex)
     {
         texture = tex;
         for(unsigned int i=0;i<9;++i)

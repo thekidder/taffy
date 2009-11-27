@@ -177,7 +177,7 @@ namespace SORE_Font
             }
         }
 
-        textures[height] = boost::shared_ptr<SORE_Graphics::Texture2D>(
+        textures[height] = SORE_Graphics::Texture2DPtr(
             new SORE_Graphics::Texture2D(
                 texture, GL_RGBA, GL_RGBA, texWidth, texHeight));
 
@@ -269,7 +269,7 @@ namespace SORE_Font
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk
-                (boost::shared_ptr<SORE_Graphics::Texture2D>(), shader, bounds,
+                (SORE_Graphics::Texture2DPtr(), shader, bounds,
                  SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
         else

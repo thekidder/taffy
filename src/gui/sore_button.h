@@ -52,7 +52,7 @@ namespace SORE_GUI
 
         SORE_Font::FontPtr font;
         SORE_Graphics::Text* t;
-        boost::shared_ptr<SORE_Graphics::Texture2D> normal, active, hover;
+        SORE_Graphics::Texture2DPtr normal, active, hover;
 
         boost::signal<void ()> onRelease;
 

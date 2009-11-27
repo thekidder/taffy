@@ -61,7 +61,7 @@ namespace SORE_Graphics
                 }
                 else if(section=="Textures")
                 {
-                    boost::shared_ptr<SORE_Graphics::Texture2D> tex =
+                    SORE_Graphics::Texture2DPtr tex =
                         rm->GetResource<SORE_Graphics::Texture2D>(value);
                     if(tex!=NULL)
                     {

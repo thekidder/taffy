@@ -29,7 +29,7 @@ namespace SORE_Graphics
     {
     public:
         CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                       boost::shared_ptr<SORE_Graphics::Texture2D> tex,
+                       SORE_Graphics::Texture2DPtr tex,
                        boost::shared_ptr<SORE_Graphics::GLSLShader> shad);
 
         bool IsActive() const;

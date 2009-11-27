@@ -56,10 +56,10 @@ namespace SORE_GUI
         std::string text;
         SORE_Font::FontPtr font;
         SORE_Graphics::Text* displayText;
-        boost::shared_ptr<SORE_Graphics::Texture2D> texture;
+        SORE_Graphics::Texture2DPtr texture;
 
         SORE_Graphics::GeometryChunk* caret;
-        boost::shared_ptr<SORE_Graphics::Texture2D> caretTex;
+        SORE_Graphics::Texture2DPtr caretTex;
         SORE_Math::Matrix4<float> caretMat;
         unsigned int caretPos;
         unsigned int caretWidth;
