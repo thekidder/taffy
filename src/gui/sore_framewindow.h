@@ -26,25 +26,25 @@
 
 namespace SORE_GUI
 {
-	class SORE_EXPORT FrameWindow : public FrameWidget
-	{
-	public:
-		FrameWindow(SVec s, SVec p, const std::string& t, 
-								SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-		~FrameWindow();
-	protected:
-		unsigned int GetClientSize(unit_type type) const;
-		unsigned int GetClientPosition(unit_type type) const;
-	private:
-		bool ProcessEvents(SORE_Kernel::Event* e); 
-		virtual SORE_Graphics::render_list GetThisRenderList();
-		void UpdatePosition();
+    class SORE_EXPORT FrameWindow : public FrameWidget
+    {
+    public:
+        FrameWindow(SVec s, SVec p, const std::string& t,
+                    SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        ~FrameWindow();
+    protected:
+        unsigned int GetClientSize(unit_type type) const;
+        unsigned int GetClientPosition(unit_type type) const;
+    private:
+        bool ProcessEvents(SORE_Kernel::Event* e);
+        virtual SORE_Graphics::render_list GetThisRenderList();
+        void UpdatePosition();
 
-		std::string title;
-		SORE_Font::Font* font;
-		SORE_Graphics::Text* titleText;
-		bool dragged;
-	};
+        std::string title;
+        boost::shared_ptr<SORE_Font::Font> font;
+        SORE_Graphics::Text* titleText;
+        bool dragged;
+    };
 }
 
 #endif

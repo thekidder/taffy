@@ -29,16 +29,16 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        SORE_Graphics::Texture2D* tex =
+        boost::shared_ptr<SORE_Graphics::Texture2D> tex =
             pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "frame.tga");
-        SORE_Graphics::GLSLShader* shad =
+        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
         SetTexture(tex);
         SetShader(shad);
 
-        font = pool.GetResource<SORE_Font::Font>(styleDir +
-                                                 "LiberationSans-Regular.ttf");
+        font = pool.GetResource<SORE_Font::Font>(
+            styleDir + "LiberationSans-Regular.ttf");
         titleText = new SORE_Graphics::Text(*font, 24, title);
 
         UpdatePosition();

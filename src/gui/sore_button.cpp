@@ -26,19 +26,18 @@ namespace SORE_GUI
 {
     Button::Button(SVec s, SVec p, const std::string& text,
                    SORE_Resource::ResourcePool& pool, Widget* par)
-        : FrameWidget(s, p, SCALE_ALL, par), normal(0), active(0), hover(0),
-          pressed(false), inArea(false)
+        : FrameWidget(s, p, SCALE_ALL, par), pressed(false), inArea(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        normal = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                            "button_sheet_normal.tga");
-        active = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                            "button_sheet_active.tga");
-        hover = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                           "button_sheet_hover.tga");
-        SORE_Graphics::GLSLShader* shad =
+        normal = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_normal.tga");
+        active = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_active.tga");
+        hover = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_hover.tga");
+        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         unsigned int height = GetSize(VERTICAL);
         unsigned int width = GetSize(HORIZONTAL);

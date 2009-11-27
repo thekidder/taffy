@@ -27,17 +27,18 @@ namespace SORE_GUI
 {
     TextField::TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool,
                          Widget* par)
-        : FrameWidget(s, p, SCALE_CENTER, par), text(""), font(0), displayText(0),
-          texture(0),
-          caret(0), caretTex(0), pos(0), textStart(0), textEnd(0)
+        : FrameWidget(s, p, SCALE_CENTER, par), text(""), displayText(0),
+          caret(0), pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        SORE_Graphics::GLSLShader* shad = pool.GetResource<SORE_Graphics::GLSLShader>
-            ("data/Shaders/default.shad");
-        texture = pool.GetResource<SORE_Graphics::Texture2D>(styleDir+"textfield.tga");
-        caretTex = pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "caret.tga");
+        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
+            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
+        texture = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir+"textfield.tga");
+        caretTex = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "caret.tga");
 
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(texture);

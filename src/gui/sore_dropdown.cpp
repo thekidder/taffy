@@ -23,26 +23,25 @@
 namespace SORE_GUI
 {
     Dropdown::Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par)
-        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s), font(0), normal(0),
-          active(0), hover(0), arrow(0), menuBg(0), arrowChunk(0), curChoice(0),
-          pressed(false), inArea(false)
+        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s), arrowChunk(0),
+          curChoice(0), pressed(false), inArea(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        font = pool.GetResource<SORE_Font::Font>(styleDir +
-                                                 "LiberationSans-Regular.ttf");
+        font = pool.GetResource<SORE_Font::Font>(
+            styleDir + "LiberationSans-Regular.ttf");
 
-        normal = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                            "button_sheet_normal.tga");
-        active = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                            "button_sheet_active.tga");
-        hover = pool.GetResource<SORE_Graphics::Texture2D>(styleDir +
-                                                           "button_sheet_hover.tga");
-        arrow =
-            pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "arrow.tga");
-        menuBg =
-            pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "dropdown_bg.tga");
+        normal = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_normal.tga");
+        active = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_active.tga");
+        hover = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "button_sheet_hover.tga");
+        arrow = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "arrow.tga");
+        menuBg = pool.GetResource<SORE_Graphics::Texture2D>(
+            styleDir + "dropdown_bg.tga");
 
         textHeight = GetSize(VERTICAL) / 2;
         if(textHeight < 16) textHeight = 16;
@@ -106,15 +105,17 @@ namespace SORE_GUI
         for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
             it!=choices.end();++it)
         {
-            SORE_Math::Rect<float> bounds(0.0f,
-                                          static_cast<float>(GetSize(HORIZONTAL)),
-                                          static_cast<float>(currHeight),
-                                          static_cast<float>(currHeight+textHeight*2));
-            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk
-                (menuBg, shad, bounds);
+            SORE_Math::Rect<float> bounds(
+                0.0f,
+                static_cast<float>(GetSize(HORIZONTAL)),
+                static_cast<float>(currHeight),
+                static_cast<float>(currHeight+textHeight*2));
+            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(
+                menuBg, shad, bounds);
             SORE_Math::Matrix4<float> m =
-                SORE_Math::Matrix4<float>::GetTranslation(0.0f, 0.0f,
-                                                          GetTopLayer() + 0.0009f) *
+                SORE_Math::Matrix4<float>::GetTranslation(
+                    0.0f, 0.0f,
+                    GetTopLayer() + 0.0009f) *
                 GetPositionMatrix();
             menu.push_back(std::make_pair(m, g));
             it->second->SetTransform(

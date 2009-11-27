@@ -54,12 +54,12 @@ namespace SORE_GUI
         void UpdateText(int dir);
 
         std::string text;
-        SORE_Font::Font* font;
+        boost::shared_ptr<SORE_Font::Font> font;
         SORE_Graphics::Text* displayText;
-        SORE_Graphics::Texture2D* texture;
+        boost::shared_ptr<SORE_Graphics::Texture2D> texture;
 
         SORE_Graphics::GeometryChunk* caret;
-        SORE_Graphics::Texture2D* caretTex;
+        boost::shared_ptr<SORE_Graphics::Texture2D> caretTex;
         SORE_Math::Matrix4<float> caretMat;
         unsigned int caretPos;
         unsigned int caretWidth;
