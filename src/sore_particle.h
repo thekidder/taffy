@@ -22,26 +22,27 @@
 #define SORE_PARTICLE_H
 
 #include "math/sore_matrix4x4.h"
+#include "sore_color.h"
 #include "sore_geometrychunk.h"
 
 namespace SORE_Graphics
 {
-	class SORE_EXPORT Particle
-	{
-	public:
-		Particle(SORE_Math::Matrix4<float> initial, const Color& c);
-		virtual ~Particle();
+    class SORE_EXPORT Particle
+    {
+    public:
+        Particle(SORE_Math::Matrix4<float> initial, const Color& c);
+        virtual ~Particle();
 
-		const SORE_Math::Matrix4<float>* GetTransform() const;
-		const GeometryChunk* GetGeometry() const;
+        const SORE_Math::Matrix4<float>* GetTransform() const;
+        const GeometryChunk* GetGeometry() const;
 
-		virtual bool IsActive() const = 0;
-		virtual void Frame(int elapsed) = 0;
-	protected:
-		SORE_Math::Matrix4<float> transform;
-		GeometryChunk* gc;
-		Color color;
-	};
+        virtual bool IsActive() const = 0;
+        virtual void Frame(int elapsed) = 0;
+    protected:
+        SORE_Math::Matrix4<float> transform;
+        GeometryChunk* gc;
+        Color color;
+    };
 }
 
 #endif

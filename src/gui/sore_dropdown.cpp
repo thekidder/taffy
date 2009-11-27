@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "../math/sore_geometry.h"
 #include "sore_dropdown.h"
 
 namespace SORE_GUI
@@ -51,7 +52,8 @@ namespace SORE_GUI
             static_cast<float>(textHeight));
         shad = pool.GetResource<SORE_Graphics::GLSLShader>
             ("data/Shaders/default.shad");
-        arrowChunk = new SORE_Graphics::GeometryChunk(arrow, shad, arrowSize);
+        //TODO:fixme
+        //arrowChunk = new SORE_Graphics::GeometryChunk(arrow, shad, arrowSize);
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
@@ -110,14 +112,16 @@ namespace SORE_GUI
                 static_cast<float>(GetSize(HORIZONTAL)),
                 static_cast<float>(currHeight),
                 static_cast<float>(currHeight+textHeight*2));
-            SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(
+            //TODO:fixme
+            /*SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(
                 menuBg, shad, bounds);
+            */
             SORE_Math::Matrix4<float> m =
                 SORE_Math::Matrix4<float>::GetTranslation(
                     0.0f, 0.0f,
                     GetTopLayer() + 0.0009f) *
                 GetPositionMatrix();
-            menu.push_back(std::make_pair(m, g));
+            //menu.push_back(std::make_pair(m, g));
             it->second->SetTransform(
                 GetPositionMatrix() *
                 SORE_Math::Matrix4<float>::GetTranslation
@@ -134,7 +138,7 @@ namespace SORE_GUI
         onChange.connect(c);
     }
 
-    SORE_Graphics::render_list Dropdown::GetThisRenderList()
+    /*SORE_Graphics::render_list Dropdown::GetThisRenderList()
     {
         SORE_Graphics::render_list list;
 
@@ -169,6 +173,7 @@ namespace SORE_GUI
 
         return list;
     }
+    */
 
     bool Dropdown::ProcessEvents(SORE_Kernel::Event* e)
     {

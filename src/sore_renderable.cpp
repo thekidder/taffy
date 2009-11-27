@@ -21,7 +21,7 @@
 #include "sore_renderable.h"
 
 SORE_Graphics::Renderable::Renderable(
-    GeometryChunkPtr g, ShaderPtr s, Texture2DPtr tex,
+    GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
     TransformationPtr trans, geometry_layer l, blend_mode b)
     : geometry(g), shader(s), texture(tex), transformation(trans),
       layer(l), blending(b), cachedDepth(0.0f), sortKey(0)
@@ -30,29 +30,29 @@ SORE_Graphics::Renderable::Renderable(
     CalculateSortKey();
 }
 
-GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
+SORE_Graphics::GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
 {
     return geometry;
 }
 
-void SORE_Graphics::Renderable::SetShader(ShaderPtr s)
+void SORE_Graphics::Renderable::SetShader(GLSLShaderPtr s)
 {
     shader = s;
     CalculateSortKey();
 }
 
-ShaderPtr SORE_Graphics::Renderable::GetShader() const
+SORE_Graphics::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
 {
     return shader;
 }
 
-void SORE_Graphics::Renderable::SetTexture(TexturePtr t)
+void SORE_Graphics::Renderable::SetTexture(Texture2DPtr t)
 {
     texture = t;
     CalculateSortKey();
 }
 
-Texture2DPtr SORE_Graphics::Renderable::GetTexture() const
+SORE_Graphics::Texture2DPtr SORE_Graphics::Renderable::GetTexture() const
 {
     return texture;
 }
@@ -71,12 +71,12 @@ void SORE_Graphics::Renderable::SetTransform(TransformationPtr t)
     CalculateSortKey();
 }
 
-TransformationPtr SORE_Graphics::Renderable::GetTransform() const
+SORE_Graphics::TransformationPtr SORE_Graphics::Renderable::GetTransform() const
 {
     return transformation;
 }
 
-int64 SORE_Graphics::Renderable::GetSortKey() const
+SORE_Graphics::int64 SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;
 }

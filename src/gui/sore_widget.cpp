@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "../sore_logger.h"
 #include "sore_widget.h"
 
 namespace SORE_GUI
@@ -71,11 +72,17 @@ namespace SORE_GUI
         UpdatePositionMatrix();
     }
 
+    unsigned int Widget::GetClientSize(unit_type type) const
+    {
+        return GetSize(type);
+    };
+
     void Widget::UpdatePositionMatrix()
     {
-        mat = SORE_Math::Matrix4<float>::GetTranslation(static_cast<float>(GetPosition(HORIZONTAL)),
-                                                        static_cast<float>(GetPosition(VERTICAL)),
-                                                        layer);
+        mat = SORE_Math::Matrix4<float>::GetTranslation(
+            static_cast<float>(GetPosition(HORIZONTAL)),
+            static_cast<float>(GetPosition(VERTICAL)),
+            layer);
         UpdatePosition();
         for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
         {
@@ -89,14 +96,15 @@ namespace SORE_GUI
         return mat;
     }
 
-    SORE_Graphics::render_list Widget::GetRenderList()
+    /*SORE_Graphics::render_list Widget::GetRenderList()
     {
         SORE_Graphics::render_list all;
         if(isVisible)
         {
             all = GetThisRenderList();
 
-            for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+            std::vector<Widget*>::iterator it;
+            for(it = children.begin(); it != children.end(); ++it)
             {
                 SORE_Graphics::render_list child = (*it)->GetRenderList();
                 all.insert(all.begin(), child.begin(), child.end());
@@ -104,6 +112,7 @@ namespace SORE_GUI
         }
         return all;
     }
+    */
 
     bool Widget::PropagateEvents(SORE_Kernel::Event* e)
     {

@@ -29,6 +29,9 @@
 
 #include <list>
 
+#include "math/sore_matrix4x4.h"
+#include "math/sore_vector3.h"
+#include "sore_dll.h"
 #include "sore_geometrychunk.h"
 
 namespace SORE_Graphics
@@ -48,8 +51,9 @@ namespace SORE_Graphics
 
         const GeometryChunk* GetChunk() const;
         const node_list& GetChildren() const;
-        node_list::iterator AddChild(GeometryChunk* gc = NULL,
-                                     SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+        node_list::iterator AddChild(
+            GeometryChunk* gc = NULL,
+            SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
         void RemoveChild(node_list::iterator it);
 
         const SORE_Math::Matrix4<float>& GetTransform() const;
@@ -61,7 +65,7 @@ namespace SORE_Graphics
         void SetIdentity();
 
         void UpdateCache(SceneNode* parent);
-        void AddToRenderList(render_list& list);
+        //void AddToRenderList(render_list& list);
     protected:
         void InvalidateCache();
     private:

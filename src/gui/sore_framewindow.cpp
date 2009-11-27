@@ -103,7 +103,7 @@ namespace SORE_GUI
         return false;
     }
 
-    SORE_Graphics::render_list FrameWindow::GetThisRenderList()
+    /*SORE_Graphics::render_list FrameWindow::GetThisRenderList()
     {
         SORE_Graphics::render_list list;
 
@@ -119,4 +119,5 @@ namespace SORE_GUI
 
         return list;
     }
+    */
 }

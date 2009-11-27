@@ -50,7 +50,8 @@ namespace SORE_GUI
 
     void TextWidget::UpdateCache()
     {
-        transforms.clear();
+        //TODO:fixme
+        /*transforms.clear();
         transforms.reserve(text.GetLength());
         all.clear();
         SORE_Graphics::render_list raw = text.GetGeometry();
@@ -61,12 +62,14 @@ namespace SORE_GUI
             transforms.push_back(*(it->first) * GetPositionMatrix());
             all.push_back(std::make_pair(&transforms.back(), it->second));
         }
+        */
     }
 
-    SORE_Graphics::render_list TextWidget::GetThisRenderList()
+    /*SORE_Graphics::render_list TextWidget::GetThisRenderList()
     {
         return all;
     }
+    */
 
     bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
     {

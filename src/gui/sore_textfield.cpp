@@ -46,9 +46,11 @@ namespace SORE_GUI
         float height = GetSize(VERTICAL) - 16.0f;
         caretWidth = static_cast<unsigned int>(height/16.0f);
 
-        caret = new SORE_Graphics::GeometryChunk
+        //TODO:fixme
+        /*caret = new SORE_Graphics::GeometryChunk
             (caretTex, shad, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth,
                                                     8.0f, 8.0f+height));
+        */
 
         caretEnd = SORE_Timing::GetGlobalTicks();
 
@@ -86,7 +88,7 @@ namespace SORE_GUI
         UpdatePosition();
     }
 
-    SORE_Graphics::render_list TextField::GetThisRenderList()
+    /*SORE_Graphics::render_list TextField::GetThisRenderList()
     {
         SORE_Graphics::render_list list;
 
@@ -113,6 +115,7 @@ namespace SORE_GUI
 
         return list;
     }
+    */
 
     bool TextField::ProcessEvents(SORE_Kernel::Event* e)
     {

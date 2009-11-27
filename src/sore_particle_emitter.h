@@ -63,7 +63,7 @@ namespace SORE_Graphics
             Create(1);
         }
 
-        render_list GetGeometry()
+        /*render_list GetGeometry()
         {
             render_list geometry;
             for(unsigned int i=0;i<position;++i)
@@ -72,7 +72,7 @@ namespace SORE_Graphics
                     geometry.push_back(std::make_pair(particles[i]->GetTransform(), particles[i]->GetGeometry()));
             }
             return geometry;
-        }
+            }*/
 
         bool IsActive() const
         {

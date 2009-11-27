@@ -47,7 +47,8 @@ namespace SORE_GUI
         int GetValue() const;
         void SetValue(int value);
     private:
-        SORE_Graphics::render_list GetThisRenderList();
+        //TODO:fixme
+        //SORE_Graphics::render_list GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
         void UpdateSlider();

@@ -46,7 +46,7 @@ namespace SORE_Graphics
         void TrimToWidth(unsigned int width, size_t start);
 
         const SORE_Math::Matrix4<float>& GetTransform();
-        render_list GetGeometry() const;
+        //render_list GetGeometry() const;
         //following two functions are only valid if text is not scaled or rotated
         unsigned int GetWidth() const;
         unsigned int GetHeight() const;

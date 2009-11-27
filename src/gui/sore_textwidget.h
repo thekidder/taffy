@@ -31,14 +31,16 @@ namespace SORE_GUI
     {
     public:
         TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
-                   const SORE_Graphics::Color& c = SORE_Graphics::White, Widget* parent=NULL);
+                   const SORE_Graphics::Color& c = SORE_Graphics::White,
+                   Widget* parent=NULL);
 
         void UpdateText(const std::string& t);
         void SetColor(const SORE_Graphics::Color& c);
     private:
         void UpdatePosition();
         void OnGLReload();
-        SORE_Graphics::render_list GetThisRenderList();
+        //TODO:fixme
+        //SORE_Graphics::render_list GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdateCache();
 
@@ -48,7 +50,8 @@ namespace SORE_GUI
         SORE_Graphics::Color color;
         std::vector<SORE_Math::Matrix4<float> >transforms;
 
-        SORE_Graphics::render_list all;
+        //TODO:fixme
+        //SORE_Graphics::render_list all;
     };
 }
 

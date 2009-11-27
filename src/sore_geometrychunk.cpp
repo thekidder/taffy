@@ -18,217 +18,78 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <fstream>
+#include <cstring>
 
-#include "sore_util.h"
 #include "sore_geometrychunk.h"
 
-namespace SORE_Graphics
+SORE_Graphics::GeometryChunk::GeometryChunk(
+    unsigned short nVertices, unsigned short nIndices)
+    : numVertices(nVertices), numIndices(nIndices)
 {
-    GeometryChunk::GeometryChunk(Texture2DPtr texture,
-                                 GLSLShaderPtr shader,
-                                 SORE_Math::Rect<float> bounds,
-                                 geometry_layer l, blend_mode blend,
-                                 SORE_Math::Rect<float> texCoords,
-                                 const Color& color)
-        : layer(l), blending(blend), vertices(0), texCoords(0), colors(0),
-          c(color), tex(texture), shad(shader)
-    {
-        setup(bounds, texCoords);
-    }
+    data = new vertex[numVertices];
+    indices = new unsigned short[numIndices];
+}
 
-    void GeometryChunk::setup(SORE_Math::Rect<float> bounds,
-                              SORE_Math::Rect<float> texCoordRect)
-    {
-        vertices = new float[3 * 4];
-        texCoords = new float[2 * 4];
-        colors = new float[4 * 4];
+SORE_Graphics::GeometryChunk::GeometryChunk(const GeometryChunk& o)
+{
+    Init(o);
+}
 
-        indices = new unsigned short[6];
-        vertices[0]  = bounds.topLeft[0];
-        vertices[1]  = bounds.topLeft[1];
-        vertices[2]  = 0.0;
+SORE_Graphics::GeometryChunk::~GeometryChunk()
+{
+    delete[] data;
+    delete[] indices;
+}
 
-        vertices[3]  = bounds.topLeft[0];
-        vertices[4]  = bounds.bottomRight[1];
-        vertices[5]  = 0.0;
+SORE_Graphics::GeometryChunk& SORE_Graphics::GeometryChunk::operator=(
+    const GeometryChunk& o)
+{
+    if(this == &o)
+        return *this;
+    delete[] data;
+    delete[] indices;
+    Init(o);
+    return *this;
+}
 
-        vertices[6]  = bounds.bottomRight[0];
-        vertices[7]  = bounds.topLeft[1];
-        vertices[8]  = 0.0;
+void SORE_Graphics::GeometryChunk::Init(const GeometryChunk& o)
+{
+    numVertices = o.numVertices;
+    numIndices = o.numIndices;
+    data = new vertex[numVertices];
+    indices = new unsigned short[numIndices];
+    memcpy(data, o.data, numVertices*sizeof(vertex));
+    memcpy(indices, o.indices, numIndices*sizeof(unsigned short));
+}
 
-        vertices[9]  = bounds.bottomRight[0];
-        vertices[10] = bounds.bottomRight[1];
-        vertices[11] = 0.0;
+SORE_Graphics::vertex const* SORE_Graphics::GeometryChunk::GetVertices()
+{
+    return data;
+}
 
-        SetTexCoords(texCoordRect);
-        SetColor(c);
+SORE_Graphics::vertex& SORE_Graphics::GeometryChunk::GetVertex(unsigned short i)
+{
+    assert(i < numVertices);
+    return data[i];
+}
 
-        indices[0] = 0;
-        indices[1] = 1;
-        indices[2] = 2;
-        indices[3] = 2;
-        indices[4] = 1;
-        indices[5] = 3;
+unsigned short SORE_Graphics::GeometryChunk::NumVertices() const
+{
+    return numVertices;
+}
 
-        numVertices = 4;
-        numIndices = 6;
-    }
+unsigned short SORE_Graphics::GeometryChunk::NumIndices() const
+{
+    return numIndices;
+}
 
-    GeometryChunk::GeometryChunk(const GeometryChunk& gc) :
-        layer(gc.layer), blending(gc.blending), vertices(0), texCoords(0),
-        colors(0), indices(0), c(gc.c), numVertices(gc.numVertices),
-        numIndices(gc.numIndices), tex(gc.tex), shad(gc.shad)
-    {
-        vertices = new float[numVertices*3];
-        texCoords = new float[numVertices*2];
-        colors = new float[numVertices*4];
-        indices = new unsigned short[numIndices];
+unsigned short const* SORE_Graphics::GeometryChunk::GetIndices()
+{
+    return indices;
+}
 
-        memcpy(vertices, gc.vertices, numVertices*3*sizeof(float));
-        memcpy(texCoords, gc.texCoords, numVertices*2*sizeof(float));
-        memcpy(colors, gc.colors, numVertices*4*sizeof(float));
-        memcpy(indices, gc.indices, numIndices*sizeof(unsigned short));
-    }
-
-    GeometryChunk::~GeometryChunk()
-    {
-        delete[] vertices;
-        delete[] texCoords;
-        delete[] colors;
-        delete[] indices;
-    }
-
-    const Color& GeometryChunk::color() const
-    {
-        return c;
-    }
-
-    void GeometryChunk::SetColor(const Color& color)
-    {
-        c = color;
-        for(unsigned int i=0;i<4*4;i+=4)
-        {
-            memcpy(colors + i, color.GetColor(), 4 * sizeof(float));
-        }
-    }
-
-    void GeometryChunk::SetTexCoords(SORE_Math::Rect<float> texCoordRect)
-    {
-        texCoords[0] = texCoordRect.topLeft[0];
-        texCoords[1] = texCoordRect.topLeft[1];
-
-        texCoords[2] = texCoordRect.topLeft[0];
-        texCoords[3] = texCoordRect.bottomRight[1];
-
-        texCoords[4] = texCoordRect.bottomRight[0];
-        texCoords[5] = texCoordRect.topLeft[1];
-
-        texCoords[6] = texCoordRect.bottomRight[0];
-        texCoords[7] = texCoordRect.bottomRight[1];
-    }
-
-    float GeometryChunk::depth() const
-    {
-        //FIXME: use an average across all vertices or midpoint or closest-Z
-        //or something better
-        return vertices[2];
-    }
-
-    bool GeometryChunk::HasColor() const
-    {
-        return colors!=0;
-    }
-
-    const float * GeometryChunk::verticesPtr() const
-    {
-        return vertices;
-    }
-
-    const float * GeometryChunk::colorsPtr() const
-    {
-        return colors;
-    }
-
-    const unsigned short * GeometryChunk::indicesPtr() const
-    {
-        return indices;
-    }
-
-    const float* GeometryChunk::texCoordsPtr() const
-    {
-        return texCoords;
-    }
-
-    unsigned int GeometryChunk::getNumVertices() const
-    {
-        return numVertices;
-    }
-
-    unsigned int GeometryChunk::getNumIndices() const
-    {
-        return numIndices;
-    }
-
-    const Texture2DPtr GeometryChunk::texture() const
-    {
-        return tex;
-    }
-
-    void GeometryChunk::SetTexture(Texture2DPtr texture)
-    {
-        tex = texture;
-    }
-
-    const GLSLShaderPtr GeometryChunk::shader() const
-    {
-        return shad;
-    }
-
-    void GeometryChunk::SetShader(GLSLShaderPtr shader)
-    {
-        shad = shader;
-    }
-
-    blend_mode GeometryChunk::blendMode() const
-    {
-        return blending;
-    }
-
-    void GeometryChunk::SetBlendMode(blend_mode blend)
-    {
-        blending = blend;
-    }
-
-    geometry_layer GeometryChunk::geometryLayer() const
-    {
-        return layer;
-    }
-
-    void GeometryChunk::SetGeometryLayer(geometry_layer l)
-    {
-        layer = l;
-    }
-
-    void ApplyTransform(const SORE_Math::Matrix4<float>& transform,
-                        render_list_owned& list)
-    {
-        render_list_owned::iterator it;
-        for(it = list.begin(); it != list.end(); ++it)
-        {
-            it->first *= transform;
-        }
-    }
-
-    render_list GetRenderList(render_list_owned& list)
-    {
-        render_list_owned::iterator it;
-        render_list newList;//(list.size());
-        for(it = list.begin(); it != list.end(); ++it)
-        {
-            assert(it->second);
-            newList.push_back(std::make_pair(&it->first, it->second));
-        }
-        return newList;
-    }
+unsigned short& SORE_Graphics::GeometryChunk::GetIndex(unsigned short i)
+{
+    assert(i < numIndices);
+    return indices[i];
 }

@@ -46,7 +46,8 @@ namespace SORE_GUI
 
         void ConnectPressed(boost::function<void ()> c);
     private:
-        virtual SORE_Graphics::render_list GetThisRenderList();
+        //TODO:fixme
+        //virtual SORE_Graphics::render_list GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
 

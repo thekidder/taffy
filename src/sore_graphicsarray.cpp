@@ -33,52 +33,31 @@ void SORE_Graphics::GraphicsArray::Clear()
 }
 
 void SORE_Graphics::GraphicsArray::AddObject(
-    const GLfloat* v, const unsigned short* ind,
-    unsigned int numVertices, unsigned int numIndices,
-    const SORE_Math::Matrix4<float>* transform,
-    const GLfloat* t, const GLfloat* n, const GLfloat* c)
+    GeometryChunkPtr geometry, boost::shared_ptr<SORE_Math::Matrix4<float> > transform)
 {
-    if( (hasNormals && !n) || (hasTexCoords && !t) || (hasColors && !c) )
-    {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   "Invalid VBO format; check constructer");
-    }
     size_t oldSize = vertices.size();
 
-    vertices.resize(vertices.size() + numVertices);
-    for(unsigned int i=0;i<numVertices;++i)
+    vertices.resize(vertices.size() + geometry->NumVertices());
+    memcpy(&vertices[0], geometry->GetVertices(),
+           geometry->NumVertices()*sizeof(vertex));
+    for(unsigned int i=0; i<geometry->NumVertices(); ++i)
     {
-        SORE_Math::Vector4<float> pos(v[i*3], v[i*3+1],v[i*3+2], 1.0f);
+        SORE_Math::Vector4<float> pos(
+            geometry->GetVertex(i).x,
+            geometry->GetVertex(i).y,
+            geometry->GetVertex(i).z,
+            1.0f);
         pos = *transform * pos;
 
         vertices[oldSize + i].x = pos[0];
         vertices[oldSize + i].y = pos[1];
         vertices[oldSize + i].z = pos[2];
-
-        if(hasColors)
-        {
-            vertices[oldSize + i].r = c[i*4];
-            vertices[oldSize + i].g = c[i*4+1];
-            vertices[oldSize + i].b = c[i*4+2];
-            vertices[oldSize + i].a = c[i*4+3];
-        }
-        if(hasTexCoords)
-        {
-            vertices[oldSize + i].texi = t[i*2+0];
-            vertices[oldSize + i].texj = t[i*2+1];
-        }
-        if(hasNormals)
-        {
-            vertices[oldSize + i].normx = n[i*3];
-            vertices[oldSize + i].normy = n[i*3+1];
-            vertices[oldSize + i].normz = n[i*3+2];
-        }
     }
 
     //copy vertices into VBO, taking into account index renumbering
-    for(unsigned short j=0;j<numIndices;++j)
+    for(unsigned short j=0;j<geometry->NumIndices();++j)
     {
-        unsigned short index = ind[j] + oldSize;
+        unsigned short index = geometry->GetIndex(j) + oldSize;
         indices.push_back(index);
     }
 }

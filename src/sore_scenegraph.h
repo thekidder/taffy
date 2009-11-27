@@ -35,12 +35,13 @@ namespace SORE_Graphics
         SceneGraph();
         ~SceneGraph();
 
-        node_list::iterator AddNode(GeometryChunk* gc = NULL,
-                                    SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+        node_list::iterator AddNode(
+            GeometryChunk* gc = NULL,
+            SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
 
         SceneNode& GetParent();
 
-        render_list GetRenderList();
+        //render_list GetRenderList();
     protected:
     private:
         SceneNode* parent;

@@ -37,7 +37,8 @@ namespace SORE_GUI
         unsigned int GetClientPosition(unit_type type) const;
     private:
         bool ProcessEvents(SORE_Kernel::Event* e);
-        virtual SORE_Graphics::render_list GetThisRenderList();
+        //TODO:fixme
+        //virtual SORE_Graphics::render_list GetThisRenderList();
         void UpdatePosition();
 
         std::string title;

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "../math/sore_geometry.h"
 #include "sore_framewidget.h"
 
 namespace SORE_GUI
@@ -70,8 +71,10 @@ namespace SORE_GUI
         texture = tex;
         for(unsigned int i=0;i<9;++i)
         {
-            if(chunk[i])
+            //TODO:fixme
+            /*if(chunk[i])
                 chunk[i]->SetTexture(tex);
+            */
         }
     }
 
@@ -80,8 +83,10 @@ namespace SORE_GUI
         shader = shad;
         for(unsigned int i=0;i<9;++i)
         {
-            if(chunk[i])
+            //TODO:fixme
+            /*if(chunk[i])
                 chunk[i]->SetShader(shad);
+            */
         }
     }
 
@@ -104,7 +109,8 @@ namespace SORE_GUI
         SORE_Math::Rect<float> bounds;
         SORE_Math::Rect<float> texCoords;
 
-        if(leftBorder + rightBorder < width && bottomBorder + topBorder < height)
+        //TODO:major fixme
+        /*if(leftBorder + rightBorder < width && bottomBorder + topBorder < height)
         {
             //center
             bounds = SORE_Math::Rect<float>(static_cast<float>(leftBorder),
@@ -228,6 +234,7 @@ namespace SORE_GUI
                 (texture, shader, bounds,
                  SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
+        */
     }
 
     void FrameWidget::DestroyGeometry()

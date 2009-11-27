@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "math/sore_geometry.h"
 #include "sore_particle_circle.h"
 
 namespace SORE_Graphics
@@ -29,9 +30,9 @@ namespace SORE_Graphics
     {
         transform *= SORE_Math::Matrix4<float>::GetScale(1.0f/20.0f, 1.0f/20.0f, 0.0f);
         SORE_Math::Rect<float> bounds(-1.0f, 1.0f, -1.0f, 1.0f);
-        gc = new GeometryChunk(tex, shad, bounds,
+        /*gc = new GeometryChunk(tex, shad, bounds,
                                SORE_Graphics::LAYER4, SORE_Graphics::SUBTRACTIVE,
-                               defaultTexCoords, color);
+                               defaultTexCoords, color);*/
     }
 
     bool CircleParticle::IsActive() const
@@ -44,6 +45,6 @@ namespace SORE_Graphics
         transform *= SORE_Math::Matrix4<float>::GetScale
             (1.0f+elapsed*0.0006f, 1.0f+elapsed*0.0006f, 0.0f);
         alpha -= 0.00015f * elapsed;
-        gc->SetColor(Color(1.0f, 0.0f, 0.0f, alpha));
+        //gc->SetColor(Color(1.0f, 0.0f, 0.0f, alpha));
     }
 }

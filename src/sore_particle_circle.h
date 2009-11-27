@@ -22,6 +22,8 @@
 #define SORE_PARTICLE_CIRCLE_H
 
 #include "sore_particle.h"
+#include "sore_texture.h"
+#include "sore_shaders.h"
 
 namespace SORE_Graphics
 {

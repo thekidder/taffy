@@ -113,7 +113,7 @@ namespace SORE_Graphics
             (*it)->UpdateCache(this);
     }
 
-    void SceneNode::AddToRenderList(render_list & list)
+    /*void SceneNode::AddToRenderList(render_list & list)
     {
         if(geometry)
         {
@@ -121,5 +121,5 @@ namespace SORE_Graphics
         }
         for(node_list::iterator it=children.begin();it!=children.end();++it)
             (*it)->AddToRenderList(list);
-    }
+            }*/
 }

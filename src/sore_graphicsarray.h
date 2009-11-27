@@ -25,18 +25,10 @@
 
 #include "math/sore_matrix4x4.h"
 #include "sore_allgl.h"
+#include "sore_geometrychunk.h"
 
 namespace SORE_Graphics
 {
-
-    struct vertex
-    {
-        GLfloat x, y, z;
-        GLfloat texi, texj;
-        GLfloat normx, normy, normz;
-        GLfloat r, g, b, a;
-    };
-
     /**
        @author Adam Kidder <thekidder@gmail.com>
        Class abstracting the details of Vertex Arrays and VBOs
@@ -50,12 +42,8 @@ namespace SORE_Graphics
         virtual void Build() = 0;
 
         void Clear();
-        void AddObject(const GLfloat* v, const unsigned short* ind,
-                       unsigned int numVertices,
-                       unsigned int numIndices,
-                       const SORE_Math::Matrix4<float>* transform = NULL,
-                       const GLfloat* t = NULL, const GLfloat* n = NULL,
-                       const GLfloat* c = NULL);
+        void AddObject(GeometryChunkPtr geometry,
+                       boost::shared_ptr<SORE_Math::Matrix4<float> > transform);
 
         void BeginDraw();
         void EndDraw();
@@ -68,11 +56,10 @@ namespace SORE_Graphics
         virtual void BeginDrawHook() = 0;
         virtual void* GetOffset(void* pointer, unsigned int offset) = 0;
 
-        bool hasTexCoords, hasNormals, hasColors;
-
         std::vector<vertex> vertices;
         std::vector<unsigned short> indices;
 
+        bool hasTexCoords, hasNormals, hasColors;
     };
 }
 

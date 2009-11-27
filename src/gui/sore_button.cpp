@@ -81,7 +81,7 @@ namespace SORE_GUI
         delete t;
     }
 
-    SORE_Graphics::render_list Button::GetThisRenderList()
+    /*SORE_Graphics::render_list Button::GetThisRenderList()
     {
         SORE_Graphics::render_list list;
 
@@ -97,6 +97,7 @@ namespace SORE_GUI
 
         return list;
     }
+    */
 
     void Button::ConnectPressed(boost::function<void ()> c)
     {

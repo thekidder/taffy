@@ -21,118 +21,49 @@
 #ifndef SORE_GEOMETRYCHUNK_H
 #define SORE_GEOMETRYCHUNK_H
 
-#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 
-#include <map>
-#include "sore_color.h"
-#include "sore_shaders.h"
-#include "sore_texture.h"
-#include "math/sore_matrix4x4.h"
-#include "math/sore_geometry.h"
+#include "sore_dll.h"
 
 /**
    @author Adam Kidder <thekidder@gmail.com>
 */
 namespace SORE_Graphics
 {
-     enum geometry_layer
-     {
-         LAYER0,
-         LAYER1,
-         LAYER2,
-         LAYER3,
-         LAYER4,
-         LAYER5,
-         LAYER6,
-         LAYER7
-     };
-
-     enum blend_mode
-     {
-         OPAQUE,
-         ADDITIVE,
-         SUBTRACTIVE,
-         UNUSED
-     };
-
-     static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
-
-     class SORE_EXPORT GeometryChunk
-     {
-     public:
-         GeometryChunk(
-             Texture2DPtr texture,
-             GLSLShaderPtr shader,
-             SORE_Math::Rect<float> bounds,
-             geometry_layer l = LAYER4, blend_mode blend = SUBTRACTIVE,
-             SORE_Math::Rect<float> texCoords = defaultTexCoords,
-             const Color& color = White);
-         //produces a deep copy
-         GeometryChunk(const GeometryChunk& gc);
-         ~GeometryChunk();
-
-         const Color& color() const;
-         void SetColor(const Color& color);
-
-         void SetTexCoords(SORE_Math::Rect<float> texCoordRect);
-
-         blend_mode blendMode() const;
-         void SetBlendMode(blend_mode blend);
-
-         geometry_layer geometryLayer() const;
-         void SetGeometryLayer(geometry_layer l);
-
-         float depth() const;
-         bool HasColor() const;
-
-         const float* verticesPtr() const;
-         const float* colorsPtr() const;
-         const float* texCoordsPtr() const;
-         const unsigned short* indicesPtr() const;
-
-         unsigned int getNumVertices() const;
-         unsigned int getNumIndices() const;
-
-         const Texture2DPtr texture() const;
-         const GLSLShaderPtr shader() const;
-         void SetTexture(Texture2DPtr texture);
-         void SetShader(GLSLShaderPtr shader);
-     private:
-         void setup(SORE_Math::Rect<float> bounds,
-                    SORE_Math::Rect<float> texCoordRect);
-
-         geometry_layer layer;
-         blend_mode blending;
-
-         //geometry
-         float* vertices;
-         float* texCoords;
-         float* colors;
-         unsigned short* indices;
-
-         //color
-         Color c;
-
-         unsigned int numVertices, numIndices;
-
-         SORE_Graphics::Texture2DPtr tex;
-         SORE_Graphics::GLSLShaderPtr shad;
+    struct vertex
+    {
+        float x, y, z;
+        float tex0i, tex0j;
+        float normx, normy, normz;
+        float r, g, b, a;
     };
 
-    typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*,
-                                  const GeometryChunk *> >
-    render_list;
+    class SORE_EXPORT GeometryChunk
+    {
+    public:
+        GeometryChunk(unsigned short nVertices, unsigned short nIndices);
+        GeometryChunk(const GeometryChunk& o);
+        ~GeometryChunk();
 
-    typedef std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk *> >
-    render_list_owned;
+        vertex const* GetVertices();
+        vertex& GetVertex(unsigned short i);
 
-    void SORE_EXPORT ApplyTransform(const SORE_Math::Matrix4<float>& transform,
-                                    render_list_owned& list);
-    render_list SORE_EXPORT GetRenderList(render_list_owned& list);
+        unsigned short const* GetIndices();
+        unsigned short& GetIndex(unsigned short i);
 
-    const int SORT_LESS    = -1;
-    const int SORT_EQUAL   =  0;
-    const int SORT_GREATER =  1;
+        unsigned short NumVertices() const;
+        unsigned short NumIndices() const;
+
+        GeometryChunk& operator=(const GeometryChunk& o);
+
+    private:
+        void Init(const GeometryChunk& o);
+
+        unsigned short numVertices, numIndices;
+        vertex* data;
+        unsigned short* indices;
+
+    };
 
     typedef boost::shared_ptr<GeometryChunk> GeometryChunkPtr;
 }

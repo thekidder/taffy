@@ -18,54 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_vbo.h"
-#include "sore_logger.h"
-#include <algorithm>
+#ifndef SORE_GEOMETRYPROVIDER_H
+#define SORE_GEOMETRYPROVIDER_H
 
 namespace SORE_Graphics
 {
-    VBO::VBO(bool t, bool c, bool n) :
-        GraphicsArray(t, c, n), vbo(0), vboIndices(0)
+    class GeometryProvider
     {
-        glGenBuffersARB(1, &vbo);
-        if(!vbo)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
-        glGenBuffersARB(1, &vboIndices);
-        if(!vboIndices)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create index buffer");
-    }
 
-    VBO::~VBO()
-    {
-        glDeleteBuffersARB(1, &vbo);
-        glDeleteBuffersARB(1, &vboIndices);
-    }
-
-    void VBO::BeginDrawHook()
-    {
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-    }
-
-    void* VBO::GetOffset(void* pointer, unsigned int offset)
-    {
-        return ((char*)NULL + (offset));
-    }
-
-    void VBO::Build()
-    {
-        if(!indices.size()) return;
-
-        unsigned int usage = GL_STREAM_DRAW_ARB;
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB,
-                        vertices.size()*sizeof(vertex),
-                        &(vertices[0]), usage);
-
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                        indices.size()*sizeof(unsigned short),
-                        &(indices[0]), usage);
-
-    }
+    };
 }
+
+#endif

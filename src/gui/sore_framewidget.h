@@ -21,6 +21,8 @@
 #ifndef SORE_FRAMEWIDGET_H
 #define SORE_FRAMEWIDGET_H
 
+#include "../sore_texture.h"
+#include "../sore_shaders.h"
 #include "sore_widget.h"
 
 namespace SORE_GUI
@@ -40,7 +42,7 @@ namespace SORE_GUI
         std::vector<SORE_Graphics::GeometryChunk*> GetChunks() const;
     private:
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
-        virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        //virtual SORE_Graphics::render_list GetThisRenderList() = 0;
 
         void BuildGeometry();
         void DestroyGeometry();

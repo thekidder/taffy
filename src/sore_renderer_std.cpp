@@ -31,18 +31,10 @@ inline int next_p2 (int a )
     return rval;
 }
 
-SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _rm)
-    : rm(_rm)
+SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _pool)
+    : pool(_pool)
 {
     PushState();
-}
-
-SORE_Graphics::Renderer::~Renderer()
-{
-    for(std::vector<batch>::iterator dit = batches.begin();dit!=batches.end();++dit)
-    {
-        delete dit->second;
-    }
 }
 
 void SORE_Graphics::Renderer::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
@@ -89,8 +81,8 @@ void SORE_Graphics::Renderer::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
     }
 }
 
-int SORE_Graphics::Renderer::ChangeProjectionMatrix
-(SORE_Graphics::ProjectionInfo& projection)
+int SORE_Graphics::Renderer::ChangeProjectionMatrix(
+    SORE_Graphics::ProjectionInfo& projection)
 {
     SetupProjection(projection);
     int returnCode = 0;
@@ -133,6 +125,7 @@ void SORE_Graphics::Renderer::OnScreenChange()
 {
 }
 
+/*
 void SORE_Graphics::Renderer::Build()
 {
     if(!currentProvider->size())
@@ -221,10 +214,10 @@ void SORE_Graphics::Renderer::RenderBatch(batch& b)
         b.second->EndDraw();
     }
 }
-
+*/
 void SORE_Graphics::Renderer::Render()
 {
-    Build();
+    //Build();
 
     numPolys = 0;
     drawCalls = 0;
@@ -236,7 +229,7 @@ void SORE_Graphics::Renderer::Render()
 
     glEnable(GL_TEXTURE_2D);
 
-    for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
+    /*for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
     {
         if(!it->second->Empty())
         {
@@ -259,7 +252,15 @@ void SORE_Graphics::Renderer::Render()
                 it->effect->EndFrame(proj);
         }
     }
+    */
 
+    CalculateFPS();
+
+    PrintGLErrors(SORE_Logging::LVL_ERROR);
+}
+
+void SORE_Graphics::Renderer::CalculateFPS()
+{
     static int frames = 0;
     static int T0 = SORE_Timing::GetGlobalTicks();
     static int last;
@@ -277,8 +278,6 @@ void SORE_Graphics::Renderer::Render()
         frames = 0;
     }
     last = t;
-
-    PrintGLErrors(SORE_Logging::LVL_ERROR);
 }
 
 float SORE_Graphics::Renderer::GetFPS() const
@@ -303,70 +302,23 @@ unsigned int SORE_Graphics::Renderer::GetNumPolys() const
 
 void SORE_Graphics::Renderer::ClearGeometryProviders()
 {
-    currentProvider->clear();
+    currentState->clear();
 }
 
-void SORE_Graphics::Renderer::AddGeometryProvider(geometry_provider c)
+void SORE_Graphics::Renderer::AddGeometryProvider(GeometryProvider gp)
 {
-    currentProvider->push_back(c);
+    currentState->push_back(gp);
 }
 
 void SORE_Graphics::Renderer::PushState()
 {
-    std::vector<geometry_provider> temp;
+    std::vector<GeometryProvider> temp;
     geometryProviders.push_back(temp);
-    currentProvider = geometryProviders.end() - 1;
+    currentState = geometryProviders.end() - 1;
 }
 
 void SORE_Graphics::Renderer::PopState()
 {
     geometryProviders.pop_back();
-    currentProvider = geometryProviders.end() - 1;
-}
-
-inline int TextureSort(const SORE_Graphics::GeometryChunk* one,
-                       const SORE_Graphics::GeometryChunk* two)
-{
-    if(*one->texture() < *two->texture())
-        return SORE_Graphics::SORT_LESS;
-    else if(*one->texture() == *two->texture())
-        return SORE_Graphics::SORT_EQUAL;
-    else
-        return SORE_Graphics::SORT_GREATER;
-}
-
-inline int ShaderSort(const SORE_Graphics::GeometryChunk* one,
-                      const SORE_Graphics::GeometryChunk* two)
-{
-    if(*one->shader() < *two->shader())
-        return SORE_Graphics::SORT_LESS;
-    else if(*one->shader() == *two->shader())
-        return SORE_Graphics::SORT_EQUAL;
-    else
-        return SORE_Graphics::SORT_GREATER;
-}
-
-bool SORE_Graphics::GeometrySort(std::pair<const SORE_Math::Matrix4<float>*,
-                                 const SORE_Graphics::GeometryChunk*> one,
-                                 std::pair<const SORE_Math::Matrix4<float>*,
-                                 const SORE_Graphics::GeometryChunk*> two)
-{
-    if( one.second->blendMode() != OPAQUE &&
-        two.second->blendMode() == OPAQUE)
-        return true;
-    if( two.second->blendMode() != OPAQUE &&
-        one.second->blendMode() == OPAQUE)
-        return false;
-    if(one.second->blendMode() != OPAQUE)
-    {
-        if(one.first->GetData()[14] < two.first->GetData()[14])
-            return true;
-        else if(two.first->GetData()[14] < one.first->GetData()[14])
-            return false;
-    }
-    if(ShaderSort(one.second, two.second) == SORT_LESS)
-        return true;
-    if(TextureSort(one.second, two.second) == SORT_LESS)
-        return true;
-    return false;
+    currentState = geometryProviders.end() - 1;
 }

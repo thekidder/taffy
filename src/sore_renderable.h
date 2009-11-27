@@ -23,7 +23,10 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "math/sore_matrix4x4.h"
 #include "sore_geometrychunk.h"
+#include "sore_texture.h"
+#include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
@@ -53,15 +56,15 @@ namespace SORE_Graphics
     class Renderable
     {
     public:
-        Renderable(GeometryChunkPtr g, ShaderPtr s, Texture2DPtr tex,
+        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
                    TransformationPtr trans, geometry_layer l, blend_mode b);
 
         GeometryChunkPtr GetGeometryChunk() const;
 
-        void SetShader(ShaderPtr s);
-        ShaderPtr GetShader() const;
+        void SetShader(GLSLShaderPtr s);
+        GLSLShaderPtr GetShader() const;
 
-        void SetTexture(TexturePtr t);
+        void SetTexture(Texture2DPtr t);
         Texture2DPtr GetTexture() const;
 
         void MulitplyTransform(TransformationPtr t);
@@ -75,7 +78,7 @@ namespace SORE_Graphics
         void CalculateSortKey();
 
         GeometryChunkPtr geometry;
-        ShaderPtr shader;
+        GLSLShaderPtr shader;
         Texture2DPtr texture;
         TransformationPtr transformation;
         geometry_layer layer;

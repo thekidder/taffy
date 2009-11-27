@@ -22,33 +22,33 @@
 
 namespace SORE_Graphics
 {
-	SceneGraph::SceneGraph()
-	{
-		parent = new SceneNode;
-	}
+    SceneGraph::SceneGraph()
+    {
+        parent = new SceneNode;
+    }
 
-	SceneGraph::~SceneGraph()
-	{
-		delete parent;
-	}
+    SceneGraph::~SceneGraph()
+    {
+        delete parent;
+    }
 
-	render_list SceneGraph::GetRenderList()
-	{
-		parent->UpdateCache(NULL);
-		render_list all;
-	
-		parent->AddToRenderList(all);
-	
-		return all;
-	}
+    /*render_list SceneGraph::GetRenderList()
+    {
+        parent->UpdateCache(NULL);
+        render_list all;
 
-	SceneNode& SceneGraph::GetParent()
-	{
-		return *parent;
-	}
+        parent->AddToRenderList(all);
 
-	node_list::iterator SceneGraph::AddNode(GeometryChunk * gc, SORE_Math::Vector3< float > pos)
-	{
-		return parent->AddChild(gc, pos);
-	}
+        return all;
+        }*/
+
+    SceneNode& SceneGraph::GetParent()
+    {
+        return *parent;
+    }
+
+    node_list::iterator SceneGraph::AddNode(GeometryChunk * gc, SORE_Math::Vector3< float > pos)
+    {
+        return parent->AddChild(gc, pos);
+    }
 }

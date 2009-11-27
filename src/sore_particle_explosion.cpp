@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "math/sore_geometry.h"
 #include "sore_particle_explosion.h"
 #include "sore_util.h"
 #include "sore_math.h"
@@ -38,9 +39,9 @@ namespace SORE_Graphics
         transform *= SORE_Math::Matrix4<float>::GetRotation(angle, SORE_Math::AXIS_Z);
         SORE_Math::Rect<float> bounds(-6.0f, 6.0f, -1.5f, 1.5f);
 
-        gc = new GeometryChunk(tex, shad, bounds,
+        /*gc = new GeometryChunk(tex, shad, bounds,
                                SORE_Graphics::LAYER4, SORE_Graphics::SUBTRACTIVE,
-                               defaultTexCoords, color);
+                               defaultTexCoords, color);*/
     }
 
     bool ExplosionParticle::IsActive() const
@@ -53,6 +54,6 @@ namespace SORE_Graphics
         transform *=
             SORE_Math::Matrix4<float>::GetTranslation(elapsed*speed, 0.0f, 0.0f);
         alpha -= alphaSpeed * elapsed;
-        gc->SetColor(gc->color() - Color(0.0f, 0.0f, 0.0f, alphaSpeed * elapsed));
+        //gc->SetColor(gc->color() - Color(0.0f, 0.0f, 0.0f, alphaSpeed * elapsed));
     }
 }

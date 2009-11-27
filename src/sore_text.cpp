@@ -68,16 +68,18 @@ namespace SORE_Graphics
         return text.size();
     }
 
-    render_list Text::GetGeometry() const
+    /*render_list Text::GetGeometry() const
     {
         render_list r;
-        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
+        std::vector<std::pair<SORE_Math::Matrix4<float>,
+        GeometryChunk*> >::const_iterator it;
         for(it = geometry.begin();it!=geometry.end();++it)
         {
             r.push_back(std::make_pair(&(it->first), it->second));
         }
         return r;
     }
+    */
 
     void Text::UpdateText(const std::string& newText, const Color& c)
     {
@@ -133,7 +135,8 @@ namespace SORE_Graphics
             {
                 //create a shared geometry
                 GeometryChunk* coloredCharacter = new GeometryChunk(*c.gc);
-                coloredCharacter->SetColor(color);
+                //TODO:
+                //coloredCharacter->SetColor(color);
 
                 SORE_Math::Matrix4<float> m = c.transform;
                 m *= SORE_Math::Matrix4<float>::GetTranslation(currentAdvance, 0.0f, 0.0f);

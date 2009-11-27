@@ -29,6 +29,7 @@
 
 #include <vector>
 
+#include "../math/sore_matrix4x4.h"
 #include "../sore_dll.h"
 #include "../sore_geometrychunk.h"
 #include "../sore_input.h"
@@ -47,7 +48,8 @@ namespace SORE_GUI
         Widget(SVec s, SVec p, Widget* par=NULL);
         ~Widget();
 
-        SORE_Graphics::render_list GetRenderList();
+        //TODO
+        //SORE_Graphics::render_list GetRenderList();
         bool PropagateEvents(SORE_Kernel::Event* e);
 
         int GetSize(unit_type type) const;
@@ -65,7 +67,7 @@ namespace SORE_GUI
         //returns true if inside widget area
         bool InBounds(unsigned int x, unsigned int y);
         //returns total size of area for child widgets
-        virtual unsigned int GetClientSize(unit_type type) const {return GetSize(type); };
+        virtual unsigned int GetClientSize(unit_type type) const;
         //returns position of area for child widgets
         virtual unsigned int GetClientPosition(unit_type type) const {return 0; };
 
@@ -74,7 +76,8 @@ namespace SORE_GUI
         const SVec& GetSize() const;
         void SetSize(const SVec& s);
 
-        int GetPixels(unit_type type, SUnit unit) const; //translate an SVec into pixels
+        //translate an SVec into pixels
+        int GetPixels(unit_type type, SUnit unit) const;
         float GetLayer() const; //used for child widgets to determine their layer
         const SORE_Math::Matrix4<float>& GetPositionMatrix() const;
 
@@ -84,8 +87,10 @@ namespace SORE_GUI
         //these events are preprocessed: mouse coordinates are relative to the widget,
         //not absolute
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
-        //child widgets ARE responsible to transforming their geometry via GetPositionMatrix()
-        virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        //child widgets ARE responsible to transforming their geometry
+        //via GetPositionMatrix()
+        //TODO:fixme
+        //virtual SORE_Graphics::render_list GetThisRenderList() = 0;
         //gets called when the parent's position is updated; overload if we need to do
         //processing on a position change
         virtual void UpdatePosition() {}

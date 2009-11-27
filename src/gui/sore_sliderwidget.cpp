@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "../math/sore_geometry.h"
 #include "../sore_logger.h"
 #include "sore_sliderwidget.h"
 
@@ -65,7 +66,7 @@ namespace SORE_GUI
         onChange(value);
     }
 
-    SORE_Graphics::render_list SliderWidget::GetThisRenderList()
+    /*SORE_Graphics::render_list SliderWidget::GetThisRenderList()
     {
         SORE_Graphics::render_list list;
 
@@ -80,6 +81,7 @@ namespace SORE_GUI
 
         return list;
     }
+    */
 
     bool SliderWidget::ProcessEvents(SORE_Kernel::Event* e)
     {
@@ -117,7 +119,8 @@ namespace SORE_GUI
 
         SORE_Math::Rect<float> sliderBounds
             (-sliderWidth, sliderWidth, 0, sliderHeight);
-        sliderChunk = new SORE_Graphics::GeometryChunk(slider, shader, sliderBounds);
+        //TODO:fixme!
+        //sliderChunk = new SORE_Graphics::GeometryChunk(slider, shader, sliderBounds);
 
         UpdateSlider();
     }

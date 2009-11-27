@@ -20,6 +20,7 @@
 
 #include "sore_fileio.h"
 #include "sore_font.h"
+#include "math/sore_geometry.h"
 #include "sore_geometrychunk.h"
 #include "sore_logger.h"
 #include "sore_shaders.h"
@@ -199,8 +200,8 @@ namespace SORE_Font
                     static_cast<float>(buffers[i].height) / glyphHeight * yBlock;
 
                 SORE_Math::Rect<float> texCoords(xMin, xMax, yMin, yMax);
-                characters[height][i].gc->SetTexture(textures[height]);
-                characters[height][i].gc->SetTexCoords(texCoords);
+                //characters[height][i].gc->SetTexture(textures[height]);
+                //characters[height][i].gc->SetTexCoords(texCoords);
             }
         }
 
@@ -269,9 +270,9 @@ namespace SORE_Font
             SORE_Graphics::GLSLShaderPtr shader =
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
-            c[index].gc = new SORE_Graphics::GeometryChunk
+            /*c[index].gc = new SORE_Graphics::GeometryChunk
                 (SORE_Graphics::Texture2DPtr(), shader, bounds,
-                 SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
+                SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);*/
         }
         else
         {

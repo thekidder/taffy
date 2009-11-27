@@ -21,9 +21,12 @@
 #ifndef SORE_RENDERER2D_H
 #define SORE_RENDERER2D_H
 
+#include <boost/function.hpp>
+
 #include "sore_fbo.h"
 #include "sore_font.h"
 #include "sore_geometrychunk.h"
+#include "sore_geometryprovider.h"
 #include "sore_graphics.h"
 #include "sore_graphicsarray.h"
 #include "sore_postprocess.h"
@@ -42,63 +45,15 @@
 */
 namespace SORE_Graphics
 {
-    typedef std::pair<proj_callback, boost::function<render_list ()> >
-    geometry_callback;
-
-    struct vbo_tex_order
-    {
-        vbo_tex_order(Texture2DPtr t,
-                      GLSLShaderPtr sh,
-                      unsigned s, unsigned l)
-            : tex(t), shad(sh), triStart(s), triLen(l) {}
-        Texture2DPtr tex;
-        GLSLShaderPtr shad;
-        unsigned int triStart;
-        unsigned int triLen;
-    };
-
-    class SORE_EXPORT Renderer;
-
-    typedef std::vector<vbo_tex_order> texture_stack;
-
-    struct geometry_provider
-    {
-        boost::function<render_list ()> geometryCallback;
-        proj_callback projCallback;
-        boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
-        PostProcessEffect* effect;
-        blend_mode blend;
-    };
-
-    struct batch
-    {
-        batch()
-        {
-#ifndef SORE_NO_VBO
-            second = new VBO(true, true);
-#else
-            second = new VertexArray(true, true);
-#endif
-        }
-        texture_stack first;
-        GraphicsArray* second;
-        PostProcessEffect* effect;
-        GLenum blendSFactor, blendDFactor;
-        proj_callback projCallback;
-        boost::function<const SORE_Math::Matrix4<float>& ()> cameraCallback;
-    };
-
     class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer
     {
     public:
-        Renderer(SORE_Resource::ResourcePool& _rm);
-        ~Renderer();
+        Renderer(SORE_Resource::ResourcePool& _pool);
 
         virtual void Render();
 
         void ClearGeometryProviders();
-        void AddGeometryProvider(geometry_provider c);
-        void Build();
+        void AddGeometryProvider(GeometryProvider gp);
 
         //Rendering Statistics
         float GetFPS() const;
@@ -111,22 +66,17 @@ namespace SORE_Graphics
 
         void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
     protected:
-        void RenderBatch(batch& b);
         virtual void OnScreenChange();
 
         //returns 0 on success
         int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
     private:
-        SORE_Resource::ResourcePool& rm;
+        void CalculateFPS();
+        SORE_Resource::ResourcePool& pool;
 
         //acts as a stack: only providers on the top are called
-        std::vector<
-            std::vector<geometry_provider>
-            > geometryProviders;
-
-        std::vector<std::vector<geometry_provider> >::iterator currentProvider;
-
-        std::vector<batch> batches;
+        std::vector<std::vector<GeometryProvider> > geometryProviders;
+        std::vector<std::vector<GeometryProvider> >::iterator currentState;
 
         //statistics: get info about current rendering
         float fps;
@@ -134,11 +84,6 @@ namespace SORE_Graphics
         unsigned int drawCalls;
         unsigned int numPolys;
     };
-
-    bool GeometrySort(std::pair<const SORE_Math::Matrix4<float>*,
-                      const GeometryChunk*> one,
-                      std::pair<const SORE_Math::Matrix4<float>*,
-                      const GeometryChunk*> two);
 }
 
 #endif
