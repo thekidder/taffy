@@ -48,8 +48,8 @@ namespace SORE_FileIO
 
         bool Contains(const char* filename) const;
         PkgFileBuf* GetFileBuf(const char* filename);
-        //return filename of the package containing filename, or empty string if the file
-        //does not exist in this cache
+        //return filename of the package containing filename, or empty string if
+        //the file does not exist in this cache
         std::string PackageFilename(const char* filename);
     private:
         struct file_info

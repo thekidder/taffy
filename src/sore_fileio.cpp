@@ -46,7 +46,8 @@ namespace SORE_FileIO
     class GenericPkgFileBuf
     {
     public:
-        GenericPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        GenericPkgFileBuf(
+            std::ifstream& package_, unsigned int pos_, unsigned int size_);
         virtual ~GenericPkgFileBuf() {}
 
         virtual std::streamsize read(char* s, std::streamsize n) = 0;
@@ -60,7 +61,8 @@ namespace SORE_FileIO
     class UncompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
-        UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_);
+        UncompressedPkgFileBuf(
+            std::ifstream& package_, unsigned int pos_, unsigned int size_);
         ~UncompressedPkgFileBuf();
 
         std::streamsize read(char* s, std::streamsize n);
@@ -69,7 +71,8 @@ namespace SORE_FileIO
     class CompressedPkgFileBuf : public GenericPkgFileBuf
     {
     public:
-        CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_, unsigned int size_,
+        CompressedPkgFileBuf(
+            std::ifstream& package_, unsigned int pos_, unsigned int size_,
             unsigned int sizeRaw_);
         ~CompressedPkgFileBuf();
 
@@ -127,7 +130,8 @@ namespace SORE_FileIO
     {
         if(openPackages.find(packagename) == openPackages.end())
         {
-            std::ifstream* packageFile = new std::ifstream(packagename, std::ios::binary);
+            std::ifstream* packageFile = new std::ifstream(
+                packagename, std::ios::binary);
             openPackages.insert(std::make_pair(packagename, packageFile));
             if(!packageFile->good())
                 ENGINE_LOG(SORE_Logging::LVL_ERROR, "could not open file");
@@ -182,7 +186,8 @@ namespace SORE_FileIO
     {
         char header[7];
 
-        if(find(cachedPackages.begin(), cachedPackages.end(), packagename) != cachedPackages.end())
+        if(find(cachedPackages.begin(), cachedPackages.end(), packagename) !=
+           cachedPackages.end())
             return; //package is already in cache
         cachedPackages.push_back(packagename);
 
@@ -192,7 +197,8 @@ namespace SORE_FileIO
         if(header[0]!='S' || header[1]!='D' || header[2]!='P')
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Failed to open %s: not a valid SDP package") % packagename);
+                       boost::format("Failed to open %s: not a valid SDP package")
+                       % packagename);
             return;
         }
 
@@ -203,18 +209,20 @@ namespace SORE_FileIO
            (version_major == MAX_SDP_MAJOR && version_minor > MAX_SDP_MINOR))
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Failed to open %s: SDP version is too high (%d.%d)")
+                       boost::format("Failed to open %s: SDP version is too "
+                                     "high (%d.%d)")
                        % version_major % version_minor);
             return;
         }
 
-        unsigned short numFiles = static_cast<unsigned short>(header[5] + (header[6]<<8));
+        unsigned short numFiles = static_cast<unsigned short>(
+            header[5]+(header[6]<<8));
         ENGINE_LOG(SORE_Logging::LVL_INFO,
                    boost::format("Caching %s with %d files and directories")
                    % packagename % numFiles);
 
-        //we need to reassign IDs given how many files are already cached so we don't mangle
-        //existing ids
+        //we need to reassign IDs given how many files are already cached so we
+        //don't mangle existing ids
         unsigned int idPrefix = cache.size();
 
         //we also need to reassign folder IDs if a folder already exists in the cache
@@ -314,8 +322,8 @@ namespace SORE_FileIO
         return fileSize;
     }
 
-    UncompressedPkgFileBuf::UncompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
-                           unsigned int size_) :
+    UncompressedPkgFileBuf::UncompressedPkgFileBuf(
+        std::ifstream& package_, unsigned int pos_, unsigned int size_) :
         GenericPkgFileBuf(package_, pos_, size_)
     {
     }
@@ -334,10 +342,11 @@ namespace SORE_FileIO
         return package.gcount();
     }
 
-    CompressedPkgFileBuf::CompressedPkgFileBuf(std::ifstream& package_, unsigned int pos_,
-                                               unsigned int size_, unsigned int sizeRaw_) :
-        GenericPkgFileBuf(package_, pos_, size_),
-        sizeRaw(sizeRaw_), num_out(0), eof(false)
+    CompressedPkgFileBuf::CompressedPkgFileBuf(
+        std::ifstream& package_, unsigned int pos_, unsigned int size_,
+        unsigned int sizeRaw_)
+        : GenericPkgFileBuf(package_, pos_, size_), sizeRaw(sizeRaw_),
+          num_out(0), eof(false)
     {
         strm.zalloc = Z_NULL;
         strm.zfree = Z_NULL;
@@ -407,13 +416,14 @@ namespace SORE_FileIO
     {
         if(sizeRaw == 0)
         {
-            boost::shared_ptr<GenericPkgFileBuf> p(new UncompressedPkgFileBuf(package, pos, size));
+            boost::shared_ptr<GenericPkgFileBuf> p(
+                new UncompressedPkgFileBuf(package, pos, size));
             d_ptr = p;
         }
         else
         {
-            boost::shared_ptr<GenericPkgFileBuf> p
-                (new CompressedPkgFileBuf(package, pos, size, sizeRaw));
+            boost::shared_ptr<GenericPkgFileBuf> p(
+                new CompressedPkgFileBuf(package, pos, size, sizeRaw));
             d_ptr =p;
         }
     }
