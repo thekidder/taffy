@@ -53,6 +53,8 @@ namespace SORE_Graphics
     };
 
     bool operator!=(const Texture2D& one, const Texture2D& two);
+
+    typedef boost::shared_ptr<Texture2D> Texture2DPtr;
 }
 
 #endif

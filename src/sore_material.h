@@ -44,11 +44,12 @@ namespace SORE_Graphics
         bool                     HasFlag(std::string flag);
     protected:
         void Load();
-        GLSLShader* shader;
+        GLSLShaderPtr shader;
         bool useShader;
         virtual std::string ProcessFilename(std::string file) {return file;}
         std::string file;
-        std::map<std::string, std::pair<int, SORE_Graphics::Texture2D*> > textureMap;
+        std::map<std::string, std::pair<int,
+            SORE_Graphics::Texture2DPtr > > textureMap;
         std::vector<std::string> textureOrder;
         std::vector<std::string> flags;
     };

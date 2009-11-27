@@ -96,50 +96,30 @@ namespace SORE_Resource
     {
     }
 
-    ResourcePool::~ResourcePool()
-    {
-        std::map<std::size_t, Resource*>::iterator it;
-
-        for(it=resources.begin();it!=resources.end();++it)
-        {
-            delete it->second;
-        }
-    }
-
-    bool ResourcePool::UnloadResource(Resource* r)
-    {
-        std::map<std::size_t, Resource*>::iterator it;
-        for(it=resources.begin();it!=resources.end();++it)
-        {
-            if(it->second == r)
-            {
-                delete r;
-                resources.erase(it);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void ResourcePool::for_each(boost::function<void (Resource*)> func)
+    void ResourcePool::for_each(boost::function<void (ResourcePtr)> func)
     {
         //std::for_each(resources.begin(), resources.end(), boost::bind(func));
-        std::map<std::size_t, Resource*>::iterator it;
+        std::map<std::size_t, boost::weak_ptr<Resource> >::iterator it;
         for(it=resources.begin();it!=resources.end();it++)
         {
-            Resource* r = it->second;
-            func(r);
+            if(ResourcePtr r = it->second.lock())
+            {
+                func(r);
+            }
         }
     }
 
     bool ResourcePool::OnResize(SORE_Kernel::Event* e)
     {
         ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Reloading all GL dependent resources");
-        std::map<std::size_t, Resource*>::iterator it;
+        std::map<std::size_t, boost::weak_ptr<Resource> >::iterator it;
         for(it=resources.begin();it!=resources.end();it++)
         {
-            if(it->second->GLContextDependent())
-                it->second->Reload();
+            if(ResourcePtr r = it->second.lock())
+            {
+                if(r->GLContextDependent())
+                    r->Reload();
+            }
         }
         return true;
     }

@@ -47,12 +47,12 @@ namespace SORE_Graphics
 
     struct vbo_tex_order
     {
-        vbo_tex_order(const SORE_Graphics::Texture2D* t,
-                      const SORE_Graphics::GLSLShader* sh,
+        vbo_tex_order(Texture2DPtr t,
+                      GLSLShaderPtr sh,
                       unsigned s, unsigned l)
             : tex(t), shad(sh), triStart(s), triLen(l) {}
-        const SORE_Graphics::Texture2D* tex;
-        const SORE_Graphics::GLSLShader* shad;
+        Texture2DPtr tex;
+        GLSLShaderPtr shad;
         unsigned int triStart;
         unsigned int triLen;
     };

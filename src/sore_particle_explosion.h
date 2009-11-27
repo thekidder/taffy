@@ -29,8 +29,8 @@ namespace SORE_Graphics
     {
     public:
         ExplosionParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                          SORE_Graphics::Texture2D* tex,
-                          SORE_Graphics::GLSLShader* shad);
+                          Texture2DPtr tex,
+                          GLSLShaderPtr shad);
 
         bool IsActive() const;
         void Frame(int elapsed);

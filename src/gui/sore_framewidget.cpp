@@ -23,7 +23,7 @@
 namespace SORE_GUI
 {
     FrameWidget::FrameWidget(SVec s, SVec p, size_mode m, Widget* par)
-        : Widget(s, p, par), mode(m), texture(0), shader(0), leftBorder(16),
+        : Widget(s, p, par), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
         for(unsigned int i=0;i<9;++i)
@@ -65,7 +65,7 @@ namespace SORE_GUI
         BuildGeometry();
     }
 
-    void FrameWidget::SetTexture(SORE_Graphics::Texture2D* tex)
+    void FrameWidget::SetTexture(SORE_Graphics::Texture2DPtr tex)
     {
         texture = tex;
         for(unsigned int i=0;i<9;++i)
@@ -75,7 +75,7 @@ namespace SORE_GUI
         }
     }
 
-    void FrameWidget::SetShader(SORE_Graphics::GLSLShader* shad)
+    void FrameWidget::SetShader(SORE_Graphics::GLSLShaderPtr shad)
     {
         shader = shad;
         for(unsigned int i=0;i<9;++i)

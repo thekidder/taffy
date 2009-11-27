@@ -26,7 +26,7 @@ namespace SORE_Graphics
 {
     Material::Material(std::string materialFile, std::string additionalInfo,
                        SORE_FileIO::PackageCache* pc) :
-        Resource(materialFile, pc, additionalInfo), shader(NULL), useShader(false),
+        Resource(materialFile, pc, additionalInfo), useShader(false),
         file(materialFile)
     {
         Load();
@@ -61,7 +61,7 @@ namespace SORE_Graphics
                 }
                 else if(section=="Textures")
                 {
-                    SORE_Graphics::Texture2D* tex =
+                    SORE_Graphics::Texture2DPtr tex =
                         rm->GetResource<SORE_Graphics::Texture2D>(value);
                     if(tex!=NULL)
                     {

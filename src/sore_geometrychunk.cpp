@@ -25,7 +25,8 @@
 
 namespace SORE_Graphics
 {
-    GeometryChunk::GeometryChunk(Texture2D* texture, GLSLShader* shader,
+    GeometryChunk::GeometryChunk(Texture2DPtr texture,
+                                 GLSLShaderPtr shader,
                                  SORE_Math::Rect<float> bounds,
                                  geometry_layer l, blend_mode blend,
                                  SORE_Math::Rect<float> texCoords,
@@ -169,22 +170,22 @@ namespace SORE_Graphics
         return numIndices;
     }
 
-    const SORE_Graphics::Texture2D* GeometryChunk::texture() const
+    const Texture2DPtr GeometryChunk::texture() const
     {
         return tex;
     }
 
-    void GeometryChunk::SetTexture(SORE_Graphics::Texture2D* texture)
+    void GeometryChunk::SetTexture(Texture2DPtr texture)
     {
         tex = texture;
     }
 
-    const SORE_Graphics::GLSLShader* GeometryChunk::shader() const
+    const GLSLShaderPtr GeometryChunk::shader() const
     {
         return shad;
     }
 
-    void GeometryChunk::SetShader(GLSLShader* shader)
+    void GeometryChunk::SetShader(GLSLShaderPtr shader)
     {
         shad = shader;
     }

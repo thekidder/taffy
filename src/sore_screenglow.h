@@ -28,22 +28,22 @@
 
 namespace SORE_Graphics
 {
-	class SORE_EXPORT ScreenGlow : public PostProcessEffect
-	{
-	public:
-		ScreenGlow(unsigned int w, unsigned int h, SORE_Resource::ResourcePool& pool);
-		~ScreenGlow();
+    class SORE_EXPORT ScreenGlow : public PostProcessEffect
+    {
+    public:
+        ScreenGlow(unsigned int w, unsigned int h, SORE_Resource::ResourcePool& pool);
+        ~ScreenGlow();
 
-		void StartFrame(ProjectionInfo& proj);
-		void EndFrame(ProjectionInfo& proj);
+        void StartFrame(ProjectionInfo& proj);
+        void EndFrame(ProjectionInfo& proj);
 
-	private:
-		void OnScreenChange();
+    private:
+        void OnScreenChange();
 
-		FBO* fbo;
+        FBO* fbo;
 
-		GLSLShader* blur, *combine;
-	};
+        GLSLShaderPtr blur, combine;
+    };
 }
 
 #endif

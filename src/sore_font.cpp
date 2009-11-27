@@ -71,11 +71,6 @@ namespace SORE_Font
             CharInfo* c = it->second;
             delete[] c;
         }
-        std::map<unsigned int, SORE_Graphics::Texture2D*>::iterator t_it;
-        for(t_it = textures.begin(); t_it!=textures.end(); ++t_it)
-        {
-            delete t_it->second;
-        }
         FT_Done_Face(face);
         FT_Done_FreeType(library);
     }
@@ -183,8 +178,9 @@ namespace SORE_Font
             }
         }
 
-        textures[height] = new SORE_Graphics::Texture2D
-            (texture, GL_RGBA, GL_RGBA, texWidth, texHeight);
+        textures[height] = SORE_Graphics::Texture2DPtr(
+            new SORE_Graphics::Texture2D(
+                texture, GL_RGBA, GL_RGBA, texWidth, texHeight));
 
         for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
         {
@@ -270,11 +266,11 @@ namespace SORE_Font
                                            static_cast<float>(height));
             SORE_Math::Rect<float> texCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
-            SORE_Graphics::GLSLShader* shader =
+            SORE_Graphics::GLSLShaderPtr shader =
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk
-                (0, shader, bounds,
+                (SORE_Graphics::Texture2DPtr(), shader, bounds,
                  SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);
         }
         else

@@ -29,8 +29,8 @@ namespace SORE_Graphics
     {
     public:
         CircleParticle(SORE_Math::Matrix4<float> initial, const Color& c,
-                       SORE_Graphics::Texture2D* tex,
-                       SORE_Graphics::GLSLShader* shad);
+                       SORE_Graphics::Texture2DPtr tex,
+                       SORE_Graphics::GLSLShaderPtr shad);
 
         bool IsActive() const;
         void Frame(int elapsed);

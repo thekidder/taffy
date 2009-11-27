@@ -31,9 +31,10 @@
 #include <vector>
 #include <string>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include "sore_input.h"
 #include "sore_fileio.h"
@@ -41,8 +42,11 @@
 
 namespace SORE_Resource
 {
-    class SORE_EXPORT ResourcePool;
     class SORE_EXPORT Resource;
+
+    typedef boost::shared_ptr<Resource> ResourcePtr;
+
+    class SORE_EXPORT ResourcePool;
 }
 
 /*
@@ -90,41 +94,57 @@ class SORE_EXPORT SORE_Resource::ResourcePool
 {
 public:
     ResourcePool(SORE_FileIO::PackageCache* pc = NULL);
-    ~ResourcePool();
 
     template<typename T>
-        T* GetResource(std::string filename)
+        boost::shared_ptr<T> GetResource(const std::string& filename);
+    void for_each(boost::function<void (ResourcePtr)> func);
+    bool OnResize(SORE_Kernel::Event* e);
+private:
+    template<typename T>
+        boost::shared_ptr<T> InsertResource(
+            const std::string& filename, std::size_t hash);
+
+    boost::hash<std::string> string_hash;
+    SORE_FileIO::PackageCache* packageCache;
+
+    std::map<std::size_t, boost::weak_ptr<Resource> > resources;
+};
+
+template<typename T>
+boost::shared_ptr<T> SORE_Resource::ResourcePool::GetResource(
+    const std::string& filename)
+{
+    std::size_t hash = string_hash(filename);
+    if(resources.find(hash)==resources.end())
     {
-        std::size_t hash = string_hash(filename);
-        if(resources.find(hash)==resources.end())
+        return InsertResource<T>(filename, hash);
+    }
+    else
+    {
+        boost::weak_ptr<Resource> r = resources.find(hash)->second;
+        if(ResourcePtr temp = r.lock())
         {
-            T* temp = new T(filename, packageCache);
-            resources.insert(std::pair<std::size_t, Resource*>(hash, temp) );
-            return temp;
+            boost::shared_ptr<T> temp_casted = boost::dynamic_pointer_cast<T>(temp);
+            return temp_casted;
         }
         else
         {
-            Resource* r = resources.find(hash)->second;
-            T* resource = dynamic_cast<T*>(r);
-            if(resource==NULL)
-                ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           boost::format("Could not downcast resource for filename %s")
-                           % filename);
-            return resource;
+            return InsertResource<T>(filename, hash);
         }
     }
-    //searchs for r in resource map, then unloads it. returns true if it was unloaded,
-    //false if not found
-    bool UnloadResource(Resource* r);
+}
 
-    void for_each(boost::function<void (Resource*)> func);
-    bool OnResize(SORE_Kernel::Event* e);
-protected:
-    std::map<std::size_t, Resource*> resources;
-private:
-    boost::hash<std::string> string_hash;
-    SORE_FileIO::PackageCache* packageCache;
-};
+template<typename T>
+boost::shared_ptr<T> SORE_Resource::ResourcePool::InsertResource(
+    const std::string& filename, std::size_t hash)
+{
+    ResourcePtr r(new T(filename, packageCache));
+    boost::weak_ptr<Resource> temp = r;
+    resources.insert(std::make_pair(hash, temp));
+    boost::shared_ptr<T> resource = boost::dynamic_pointer_cast<T>(r);
+    return resource;
+}
+
 
 #ifdef _MSC_VER
 #pragma warning( pop )
