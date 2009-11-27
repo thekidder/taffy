@@ -26,7 +26,7 @@
 namespace SORE_Graphics
 {
     GeometryChunk::GeometryChunk(Texture2DPtr texture,
-                                 boost::shared_ptr<GLSLShader> shader,
+                                 GLSLShaderPtr shader,
                                  SORE_Math::Rect<float> bounds,
                                  geometry_layer l, blend_mode blend,
                                  SORE_Math::Rect<float> texCoords,
@@ -180,12 +180,12 @@ namespace SORE_Graphics
         tex = texture;
     }
 
-    const boost::shared_ptr<GLSLShader> GeometryChunk::shader() const
+    const GLSLShaderPtr GeometryChunk::shader() const
     {
         return shad;
     }
 
-    void GeometryChunk::SetShader(boost::shared_ptr<GLSLShader> shader)
+    void GeometryChunk::SetShader(GLSLShaderPtr shader)
     {
         shad = shader;
     }

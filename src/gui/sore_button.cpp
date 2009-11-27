@@ -37,7 +37,7 @@ namespace SORE_GUI
             styleDir + "button_sheet_active.tga");
         hover = pool.GetResource<SORE_Graphics::Texture2D>(
             styleDir + "button_sheet_hover.tga");
-        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
+        SORE_Graphics::GLSLShaderPtr shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         unsigned int height = GetSize(VERTICAL);
         unsigned int width = GetSize(HORIZONTAL);

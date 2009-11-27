@@ -31,7 +31,7 @@ namespace SORE_GUI
 
         SORE_Graphics::Texture2DPtr tex =
             pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "frame.tga");
-        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
+        SORE_Graphics::GLSLShaderPtr shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
         SetTexture(tex);

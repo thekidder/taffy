@@ -62,7 +62,7 @@ namespace SORE_GUI
         SVec originalSize;
 
         SORE_Font::FontPtr font;
-        boost::shared_ptr<SORE_Graphics::GLSLShader> shad;
+        SORE_Graphics::GLSLShaderPtr shad;
         unsigned int textHeight;
         SORE_Graphics::Texture2DPtr
             normal, active, hover, arrow, menuBg;

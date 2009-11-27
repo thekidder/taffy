@@ -95,6 +95,8 @@ namespace SORE_Graphics
     };
 
     bool operator!=(const GLSLShader& one, const GLSLShader& two);
+
+    typedef boost::shared_ptr<GLSLShader> GLSLShaderPtr;
 }
 
 #ifdef _MSC_VER

@@ -28,7 +28,7 @@ namespace SORE_Graphics
         SORE_Math::Matrix4<float> initial,
         const Color& c,
         SORE_Graphics::Texture2DPtr tex,
-        boost::shared_ptr<SORE_Graphics::GLSLShader> shad)
+        SORE_Graphics::GLSLShaderPtr shad)
         : Particle(initial, c), alpha(c.GetColor()[3])
     {
         angle = SORE_Utility::getRandomMinMax(0.0f, 2.0f*static_cast<float>(M_PI));

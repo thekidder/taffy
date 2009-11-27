@@ -33,7 +33,7 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        boost::shared_ptr<SORE_Graphics::GLSLShader> shad =
+        SORE_Graphics::GLSLShaderPtr shad =
             pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         texture = pool.GetResource<SORE_Graphics::Texture2D>(
             styleDir+"textfield.tga");

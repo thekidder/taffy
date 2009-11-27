@@ -62,7 +62,7 @@ namespace SORE_Graphics
      public:
          GeometryChunk(
              Texture2DPtr texture,
-             boost::shared_ptr<GLSLShader> shader,
+             GLSLShaderPtr shader,
              SORE_Math::Rect<float> bounds,
              geometry_layer l = LAYER4, blend_mode blend = SUBTRACTIVE,
              SORE_Math::Rect<float> texCoords = defaultTexCoords,
@@ -94,9 +94,9 @@ namespace SORE_Graphics
          unsigned int getNumIndices() const;
 
          const Texture2DPtr texture() const;
-         const boost::shared_ptr<GLSLShader> shader() const;
+         const GLSLShaderPtr shader() const;
          void SetTexture(Texture2DPtr texture);
-         void SetShader(boost::shared_ptr<GLSLShader> shader);
+         void SetShader(GLSLShaderPtr shader);
      private:
          void setup(SORE_Math::Rect<float> bounds,
                     SORE_Math::Rect<float> texCoordRect);
@@ -116,7 +116,7 @@ namespace SORE_Graphics
          unsigned int numVertices, numIndices;
 
          SORE_Graphics::Texture2DPtr tex;
-         boost::shared_ptr<SORE_Graphics::GLSLShader> shad;
+         SORE_Graphics::GLSLShaderPtr shad;
     };
 
     typedef std::vector<std::pair<const SORE_Math::Matrix4<float>*,

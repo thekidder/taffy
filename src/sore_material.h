@@ -44,7 +44,7 @@ namespace SORE_Graphics
         bool                     HasFlag(std::string flag);
     protected:
         void Load();
-        boost::shared_ptr<GLSLShader> shader;
+        GLSLShaderPtr shader;
         bool useShader;
         virtual std::string ProcessFilename(std::string file) {return file;}
         std::string file;

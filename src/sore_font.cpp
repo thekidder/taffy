@@ -265,7 +265,7 @@ namespace SORE_Font
                                            static_cast<float>(height));
             SORE_Math::Rect<float> texCoords(0.0f, 1.0f, 0.0f, 1.0f);
 
-            boost::shared_ptr<SORE_Graphics::GLSLShader> shader =
+            SORE_Graphics::GLSLShaderPtr shader =
                 rm->GetResource<SORE_Graphics::GLSLShader>
                 ("data/Shaders/default.shad");
             c[index].gc = new SORE_Graphics::GeometryChunk

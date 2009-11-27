@@ -42,7 +42,7 @@ namespace SORE_Graphics
 
         FBO* fbo;
 
-        boost::shared_ptr<GLSLShader> blur, combine;
+        GLSLShaderPtr blur, combine;
     };
 }
 

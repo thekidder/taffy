@@ -75,7 +75,7 @@ namespace SORE_GUI
         }
     }
 
-    void FrameWidget::SetShader(boost::shared_ptr<SORE_Graphics::GLSLShader> shad)
+    void FrameWidget::SetShader(SORE_Graphics::GLSLShaderPtr shad)
     {
         shader = shad;
         for(unsigned int i=0;i<9;++i)

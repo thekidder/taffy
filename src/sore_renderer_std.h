@@ -48,11 +48,11 @@ namespace SORE_Graphics
     struct vbo_tex_order
     {
         vbo_tex_order(Texture2DPtr t,
-                      boost::shared_ptr<GLSLShader> sh,
+                      GLSLShaderPtr sh,
                       unsigned s, unsigned l)
             : tex(t), shad(sh), triStart(s), triLen(l) {}
         Texture2DPtr tex;
-        boost::shared_ptr<GLSLShader> shad;
+        GLSLShaderPtr shad;
         unsigned int triStart;
         unsigned int triLen;
     };
