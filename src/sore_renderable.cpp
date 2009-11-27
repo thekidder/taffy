@@ -30,6 +30,11 @@ SORE_Graphics::Renderable::Renderable(
     CalculateSortKey();
 }
 
+GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
+{
+    return geometry;
+}
+
 void SORE_Graphics::Renderable::SetShader(ShaderPtr s)
 {
     shader = s;

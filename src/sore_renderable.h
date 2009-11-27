@@ -48,10 +48,6 @@ namespace SORE_Graphics
     };
 
     typedef unsigned long long int64;
-
-    typedef boost::shared_ptr<GeometryChunk> GeometryChunkPtr;
-    typedef boost::shared_ptr<GLSLShader> ShaderPtr;
-    typedef boost::shared_ptr<Texture2D> Texture2DPtr;
     typedef boost::shared_ptr<SORE_Math::Matrix4<float> > TransformationPtr;
 
     class Renderable
@@ -59,6 +55,8 @@ namespace SORE_Graphics
     public:
         Renderable(GeometryChunkPtr g, ShaderPtr s, Texture2DPtr tex,
                    TransformationPtr trans, geometry_layer l, blend_mode b);
+
+        GeometryChunkPtr GetGeometryChunk() const;
 
         void SetShader(ShaderPtr s);
         ShaderPtr GetShader() const;

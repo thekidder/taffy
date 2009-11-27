@@ -133,5 +133,7 @@ namespace SORE_Graphics
     const int SORT_LESS    = -1;
     const int SORT_EQUAL   =  0;
     const int SORT_GREATER =  1;
+
+    typedef boost::shared_ptr<GeometryChunk> GeometryChunkPtr;
 }
 #endif
