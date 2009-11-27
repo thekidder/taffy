@@ -41,7 +41,7 @@ namespace SORE_GUI
         void UpdatePosition();
 
         std::string title;
-        boost::shared_ptr<SORE_Font::Font> font;
+        SORE_Font::FontPtr font;
         SORE_Graphics::Text* titleText;
         bool dragged;
     };

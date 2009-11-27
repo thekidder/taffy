@@ -14,7 +14,7 @@ namespace SORE_GUI
         renderer(r), frame(0), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
         polys(0), polysLabel(0), ms(0), msLabel(0)
     {
-        boost::shared_ptr<SORE_Font::Font> font = pool.GetResource<SORE_Font::Font>(
+        SORE_Font::FontPtr font = pool.GetResource<SORE_Font::Font>(
             "data/ix_style/LiberationSans-Regular.ttf");
 
         frame = new SORE_GUI::FrameWindow(SVec(SUnit(0.0, 200), SUnit(0.0, 180)),

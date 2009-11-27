@@ -54,7 +54,7 @@ namespace SORE_GUI
         void UpdateText(int dir);
 
         std::string text;
-        boost::shared_ptr<SORE_Font::Font> font;
+        SORE_Font::FontPtr font;
         SORE_Graphics::Text* displayText;
         boost::shared_ptr<SORE_Graphics::Texture2D> texture;
 

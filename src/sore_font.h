@@ -106,6 +106,8 @@ namespace SORE_Font
         FT_Face face;
         FT_Byte* fontInfo;
     };
+
+    typedef boost::shared_ptr<Font> FontPtr;
 }
 
 #ifdef _MSC_VER

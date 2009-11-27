@@ -50,7 +50,7 @@ namespace SORE_GUI
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
 
-        boost::shared_ptr<SORE_Font::Font> font;
+        SORE_Font::FontPtr font;
         SORE_Graphics::Text* t;
         boost::shared_ptr<SORE_Graphics::Texture2D> normal, active, hover;
 
