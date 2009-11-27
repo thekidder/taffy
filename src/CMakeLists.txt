@@ -24,10 +24,12 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 set(INOTIFY inotify-cxx.cpp inotify-cxx.h)
 
 IF(UNIX)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp sore_timing_linux.cpp ${INOTIFY})
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
+  sore_timing_linux.cpp ${INOTIFY})
 ENDIF(UNIX)
 IF(WIN32)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp sore_timing_windows.cpp)
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
+  sore_timing_windows.cpp)
 ENDIF(WIN32)
 
 IF(SORE_WITH_VBO)
@@ -55,12 +57,13 @@ set(SORE_SRCS
   sore_logginginit.cpp sore_material.cpp sore_math.cpp
   sore_particle.cpp sore_particle_circle.cpp sore_particle_emitter.cpp
   sore_particle_explosion.cpp sore_postprocess.cpp sore_profiler.cpp
-  sore_renderer.cpp sore_renderer_std.cpp sore_resource.cpp
-  sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp
-  sore_screenglow.cpp sore_screeninfo.cpp sore_settings.cpp
-  sore_shaders.cpp sore_task.cpp sore_text.cpp sore_texture.cpp
-  sore_timing.cpp sore_util.cpp sore_vbo.cpp sore_vertexarray.cpp
-  ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
+  sore_renderable.cpp sore_renderer.cpp sore_renderer_std.cpp
+  sore_resource.cpp sore_scenegraph.cpp sore_scenenode.cpp
+  sore_screen.cpp sore_screenglow.cpp sore_screeninfo.cpp
+  sore_settings.cpp sore_shaders.cpp sore_task.cpp sore_text.cpp
+  sore_texture.cpp sore_timing.cpp sore_util.cpp sore_vbo.cpp
+  sore_vertexarray.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS}
+  ${SORE_MATH_SRCS})
 
 set(SORE_HEADERS sore.h
   sore_allgl.h sore_color.h sore_dll.h sore_defines.h sore_fbo.h
@@ -70,12 +73,13 @@ set(SORE_HEADERS sore.h
   sore_logginginit.h sore_material.h sore_math.h sore_particle.h
   sore_particle_circle.h sore_particle_emitter.h
   sore_particle_explosion.h sore_postprocess.h sore_profiler.h
-  sore_renderer.h sore_renderer_std.h sore_resource.h
-  sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screenglow.h
-  sore_screeninfo.h sore_settings.h sore_shaders.h sore_task.h
-  sore_text.h sore_texture.h sore_timing.h sore_util.h sore_vbo.h
-  sore_vertexarray.h ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS}
-  ${SORE_NETWORK_HEADERS} ${CMAKE_VERSION_OUT} ${CMAKE_VERSION_IN})
+  sore_renderable.h sore_renderer.h sore_renderer_std.h
+  sore_resource.h sore_scenegraph.h sore_scenenode.h sore_screen.h
+  sore_screenglow.h sore_screeninfo.h sore_settings.h sore_shaders.h
+  sore_task.h sore_text.h sore_texture.h sore_timing.h sore_util.h
+  sore_vbo.h sore_vertexarray.h ${SORE_GUI_HEADERS}
+  ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS} ${CMAKE_VERSION_OUT}
+  ${CMAKE_VERSION_IN})
 
 ADD_LIBRARY(sore_lib SHARED ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
   ${SORE_HEADERS})
