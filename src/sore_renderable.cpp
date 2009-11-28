@@ -20,6 +20,10 @@
 
 #include "sore_renderable.h"
 
+SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
+{
+}
+
 SORE_Graphics::Renderable::Renderable(
     GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
     TransformationPtr trans, geometry_layer l, blend_mode b)

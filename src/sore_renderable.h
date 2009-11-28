@@ -56,6 +56,7 @@ namespace SORE_Graphics
     class Renderable
     {
     public:
+        Renderable();
         Renderable(GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
                    TransformationPtr trans, geometry_layer l, blend_mode b);
 
