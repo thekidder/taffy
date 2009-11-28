@@ -158,7 +158,7 @@ namespace SORE_Graphics
                textureMap[textureOrder[i]].second!=NULL)
             {
                 glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(i));
-                textureMap[textureOrder[i]].second->Bind();
+                //textureMap[textureOrder[i]].second->Bind();
                 glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
                           textureMap[textureOrder[i]].first);
                 if(shader && useShader)

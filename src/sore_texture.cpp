@@ -177,7 +177,7 @@ namespace SORE_Graphics
         unsigned char* data = new unsigned char[w*h*4];
 
         glActiveTexture(GL_TEXTURE0);
-        Bind();
+        glBindTexture(GL_TEXTURE_2D, handle);
 
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
@@ -238,8 +238,14 @@ namespace SORE_Graphics
         return handle == o.handle;
     }
 
-    void Texture2D::Bind() const
+    void Texture2D::Bind(
+        GLSLShaderPtr shader,
+        const std::string& sampleName,
+        unsigned int textureSlot) const
     {
+        assert(textureSlot < 8);
+        shader->SetUniform1i(sampleName, textureSlot);
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, handle);
     }
 

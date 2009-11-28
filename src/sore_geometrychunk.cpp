@@ -62,6 +62,17 @@ void SORE_Graphics::GeometryChunk::Init(const GeometryChunk& o)
     memcpy(indices, o.indices, numIndices*sizeof(unsigned short));
 }
 
+void SORE_Graphics::GeometryChunk::SetColor(const Color& c)
+{
+    for(unsigned short i = 0; i < numVertices; ++i)
+    {
+        data[i].r = c.GetComponent(RED);
+        data[i].g = c.GetComponent(GREEN);
+        data[i].b = c.GetComponent(BLUE);
+        data[i].a = c.GetComponent(ALPHA);
+    }
+}
+
 SORE_Graphics::vertex* const SORE_Graphics::GeometryChunk::GetVertices()
 {
     return data;

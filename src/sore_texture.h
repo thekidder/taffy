@@ -21,8 +21,9 @@
 #ifndef SORE_TEXTURE_H
 #define SORE_TEXTURE_H
 
-#include "sore_resource.h"
 #include "sore_allgl.h"
+#include "sore_resource.h"
+#include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
@@ -32,7 +33,10 @@ namespace SORE_Graphics
         Texture2D(std::string filename, SORE_FileIO::PackageCache* pc = NULL);
         Texture2D(const unsigned char* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
-        void Bind() const;
+        void Bind(
+            GLSLShaderPtr shader,
+            const std::string& sampleName,
+            unsigned int textureSlot) const;
         const char* Type() const {return "2D texture";}
 
         void SaveTGA(const char* filename);

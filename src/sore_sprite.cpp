@@ -36,9 +36,9 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
     indices[0] = 0;
     indices[1] = 1;
     indices[2] = 2;
-    indices[3] = 1;
-    indices[4] = 3;
-    indices[5] = 2;
+    indices[3] = 2;
+    indices[4] = 1;
+    indices[5] = 3;
 
     vertices[0].x = bounds.topLeft[0];
     vertices[0].y = bounds.topLeft[1];
@@ -63,6 +63,8 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
     vertices[3].z = z;
     vertices[3].tex0i = texCoords.bottomRight[0];
     vertices[3].tex0j = texCoords.bottomRight[1];
+
+    g->SetColor(White);
 
     TransformationPtr transformation(new SORE_Math::Matrix4<float>());
     Renderable r(g, shader, texture, transformation, l, b);

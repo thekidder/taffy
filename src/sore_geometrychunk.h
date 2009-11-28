@@ -23,6 +23,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "sore_color.h"
 #include "sore_dll.h"
 
 /**
@@ -44,6 +45,9 @@ namespace SORE_Graphics
         GeometryChunk(unsigned short nVertices, unsigned short nIndices);
         GeometryChunk(const GeometryChunk& o);
         ~GeometryChunk();
+
+        //sets up vertices to the same color
+        void SetColor(const Color& c);
 
         vertex* const GetVertices();
         vertex& GetVertex(unsigned short i);

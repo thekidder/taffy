@@ -170,7 +170,7 @@ void SORE_Graphics::Renderer::Build()
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
     unsigned int vboSize = 0, numTris = 0, offset = 0, lastLen = 0;
-    GraphicsArray* ga = new GraphicsArrayClass;
+    GraphicsArray* ga = new GraphicsArrayClass(true, true);
     geometry.push_back(ga);
     Renderable old = allRenderables.front();
     for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
@@ -178,8 +178,9 @@ void SORE_Graphics::Renderer::Build()
         offset += lastLen;
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
+            geometry.back()->Build();
             vboSize = 0;
-            ga = new GraphicsArrayClass;
+            ga = new GraphicsArrayClass(true, true);
             geometry.push_back(ga);
         }
         geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
@@ -205,7 +206,8 @@ void SORE_Graphics::Renderer::Build()
             if(bindShader)
                 batches.back().AddBindShaderCommand(r_it->GetShader());
             if(bindTexture)
-                batches.back().AddBindTextureCommand(r_it->GetTexture());
+                batches.back().AddBindTextureCommand(
+                    r_it->GetShader(), r_it->GetTexture());
             if(vboSize == 0)
                 offset = numTris = 0;
         }
@@ -213,6 +215,7 @@ void SORE_Graphics::Renderer::Build()
         numTris += r_it->GetGeometryChunk()->NumIndices()/3;
         lastLen  = r_it->GetGeometryChunk()->NumIndices()/3;
     }
+    geometry.back()->Build();
     batches.back().SetNumTriangles(numTris);
     batches.back().SetTriangleOffset(offset);
 
@@ -299,8 +302,6 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    glEnable(GL_TEXTURE_2D);
 
     ProjectionInfo proj;
     proj.type = ORTHO2D;

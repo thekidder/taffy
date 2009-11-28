@@ -43,8 +43,10 @@ void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
     commands |= RENDER_CMD_BIND_SHADER;
 }
 
-void SORE_Graphics::RenderBatch::AddBindTextureCommand(Texture2DPtr texture)
+void SORE_Graphics::RenderBatch::AddBindTextureCommand(
+    GLSLShaderPtr shader, Texture2DPtr texture)
 {
+    this->shader = shader;
     this->texture = texture;
     commands |= RENDER_CMD_BIND_TEXTURE;
 }
@@ -56,7 +58,7 @@ void SORE_Graphics::RenderBatch::Render() const
     if(commands & RENDER_CMD_BIND_SHADER)
         shader->Bind();
     if(commands & RENDER_CMD_BIND_TEXTURE)
-        texture->Bind();
+        texture->Bind(shader, "texture", 0);
     if(geometry)
         geometry->DrawElements(numberTriangles, triangleOffset);
 }

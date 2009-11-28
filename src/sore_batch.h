@@ -43,7 +43,7 @@ namespace SORE_Graphics
         void SetTriangleOffset(unsigned int offset);
 
         void AddBindShaderCommand(GLSLShaderPtr shader);
-        void AddBindTextureCommand(Texture2DPtr texture);
+        void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
 
         void Render() const;
     private:
