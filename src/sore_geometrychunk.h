@@ -45,10 +45,10 @@ namespace SORE_Graphics
         GeometryChunk(const GeometryChunk& o);
         ~GeometryChunk();
 
-        vertex const* GetVertices();
+        vertex* const GetVertices();
         vertex& GetVertex(unsigned short i);
 
-        unsigned short const* GetIndices();
+        unsigned short* const GetIndices();
         unsigned short& GetIndex(unsigned short i);
 
         unsigned short NumVertices() const;

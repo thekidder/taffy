@@ -62,7 +62,7 @@ void SORE_Graphics::GeometryChunk::Init(const GeometryChunk& o)
     memcpy(indices, o.indices, numIndices*sizeof(unsigned short));
 }
 
-SORE_Graphics::vertex const* SORE_Graphics::GeometryChunk::GetVertices()
+SORE_Graphics::vertex* const SORE_Graphics::GeometryChunk::GetVertices()
 {
     return data;
 }
@@ -83,7 +83,7 @@ unsigned short SORE_Graphics::GeometryChunk::NumIndices() const
     return numIndices;
 }
 
-unsigned short const* SORE_Graphics::GeometryChunk::GetIndices()
+unsigned short* const SORE_Graphics::GeometryChunk::GetIndices()
 {
     return indices;
 }
