@@ -58,9 +58,10 @@ set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
   sore_renderer.cpp sore_renderer_std.cpp sore_resource.cpp
   sore_scenegraph.cpp sore_scenenode.cpp sore_screen.cpp
   sore_screenglow.cpp sore_screeninfo.cpp sore_settings.cpp
-  sore_shaders.cpp sore_task.cpp sore_text.cpp sore_texture.cpp
-  sore_timing.cpp sore_util.cpp sore_vbo.cpp sore_vertexarray.cpp
-  ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
+  sore_shaders.cpp sore_sprite.cpp sore_task.cpp sore_text.cpp
+  sore_texture.cpp sore_timing.cpp sore_util.cpp sore_vbo.cpp
+  sore_vertexarray.cpp ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS}
+  ${SORE_MATH_SRCS})
 
 set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
@@ -71,7 +72,7 @@ set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_profiler.h sore_renderable.h sore_renderer.h
   sore_renderer_std.h sore_resource.h sore_scenegraph.h
   sore_scenenode.h sore_screen.h sore_screenglow.h sore_screeninfo.h
-  sore_settings.h sore_shaders.h sore_task.h sore_text.h
+  sore_settings.h sore_shaders.h sore_sprite.h sore_task.h sore_text.h
   sore_texture.h sore_timing.h sore_util.h sore_vbo.h
   sore_vertexarray.h ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS}
   ${SORE_NETWORK_HEADERS} ${CMAKE_VERSION_OUT} ${CMAKE_VERSION_IN})
