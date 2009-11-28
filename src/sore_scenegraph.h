@@ -21,30 +21,34 @@
 #ifndef SORE_SCENEGRAPH_H
 #define SORE_SCENEGRAPH_H
 
-#include "sore_scenenode.h"
-#include "sore_geometrychunk.h"
-#include "math/sore_vector3.h"
-#include "math/sore_matrix4x4.h"
 #include <vector>
+
+#include "math/sore_matrix4x4.h"
+#include "math/sore_vector3.h"
+#include "sore_geometryprovider.h"
+#include "sore_renderable.h"
+#include "sore_scenenode.h"
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT SceneGraph
+    class SORE_EXPORT SceneGraph : public GeometryProvider
     {
     public:
         SceneGraph();
         ~SceneGraph();
 
-        node_list::iterator AddNode(
-            GeometryChunk* gc = NULL,
-            SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+        node_list::iterator AddNode(Renderable r);
+
+        virtual void MakeUpToDate();
+        virtual std::vector<Renderable>::iterator GeometryBegin();
+        virtual std::vector<Renderable>::iterator GeometryEnd();
 
         SceneNode& GetParent();
 
-        //render_list GetRenderList();
-    protected:
     private:
         SceneNode* parent;
+
+        std::vector<Renderable> renderList;
     };
 }
 #endif

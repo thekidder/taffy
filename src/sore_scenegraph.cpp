@@ -24,7 +24,7 @@ namespace SORE_Graphics
 {
     SceneGraph::SceneGraph()
     {
-        parent = new SceneNode;
+        parent = new SceneNode(Renderable());
     }
 
     SceneGraph::~SceneGraph()
@@ -32,23 +32,30 @@ namespace SORE_Graphics
         delete parent;
     }
 
-    /*render_list SceneGraph::GetRenderList()
+    void SceneGraph::MakeUpToDate()
     {
-        parent->UpdateCache(NULL);
-        render_list all;
+        renderList.clear();
+        parent->AddToRenderList(renderList);
+    }
 
-        parent->AddToRenderList(all);
+    std::vector<Renderable>::iterator SceneGraph::GeometryBegin()
+    {
+        return renderList.begin();
+    }
 
-        return all;
-        }*/
+    std::vector<Renderable>::iterator SceneGraph::GeometryEnd()
+    {
+        return renderList.end();
+    }
+
 
     SceneNode& SceneGraph::GetParent()
     {
         return *parent;
     }
 
-    node_list::iterator SceneGraph::AddNode(GeometryChunk * gc, SORE_Math::Vector3< float > pos)
+    node_list::iterator SceneGraph::AddNode(Renderable r)
     {
-        return parent->AddChild(gc, pos);
+        return parent->AddChild(r);
     }
 }

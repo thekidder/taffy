@@ -32,7 +32,7 @@
 #include "math/sore_matrix4x4.h"
 #include "math/sore_vector3.h"
 #include "sore_dll.h"
-#include "sore_geometrychunk.h"
+#include "sore_renderable.h"
 
 namespace SORE_Graphics
 {
@@ -46,34 +46,30 @@ namespace SORE_Graphics
     class SORE_EXPORT SceneNode
     {
     public:
-        SceneNode(GeometryChunk* g = NULL);
+        SceneNode(Renderable r);
         ~SceneNode();
 
-        const GeometryChunk* GetChunk() const;
         const node_list& GetChildren() const;
-        node_list::iterator AddChild(
-            GeometryChunk* gc = NULL,
-            SORE_Math::Vector3<float> pos=SORE_Math::zeroVector3f);
+        node_list::iterator AddChild(Renderable r);
         void RemoveChild(node_list::iterator it);
 
         const SORE_Math::Matrix4<float>& GetTransform() const;
 
-        void SetGeometry(GeometryChunk* g);
+        void SetGeometry(Renderable r);
 
         void Translate(float x, float y, float z);
         void Rotate(float rad, unsigned int axis);
         void SetIdentity();
 
         void UpdateCache(SceneNode* parent);
-        //void AddToRenderList(render_list& list);
+        void AddToRenderList(std::vector<Renderable>& list);
     protected:
         void InvalidateCache();
     private:
-        GeometryChunk* geometry;
+        Renderable geometry;
         node_list children;
 
         //transformations
-        SORE_Math::Matrix4<float> mat;
         SORE_Math::Matrix4<float> cachedAbsoluteTransform;
         bool cacheUpdated;
     };

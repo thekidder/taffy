@@ -158,6 +158,7 @@ void SORE_Graphics::Renderer::Build()
     std::vector<GeometryProvider*>::iterator it;
     for(it = currentState->begin(); it != currentState->end(); ++it)
     {
+        (*it)->MakeUpToDate();
         std::copy((*it)->GeometryBegin(), (*it)->GeometryEnd(),
                   std::back_inserter(allRenderables));
     }

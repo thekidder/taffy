@@ -30,6 +30,9 @@ namespace SORE_Graphics
     {
     public:
         virtual ~GeometryProvider() {}
+
+        //always called before calling GeometryBegin or GeometryEnd
+        virtual void MakeUpToDate() {}
         virtual std::vector<Renderable>::iterator GeometryBegin() = 0;
         virtual std::vector<Renderable>::iterator GeometryEnd() = 0;
     };
