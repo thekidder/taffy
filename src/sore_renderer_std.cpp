@@ -196,7 +196,7 @@ void SORE_Graphics::Renderer::Build()
         if(r_it == allRenderables.begin() ||
            r_it->GetBlendMode() != old.GetBlendMode())
             changeBlend = true;
-        if(bindVBO || bindShader || bindTexture)
+        if(bindVBO || bindShader || bindTexture || changeBlend)
         {
             if(!batches.empty())
             {
