@@ -18,40 +18,46 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_gamestate_manager.h"
-#include "sore_logger.h"
-#include "sore_gamestate.h"
+#include "sore_batch.h"
 
-namespace SORE_Game
+SORE_Graphics::RenderBatch::RenderBatch(GraphicsArray* vertices, bool bindVBO)
+    : commands(RENDER_CMD_NONE), geometry(vertices)
 {
-    Gamestate::Gamestate(int ms) : owner(0), interval(ms)
-    {
-    }
-
-    int Gamestate::GetInterval() const
-    {
-        return interval;
-    }
-
-    void Gamestate::Initialize(GamestateManager* o)
-    {
-        owner = o;
-        Init();
-    }
-
-    void Gamestate::PushState(Gamestate*  newState)
-    {
-        if(owner)
-            owner->PushState(newState);
-        else
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not push state; no GamestateManager");
-    }
-
-    void Gamestate::PopState()
-    {
-        if(owner)
-            owner->PopState();
-        else
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not pop state; no GamestateManager");
-    }
+    if(bindVBO)
+        commands |= RENDER_CMD_BIND_VBO;
 }
+
+void SORE_Graphics::RenderBatch::SetNumTriangles(unsigned int numTris)
+{
+    numberTriangles = numTris;
+}
+
+void SORE_Graphics::RenderBatch::SetTriangleOffset(unsigned int offset)
+{
+    triangleOffset = offset;
+}
+
+void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
+{
+    this->shader = shader;
+    commands |= RENDER_CMD_BIND_SHADER;
+}
+
+void SORE_Graphics::RenderBatch::AddBindTextureCommand(Texture2DPtr texture)
+{
+    this->texture = texture;
+    commands |= RENDER_CMD_BIND_TEXTURE;
+}
+
+void SORE_Graphics::RenderBatch::Render() const
+{
+    if(commands & RENDER_CMD_BIND_VBO && geometry)
+        geometry->BeginDraw();
+    if(commands & RENDER_CMD_BIND_SHADER)
+        shader->Bind();
+    if(commands & RENDER_CMD_BIND_TEXTURE)
+        texture->Bind();
+    if(geometry)
+        geometry->DrawElements(numberTriangles, triangleOffset);
+}
+

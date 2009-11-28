@@ -18,78 +18,44 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SORE_RENDERABLE_H
-#define SORE_RENDERABLE_H
+#ifndef SORE_BATCH_H
+#define SORE_BATCH_H
 
-#include <boost/shared_ptr.hpp>
-
-#include "math/sore_matrix4x4.h"
-#include "sore_geometrychunk.h"
+#include "sore_graphicsarray.h"
 #include "sore_texture.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-    enum geometry_layer
-    {
-        LAYER0,
-        LAYER1,
-        LAYER2,
-        LAYER3,
-        LAYER4,
-        LAYER5,
-        LAYER6,
-        LAYER7
-    };
+    const unsigned int RENDER_CMD_NONE         = 0;
+    const unsigned int RENDER_CMD_BIND_VBO     = 1;
+    const unsigned int RENDER_CMD_BIND_SHADER  = 2;
+    const unsigned int RENDER_CMD_BIND_TEXTURE = 4;
 
-    enum blend_mode
-    {
-        OPAQUE,
-        ADDITIVE,
-        SUBTRACTIVE,
-        UNUSED
-    };
 
-    typedef unsigned long long int64;
-    typedef boost::shared_ptr<SORE_Math::Matrix4<float> > TransformationPtr;
-
-    class Renderable
+    class RenderBatch
     {
     public:
-        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
-                   TransformationPtr trans, geometry_layer l, blend_mode b);
+        //sets command to either NONE or BIND_VBO
+        RenderBatch(GraphicsArray* vertices, bool bindVBO = false);
 
-        GeometryChunkPtr GetGeometryChunk() const;
+        void SetNumTriangles(unsigned int numTris);
+        void SetTriangleOffset(unsigned int offset);
 
-        void SetShader(GLSLShaderPtr s);
-        GLSLShaderPtr GetShader() const;
+        void AddBindShaderCommand(GLSLShaderPtr shader);
+        void AddBindTextureCommand(Texture2DPtr texture);
 
-        void SetTexture(Texture2DPtr t);
-        Texture2DPtr GetTexture() const;
-
-        void MulitplyTransform(TransformationPtr t);
-        void SetTransform(TransformationPtr t);
-        TransformationPtr GetTransform() const;
-
-        int64 GetSortKey() const;
-
+        void Render() const;
     private:
-        void CalculateDepth();
-        void CalculateSortKey();
+        unsigned int commands;
 
-        GeometryChunkPtr geometry;
+        GraphicsArray* geometry;
+        unsigned int numberTriangles;
+        unsigned int triangleOffset;
+
         GLSLShaderPtr shader;
         Texture2DPtr texture;
-        TransformationPtr transformation;
-        geometry_layer layer;
-        blend_mode blending;
-
-        float cachedDepth;
-
-        int64 sortKey;
     };
-
-    bool operator<(const Renderable& one, const Renderable& two);
 }
 
 #endif

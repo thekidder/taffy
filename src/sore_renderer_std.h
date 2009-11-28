@@ -23,13 +23,14 @@
 
 #include <boost/function.hpp>
 
+#include "sore_batch.h"
 #include "sore_fbo.h"
-#include "sore_font.h"
 #include "sore_geometrychunk.h"
 #include "sore_geometryprovider.h"
 #include "sore_graphics.h"
 #include "sore_graphicsarray.h"
 #include "sore_postprocess.h"
+#include "sore_renderable.h"
 #include "sore_renderer.h"
 #include "sore_resource.h"
 #include "sore_shaders.h"
@@ -49,11 +50,12 @@ namespace SORE_Graphics
     {
     public:
         Renderer(SORE_Resource::ResourcePool& _pool);
+        ~Renderer();
 
         virtual void Render();
 
         void ClearGeometryProviders();
-        void AddGeometryProvider(GeometryProvider gp);
+        void AddGeometryProvider(GeometryProvider* gp);
 
         //Rendering Statistics
         float GetFPS() const;
@@ -71,12 +73,22 @@ namespace SORE_Graphics
         //returns 0 on success
         int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
     private:
+        Renderer& operator=(const Renderer& o);
+        Renderer(const Renderer& o);
+
+        void ClearGeometry();
+        void Build();
+
         void CalculateFPS();
+
         SORE_Resource::ResourcePool& pool;
 
         //acts as a stack: only providers on the top are called
-        std::vector<std::vector<GeometryProvider> > geometryProviders;
-        std::vector<std::vector<GeometryProvider> >::iterator currentState;
+        std::vector<std::vector<GeometryProvider*> > geometryProviders;
+        std::vector<std::vector<GeometryProvider*> >::iterator currentState;
+
+        std::vector<GraphicsArray*> geometry;
+        std::vector<RenderBatch> batches;
 
         //statistics: get info about current rendering
         float fps;

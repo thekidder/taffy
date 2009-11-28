@@ -37,6 +37,11 @@ SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _pool)
     PushState();
 }
 
+SORE_Graphics::Renderer::~Renderer()
+{
+    ClearGeometry();
+}
+
 void SORE_Graphics::Renderer::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
 {
     switch(pi.type)
@@ -125,28 +130,88 @@ void SORE_Graphics::Renderer::OnScreenChange()
 {
 }
 
-/*
+void SORE_Graphics::Renderer::ClearGeometry()
+{
+    std::vector<GraphicsArray*>::iterator it;
+    for(it = geometry.begin(); it != geometry.end(); ++it)
+    {
+        delete *it;
+    }
+    geometry.clear();
+}
+
+#ifndef SORE_NO_VBO
+#define GraphicsArrayClass VBO
+#else
+#define GraphicsArrayClass VertexArray
+#endif
+
 void SORE_Graphics::Renderer::Build()
 {
-    if(!currentProvider->size())
+    ClearGeometry();
+    batches.clear();
+    if(!currentState->size())
         return;
 
-    for(std::vector<batch>::iterator dit = batches.begin();dit!=batches.end();++dit)
+    std::vector<Renderable> allRenderables;
+
+    std::vector<GeometryProvider*>::iterator it;
+    for(it = currentState->begin(); it != currentState->end(); ++it)
     {
-        delete dit->second;
+        std::copy((*it)->GeometryBegin(), (*it)->GeometryEnd(),
+                  std::back_inserter(allRenderables));
     }
 
-    batches.clear();
+    std::sort(allRenderables.begin(), allRenderables.end());
 
-    std::vector<geometry_provider >::iterator git;
-    for(git=currentProvider->begin();git!=currentProvider->end();++git)
+    //loop through all renderables, building VBOs and draw call commands
+    std::vector<Renderable>::iterator r_it;
+    unsigned int vboSize = 0, numTris = 0, offset = 0;
+    GraphicsArray* ga = new GraphicsArrayClass;
+    geometry.push_back(ga);
+    Renderable old = allRenderables.front();
+    for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
     {
-        unsigned int numIndices = 0, totalIndices = 0;
-        batch newBatch;
-        newBatch.projCallback = git->projCallback;
-        newBatch.cameraCallback = git->cameraCallback;
-        newBatch.effect = git->effect;
-        switch(git->blend)
+        if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
+        {
+            vboSize = 0;
+            ga = new GraphicsArrayClass;
+            geometry.push_back(ga);
+        }
+        geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
+
+        bool bindVBO = false, bindShader = false, bindTexture = false;
+        if(vboSize == 0)
+            bindVBO = true;
+        if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
+            bindShader = true;
+        if(r_it == allRenderables.begin() || *r_it->GetTexture() != *old.GetTexture())
+            bindTexture = true;
+
+        if(bindVBO || bindShader || bindTexture)
+        {
+            if(!batches.empty())
+            {
+                batches.back().SetNumTriangles(numTris);
+                batches.back().SetTriangleOffset(offset);
+            }
+            batches.push_back(RenderBatch(geometry.back(),
+                                          bindVBO));
+
+            if(bindShader)
+                batches.back().AddBindShaderCommand(r_it->GetShader());
+            if(bindTexture)
+                batches.back().AddBindTextureCommand(r_it->GetTexture());
+            if(vboSize == 0)
+                offset = numTris = 0;
+        }
+        vboSize += r_it->GetGeometryChunk()->NumIndices();
+        offset  += r_it->GetGeometryChunk()->NumIndices()/3;
+        numTris += r_it->GetGeometryChunk()->NumIndices()/3;
+    }
+
+
+    /*        switch(git->blend)
         {
         case ADDITIVE:
             newBatch.blendSFactor = GL_SRC_ALPHA;
@@ -194,8 +259,10 @@ void SORE_Graphics::Renderer::Build()
         batches.push_back(newBatch);
         batches.back().second->Build();
     }
+    */
 }
 
+/*
 void SORE_Graphics::Renderer::RenderBatch(batch& b)
 {
     if(!b.second->Empty())
@@ -217,7 +284,7 @@ void SORE_Graphics::Renderer::RenderBatch(batch& b)
 */
 void SORE_Graphics::Renderer::Render()
 {
-    //Build();
+    Build();
 
     numPolys = 0;
     drawCalls = 0;
@@ -228,6 +295,12 @@ void SORE_Graphics::Renderer::Render()
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     glEnable(GL_TEXTURE_2D);
+
+    std::vector<RenderBatch>::iterator it;
+    for(it = batches.begin(); it != batches.end(); ++it)
+    {
+        it->Render();
+    }
 
     /*for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
     {
@@ -305,14 +378,14 @@ void SORE_Graphics::Renderer::ClearGeometryProviders()
     currentState->clear();
 }
 
-void SORE_Graphics::Renderer::AddGeometryProvider(GeometryProvider gp)
+void SORE_Graphics::Renderer::AddGeometryProvider(GeometryProvider* gp)
 {
     currentState->push_back(gp);
 }
 
 void SORE_Graphics::Renderer::PushState()
 {
-    std::vector<GeometryProvider> temp;
+    std::vector<GeometryProvider*> temp;
     geometryProviders.push_back(temp);
     currentState = geometryProviders.end() - 1;
 }

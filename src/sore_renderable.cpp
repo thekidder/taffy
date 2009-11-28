@@ -88,3 +88,9 @@ void SORE_Graphics::Renderable::CalculateDepth()
 void SORE_Graphics::Renderable::CalculateSortKey()
 {
 }
+
+bool SORE_Graphics::operator<(const SORE_Graphics::Renderable& one,
+                              const SORE_Graphics::Renderable& two)
+{
+    return one.GetSortKey() < two.GetSortKey();
+}

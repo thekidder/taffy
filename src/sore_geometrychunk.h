@@ -67,4 +67,5 @@ namespace SORE_Graphics
 
     typedef boost::shared_ptr<GeometryChunk> GeometryChunkPtr;
 }
+
 #endif

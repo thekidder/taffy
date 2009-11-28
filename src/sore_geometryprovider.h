@@ -21,11 +21,17 @@
 #ifndef SORE_GEOMETRYPROVIDER_H
 #define SORE_GEOMETRYPROVIDER_H
 
+#include "sore_dll.h"
+#include "sore_renderable.h"
+
 namespace SORE_Graphics
 {
-    class GeometryProvider
+    class SORE_EXPORT GeometryProvider
     {
-
+    public:
+        virtual ~GeometryProvider() {}
+        virtual std::vector<Renderable>::iterator GeometryBegin() = 0;
+        virtual std::vector<Renderable>::iterator GeometryEnd() = 0;
     };
 }
 
