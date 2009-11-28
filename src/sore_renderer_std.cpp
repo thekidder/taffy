@@ -223,79 +223,8 @@ void SORE_Graphics::Renderer::Build()
     geometry.back()->Build();
     batches.back().SetNumTriangles(numTris);
     batches.back().SetTriangleOffset(offset);
-
-
-    /*        switch(git->blend)
-        {
-        case ADDITIVE:
-            newBatch.blendSFactor = GL_SRC_ALPHA;
-            newBatch.blendDFactor = GL_DST_ALPHA;
-            break;
-        case SUBTRACTIVE:
-        default: //treat unknown type as subtractive by default
-            newBatch.blendSFactor = GL_SRC_ALPHA;
-            newBatch.blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
-            break;
-        }
-        render_list geometry = git->geometryCallback();
-        if(geometry.size())
-        {
-            std::sort(geometry.begin(), geometry.end(), &GeometrySort);
-            render_list::iterator it;
-            for(it=geometry.begin();it!=geometry.end();++it)
-            {
-                newBatch.second->AddObject(it->second->verticesPtr(),
-                                           it->second->indicesPtr(),
-                                           it->second->getNumVertices(),
-                                           it->second->getNumIndices(),
-                                           it->first, it->second->texCoordsPtr(),
-                                           NULL,
-                                           it->second->colorsPtr());
-                if(!newBatch.first.size() ||
-                   *(newBatch.first.back().tex) != *(it->second->texture()))
-                {
-                    if(newBatch.first.size()>0)
-                    {
-                        newBatch.first.back().triLen = numIndices/3;
-                    }
-                    newBatch.first.push_back
-                        (vbo_tex_order(it->second->texture(),
-                                       it->second->shader(),
-                                       totalIndices/3, 0));
-                    numIndices = 0;
-                }
-                numIndices+=it->second->getNumIndices();
-                totalIndices+=it->second->getNumIndices();
-            }
-            newBatch.first.back().triLen =
-                totalIndices/3 - newBatch.first.back().triStart;
-        }
-        batches.push_back(newBatch);
-        batches.back().second->Build();
-    }
-    */
 }
 
-/*
-void SORE_Graphics::Renderer::RenderBatch(batch& b)
-{
-    if(!b.second->Empty())
-    {
-        b.second->BeginDraw();
-        for(std::vector<vbo_tex_order>::iterator it = b.first.begin();
-            it != b.first.end(); ++it)
-        {
-            it->shad->Bind();
-            glClientActiveTexture(GL_TEXTURE0);
-            it->tex->Bind();
-            b.second->DrawElements(it->triLen, it->triStart);
-            numPolys += it->triLen;
-            drawCalls++;
-        }
-        b.second->EndDraw();
-    }
-}
-*/
 void SORE_Graphics::Renderer::Render()
 {
     Build();
@@ -320,31 +249,6 @@ void SORE_Graphics::Renderer::Render()
         it->Render();
     }
     geometry.back()->EndDraw();
-
-    /*for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
-    {
-        if(!it->second->Empty())
-        {
-            glBlendFunc(it->blendSFactor, it->blendDFactor);
-            ProjectionInfo proj;
-            proj = it->projCallback(screen);
-            ChangeProjectionMatrix(proj);
-
-            if(it->effect)
-                it->effect->StartFrame(proj);
-
-            if(it->cameraCallback)
-            {
-                glLoadMatrixf(it->cameraCallback().GetData());
-            }
-
-            RenderBatch(*it);
-
-            if(it->effect)
-                it->effect->EndFrame(proj);
-        }
-    }
-    */
 
     CalculateFPS();
 
