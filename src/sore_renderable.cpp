@@ -80,6 +80,11 @@ SORE_Graphics::TransformationPtr SORE_Graphics::Renderable::GetTransform() const
     return transformation;
 }
 
+SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
+{
+    return blending;
+}
+
 SORE_Graphics::int64 SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;

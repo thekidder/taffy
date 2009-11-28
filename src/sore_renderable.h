@@ -72,6 +72,8 @@ namespace SORE_Graphics
         void SetTransform(TransformationPtr t);
         TransformationPtr GetTransform() const;
 
+        blend_mode GetBlendMode() const;
+
         int64 GetSortKey() const;
 
     private:

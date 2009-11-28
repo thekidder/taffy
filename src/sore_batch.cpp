@@ -37,6 +37,12 @@ void SORE_Graphics::RenderBatch::SetTriangleOffset(unsigned int offset)
     triangleOffset = offset;
 }
 
+void SORE_Graphics::RenderBatch::AddChangeBlendModeCommand(blend_mode mode)
+{
+    blend = mode;
+    commands |= RENDER_CMD_CHANGE_BLEND_MODE;
+}
+
 void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
 {
     this->shader = shader;
@@ -54,12 +60,43 @@ void SORE_Graphics::RenderBatch::AddBindTextureCommand(
 void SORE_Graphics::RenderBatch::Render() const
 {
     if(commands & RENDER_CMD_BIND_VBO && geometry)
+    {
         geometry->BeginDraw();
+    }
+    if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
+    {
+        unsigned int blendSFactor, blendDFactor;
+        switch(blend)
+        {
+        case OPAQUE:
+            glDisable(GL_BLEND);
+            blendSFactor = GL_ZERO;
+            blendDFactor = GL_ONE;
+        case ADDITIVE:
+            glEnable(GL_BLEND);
+            blendSFactor = GL_SRC_ALPHA;
+            blendDFactor = GL_DST_ALPHA;
+            break;
+        case SUBTRACTIVE:
+        default: //treat unknown type as subtractive by default
+            glEnable(GL_BLEND);
+            blendSFactor = GL_SRC_ALPHA;
+            blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
+            break;
+        }
+        glBlendFunc(blendSFactor, blendDFactor);
+    }
     if(commands & RENDER_CMD_BIND_SHADER)
+    {
         shader->Bind();
+    }
     if(commands & RENDER_CMD_BIND_TEXTURE)
+    {
         texture->Bind(shader, "texture", 0);
+    }
     if(geometry)
+    {
         geometry->DrawElements(numberTriangles, triangleOffset);
+    }
 }
 

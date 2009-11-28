@@ -22,15 +22,17 @@
 #define SORE_BATCH_H
 
 #include "sore_graphicsarray.h"
+#include "sore_renderable.h"
 #include "sore_texture.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-    const unsigned int RENDER_CMD_NONE         = 0;
-    const unsigned int RENDER_CMD_BIND_VBO     = 1;
-    const unsigned int RENDER_CMD_BIND_SHADER  = 2;
-    const unsigned int RENDER_CMD_BIND_TEXTURE = 4;
+    const unsigned int RENDER_CMD_NONE              = 0;
+    const unsigned int RENDER_CMD_BIND_VBO          = 1;
+    const unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 2;
+    const unsigned int RENDER_CMD_BIND_SHADER       = 4;
+    const unsigned int RENDER_CMD_BIND_TEXTURE      = 8;
 
 
     class RenderBatch
@@ -42,6 +44,7 @@ namespace SORE_Graphics
         void SetNumTriangles(unsigned int numTris);
         void SetTriangleOffset(unsigned int offset);
 
+        void AddChangeBlendModeCommand(blend_mode mode);
         void AddBindShaderCommand(GLSLShaderPtr shader);
         void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
 
@@ -52,6 +55,8 @@ namespace SORE_Graphics
         GraphicsArray* geometry;
         unsigned int numberTriangles;
         unsigned int triangleOffset;
+
+        blend_mode blend;
 
         GLSLShaderPtr shader;
         Texture2DPtr texture;

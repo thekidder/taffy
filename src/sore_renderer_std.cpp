@@ -186,13 +186,16 @@ void SORE_Graphics::Renderer::Build()
         geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
 
         bool bindVBO = false, bindShader = false, bindTexture = false;
+        bool changeBlend = false;
         if(vboSize == 0)
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
             bindShader = true;
         if(r_it == allRenderables.begin() || *r_it->GetTexture() != *old.GetTexture())
             bindTexture = true;
-
+        if(r_it == allRenderables.begin() ||
+           r_it->GetBlendMode() != old.GetBlendMode())
+            changeBlend = true;
         if(bindVBO || bindShader || bindTexture)
         {
             if(!batches.empty())
@@ -203,6 +206,8 @@ void SORE_Graphics::Renderer::Build()
             batches.push_back(RenderBatch(geometry.back(),
                                           bindVBO));
 
+            if(changeBlend)
+                batches.back().AddChangeBlendModeCommand(r_it->GetBlendMode());
             if(bindShader)
                 batches.back().AddBindShaderCommand(r_it->GetShader());
             if(bindTexture)
@@ -300,7 +305,6 @@ void SORE_Graphics::Renderer::Render()
 
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     ProjectionInfo proj;
