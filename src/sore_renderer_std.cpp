@@ -163,6 +163,8 @@ void SORE_Graphics::Renderer::Build()
                   std::back_inserter(allRenderables));
     }
 
+    if(allRenderables.empty())
+        return;
     std::sort(allRenderables.begin(), allRenderables.end());
 
     //loop through all renderables, building VBOs and draw call commands
