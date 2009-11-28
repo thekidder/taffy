@@ -169,12 +169,13 @@ void SORE_Graphics::Renderer::Build()
 
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
-    unsigned int vboSize = 0, numTris = 0, offset = 0;
+    unsigned int vboSize = 0, numTris = 0, offset = 0, lastLen = 0;
     GraphicsArray* ga = new GraphicsArrayClass;
     geometry.push_back(ga);
     Renderable old = allRenderables.front();
     for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
     {
+        offset += lastLen;
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
             vboSize = 0;
@@ -209,9 +210,11 @@ void SORE_Graphics::Renderer::Build()
                 offset = numTris = 0;
         }
         vboSize += r_it->GetGeometryChunk()->NumIndices();
-        offset  += r_it->GetGeometryChunk()->NumIndices()/3;
         numTris += r_it->GetGeometryChunk()->NumIndices()/3;
+        lastLen  = r_it->GetGeometryChunk()->NumIndices()/3;
     }
+    batches.back().SetNumTriangles(numTris);
+    batches.back().SetTriangleOffset(offset);
 
 
     /*        switch(git->blend)
@@ -299,11 +302,19 @@ void SORE_Graphics::Renderer::Render()
 
     glEnable(GL_TEXTURE_2D);
 
+    ProjectionInfo proj;
+    proj.type = ORTHO2D;
+    proj.left = -1.0f;
+    proj.right = 1.0f;
+    proj.useScreenRatio = true;
+    ChangeProjectionMatrix(proj);
+
     std::vector<RenderBatch>::iterator it;
     for(it = batches.begin(); it != batches.end(); ++it)
     {
         it->Render();
     }
+    geometry.back()->EndDraw();
 
     /*for(std::vector<batch>::iterator it=batches.begin();it!=batches.end();++it)
     {
