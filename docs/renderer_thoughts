@@ -1,8 +1,7 @@
 Renderer design:
-Buffer: 
-  Contains a (possibly shared) chunk of geometry or index information.
 GeometryChunk:
-  Contains multiple Buffers
+  Contains geometry information (vertices [vertex data, colors, texcoords, etc], 
+  indices).
 Renderable:
   Composed of a GeometryChunk, shader, textures, blending mode, and transformation.
   Is sortable -  contains a key that implements sorting (see below)
@@ -20,6 +19,20 @@ Renderer:
      Find the minimum that has to be changed, and change it
   Per Frame:
     For the current state: render all VBOs
+
+Rendering:
+  State changes that have to be accounted for:
+    -Bind/Draw from new VBO
+    -Change blending mode
+    -Bind new shader
+    -Bind new texture(s)
+    -Bind new uniforms
+
+  For simplicity we will impose the following limitations for the first iteration:
+    -Only one texture/renderable
+    -No shader uniforms
+
+  Goal is to get to same functionality in old renderer, then expand it
 
 Current issues:
   where to store transformations?
