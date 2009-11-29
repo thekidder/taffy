@@ -60,10 +60,14 @@ namespace SORE_Graphics
         bool useNativeResolution; //supercedes width, height, ratio
     };
 
-    SORE_Math::Vector2<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj,
-                                                 SORE_Math::Vector2<int> pos);
-    SORE_Math::Vector2<int>   ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj,
-                                                 SORE_Math::Vector2<float> pos);
+    ProjectionInfo SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
+
+    SORE_Math::Vector2<float> ScreenToProjection(
+        ScreenInfo screen, ProjectionInfo proj,
+        SORE_Math::Vector2<int> pos);
+    SORE_Math::Vector2<int>   ProjectionToScreen(
+        ScreenInfo screen, ProjectionInfo proj,
+        SORE_Math::Vector2<float> pos);
 
     typedef boost::function<ProjectionInfo (ScreenInfo)> proj_callback;
 }

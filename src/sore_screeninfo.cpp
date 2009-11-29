@@ -22,19 +22,71 @@
 
 namespace SORE_Graphics
 {
-	SORE_Math::Vector2<float> ScreenToProjection(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
-	{
-		SORE_Math::Vector2<float> projected;
-		projected[0] = proj.left + (proj.right-proj.left)*(static_cast<float>(pos[0])/static_cast<float>(screen.width));
-		projected[1] = proj.bottom + (proj.top-proj.bottom)*(static_cast<float>(pos[1])/static_cast<float>(screen.height));
-		return projected;
-	}
+    ProjectionInfo SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si)
+    {
+        ProjectionInfo returnProj;
+        switch(pi.type)
+        {
+        case NONE:
+            break;
+        case ORTHO2D:
+            if(pi.useScreenCoords)
+            {
+                returnProj.top = 0;
+                returnProj.left = 0;
+                returnProj.bottom = static_cast<float>(si.height);
+                returnProj.right = static_cast<float>(si.width);
+                returnProj.ratio = si.ratio;
+            }
+            else if(pi.useScreenRatio)
+            {
+                returnProj.bottom = pi.left / si.ratio;
+                returnProj.top = pi.right / si.ratio;
+                returnProj.ratio = si.ratio;
+            }
+            else
+            {
+                returnProj.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
+            }
+            break;
+        case ORTHO:
+            //TODO: finish ortho projection
+            break;
+        case PERSPECTIVE:
+            if(pi.useScreenRatio)
+            {
+                returnProj.ratio = si.ratio;
+            }
+            else
+            {
+                returnProj.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
+            }
+            break;
+        default:
+            break;
+        }
+        return returnProj;
+    }
 
-	SORE_Math::Vector2<int> ProjectionToScreen(ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos)
-	{
-		SORE_Math::Vector2<int> screenPos;
-		screenPos[0] = static_cast<int>((screen.width )*(pos[0]/(proj.right-proj.left)));
-		screenPos[1] = static_cast<int>((screen.height)*(pos[1]/(proj.top-proj.bottom)));
-		return screenPos;
-	}
+    SORE_Math::Vector2<float> ScreenToProjection(
+        ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
+    {
+        SORE_Math::Vector2<float> projected;
+        projected[0] = proj.left + (proj.right-proj.left)*
+            (static_cast<float>(pos[0])/static_cast<float>(screen.width));
+        projected[1] = proj.bottom + (proj.top-proj.bottom)*
+            (static_cast<float>(pos[1])/static_cast<float>(screen.height));
+        return projected;
+    }
+
+    SORE_Math::Vector2<int> ProjectionToScreen(
+        ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<float> pos)
+    {
+        SORE_Math::Vector2<int> screenPos;
+        screenPos[0] = static_cast<int>((screen.width )*
+                                        (pos[0]/(proj.right-proj.left)));
+        screenPos[1] = static_cast<int>((screen.height)*
+                                        (pos[1]/(proj.top-proj.bottom)));
+        return screenPos;
+    }
 }

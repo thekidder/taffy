@@ -54,7 +54,6 @@ namespace SORE_Graphics
         //returns number of polygons rendered
         unsigned int Render(const ScreenInfo& si);
     private:
-        void SetupProjection(ProjectionInfo& proj, const ScreenInfo& si);
         void ChangeProjectionMatrix(ProjectionInfo& proj, const ScreenInfo& si);
 
         unsigned int commands;
