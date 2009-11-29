@@ -144,7 +144,7 @@ void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
 }
 
 
-void SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
+unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
 {
     if(commands & RENDER_CMD_BIND_VBO && geometry)
     {
@@ -194,6 +194,8 @@ void SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("drawing %d triangles from %d") % numberTriangles % triangleOffset);
         geometry->DrawElements(numberTriangles, triangleOffset);
+        return numberTriangles;
     }
+    return 0;
 }
 

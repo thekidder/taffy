@@ -164,7 +164,8 @@ void SORE_Graphics::Renderer::Render()
     {
         for(it = batches.begin(); it != batches.end(); ++it)
         {
-            it->Render(screen);
+            numPolys += it->Render(screen);
+            drawCalls++;
         }
         geometry.back()->EndDraw();
     }

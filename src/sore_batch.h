@@ -51,7 +51,8 @@ namespace SORE_Graphics
         void AddBindShaderCommand(GLSLShaderPtr shader);
         void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
 
-        void Render(const ScreenInfo& si);
+        //returns number of polygons rendered
+        unsigned int Render(const ScreenInfo& si);
     private:
         void SetupProjection(ProjectionInfo& proj, const ScreenInfo& si);
         void ChangeProjectionMatrix(ProjectionInfo& proj, const ScreenInfo& si);
