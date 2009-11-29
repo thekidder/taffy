@@ -23,6 +23,7 @@
 
 #include "../sore_text.h"
 #include "sore_framewidget.h"
+#include "sore_textwidget.h"
 
 namespace SORE_GUI
 {
@@ -42,7 +43,7 @@ namespace SORE_GUI
 
         std::string title;
         SORE_Font::FontPtr font;
-        SORE_Graphics::Text* titleText;
+        TextWidget* titleText;
         bool dragged;
     };
 }

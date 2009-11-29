@@ -39,19 +39,19 @@ namespace SORE_GUI
 
         font = pool.GetResource<SORE_Font::Font>(
             styleDir + "LiberationSans-Regular.ttf");
-        titleText = new SORE_Graphics::Text(*font, 24, title);
+        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)),
+                                   *font, 24, title,
+                                   SORE_Graphics::White, this);
 
         UpdatePosition();
     }
 
     void FrameWindow::UpdatePosition()
     {
-        float left = static_cast<float>((GetSize(HORIZONTAL) -
-                                         titleText->GetWidth()) / 2);
-        float up = 2.0f;
-        titleText->SetTransform
-            (GetPositionMatrix() *
-             SORE_Math::Matrix4<float>::GetTranslation(left, up, 0.0f));
+        float left = static_cast<float>(
+            (GetSize(HORIZONTAL) - titleText->GetSize(HORIZONTAL)) / 2);
+        float up = 3.0f;
+        titleText->SetPosition(SVec(SUnit(0.0, left-8), SUnit(0.0, up-36)));
     }
 
     unsigned int FrameWindow::GetClientSize(unit_type type) const
@@ -109,8 +109,6 @@ namespace SORE_GUI
 
         std::vector<SORE_Graphics::Renderable> frame = GetChunks();
         std::copy(frame.begin(), frame.end(), std::back_inserter(list));
-        std::vector<SORE_Graphics::Renderable> text = titleText->GetGeometry();
-        std::copy(text.begin(), text.end(), std::back_inserter(list));
 
         return list;
     }
