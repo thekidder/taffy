@@ -162,16 +162,19 @@ unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
         switch(blend)
         {
         case OPAQUE:
+            glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
             blendSFactor = GL_ZERO;
             blendDFactor = GL_ONE;
         case ADDITIVE:
+            glDisable(GL_DEPTH_TEST);
             glEnable(GL_BLEND);
             blendSFactor = GL_SRC_ALPHA;
             blendDFactor = GL_DST_ALPHA;
             break;
         case SUBTRACTIVE:
         default: //treat unknown type as subtractive by default
+            glDisable(GL_DEPTH_TEST);
             glEnable(GL_BLEND);
             blendSFactor = GL_SRC_ALPHA;
             blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
