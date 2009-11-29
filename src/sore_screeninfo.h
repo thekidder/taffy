@@ -31,6 +31,10 @@ namespace SORE_Graphics
 
     struct ProjectionInfo
     {
+        ProjectionInfo(float left, float right) { type = ORTHO2D;
+            this->left = left; this->right = right;
+            useScreenCoords = false;
+            useScreenRatio = true; }
         ProjectionInfo() {type = NONE;
             fov = ratio = znear = zfar = top = bottom = left = right = 0.0;
             useScreenCoords = useScreenRatio = false; }

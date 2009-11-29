@@ -22,7 +22,8 @@
 
 namespace SORE_Graphics
 {
-    SceneGraph::SceneGraph()
+    SceneGraph::SceneGraph(geometry_layer l, ProjectionInfo proj)
+        : layer(l), projection(proj)
     {
         parent = new SceneNode(Renderable());
     }
@@ -48,6 +49,19 @@ namespace SORE_Graphics
         return renderList.end();
     }
 
+    bool SceneGraph::HasProjection(geometry_layer layer)
+    {
+        if(layer == this->layer)
+            return true;
+        return false;
+    }
+
+    ProjectionInfo SceneGraph::GetProjection(geometry_layer layer)
+    {
+        if(layer != this->layer)
+            return ProjectionInfo();
+        return projection;
+    }
 
     SceneNode& SceneGraph::GetParent()
     {

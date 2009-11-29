@@ -31,10 +31,13 @@
 
 namespace SORE_Graphics
 {
+    const static ProjectionInfo defaultProjection(-1.0f, 1.0f);
+
     class SORE_EXPORT SceneGraph : public GeometryProvider
     {
     public:
-        SceneGraph();
+        SceneGraph(
+            geometry_layer l = LAYER5, ProjectionInfo proj = defaultProjection);
         ~SceneGraph();
 
         node_list::iterator AddNode(Renderable r);
@@ -43,12 +46,18 @@ namespace SORE_Graphics
         virtual std::vector<Renderable>::iterator GeometryBegin();
         virtual std::vector<Renderable>::iterator GeometryEnd();
 
+        //A geometry provider can optionally set a projection for any layer
+        virtual bool HasProjection(geometry_layer layer);
+        virtual ProjectionInfo GetProjection(geometry_layer layer);
+
         SceneNode& GetParent();
 
     private:
         SceneNode* parent;
-
         std::vector<Renderable> renderList;
+
+        geometry_layer layer;
+        ProjectionInfo projection;
     };
 }
 #endif
