@@ -27,6 +27,8 @@
 
 namespace SORE_Graphics
 {
+    const static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
+
     Renderable MakeSprite(
         SORE_Math::Rect<float> bounds,
         SORE_Math::Rect<float> texCoords,
