@@ -18,29 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SORE_GEOMETRYPROVIDER_H
-#define SORE_GEOMETRYPROVIDER_H
+#include "sore_geometryprovider.h"
 
-#include "sore_dll.h"
-#include "sore_renderable.h"
-#include "sore_screeninfo.h"
-
-namespace SORE_Graphics
+SORE_Graphics::ProjectionInfo SORE_Graphics::GeometryProvider::GetProjection(
+    geometry_layer layer)
 {
-    class SORE_EXPORT GeometryProvider
-    {
-    public:
-        virtual ~GeometryProvider() {}
-
-        //always called before calling GeometryBegin or GeometryEnd
-        virtual void MakeUpToDate() {}
-        virtual std::vector<Renderable>::iterator GeometryBegin() = 0;
-        virtual std::vector<Renderable>::iterator GeometryEnd() = 0;
-
-        //A geometry provider can optionally set a projection for any layer
-        virtual bool HasProjection(geometry_layer layer) {return false;}
-        virtual ProjectionInfo GetProjection(geometry_layer layer);
-    };
+    ProjectionInfo pi;
+    pi.type = NONE;
+    return pi;
 }
-
-#endif

@@ -81,6 +81,8 @@ namespace SORE_Graphics
 
         void CalculateFPS();
 
+        ProjectionInfo GetProjection(geometry_layer layer);
+
         SORE_Resource::ResourcePool& pool;
 
         //acts as a stack: only providers on the top are called

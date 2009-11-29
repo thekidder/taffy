@@ -38,9 +38,11 @@ namespace SORE_Graphics
         float fov,ratio;
         float znear, zfar;
         float top, bottom, left, right;
-        //if this is true, and type of projection is ortho2d, use width/height for projection
+        //if this is true, and type of projection is ortho2d, use width/height
+        //for projection
         bool useScreenCoords;
-        //if true, uses screen ratio (for ortho, gets top/bottom by dividing left/right by ratio)
+        //if true, uses screen ratio (for ortho, gets top/bottom by dividing
+        //left/right by ratio)
         bool useScreenRatio;
     };
 

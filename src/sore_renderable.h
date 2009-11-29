@@ -73,6 +73,7 @@ namespace SORE_Graphics
         TransformationPtr GetTransform() const;
 
         blend_mode GetBlendMode() const;
+        geometry_layer GetLayer() const;
 
         int64 GetSortKey() const;
 

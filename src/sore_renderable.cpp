@@ -85,6 +85,11 @@ SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
     return blending;
 }
 
+SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const
+{
+    return layer;
+}
+
 SORE_Graphics::int64 SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;

@@ -42,90 +42,6 @@ SORE_Graphics::Renderer::~Renderer()
     ClearGeometry();
 }
 
-void SORE_Graphics::Renderer::SetupProjection(SORE_Graphics::ProjectionInfo& pi)
-{
-    switch(pi.type)
-    {
-    case SORE_Graphics::NONE:
-        break;
-    case SORE_Graphics::ORTHO2D:
-        if(pi.useScreenCoords)
-        {
-            pi.top = 0;
-            pi.left = 0;
-            pi.bottom = static_cast<GLfloat>(screen.height);
-            pi.right = static_cast<GLfloat>(screen.width);
-            pi.ratio = screen.ratio;
-        }
-        else if(pi.useScreenRatio)
-        {
-            pi.bottom = pi.left / screen.ratio;
-            pi.top = pi.right / screen.ratio;
-            pi.ratio = screen.ratio;
-        }
-        else
-        {
-            pi.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
-        }
-        break;
-    case SORE_Graphics::ORTHO:
-        //TODO: finish ortho projection
-        break;
-    case SORE_Graphics::PERSPECTIVE:
-        if(pi.useScreenRatio)
-        {
-            pi.ratio = screen.ratio;
-        }
-        else
-        {
-            pi.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-int SORE_Graphics::Renderer::ChangeProjectionMatrix(
-    SORE_Graphics::ProjectionInfo& projection)
-{
-    SetupProjection(projection);
-    int returnCode = 0;
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity( );
-    switch(projection.type)
-    {
-    case SORE_Graphics::NONE:
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   "No projection type set, could not initialize projection");
-        returnCode = -1;
-        break;
-    case SORE_Graphics::ORTHO2D:
-        gluOrtho2D(projection.left, projection.right,
-                   projection.top, projection.bottom);
-        break;
-    case SORE_Graphics::ORTHO:
-        //TODO: finish ortho projection
-        break;
-    case SORE_Graphics::PERSPECTIVE:
-        {
-            if(projection.useScreenRatio)
-                projection.ratio = static_cast<float>(screen.width) /
-                    static_cast<float>(screen.height);
-            gluPerspective(projection.fov, projection.ratio,
-                           projection.znear, projection.zfar );
-            break;
-        }
-    default:
-        returnCode = -1;
-        break;
-    }
-    glMatrixMode( GL_MODELVIEW );
-
-    glLoadIdentity( );
-    return returnCode;
-}
-
 void SORE_Graphics::Renderer::OnScreenChange()
 {
 }
@@ -186,7 +102,7 @@ void SORE_Graphics::Renderer::Build()
         geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
 
         bool bindVBO = false, bindShader = false, bindTexture = false;
-        bool changeBlend = false;
+        bool changeBlend = false, changeProjection = false;
         if(vboSize == 0)
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
@@ -196,7 +112,9 @@ void SORE_Graphics::Renderer::Build()
         if(r_it == allRenderables.begin() ||
            r_it->GetBlendMode() != old.GetBlendMode())
             changeBlend = true;
-        if(bindVBO || bindShader || bindTexture || changeBlend)
+        if(r_it == allRenderables.begin() || r_it->GetLayer() != old.GetLayer())
+            changeProjection = true;
+        if(bindVBO || bindShader || bindTexture || changeBlend || changeProjection)
         {
             if(!batches.empty())
             {
@@ -206,6 +124,9 @@ void SORE_Graphics::Renderer::Build()
             batches.push_back(RenderBatch(geometry.back(),
                                           bindVBO));
 
+            if(changeProjection)
+                batches.back().AddChangeProjectionCommand(
+                    GetProjection(r_it->GetLayer()));
             if(changeBlend)
                 batches.back().AddChangeBlendModeCommand(r_it->GetBlendMode());
             if(bindShader)
@@ -236,23 +157,30 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    ProjectionInfo proj;
-    proj.type = ORTHO2D;
-    proj.left = -1.0f;
-    proj.right = 1.0f;
-    proj.useScreenRatio = true;
-    ChangeProjectionMatrix(proj);
-
     std::vector<RenderBatch>::iterator it;
     for(it = batches.begin(); it != batches.end(); ++it)
     {
-        it->Render();
+        it->Render(screen);
     }
     geometry.back()->EndDraw();
 
     CalculateFPS();
 
     PrintGLErrors(SORE_Logging::LVL_ERROR);
+}
+
+SORE_Graphics::ProjectionInfo SORE_Graphics::Renderer::GetProjection(
+    geometry_layer layer)
+{
+    std::vector<GeometryProvider*>::iterator it;
+    for(it = currentState->begin(); it != currentState->end(); ++it)
+    {
+        if((*it)->HasProjection(layer))
+            return (*it)->GetProjection(layer);
+    }
+    ProjectionInfo none;
+    none.type = NONE;
+    return none;
 }
 
 void SORE_Graphics::Renderer::CalculateFPS()
