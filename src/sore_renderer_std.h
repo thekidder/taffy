@@ -65,13 +65,8 @@ namespace SORE_Graphics
 
         void PushState();
         void PopState();
-
-        void SetupProjection(SORE_Graphics::ProjectionInfo& pi);
     protected:
         virtual void OnScreenChange();
-
-        //returns 0 on success
-        int ChangeProjectionMatrix(SORE_Graphics::ProjectionInfo& projection);
     private:
         Renderer& operator=(const Renderer& o);
         Renderer(const Renderer& o);
