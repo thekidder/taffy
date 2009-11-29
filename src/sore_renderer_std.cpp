@@ -93,7 +93,6 @@ void SORE_Graphics::Renderer::Build()
     {
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
-            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("built vbo with %d triangles") % (vboSize/3));
             geometry.back()->Build();
             vboSize = numTris = offset = 0;
             ga = new GraphicsArrayClass(true, true);
@@ -141,7 +140,6 @@ void SORE_Graphics::Renderer::Build()
         numTris += r_it->GetGeometryChunk()->NumIndices()/3;
         old = *r_it;
     }
-    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("built vbo with %d triangles") % (vboSize/3));
     geometry.back()->Build();
     batches.back().SetNumTriangles(numTris);
     batches.back().SetTriangleOffset(offset);
@@ -158,7 +156,6 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    ENGINE_LOG(SORE_Logging::LVL_INFO, "DRAWING FRAME");
     std::vector<RenderBatch>::iterator it;
     if(batches.size())
     {
