@@ -24,7 +24,7 @@ namespace SORE_Graphics
 {
     ProjectionInfo SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si)
     {
-        ProjectionInfo returnProj;
+        ProjectionInfo returnProj = pi;
         switch(pi.type)
         {
         case NONE:
