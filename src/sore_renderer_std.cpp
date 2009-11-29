@@ -237,6 +237,14 @@ void SORE_Graphics::Renderer::ClearGeometryProviders()
 
 void SORE_Graphics::Renderer::AddGeometryProvider(GeometryProvider* gp)
 {
+    for(unsigned int i = 0; i < 8; ++i)
+    {
+        geometry_layer l = static_cast<geometry_layer>(LAYER0 + i);
+        if(gp->HasProjection(l) && GetProjection(l).type != NONE)
+            ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                       boost::format("GeometryProvider provides a projection for "
+                                     "layer %d that will be overridden") % i);
+    }
     currentState->push_back(gp);
 }
 
