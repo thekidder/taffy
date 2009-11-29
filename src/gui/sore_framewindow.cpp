@@ -50,8 +50,8 @@ namespace SORE_GUI
     {
         float left = static_cast<float>(
             (GetSize(HORIZONTAL) - titleText->GetSize(HORIZONTAL)) / 2);
-        float up = 3.0f;
-        titleText->SetPosition(SVec(SUnit(0.0, left-8), SUnit(0.0, up-36)));
+        float up = 2.0f;
+        titleText->SetPosition(SVec(SUnit(0.0, left-4), SUnit(0.0, up-32)));
     }
 
     unsigned int FrameWindow::GetClientSize(unit_type type) const
