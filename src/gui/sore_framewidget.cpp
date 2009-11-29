@@ -84,6 +84,8 @@ namespace SORE_GUI
         std::vector<SORE_Graphics::Renderable> all;
         for(unsigned int i=0;i<9;++i)
         {
+            if(chunk[i].GetTransform())
+                *chunk[i].GetTransform() = GetPositionMatrix();
             if(chunk[i].GetGeometryChunk())
                 all.push_back(chunk[i]);
         }
@@ -232,5 +234,11 @@ namespace SORE_GUI
                 bounds, texCoords, 0.0f, texture, shader,
                 SORE_Graphics::LAYER5, SORE_Graphics::SUBTRACTIVE);
         }
+        for(unsigned int i = 0; i < 9; ++i)
+            chunk[i].SetTransform(
+                SORE_Graphics::TransformationPtr(
+                    new SORE_Math::Matrix4<float>(
+                        GetPositionMatrix())));
+
     }
 }
