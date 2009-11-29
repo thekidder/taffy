@@ -60,6 +60,7 @@ namespace SORE_Graphics
         Renderable(GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
                    TransformationPtr trans, geometry_layer l, blend_mode b);
 
+        void SetGeometryChunk(GeometryChunkPtr g);
         GeometryChunkPtr GetGeometryChunk() const;
 
         void SetShader(GLSLShaderPtr s);
@@ -72,7 +73,10 @@ namespace SORE_Graphics
         void SetTransform(TransformationPtr t);
         TransformationPtr GetTransform() const;
 
+        void SetBlendMode(blend_mode b);
         blend_mode GetBlendMode() const;
+
+        void SetLayer(geometry_layer l);
         geometry_layer GetLayer() const;
 
         int64 GetSortKey() const;

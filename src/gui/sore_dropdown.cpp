@@ -138,18 +138,13 @@ namespace SORE_GUI
         onChange.connect(c);
     }
 
-    /*SORE_Graphics::render_list Dropdown::GetThisRenderList()
+    std::vector<SORE_Graphics::Renderable> Dropdown::GetThisRenderList()
     {
-        SORE_Graphics::render_list list;
+        std::vector<SORE_Graphics::Renderable> list;
 
-        std::vector<SORE_Graphics::GeometryChunk*> frame = GetChunks();
-        std::vector<SORE_Graphics::GeometryChunk*>::iterator it;
-        for(it = frame.begin();it!=frame.end();++it)
-        {
-            list.push_back(std::make_pair(&GetPositionMatrix(), *it));
-        }
-
-        list.push_back(std::make_pair(&arrowMat, arrowChunk));
+        std::vector<SORE_Graphics::Renderable> frame = GetChunks();
+        std::copy(frame.begin(), frame.end(), std::back_inserter(list));
+        /*list.push_back(std::make_pair(&arrowMat, arrowChunk));
 
         if(HasFocus())
         {
@@ -164,16 +159,15 @@ namespace SORE_GUI
                 list.insert(list.begin(), text.begin(), text.end());
             }
         }
-
+        */
         if(curChoice)
         {
-            SORE_Graphics::render_list text = curChoice->GetGeometry();
-            list.insert(list.begin(), text.begin(), text.end());
+            std::vector<SORE_Graphics::Renderable> text = curChoice->GetGeometry();
+            std::copy(text.begin(), text.end(), std::back_inserter(list));
         }
 
         return list;
     }
-    */
 
     bool Dropdown::ProcessEvents(SORE_Kernel::Event* e)
     {

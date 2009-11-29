@@ -39,8 +39,7 @@ namespace SORE_GUI
     private:
         void UpdatePosition();
         void OnGLReload();
-        //TODO:fixme
-        //SORE_Graphics::render_list GetThisRenderList();
+        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdateCache();
 
@@ -48,10 +47,8 @@ namespace SORE_GUI
         unsigned int height;
         SORE_Graphics::Text text;
         SORE_Graphics::Color color;
-        std::vector<SORE_Math::Matrix4<float> >transforms;
 
-        //TODO:fixme
-        //SORE_Graphics::render_list all;
+        std::vector<SORE_Graphics::Renderable> all;
     };
 }
 

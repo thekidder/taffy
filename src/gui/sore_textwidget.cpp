@@ -22,9 +22,11 @@
 
 namespace SORE_GUI
 {
-    TextWidget::TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
-                                                 const SORE_Graphics::Color& c, Widget* parent)
-        : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h), text(f, h, t, c), color(c)
+    TextWidget::TextWidget(
+        SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
+        const SORE_Graphics::Color& c, Widget* parent)
+        : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h),
+          text(f, h, t, c), color(c)
     {
         UpdateText(t);
     }
@@ -50,26 +52,26 @@ namespace SORE_GUI
 
     void TextWidget::UpdateCache()
     {
-        //TODO:fixme
-        /*transforms.clear();
-        transforms.reserve(text.GetLength());
         all.clear();
-        SORE_Graphics::render_list raw = text.GetGeometry();
+        std::vector<SORE_Graphics::Renderable> raw = text.GetGeometry();
 
-        SORE_Graphics::render_list::iterator it;
+        std::vector<SORE_Graphics::Renderable>::iterator it;
         for(it = raw.begin(); it != raw.end(); ++it)
         {
-            transforms.push_back(*(it->first) * GetPositionMatrix());
-            all.push_back(std::make_pair(&transforms.back(), it->second));
+            SORE_Graphics::Renderable r(*it);
+            SORE_Graphics::TransformationPtr m(
+                new SORE_Math::Matrix4<float>(
+                    *it->GetTransform() * GetPositionMatrix()));
+            r.SetTransform(m);
+            r.SetLayer(SORE_Graphics::LAYER5);
+            all.push_back(r);
         }
-        */
     }
 
-    /*SORE_Graphics::render_list TextWidget::GetThisRenderList()
+    std::vector<SORE_Graphics::Renderable> TextWidget::GetThisRenderList()
     {
         return all;
     }
-    */
 
     bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
     {

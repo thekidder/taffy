@@ -33,26 +33,24 @@ namespace SORE_GUI
     {
     public:
         FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);
-        ~FrameWidget();
     protected:
         void SetBorderSizes(float l, float r, float t, float b);
         void SetTexture(SORE_Graphics::Texture2DPtr tex);
         void SetShader(SORE_Graphics::GLSLShaderPtr shad);
 
-        std::vector<SORE_Graphics::GeometryChunk*> GetChunks() const;
+        std::vector<SORE_Graphics::Renderable> GetChunks() const;
     private:
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
-        //virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList() = 0;
 
         void BuildGeometry();
-        void DestroyGeometry();
 
         size_mode mode;
 
         SORE_Graphics::Texture2DPtr texture;
         SORE_Graphics::GLSLShaderPtr shader;
 
-        SORE_Graphics::GeometryChunk* chunk[9];
+        SORE_Graphics::Renderable chunk[9];
         unsigned int leftBorder, rightBorder, topBorder, bottomBorder;
     };
 }

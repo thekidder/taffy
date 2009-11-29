@@ -22,7 +22,8 @@
 
 namespace SORE_Graphics
 {
-    Text::Text(SORE_Font::Font& f, unsigned int h, const std::string& initialText, const Color& c)
+    Text::Text(SORE_Font::Font& f, unsigned int h,
+               const std::string& initialText, const Color& c)
         : height(h), text(initialText), color(c), face(f)
     {
         Update();
@@ -30,7 +31,6 @@ namespace SORE_Graphics
 
     Text::~Text()
     {
-        DeleteOldGeometry();
     }
 
     unsigned int Text::GetWidth() const
@@ -68,18 +68,10 @@ namespace SORE_Graphics
         return text.size();
     }
 
-    /*render_list Text::GetGeometry() const
+    std::vector<Renderable> Text::GetGeometry() const
     {
-        render_list r;
-        std::vector<std::pair<SORE_Math::Matrix4<float>,
-        GeometryChunk*> >::const_iterator it;
-        for(it = geometry.begin();it!=geometry.end();++it)
-        {
-            r.push_back(std::make_pair(&(it->first), it->second));
-        }
-        return r;
+        return geometry;
     }
-    */
 
     void Text::UpdateText(const std::string& newText, const Color& c)
     {
@@ -112,18 +104,8 @@ namespace SORE_Graphics
         return overallTransform;
     }
 
-    void Text::DeleteOldGeometry()
-    {
-        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> >::const_iterator it;
-        for(it = geometry.begin();it!=geometry.end();++it)
-        {
-            delete it->second;
-        }
-    }
-
     void Text::Update()
     {
-        DeleteOldGeometry();
         geometry.clear();
         const char* str = text.c_str();
         float currentAdvance = 0.0f;
@@ -131,18 +113,25 @@ namespace SORE_Graphics
         {
             const SORE_Font::CharInfo& c = face.GetCharacter(height, str[i]);
 
-            if(c.gc) //account for characters without any geometry (i.e. space)
+            //account for characters without any geometry (i.e. space)
+            if(c.renderable.GetGeometryChunk())
             {
                 //create a shared geometry
-                GeometryChunk* coloredCharacter = new GeometryChunk(*c.gc);
-                //TODO:
-                //coloredCharacter->SetColor(color);
+                GeometryChunkPtr coloredCharacter(
+                    new GeometryChunk(*c.renderable.GetGeometryChunk()));
+                coloredCharacter->SetColor(color);
 
-                SORE_Math::Matrix4<float> m = c.transform;
-                m *= SORE_Math::Matrix4<float>::GetTranslation(currentAdvance, 0.0f, 0.0f);
-                m *= overallTransform;
+                TransformationPtr m(
+                    new SORE_Math::Matrix4<float>(*c.renderable.GetTransform()));
+                *m *= SORE_Math::Matrix4<float>::GetTranslation(
+                    currentAdvance, 0.0f, 0.0f);
+                *m *= overallTransform;
 
-                geometry.push_back(std::make_pair(m, coloredCharacter));
+                Renderable r = c.renderable;
+                r.SetGeometryChunk(coloredCharacter);
+                r.SetTransform(m);
+
+                geometry.push_back(r);
             }
             currentAdvance += c.advance;
         }

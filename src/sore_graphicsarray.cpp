@@ -38,7 +38,7 @@ void SORE_Graphics::GraphicsArray::AddObject(
     size_t oldSize = vertices.size();
 
     vertices.resize(vertices.size() + geometry->NumVertices());
-    memcpy(&vertices[0], geometry->GetVertices(),
+    memcpy(&vertices[oldSize], geometry->GetVertices(),
            geometry->NumVertices()*sizeof(vertex));
     for(unsigned int i=0; i<geometry->NumVertices(); ++i)
     {

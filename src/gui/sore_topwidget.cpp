@@ -64,12 +64,52 @@ namespace SORE_GUI
         return proj;
     }
 
-    /*SORE_Graphics::render_list TopWidget::GetThisRenderList()
+    void TopWidget::MakeUpToDate()
     {
-        SORE_Graphics::render_list list;
+        renderables.clear();
+        renderables = GetRenderList();
+    }
+
+    std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryBegin()
+    {
+        return renderables.begin();
+    }
+
+    std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryEnd()
+    {
+        return renderables.end();
+    }
+
+    bool TopWidget::HasProjection(SORE_Graphics::geometry_layer layer)
+    {
+        if(layer == SORE_Graphics::LAYER5)
+            return true;
+        return false;
+    }
+
+    SORE_Graphics::ProjectionInfo TopWidget::GetProjection(
+        SORE_Graphics::geometry_layer layer)
+    {
+        if(layer != SORE_Graphics::LAYER5)
+            return SORE_Graphics::ProjectionInfo();
+        SORE_Graphics::ProjectionInfo proj;
+        proj.type = SORE_Graphics::ORTHO2D;
+        proj.left = 0.0f;
+        proj.right = static_cast<float>(
+            GetPixels(HORIZONTAL, GetSize().GetHorizontal()));
+        proj.bottom = 0.0f;
+        proj.top = static_cast<float>(
+            GetPixels(VERTICAL, GetSize().GetVertical()));
+        proj.useScreenRatio = false;
+        proj.useScreenCoords = false;
+        return proj;
+    }
+
+    std::vector<SORE_Graphics::Renderable> TopWidget::GetThisRenderList()
+    {
+        std::vector<SORE_Graphics::Renderable> list;
         return list;
     }
-    */
 
     bool TopWidget::ProcessEvents(SORE_Kernel::Event* e)
     {

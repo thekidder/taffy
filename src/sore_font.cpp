@@ -24,6 +24,7 @@
 #include "sore_geometrychunk.h"
 #include "sore_logger.h"
 #include "sore_shaders.h"
+#include "sore_sprite.h"
 #include "sore_texture.h"
 
 #include <vector>
@@ -64,11 +65,6 @@ namespace SORE_Font
         std::map<unsigned int, CharInfo*>::iterator it;
         for(it = characters.begin();it!=characters.end();++it)
         {
-            for(unsigned int i=0;i<NUM_CHARACTERS;++i)
-            {
-                if(it->second[i].gc)
-                    delete it->second[i].gc;
-            }
             CharInfo* c = it->second;
             delete[] c;
         }
@@ -185,7 +181,7 @@ namespace SORE_Font
 
         for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
         {
-            if(characters[height][i].gc)
+            if(buffers[i].width && buffers[i].height)
             {
                 float xBlock = static_cast<float>(glyphWidth) / texWidth;
                 float yBlock = static_cast<float>(glyphHeight) / texHeight;
@@ -199,9 +195,20 @@ namespace SORE_Font
                 float yMax = yMin +
                     static_cast<float>(buffers[i].height) / glyphHeight * yBlock;
 
+                SORE_Math::Rect<float> bounds(
+                    0.0f,
+                    static_cast<float>(buffers[i].width),
+                    0.0f,
+                    static_cast<float>(buffers[i].height));
                 SORE_Math::Rect<float> texCoords(xMin, xMax, yMin, yMax);
-                //characters[height][i].gc->SetTexture(textures[height]);
-                //characters[height][i].gc->SetTexCoords(texCoords);
+                SORE_Graphics::GLSLShaderPtr shader =
+                    rm->GetResource<SORE_Graphics::GLSLShader>
+                    ("data/Shaders/default.shad");
+
+                characters[height][i].renderable = SORE_Graphics::MakeSprite(
+                    bounds, texCoords, 0.0f, textures[height], shader,
+                    SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE);
+                characters[height][i].renderable.SetTransform(buffers[i].transform);
             }
         }
 
@@ -251,34 +258,18 @@ namespace SORE_Font
             }
         }
 
-        CharInfo* c = characters[h];
-
         unsigned int index = static_cast<unsigned int>(ch);
         if(width && height)
         {
-            c[index].transform = SORE_Math::Matrix4<float>::GetTranslation(
-                static_cast<float>(face->glyph->bitmap_left),
-                static_cast<float>(bitmap.rows-face->glyph->bitmap_top) +
-                (h - bitmap.rows),
-                0.0f);
-
-            SORE_Math::Rect<float> bounds (0.0f,
-                                           static_cast<float>(width), 0.0f,
-                                           static_cast<float>(height));
-            SORE_Math::Rect<float> texCoords(0.0f, 1.0f, 0.0f, 1.0f);
-
-            SORE_Graphics::GLSLShaderPtr shader =
-                rm->GetResource<SORE_Graphics::GLSLShader>
-                ("data/Shaders/default.shad");
-            /*c[index].gc = new SORE_Graphics::GeometryChunk
-                (SORE_Graphics::Texture2DPtr(), shader, bounds,
-                SORE_Graphics::LAYER3, SORE_Graphics::SUBTRACTIVE, texCoords);*/
+            info.transform = boost::shared_ptr<SORE_Math::Matrix4<float> >(
+                new SORE_Math::Matrix4<float>(
+                    SORE_Math::Matrix4<float>::GetTranslation(
+                        static_cast<float>(face->glyph->bitmap_left),
+                        static_cast<float>(bitmap.rows-face->glyph->bitmap_top) +
+                        (h - bitmap.rows),
+                        0.0f)));
         }
-        else
-        {
-            c[index].gc = NULL;
-        }
-        c[index].advance = static_cast<float>(face->glyph->advance.x >> 6);
+        characters[h][index].advance = static_cast<float>(face->glyph->advance.x >> 6);
     }
 
     const CharInfo& Font::GetCharacter(unsigned int height, char c)

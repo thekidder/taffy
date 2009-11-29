@@ -149,10 +149,12 @@ void SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
     if(commands & RENDER_CMD_BIND_VBO && geometry)
     {
         geometry->BeginDraw();
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Binding VBO");
     }
     if(commands & RENDER_CMD_CHANGE_PROJECTION)
     {
         ChangeProjectionMatrix(projection, si);
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Changing Projection");
     }
     if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
     {
@@ -175,18 +177,22 @@ void SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
             blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
             break;
         }
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Changing blend func");
         glBlendFunc(blendSFactor, blendDFactor);
     }
     if(commands & RENDER_CMD_BIND_SHADER)
     {
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Binding shader");
         shader->Bind();
     }
     if(commands & RENDER_CMD_BIND_TEXTURE)
     {
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Binding texture " + texture->GetFilename());
         texture->Bind(shader, "texture", 0);
     }
     if(geometry)
     {
+        ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("drawing %d triangles from %d") % numberTriangles % triangleOffset);
         geometry->DrawElements(numberTriangles, triangleOffset);
     }
 }

@@ -46,7 +46,7 @@ namespace SORE_Graphics
         void TrimToWidth(unsigned int width, size_t start);
 
         const SORE_Math::Matrix4<float>& GetTransform();
-        //render_list GetGeometry() const;
+        std::vector<Renderable> GetGeometry() const;
         //following two functions are only valid if text is not scaled or rotated
         unsigned int GetWidth() const;
         unsigned int GetHeight() const;
@@ -56,7 +56,6 @@ namespace SORE_Graphics
         size_t GetIndex(float xpos) const;
         const std::string& GetText() const;
     private:
-        void DeleteOldGeometry();
         void Update();
 
         unsigned int height;
@@ -66,8 +65,7 @@ namespace SORE_Graphics
         SORE_Font::Font& face;
 
         SORE_Math::Matrix4<float> overallTransform;
-
-        std::vector<std::pair<SORE_Math::Matrix4<float>, GeometryChunk*> > geometry;
+        std::vector<Renderable> geometry;
     };
 }
 

@@ -34,6 +34,11 @@ SORE_Graphics::Renderable::Renderable(
     CalculateSortKey();
 }
 
+void SORE_Graphics::Renderable::SetGeometryChunk(GeometryChunkPtr g)
+{
+    geometry = g;
+}
+
 SORE_Graphics::GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
 {
     return geometry;
@@ -80,9 +85,19 @@ SORE_Graphics::TransformationPtr SORE_Graphics::Renderable::GetTransform() const
     return transformation;
 }
 
+void SORE_Graphics::Renderable::SetBlendMode(blend_mode b)
+{
+    blending = b;
+}
+
 SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
 {
     return blending;
+}
+
+void SORE_Graphics::Renderable::SetLayer(geometry_layer l)
+{
+    layer = l;
 }
 
 SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const

@@ -21,23 +21,33 @@
 #ifndef SORE_TOPWIDGET_H
 #define SORE_TOPWIDGET_H
 
+#include "../sore_geometryprovider.h"
 #include "../sore_input.h"
 #include "../sore_screeninfo.h"
 #include "sore_widget.h"
 
 namespace SORE_GUI
 {
-    class SORE_EXPORT TopWidget : public Widget
+    class SORE_EXPORT TopWidget : public Widget, public SORE_Graphics::GeometryProvider
     {
     public:
         TopWidget(unsigned int width, unsigned int height);
         SORE_Graphics::ProjectionInfo GetProjection(SORE_Graphics::ScreenInfo s);
         bool OnResize(SORE_Kernel::Event* e);
+
+        virtual void MakeUpToDate();
+        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
+        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
+
+        virtual bool HasProjection(SORE_Graphics::geometry_layer layer);
+        virtual SORE_Graphics::ProjectionInfo GetProjection(
+            SORE_Graphics::geometry_layer layer);
     private:
-        //TODO:fixme
-        //SORE_Graphics::render_list GetThisRenderList();
+        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdateResolution(unsigned int w, unsigned int h);
+
+        std::vector<SORE_Graphics::Renderable> renderables;
     };
 }
 

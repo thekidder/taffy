@@ -33,6 +33,7 @@
 #include "../sore_dll.h"
 #include "../sore_geometrychunk.h"
 #include "../sore_input.h"
+#include "../sore_renderable.h"
 
 #include "sore_units.h"
 
@@ -48,8 +49,7 @@ namespace SORE_GUI
         Widget(SVec s, SVec p, Widget* par=NULL);
         ~Widget();
 
-        //TODO
-        //SORE_Graphics::render_list GetRenderList();
+        std::vector<SORE_Graphics::Renderable> GetRenderList();
         bool PropagateEvents(SORE_Kernel::Event* e);
 
         int GetSize(unit_type type) const;
@@ -89,8 +89,7 @@ namespace SORE_GUI
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
         //child widgets ARE responsible to transforming their geometry
         //via GetPositionMatrix()
-        //TODO:fixme
-        //virtual SORE_Graphics::render_list GetThisRenderList() = 0;
+        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList() = 0;
         //gets called when the parent's position is updated; overload if we need to do
         //processing on a position change
         virtual void UpdatePosition() {}

@@ -27,12 +27,11 @@
 #pragma warning( disable : 4251 )
 #endif
 
+#include "math/sore_matrix4x4.h"
 #include "sore_allgl.h"
-#include "sore_geometrychunk.h"
+#include "sore_renderable.h"
 #include "sore_resource.h"
 #include "sore_texture.h"
-
-#include "math/sore_matrix4x4.h"
 
 //freetype
 #include <ft2build.h>
@@ -64,8 +63,7 @@ namespace SORE_Font
 
     struct CharInfo
     {
-        SORE_Graphics::GeometryChunk* gc;
-        SORE_Math::Matrix4<float> transform;
+        SORE_Graphics::Renderable renderable;
         float advance;
     };
 
@@ -74,6 +72,7 @@ namespace SORE_Font
         GLubyte* data;
         unsigned int height;
         unsigned int width;
+        SORE_Graphics::TransformationPtr transform;
     };
 
     class SORE_EXPORT Font : public SORE_Resource::Resource

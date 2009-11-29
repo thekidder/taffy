@@ -96,9 +96,9 @@ namespace SORE_GUI
         return mat;
     }
 
-    /*SORE_Graphics::render_list Widget::GetRenderList()
+    std::vector<SORE_Graphics::Renderable> Widget::GetRenderList()
     {
-        SORE_Graphics::render_list all;
+        std::vector<SORE_Graphics::Renderable> all;
         if(isVisible)
         {
             all = GetThisRenderList();
@@ -106,13 +106,12 @@ namespace SORE_GUI
             std::vector<Widget*>::iterator it;
             for(it = children.begin(); it != children.end(); ++it)
             {
-                SORE_Graphics::render_list child = (*it)->GetRenderList();
-                all.insert(all.begin(), child.begin(), child.end());
+                std::vector<SORE_Graphics::Renderable> child = (*it)->GetRenderList();
+                std::copy(child.begin(), child.end(), std::back_inserter(all));
             }
         }
         return all;
     }
-    */
 
     bool Widget::PropagateEvents(SORE_Kernel::Event* e)
     {

@@ -85,17 +85,17 @@ void SORE_Graphics::Renderer::Build()
 
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
-    unsigned int vboSize = 0, numTris = 0, offset = 0, lastLen = 0;
+    unsigned int vboSize = 0, numTris = 0, offset = 0;
     GraphicsArray* ga = new GraphicsArrayClass(true, true);
     geometry.push_back(ga);
     Renderable old = allRenderables.front();
     for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
     {
-        offset += lastLen;
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
+            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("built vbo with %d triangles") % (vboSize/3));
             geometry.back()->Build();
-            vboSize = 0;
+            vboSize = numTris = offset = 0;
             ga = new GraphicsArrayClass(true, true);
             geometry.push_back(ga);
         }
@@ -123,6 +123,7 @@ void SORE_Graphics::Renderer::Build()
             }
             batches.push_back(RenderBatch(geometry.back(),
                                           bindVBO));
+            offset += numTris;
 
             if(changeProjection)
                 batches.back().AddChangeProjectionCommand(
@@ -134,13 +135,13 @@ void SORE_Graphics::Renderer::Build()
             if(bindTexture)
                 batches.back().AddBindTextureCommand(
                     r_it->GetShader(), r_it->GetTexture());
-            if(vboSize == 0)
-                offset = numTris = 0;
+            numTris = 0;
         }
         vboSize += r_it->GetGeometryChunk()->NumIndices();
         numTris += r_it->GetGeometryChunk()->NumIndices()/3;
-        lastLen  = r_it->GetGeometryChunk()->NumIndices()/3;
+        old = *r_it;
     }
+    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("built vbo with %d triangles") % (vboSize/3));
     geometry.back()->Build();
     batches.back().SetNumTriangles(numTris);
     batches.back().SetTriangleOffset(offset);
@@ -157,12 +158,16 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
+    ENGINE_LOG(SORE_Logging::LVL_INFO, "DRAWING FRAME");
     std::vector<RenderBatch>::iterator it;
-    for(it = batches.begin(); it != batches.end(); ++it)
+    if(batches.size())
     {
-        it->Render(screen);
+        for(it = batches.begin(); it != batches.end(); ++it)
+        {
+            it->Render(screen);
+        }
+        geometry.back()->EndDraw();
     }
-    geometry.back()->EndDraw();
 
     CalculateFPS();
 

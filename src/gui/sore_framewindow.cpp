@@ -103,21 +103,15 @@ namespace SORE_GUI
         return false;
     }
 
-    /*SORE_Graphics::render_list FrameWindow::GetThisRenderList()
+    std::vector<SORE_Graphics::Renderable> FrameWindow::GetThisRenderList()
     {
-        SORE_Graphics::render_list list;
+        std::vector<SORE_Graphics::Renderable> list;
 
-        std::vector<SORE_Graphics::GeometryChunk*> frame = GetChunks();
-        std::vector<SORE_Graphics::GeometryChunk*>::iterator it;
-        for(it = frame.begin();it!=frame.end();++it)
-        {
-            list.push_back(std::make_pair(&GetPositionMatrix(), *it));
-        }
-
-        SORE_Graphics::render_list text = titleText->GetGeometry();
-        list.insert(list.begin(), text.begin(), text.end());
+        std::vector<SORE_Graphics::Renderable> frame = GetChunks();
+        std::copy(frame.begin(), frame.end(), std::back_inserter(list));
+        std::vector<SORE_Graphics::Renderable> text = titleText->GetGeometry();
+        std::copy(text.begin(), text.end(), std::back_inserter(list));
 
         return list;
     }
-    */
 }
