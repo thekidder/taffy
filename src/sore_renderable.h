@@ -79,7 +79,7 @@ namespace SORE_Graphics
         void SetLayer(geometry_layer l);
         geometry_layer GetLayer() const;
 
-        int64 GetSortKey() const;
+        int GetSortKey() const;
 
     private:
         void CalculateDepth();
@@ -94,7 +94,7 @@ namespace SORE_Graphics
 
         float cachedDepth;
 
-        int64 sortKey;
+        int sortKey;
     };
 
     bool operator<(const Renderable& one, const Renderable& two);

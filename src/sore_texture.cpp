@@ -249,6 +249,11 @@ namespace SORE_Graphics
         glBindTexture(GL_TEXTURE_2D, handle);
     }
 
+    unsigned int Texture2D::GetHandle() const
+    {
+        return handle;
+    }
+
     void Texture2D::Unload()
     {
         ENGINE_LOG(SORE_Logging::LVL_WARNING, "Unload() not completely implemented");

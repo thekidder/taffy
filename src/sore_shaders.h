@@ -59,6 +59,7 @@ namespace SORE_Graphics
         void Link();
         void Bind() const;
         bool Ready() const;
+        unsigned int GetHandle() const;
 
         const char* Type() const {return "GLSL shader";}
         bool GLContextDependent() const {return true;}

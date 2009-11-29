@@ -42,6 +42,8 @@ namespace SORE_Graphics
         void SaveTGA(const char* filename);
         bool GLContextDependent() const {return true;}
 
+        unsigned int GetHandle() const;
+
         bool operator<(const Texture2D& o) const;
         bool operator==(const Texture2D& o) const;
     protected:

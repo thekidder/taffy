@@ -37,6 +37,7 @@ SORE_Graphics::Renderable::Renderable(
 void SORE_Graphics::Renderable::SetGeometryChunk(GeometryChunkPtr g)
 {
     geometry = g;
+    CalculateDepth();
 }
 
 SORE_Graphics::GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
@@ -88,6 +89,7 @@ SORE_Graphics::TransformationPtr SORE_Graphics::Renderable::GetTransform() const
 void SORE_Graphics::Renderable::SetBlendMode(blend_mode b)
 {
     blending = b;
+    CalculateSortKey();
 }
 
 SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
@@ -98,6 +100,7 @@ SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
 void SORE_Graphics::Renderable::SetLayer(geometry_layer l)
 {
     layer = l;
+    CalculateSortKey();
 }
 
 SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const
@@ -105,17 +108,42 @@ SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const
     return layer;
 }
 
-SORE_Graphics::int64 SORE_Graphics::Renderable::GetSortKey() const
+int SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;
 }
 
 void SORE_Graphics::Renderable::CalculateDepth()
 {
+    //sort by min-Z
+    float minZ = std::numeric_limits<float>::max();
+    for(unsigned int i = 0; i < geometry->NumVertices(); ++i)
+    {
+        SORE_Math::Vector4<float> pos(
+            geometry->GetVertex(i).x,
+            geometry->GetVertex(i).y,
+            geometry->GetVertex(i).z,
+            1.0f);
+        pos = *transformation * pos;
+        if(pos[2] > minZ)
+            minZ = pos[2];
+    }
+    cachedDepth = minZ;
 }
 
 void SORE_Graphics::Renderable::CalculateSortKey()
 {
+    const unsigned int keyLen = 32;
+    sortKey = 0;
+    sortKey |= (layer << (keyLen - 3));
+    sortKey |= (blending << (keyLen - 2 - 3));
+    sortKey |= ((static_cast<unsigned int>(cachedDepth) & 0xFFF)
+                << (keyLen - 2 - 3 - 12));
+    if(shader)
+        sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
+    if(texture)
+        sortKey |= texture->GetHandle();
+
 }
 
 bool SORE_Graphics::operator<(const SORE_Graphics::Renderable& one,

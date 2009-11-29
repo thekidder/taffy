@@ -370,6 +370,11 @@ namespace SORE_Graphics
         glUseProgramObjectARB(program);
     }
 
+    unsigned int GLSLShader::GetHandle() const
+    {
+        return program;
+    }
+
     bool GLSLShader::operator<(const GLSLShader& o) const
     {
         return program < o.program;
