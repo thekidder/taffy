@@ -128,6 +128,8 @@ namespace SORE_GUI
         //render/process inputs from this widget?
         bool isVisible;
     };
+
+    const static SORE_Graphics::geometry_layer GUI_LAYER = SORE_Graphics::LAYER3;
 }
 
 #ifdef _MSC_VER

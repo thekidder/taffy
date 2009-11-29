@@ -82,7 +82,7 @@ namespace SORE_GUI
 
     bool TopWidget::HasProjection(SORE_Graphics::geometry_layer layer)
     {
-        if(layer == SORE_Graphics::LAYER5)
+        if(layer == GUI_LAYER)
             return true;
         return false;
     }
@@ -90,7 +90,7 @@ namespace SORE_GUI
     SORE_Graphics::ProjectionInfo TopWidget::GetProjection(
         SORE_Graphics::geometry_layer layer)
     {
-        if(layer != SORE_Graphics::LAYER5)
+        if(layer != GUI_LAYER)
             return SORE_Graphics::ProjectionInfo();
         SORE_Graphics::ProjectionInfo proj;
         proj.type = SORE_Graphics::ORTHO2D;
