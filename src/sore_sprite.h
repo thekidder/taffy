@@ -34,7 +34,7 @@ namespace SORE_Graphics
         Texture2DPtr texture,
         GLSLShaderPtr shader,
         geometry_layer l = LAYER3,
-        blend_mode b = SUBTRACTIVE);
+        blend_mode b = BLEND_SUBTRACTIVE);
 }
 
 #endif
