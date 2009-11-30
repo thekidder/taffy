@@ -44,10 +44,10 @@ namespace SORE_Graphics
 
     enum blend_mode
     {
-        OPAQUE,
-        ADDITIVE,
-        SUBTRACTIVE,
-        UNUSED
+        BLEND_OPAQUE,
+        BLEND_ADDITIVE,
+        BLEND_SUBTRACTIVE,
+        BLEND_UNUSED
     };
 
     typedef unsigned long long int64;

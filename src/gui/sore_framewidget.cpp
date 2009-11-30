@@ -112,7 +112,7 @@ namespace SORE_GUI
 
             chunk[0] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(leftBorder && bottomBorder + topBorder < height)
@@ -127,7 +127,7 @@ namespace SORE_GUI
 
             chunk[1] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(leftBorder && topBorder)
@@ -142,7 +142,7 @@ namespace SORE_GUI
 
             chunk[2] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(leftBorder + rightBorder < width && topBorder)
@@ -157,7 +157,7 @@ namespace SORE_GUI
 
             chunk[3] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(rightBorder && topBorder)
@@ -172,7 +172,7 @@ namespace SORE_GUI
 
             chunk[4] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(rightBorder && topBorder + bottomBorder < height)
@@ -187,7 +187,7 @@ namespace SORE_GUI
 
             chunk[5] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(rightBorder && bottomBorder)
@@ -202,7 +202,7 @@ namespace SORE_GUI
 
             chunk[6] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(bottomBorder && rightBorder + leftBorder < width)
@@ -217,7 +217,7 @@ namespace SORE_GUI
 
             chunk[7] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
 
         if(leftBorder && bottomBorder)
@@ -232,7 +232,7 @@ namespace SORE_GUI
 
             chunk[8] = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, texture, shader,
-                GUI_LAYER, SORE_Graphics::SUBTRACTIVE);
+                GUI_LAYER, SORE_Graphics::BLEND_SUBTRACTIVE);
         }
         for(unsigned int i = 0; i < 9; ++i)
             chunk[i].SetTransform(
