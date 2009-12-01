@@ -1,7 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-SET(DEFAULT_SHADERS_SRCS default.shad default_fragment.glsl default_vertex.glsl
-  combine.shad fragment_combine.glsl fragment_gauss.glsl gaussian.shad)
+SET(DEFAULT_SHADERS_SRCS default.shad default_fragment.glsl default_vertex.glsl)
 
 SET(OUTPUT_NAME default_shaders.sdp)
 
