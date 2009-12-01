@@ -29,7 +29,6 @@
 #include "sore_geometryprovider.h"
 #include "sore_graphics.h"
 #include "sore_graphicsarray.h"
-#include "sore_postprocess.h"
 #include "sore_renderable.h"
 #include "sore_renderer.h"
 #include "sore_resource.h"
