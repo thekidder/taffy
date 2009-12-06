@@ -39,7 +39,7 @@
 
 namespace SORE_GUI
 {
-    const static float LAYER_SEPARATION = 0.0001f;
+    const static float LAYER_SEPARATION = 0.0005f;
 
     enum unit_type {HORIZONTAL, VERTICAL};
 

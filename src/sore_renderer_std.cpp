@@ -81,6 +81,11 @@ void SORE_Graphics::Renderer::Build()
 
     if(allRenderables.empty())
         return;
+    std::vector<Renderable>::iterator rit;
+    for(rit = allRenderables.begin(); rit != allRenderables.end(); ++rit)
+    {
+        rit->SetProjection(SetupProjection(GetProjection(rit->GetLayer()), screen));
+    }
     std::sort(allRenderables.begin(), allRenderables.end());
 
     //loop through all renderables, building VBOs and draw call commands

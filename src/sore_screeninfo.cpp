@@ -30,6 +30,8 @@ namespace SORE_Graphics
         case NONE:
             break;
         case ORTHO2D:
+            returnProj.znear = -1.0f;
+            returnProj.zfar  =  1.0f;
             if(pi.useScreenCoords)
             {
                 returnProj.top = 0;

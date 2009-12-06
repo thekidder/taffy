@@ -26,6 +26,7 @@
 #include "math/sore_matrix4x4.h"
 #include "sore_geometrychunk.h"
 #include "sore_texture.h"
+#include "sore_screeninfo.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
@@ -81,6 +82,7 @@ namespace SORE_Graphics
 
         int GetSortKey() const;
 
+        void SetProjection(const ProjectionInfo& pi);
     private:
         void CalculateDepth();
         void CalculateSortKey();
@@ -95,6 +97,8 @@ namespace SORE_Graphics
         float cachedDepth;
 
         int sortKey;
+
+        ProjectionInfo proj;
     };
 
     bool operator<(const Renderable& one, const Renderable& two);
