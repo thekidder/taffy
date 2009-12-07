@@ -28,191 +28,202 @@
 
 namespace SORE_Math
 {
-	template<typename T>
-	class Vector2
-	{
-	public:
-		Vector2()
-		{
-			value[0] = T(0);
-			value[1] = T(0);
-		}
-		Vector2(T x, T y)
-		{
-			value[0] = x;
-			value[1] = y;
-		}
-			
-		Vector2(const Vector2<T>& v)
-		{
-			value[0] = v.value[0];
-			value[1] = v.value[1];
-		}
-			
-		void Set(T x, T y)
-		{
-			value[0] = x;
-			value[1] = y;
-		}
-			
-		T* GetValue()
-		{
-			return value;
-		}
-			
-		T& operator[] (int index)
-		{
-			if(index<0 || index>1) 
-			{
-				assert("Index out of range!");
-				return value[0];
-			}
-			return value[index];
-		}
+    template<typename T>
+    class Vector2
+    {
+    public:
+        Vector2()
+        {
+            value[0] = T(0);
+            value[1] = T(0);
+        }
+        Vector2(T x, T y)
+        {
+            value[0] = x;
+            value[1] = y;
+        }
 
-		const T& operator[] (int index)  const
-		{
-			if(index<0 || index>1) 
-			{
-				assert("Index out of range!");
-				return value[0];
-			}
-			return value[index];
-		}
+        Vector2(const Vector2<T>& v)
+        {
+            value[0] = v.value[0];
+            value[1] = v.value[1];
+        }
 
-		T dot(const Vector2<T>& v)
-		{
-			T temp = v[0]*value[0] + v[1]*value[1];
-			return temp;
-		}
-			
-		Vector2<T>& operator+=(Vector2<T> v)
-		{
-			value[0] += v.value[0];
-			value[1] += v.value[1];
-			return *this;
-		}
-		Vector2<T>& operator-=(Vector2<T> v)
-		{
-			value[0] -= v.value[0];
-			value[1] -= v.value[1];
-			return *this;
-		}
-			
-		Vector2<T>& operator*=(Vector2<T> v)
-		{
-			value[0] *= v.value[0];
-			value[1] *= v.value[1];
-			return *this;
-		}
-			
-		Vector2<T>& operator/=(Vector2<T> v)
-		{
-			value[0] /= v.value[0];
-			value[1] /= v.value[1];
-			return *this;
-		}
-			
-		Vector2<T>& operator+=(T v)
-		{
-			value[0] += v;
-			value[1] += v;
-			return *this;
-		}
+        void Set(T x, T y)
+        {
+            value[0] = x;
+            value[1] = y;
+        }
 
-		Vector2<T>& operator-=(T v)
-		{
-			value[0] -= v;
-			value[1] -= v;
-			return *this;
-		}
+        T* GetValue()
+        {
+            return value;
+        }
 
-		Vector2<T>& operator*=(T v)
-		{
-			value[0] *= v;
-			value[1] *= v;
-			return *this;
-		}
-						
-		Vector2<T>& operator/=(T num)
-		{
-			value[0] /= num;
-			value[1] /= num;
-			return *this;
-		}
-			
-		T Magnitude()
-		{
-			return sqrt(value[0]*value[0]+value[1]*value[1]);
-		}
-			
-		Vector2<T> Normalize()
-		{
-			T mag = Magnitude();
-			if(mag==0.0) return Vector2(0.0,0.0);
-			Vector2<T> temp(value[0]/mag,value[1]/mag);
-			return temp;
-		}
-	protected:
-		T value[2];
-	};
-	
-	template<typename T>
-	double distance(Vector2<T> one, Vector2<T> two)
-	{
-		return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1]));
-	}
-	
-	template<typename T>
-	Vector2<T> operator-(Vector2<T> v)
-	{
-		Vector2<T> temp(-v[0],-v[1]);
-		return temp;
-	}
-	
-	template<typename T>
-	Vector2<T> operator+(Vector2<T> v1, Vector2<T> v2)
-	{
-		Vector2<T> r = v1;
-		r += v2;
-		return r;
-	}
-	
-	template<typename T>
-	Vector2<T> operator-(Vector2<T> v1, Vector2<T> v2)
-	{
-		Vector2<T> r = v1;
-		r += -v2;
-		return r;
-	}
-	
-	template<typename T>
-	Vector2<T> operator/(Vector2<T> v1, T& num)
-	{
-		Vector2<T> r = v1;
-		r /= num;
-		return r;
-	}
-	
-	template<typename T>
-	Vector2<T> operator*(Vector2<T> v1, T num)
-	{
-		Vector2<T> r = v1;
-		r *= num;
-		return r;
-	}
-	
-	template<typename T>
-	Vector2<T> operator*(const T& num, const Vector2<T>& v1)
-	{
-		return v1*num;
-	}
+        const T* GetValue() const
+        {
+            return value;
+        }
 
-	template<typename T>
-	bool operator>(Vector2<T> one, Vector2<T> two)
-	{
-		return one.Magnitude() > two.Magnitude();
-	}
+        T& operator[] (int index)
+        {
+            if(index<0 || index>1)
+            {
+                assert("Index out of range!");
+                return value[0];
+            }
+            return value[index];
+        }
+
+        const T& operator[] (int index)  const
+        {
+            if(index<0 || index>1)
+            {
+                assert("Index out of range!");
+                return value[0];
+            }
+            return value[index];
+        }
+
+        T dot(const Vector2<T>& v)
+        {
+            T temp = v[0]*value[0] + v[1]*value[1];
+            return temp;
+        }
+
+        Vector2<T>& operator+=(const Vector2<T>& v)
+        {
+            value[0] += v.value[0];
+            value[1] += v.value[1];
+            return *this;
+        }
+        Vector2<T>& operator-=(const Vector2<T>& v)
+        {
+            value[0] -= v.value[0];
+            value[1] -= v.value[1];
+            return *this;
+        }
+
+        Vector2<T>& operator*=(const Vector2<T>& v)
+        {
+            value[0] *= v.value[0];
+            value[1] *= v.value[1];
+            return *this;
+        }
+
+        Vector2<T>& operator/=(const Vector2<T>& v)
+        {
+            value[0] /= v.value[0];
+            value[1] /= v.value[1];
+            return *this;
+        }
+
+        Vector2<T>& operator+=(T v)
+        {
+            value[0] += v;
+            value[1] += v;
+            return *this;
+        }
+
+        Vector2<T>& operator-=(T v)
+        {
+            value[0] -= v;
+            value[1] -= v;
+            return *this;
+        }
+
+        Vector2<T>& operator*=(T v)
+        {
+            value[0] *= v;
+            value[1] *= v;
+            return *this;
+        }
+
+        Vector2<T>& operator/=(T num)
+        {
+            value[0] /= num;
+            value[1] /= num;
+            return *this;
+        }
+
+        T Magnitude()
+        {
+            return sqrt(value[0]*value[0]+value[1]*value[1]);
+        }
+
+        Vector2<T> Normalize()
+        {
+            T mag = Magnitude();
+            if(mag==0.0) return Vector2(0.0,0.0);
+            Vector2<T> temp(value[0]/mag,value[1]/mag);
+            return temp;
+        }
+    protected:
+        T value[2];
+    };
+
+    template<typename T>
+    double distance(const Vector2<T>& one, const Vector2<T>& two)
+    {
+        return sqrt((one[0]-two[0])*(one[0]-two[0])+(one[1]-two[1])*(one[1]-two[1]));
+    }
+
+    template<typename T>
+    Vector2<T> operator-(const Vector2<T>& v)
+    {
+        Vector2<T> temp(-v[0],-v[1]);
+        return temp;
+    }
+
+    template<typename T>
+    Vector2<T> operator+(const Vector2<T>& v1, const Vector2<T>& v2)
+    {
+        Vector2<T> r = v1;
+        r += v2;
+        return r;
+    }
+
+    template<typename T>
+    Vector2<T> operator-(const Vector2<T>& v1, const Vector2<T>& v2)
+    {
+        Vector2<T> r = v1;
+        r += -v2;
+        return r;
+    }
+
+    template<typename T>
+    Vector2<T> operator/(const Vector2<T>& v1, T& num)
+    {
+        Vector2<T> r = v1;
+        r /= num;
+        return r;
+    }
+
+    template<typename T>
+    Vector2<T> operator*(const Vector2<T>& v1, T num)
+    {
+        Vector2<T> r = v1;
+        r *= num;
+        return r;
+    }
+
+    template<typename T>
+    Vector2<T> operator*(const T& num, const Vector2<T>& v1)
+    {
+        return v1*num;
+    }
+
+    template<typename T>
+    bool operator>(const Vector2<T>& one, const Vector2<T>& two)
+    {
+        return one.Magnitude() > two.Magnitude();
+    }
+
+    template<typename T>
+    bool operator==(const Vector2<T>& one, const Vector2<T>& two)
+    {
+        return one[0] == two[0] && one[1] == two[1];
+    }
 }
 
 #endif
