@@ -34,13 +34,22 @@ void SORE_Graphics::UniformState::Bind(GLSLShaderPtr s) const
             s->SetUniform1f(it->first, it->second.f);
             break;
         case VEC2:
-            s->SetUniformfv(it->first, 2, it->second.v2.GetValue());
+            s->SetUniform2f(it->first,
+                            it->second.v2.GetValue()[0],
+                            it->second.v2.GetValue()[1]);
             break;
         case VEC3:
-            s->SetUniformfv(it->first, 3, it->second.v3.GetValue());
+            s->SetUniform3f(it->first,
+                            it->second.v3.GetValue()[0],
+                            it->second.v3.GetValue()[1],
+                            it->second.v2.GetValue()[2]);
             break;
         case VEC4:
-            s->SetUniformfv(it->first, 4, it->second.v4.GetValue());
+            s->SetUniform4f(it->first,
+                            it->second.v4.GetValue()[0],
+                            it->second.v4.GetValue()[1],
+                            it->second.v4.GetValue()[2],
+                            it->second.v4.GetValue()[3]);
             break;
 
         }
