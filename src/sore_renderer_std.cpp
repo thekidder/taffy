@@ -108,6 +108,8 @@ void SORE_Graphics::Renderer::Build()
         UniformState u;
         if(r_it != allRenderables.begin())
             u = r_it->Uniforms().GetDiff(old.Uniforms());
+        else
+            u = r_it->Uniforms();
 
         bool bindVBO = false, bindShader = false, bindTexture = false;
         bool changeBlend = false, changeProjection = false, changeUniforms = false;
