@@ -44,6 +44,9 @@ namespace SORE_Game
 
         gk.AddTask(0, &input);
         gk.AddTask(10, &screen);
+#ifdef linux
+        SORE_FileIO::InitFileNotify(&kernel);
+#endif
         SORE_Resource::Resource::SetRM(&pool);
         renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
