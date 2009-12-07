@@ -1,4 +1,4 @@
-Renderer design:
+B0;115;0cRenderer design:
 GeometryChunk:
   Contains geometry information (vertices [vertex data, colors, texcoords, etc], 
   indices).
@@ -7,7 +7,7 @@ Renderable:
   Is sortable -  contains a key that implements sorting (see below)
 
 GeometryProvider:
-  Object that defines: 
+  Object that defines:
     Projection for the geometry to be rendered
     Callbacks for added, removed, changed objects
 
@@ -37,9 +37,6 @@ Rendering:
 Current issues:
   where to store transformations?
     use a shared_ptr
-        
-      
-
 
 Renderer sorting:
 
@@ -52,3 +49,10 @@ key: 32-bits
 12 bits: depth sorting
 6 bits: shader
 9 bits: texture
+
+alternate: 64-bit key
+3 bits: layer
+2 bits: translucency
+24 bits: depth sorting
+7 bits: shader
+28 bits:material/uniform
