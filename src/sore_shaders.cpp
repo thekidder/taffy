@@ -435,31 +435,6 @@ namespace SORE_Graphics
         return location;
     }
 
-    void GLSLShader::SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2)
-    {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
-            glUniform3fARB(location,v0,v1,v2);
-    }
-
-    void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1,
-                                  GLfloat v2, GLfloat v3)
-    {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
-            glUniform4fARB(location,v0,v1,v2,v3);
-    }
-
     void GLSLShader::SetUniform1i(std::string name, GLuint i0)
     {
         if(!ShadersSupported() || program==0)
@@ -496,7 +471,32 @@ namespace SORE_Graphics
             glUniform2fARB(location,v0,v1);
     }
 
-    void GLSLShader::SetUniformfv(
+    void GLSLShader::SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2)
+    {
+        if(!ShadersSupported() || program==0)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+            return;
+        }
+        GLint location = GetUniformLocation(name);
+        if(location!=-1)
+            glUniform3fARB(location,v0,v1,v2);
+    }
+
+    void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1,
+                                  GLfloat v2, GLfloat v3)
+    {
+        if(!ShadersSupported() || program==0)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+            return;
+        }
+        GLint location = GetUniformLocation(name);
+        if(location!=-1)
+            glUniform4fARB(location,v0,v1,v2,v3);
+    }
+
+    void GLSLShader::SetUniform1fv(
         std::string name, unsigned int count, const GLfloat * values)
     {
         if(!ShadersSupported() || program==0)
@@ -506,6 +506,8 @@ namespace SORE_Graphics
         }
         GLint location = GetUniformLocation(name);
         if(location!=-1)
-            glUniform4fvARB(location,count,values);
+        {
+            glUniform1fvARB(location, count, values);
+        }
     }
 } //end of namespace SORE_Graphics
