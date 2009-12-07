@@ -30,8 +30,8 @@ namespace SORE_Resource
 {
     ResourcePool* Resource::rm = NULL;
 
-    Resource::Resource(std::string file, SORE_FileIO::PackageCache* pc, std::string info,
-                       bool delayedNotify) :
+    Resource::Resource(std::string file, SORE_FileIO::PackageCache* pc,
+                       std::string info, bool delayedNotify) :
         additionalInfo(info), packageCache(pc)
     {
         if(!delayedNotify)
@@ -88,7 +88,8 @@ namespace SORE_Resource
 
     void Resource::OnNotify(std::string file)
     {
-        ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Reloading resource file %s") % file);
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Reloading resource file %s") % file);
         Load();
     }
 
