@@ -105,8 +105,12 @@ void SORE_Graphics::Renderer::Build()
         }
         geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
 
+        UniformState u;
+        if(r_it != allRenderables.begin())
+            u = r_it->Uniforms().GetDiff(old.Uniforms());
+
         bool bindVBO = false, bindShader = false, bindTexture = false;
-        bool changeBlend = false, changeProjection = false;
+        bool changeBlend = false, changeProjection = false, changeUniforms = false;
         if(vboSize == 0)
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
@@ -116,9 +120,12 @@ void SORE_Graphics::Renderer::Build()
         if(r_it == allRenderables.begin() ||
            r_it->GetBlendMode() != old.GetBlendMode())
             changeBlend = true;
+        if(!u.Empty())
+            changeUniforms = true;
         if(r_it == allRenderables.begin() || r_it->GetLayer() != old.GetLayer())
             changeProjection = true;
-        if(bindVBO || bindShader || bindTexture || changeBlend || changeProjection)
+        if(bindVBO || bindShader || bindTexture || changeBlend
+           || changeProjection || changeUniforms)
         {
             if(!batches.empty())
             {
@@ -139,6 +146,8 @@ void SORE_Graphics::Renderer::Build()
             if(bindTexture)
                 batches.back().AddBindTextureCommand(
                     r_it->GetShader(), r_it->GetTexture());
+            if(changeUniforms)
+                batches.back().AddChangeUniformsCommand(r_it->GetShader(), u);
             numTris = 0;
         }
         vboSize += r_it->GetGeometryChunk()->NumIndices();

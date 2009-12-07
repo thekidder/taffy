@@ -35,7 +35,7 @@ namespace SORE_Graphics
     const unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 4;
     const unsigned int RENDER_CMD_BIND_SHADER       = 8;
     const unsigned int RENDER_CMD_BIND_TEXTURE      = 16;
-
+    const unsigned int RENDER_CMD_CHANGE_UNIFORMS   = 32;
 
     class RenderBatch
     {
@@ -50,6 +50,7 @@ namespace SORE_Graphics
         void AddChangeBlendModeCommand(blend_mode mode);
         void AddBindShaderCommand(GLSLShaderPtr shader);
         void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
+        void AddChangeUniformsCommand(GLSLShaderPtr shader, UniformState uniforms);
 
         //returns number of polygons rendered
         unsigned int Render(const ScreenInfo& si);
@@ -66,6 +67,8 @@ namespace SORE_Graphics
         ProjectionInfo projection;
         GLSLShaderPtr shader;
         Texture2DPtr texture;
+
+        UniformState uniforms;
     };
 }
 

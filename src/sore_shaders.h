@@ -69,10 +69,11 @@ namespace SORE_Graphics
         void SetUniform1f(std::string name, GLfloat f0);
         void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
         void SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2);
-        void SetUniform4f(std::string name,
-                          GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+        void SetUniform4f(
+            std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
-        void SetUniform1fv(std::string name, unsigned int count, GLfloat* values);
+        void SetUniformfv(
+            std::string name, unsigned int count, const GLfloat* values);
 
         GLint GetAttributeLocation(std::string name);
 

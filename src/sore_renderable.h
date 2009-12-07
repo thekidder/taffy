@@ -28,6 +28,7 @@
 #include "sore_texture.h"
 #include "sore_screeninfo.h"
 #include "sore_shaders.h"
+#include "sore_uniformstate.h"
 
 namespace SORE_Graphics
 {
@@ -80,6 +81,8 @@ namespace SORE_Graphics
         void SetLayer(geometry_layer l);
         geometry_layer GetLayer() const;
 
+        UniformState& Uniforms();
+
         int GetSortKey() const;
 
         void SetProjection(const ProjectionInfo& pi);
@@ -93,6 +96,7 @@ namespace SORE_Graphics
         TransformationPtr transformation;
         geometry_layer layer;
         blend_mode blending;
+        UniformState uniforms;
 
         float cachedDepth;
 

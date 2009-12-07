@@ -108,6 +108,11 @@ SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const
     return layer;
 }
 
+SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms()
+{
+    return uniforms;
+}
+
 int SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;

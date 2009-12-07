@@ -496,8 +496,8 @@ namespace SORE_Graphics
             glUniform2fARB(location,v0,v1);
     }
 
-    void GLSLShader::SetUniform1fv(std::string name, unsigned int count,
-                                   GLfloat * values)
+    void GLSLShader::SetUniformfv(
+        std::string name, unsigned int count, const GLfloat * values)
     {
         if(!ShadersSupported() || program==0)
         {

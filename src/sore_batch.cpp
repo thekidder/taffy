@@ -63,6 +63,14 @@ void SORE_Graphics::RenderBatch::AddBindTextureCommand(
     commands |= RENDER_CMD_BIND_TEXTURE;
 }
 
+void SORE_Graphics::RenderBatch::AddChangeUniformsCommand(
+    GLSLShaderPtr shader, UniformState uniforms)
+{
+    this->shader = shader;
+    this->uniforms = uniforms;
+    commands |= RENDER_CMD_CHANGE_UNIFORMS;
+}
+
 void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
     ProjectionInfo& projection, const ScreenInfo& si)
 {
@@ -142,6 +150,10 @@ unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
     if(commands & RENDER_CMD_BIND_TEXTURE)
     {
         texture->Bind(shader, "texture", 0);
+    }
+    if(commands & RENDER_CMD_CHANGE_UNIFORMS)
+    {
+        uniforms.Bind(shader);
     }
     if(geometry)
     {
