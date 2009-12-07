@@ -36,9 +36,6 @@ namespace SORE_FileIO
     {
     public:
         LinuxINotifyWatch() {}
-        ~LinuxINotifyWatch()
-        {
-        }
 
         void Pause() {}
         void Resume() {}
