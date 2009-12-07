@@ -53,8 +53,10 @@ namespace SORE_FileIO
                 if(in.GetEventCount()==0) return;
                 in.GetEvent(ie);
 
-                std::string path = ie.GetWatch()->GetPath().empty() ? "" : ie.GetWatch()->GetPath();
-                ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Event path name: %s") % path);
+                std::string path = ie.GetWatch()->GetPath().empty() ?
+                    "" : ie.GetWatch()->GetPath();
+                ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
+                           boost::format("Event path name: %s") % path);
                 std::multimap<std::string, file_callback>::iterator it;
                 it = callbacks.find(path);
                 while(it!=callbacks.end() && it->first == path)
@@ -65,8 +67,9 @@ namespace SORE_FileIO
             }
             catch(InotifyException e)
             {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           boost::format("Caught Inotify exception: %s") % e.GetMessage());
+                ENGINE_LOG(
+                    SORE_Logging::LVL_ERROR,
+                    boost::format("Caught Inotify exception: %s") % e.GetMessage());
             }
         }
 
@@ -99,15 +102,18 @@ namespace SORE_FileIO
             try
             {
                 in.Add(ptr);
-                ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
-                           boost::format("Added Inotify watch on path \"%s\"") % filename);
+                ENGINE_LOG(
+                    SORE_Logging::LVL_DEBUG1,
+                    boost::format("Added Inotify watch on path \"%s\"") % filename);
             }
             catch(InotifyException e)
             {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           boost::format("Caught Inotify exception: %s") % e.GetMessage());
-                ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           boost::format("Watch path: %s") % ptr->GetPath());
+                ENGINE_LOG(
+                    SORE_Logging::LVL_ERROR,
+                    boost::format("Caught Inotify exception: %s") % e.GetMessage());
+                ENGINE_LOG(
+                    SORE_Logging::LVL_ERROR,
+                    boost::format("Watch path: %s") % ptr->GetPath());
             }
         }
         callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
