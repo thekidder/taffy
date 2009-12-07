@@ -26,6 +26,7 @@ set(INOTIFY inotify-cxx.cpp inotify-cxx.h)
 IF(UNIX)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
   sore_timing_linux.cpp ${INOTIFY})
+SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h inotify-cxx.h)
 ENDIF(UNIX)
 IF(WIN32)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
@@ -104,3 +105,4 @@ INSTALL(FILES ${SORE_HEADERS} DESTINATION include)
 INSTALL(FILES ${SORE_NETWORK_HEADERS} DESTINATION include/network)
 INSTALL(FILES ${SORE_GUI_HEADERS} DESTINATION include/gui)
 INSTALL(FILES ${SORE_MATH_HEADERS} DESTINATION include/math)
+INSTALL(FILES ${SORE_PLATFORM_HEADERS} DESTINATION include)

@@ -44,18 +44,17 @@ namespace SORE_Game
 
         gk.AddTask(0, &input);
         gk.AddTask(10, &screen);
-#ifdef linux
-        SORE_FileIO::InitFileNotify(&kernel);
-#endif
+        gk.AddTask(20, &watcher);
+
         SORE_Resource::Resource::SetRM(&pool);
         renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
-        input.AddListener
-            (SORE_Kernel::WINDOWRESIZE,
-             std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-        input.AddListener
-            (SORE_Kernel::RESIZE,
-             std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
+        input.AddListener(
+            SORE_Kernel::WINDOWRESIZE,
+            std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
+        input.AddListener(
+            SORE_Kernel::RESIZE,
+            std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
                           &pool));
     }
 

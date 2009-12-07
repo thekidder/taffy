@@ -33,6 +33,7 @@
 #include <zlib.h>
 
 #include "sore_gamekernel.h"
+#include "sore_task.h"
 
 namespace SORE_FileIO
 {
@@ -99,9 +100,23 @@ namespace SORE_FileIO
 
     typedef boost::function<void (std::string)> file_callback;
 
-    //only implemented on local files now (no packages)
-    void SORE_EXPORT Notify(std::string filename, file_callback callback);
-    bool SORE_EXPORT InitFileNotify(SORE_Kernel::GameKernel* gk);
+    class FilesystemNotifier : public SORE_Kernel::Task
+    {
+    public:
+        virtual ~FilesystemNotifier() {}
+        /*
+          Provides the following behavior:
+          -Notifies if filename has been modified
+          -If filename is deleted, notifies on next creation
+        */
+        virtual void Notify(const std::string& filename, file_callback callback) = 0;
+    };
 }
+
+#ifdef linux
+#include "sore_fileio_linux.h"
+#else
+#endif
+
 
 #endif

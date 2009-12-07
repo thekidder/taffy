@@ -58,7 +58,7 @@ namespace SORE_Game
         SORE_Graphics::Renderer* renderer;
         SORE_Kernel::InputTask input;
         SORE_Resource::ResourcePool pool;
-
+        SORE_FileIO::FilesystemWatcher watcher;
         SORE_Utility::IniSettingsBackend ini;
         SORE_Utility::SettingsManager sm;
 

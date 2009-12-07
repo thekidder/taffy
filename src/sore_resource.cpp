@@ -57,7 +57,7 @@ namespace SORE_Resource
             if(packageCache->Contains(filename.c_str()))
                 filename = packageCache->PackageFilename(filename.c_str());
         }
-        SORE_FileIO::Notify(filename, callback);
+        //SORE_FileIO::Notify(filename, callback);
     }
 
     void Resource::SetFilename(std::string file)
