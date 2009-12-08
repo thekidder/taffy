@@ -98,7 +98,7 @@ namespace SORE_FileIO
         PkgFileBuf* buf;
     };
 
-    typedef boost::function<void (std::string)> file_callback;
+    typedef boost::function<void (const std::string&)> file_callback;
 
     class FilesystemNotifier : public SORE_Kernel::Task
     {
