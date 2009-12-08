@@ -20,7 +20,7 @@
 
 #include <map>
 
-#include "inotify-cxx.h"
+#include "3rdparty/inotify-cxx.h"
 
 namespace SORE_FileIO
 {

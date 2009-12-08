@@ -21,12 +21,10 @@ FIND_PACKAGE(ENet)
 INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-set(INOTIFY inotify-cxx.cpp inotify-cxx.h)
-
 IF(UNIX)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
-  sore_timing_linux.cpp ${INOTIFY})
-SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h inotify-cxx.h)
+  sore_timing_linux.cpp 3rdparty/inotify-cxx.cpp)
+SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h 3rdparty/inotify-cxx.h)
 ENDIF(UNIX)
 IF(WIN32)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
