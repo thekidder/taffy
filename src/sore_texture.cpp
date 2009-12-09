@@ -52,15 +52,15 @@ namespace SORE_Graphics
         bool failed = false;
         GLubyte header[18];
 
-        SORE_FileIO::InFile file(filename, packageCache);
-        if(!file.strm().good() )
+        SORE_FileIO::InFile* file = File(filename);
+        if(!file->strm().good() )
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        boost::format("Could not open texture file '%s'") % filename);
             return;
         }
-        file.strm().read(reinterpret_cast<char*>(header), 18);
-        if(file.strm().gcount() < 18)
+        file->strm().read(reinterpret_cast<char*>(header), 18);
+        if(file->strm().gcount() < 18)
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        "Could not read header...corrupted file?");
@@ -101,8 +101,8 @@ namespace SORE_Graphics
 
         char* filler = new char[int(header[0])];
 
-        file.strm().read(filler, static_cast<int>(header[0]));
-        if(file.strm().gcount()!=static_cast<int>(header[0]))
+        file->strm().read(filler, static_cast<int>(header[0]));
+        if(file->strm().gcount()!=static_cast<int>(header[0]))
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        "Could not read filler...corrupted file?");
@@ -116,14 +116,15 @@ namespace SORE_Graphics
         GLubyte* imgData = new GLubyte[dataSize];
         GLubyte temp;
 
-        file.strm().read(reinterpret_cast<char*>(imgData), dataSize);
-        if(file.strm().gcount()!=dataSize)
+        file->strm().read(reinterpret_cast<char*>(imgData), dataSize);
+        if(file->strm().gcount()!=dataSize)
         {
             delete[] imgData;
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        "Could not read image data...corrupted file?");
             return;
         }
+        delete file;
 
         for(size_t i=0;i<dataSize;i+=(bpp/8))
         {
@@ -215,15 +216,15 @@ namespace SORE_Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    Texture2D::Texture2D(std::string filename, SORE_FileIO::PackageCache* pc)
-        : Resource(filename, pc), handle(0)
+    Texture2D::Texture2D(const SORE_Resource::WatchedFileArray& wfa)
+        : Resource(wfa), handle(0)
     {
         Load();
     }
 
     Texture2D::Texture2D(const unsigned char* data, GLint internalFormat,
                          GLenum format, unsigned int width, unsigned int height)
-        : Resource(), handle(0)
+        : Resource(SORE_Resource::WatchedFileArray()), handle(0)
     {
         LoadFromData(data, internalFormat, format, width, height);
     }
@@ -236,6 +237,11 @@ namespace SORE_Graphics
     bool Texture2D::operator==(const Texture2D& o) const
     {
         return handle == o.handle;
+    }
+
+    std::string Texture2D::ProcessFilename(const std::string& file)
+    {
+        return file;
     }
 
     void Texture2D::Bind(

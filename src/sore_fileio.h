@@ -94,6 +94,10 @@ namespace SORE_FileIO
         std::istream& strm();
         size_t size() const;
     private:
+        //a stream is non-copyable
+        /*InFile(const InFile& o);
+          InFile& operator=(const InFile& o);*/
+
         std::istream* in;
         PkgFileBuf* buf;
     };

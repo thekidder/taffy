@@ -96,8 +96,8 @@ namespace SORE_Graphics
         ok = true;
     }
 
-    GLSLShader::GLSLShader(std::string shaderFile, SORE_FileIO::PackageCache* pc) :
-        Resource(shaderFile, pc)
+    GLSLShader::GLSLShader(const SORE_Resource::WatchedFileArray& wfa) :
+        Resource(wfa)
     {
         Load();
     }
@@ -111,8 +111,10 @@ namespace SORE_Graphics
         if(!ShadersSupported())
             return;
         Init();
+        SORE_FileIO::InFile* in = File();
         std::map<std::string, std::map<std::string, std::string> > list =
-            SORE_Utility::ParseIniFile(GetFilename().c_str(), packageCache);
+            SORE_Utility::ParseIniFile(*in);
+        delete in;
 
         std::map<std::string, std::map<std::string, std::string> >::iterator i;
         std::map<std::string, std::string>::iterator i2;
@@ -126,12 +128,12 @@ namespace SORE_Graphics
                 std::string name = i2->first;
                 if(section=="Vertex")
                 {
-                    AddDependentFile(name);
+                    //AddDependentFile(name);
                     AddVertexFile(name.c_str());
                 }
                 else if(section=="Fragment")
                 {
-                    AddDependentFile(name);
+                    //AddDependentFile(name);
                     AddFragmentFile(name.c_str());
                 }
                 else
@@ -306,16 +308,17 @@ namespace SORE_Graphics
 
     char* GLSLShader::LoadFile(const char* filename)
     {
-        SORE_FileIO::InFile file(filename, packageCache);
-        if(!file.strm().good())
+        SORE_FileIO::InFile* file = File(filename);
+        if(!file->strm().good())
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR,
                        boost::format("Could not load shader filename: %s") % filename);
             return NULL;
         }
-        size_t size = file.size();
+        size_t size = file->size();
         char* src = new char[size+1];
-        file.strm().read(src, size);
+        file->strm().read(src, size);
+        delete file;
         src[size] = '\0';
         return src;
     }
@@ -509,5 +512,10 @@ namespace SORE_Graphics
         {
             glUniform1fvARB(location, count, values);
         }
+    }
+
+    std::string GLSLShader::ProcessFilename(const std::string& filename)
+    {
+        return filename;
     }
 } //end of namespace SORE_Graphics

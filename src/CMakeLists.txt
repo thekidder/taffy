@@ -24,7 +24,8 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 IF(UNIX)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
   sore_timing_linux.cpp 3rdparty/inotify-cxx.cpp)
-SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h 3rdparty/inotify-cxx.h)
+SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h)
+SET(SORE_3RDPARTY_HEADERS 3rdparty/inotify-cxx.h)
 ENDIF(UNIX)
 IF(WIN32)
 SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
@@ -72,12 +73,12 @@ set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_sprite.h sore_task.h sore_text.h
   sore_texture.h sore_timing.h sore_uniformstate.h sore_util.h
-  sore_vbo.h sore_vertexarray.h ${SORE_GUI_HEADERS}
-  ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS} ${CMAKE_VERSION_OUT}
-  ${CMAKE_VERSION_IN})
+  sore_vbo.h sore_vertexarray.h) 
 
-ADD_LIBRARY(sore_lib SHARED ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} 
-  ${SORE_HEADERS})
+ADD_LIBRARY(sore_lib SHARED
+  ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS}
+  ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS}
+  ${SORE_PLATFORM_HEADERS} ${SORE_3RDPARTY_HEADERS})
 
 SET_TARGET_PROPERTIES(
 sore_lib
@@ -104,3 +105,4 @@ INSTALL(FILES ${SORE_NETWORK_HEADERS} DESTINATION include/network)
 INSTALL(FILES ${SORE_GUI_HEADERS} DESTINATION include/gui)
 INSTALL(FILES ${SORE_MATH_HEADERS} DESTINATION include/math)
 INSTALL(FILES ${SORE_PLATFORM_HEADERS} DESTINATION include)
+INSTALL(FILES ${SORE_3RDPARTY_HEADERS} DESTINATION include/3rdparty)

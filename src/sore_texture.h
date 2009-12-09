@@ -30,7 +30,7 @@ namespace SORE_Graphics
     class SORE_EXPORT Texture2D : public SORE_Resource::Resource
     {
     public:
-        Texture2D(std::string filename, SORE_FileIO::PackageCache* pc = NULL);
+        Texture2D(const SORE_Resource::WatchedFileArray& wfa);
         Texture2D(const unsigned char* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
         void Bind(
@@ -41,18 +41,19 @@ namespace SORE_Graphics
 
         void SaveTGA(const char* filename);
         bool GLContextDependent() const {return true;}
-
         unsigned int GetHandle() const;
 
         bool operator<(const Texture2D& o) const;
         bool operator==(const Texture2D& o) const;
+
+        static std::string ProcessFilename(const std::string& file);
     protected:
         void Load();
         void LoadTGA(const char* filename);
         void LoadFromData(const unsigned char* data, GLint internalFormat,
                           GLenum format, unsigned int width, unsigned int height);
         void Unload();
-        virtual std::string ProcessFilename(std::string file) {return file;}
+
         GLuint handle;
     private:
         unsigned int w, h;

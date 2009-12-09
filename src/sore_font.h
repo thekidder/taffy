@@ -54,10 +54,10 @@ namespace SORE_Font
     class SORE_EXPORT FontPaths
     {
     public:
-        static void InitPaths();
-        static std::string GetFontPath(std::string name,
-                                       SORE_FileIO::PackageCache* pc = NULL);
+        static std::string GetFontPath(const std::string& name);
     private:
+        static void InitPaths();
+
         static std::vector<std::string> fontPaths;
     };
 
@@ -78,7 +78,7 @@ namespace SORE_Font
     class SORE_EXPORT Font : public SORE_Resource::Resource
     {
     public:
-        Font(std::string filename, SORE_FileIO::PackageCache* pc);
+        Font(const SORE_Resource::WatchedFileArray& wfa);
         ~Font();
 
         const char* Type() {return "Font";}
@@ -86,9 +86,11 @@ namespace SORE_Font
 
         void LoadFace(unsigned int height);
         const CharInfo& GetCharacter(unsigned int height, char c);
+
+        static std::string ProcessFilename(const std::string& filename);
     protected:
         //This loads our face, but no specific characters
-        void Load();
+        virtual void Load();
     private:
         Font(const Font& o);
         Font& operator=(const Font& o);
@@ -99,8 +101,7 @@ namespace SORE_Font
 
         //(height, CharInfo[128])
         std::map<unsigned int, CharInfo*> characters;
-        std::map<unsigned int, SORE_Graphics::Texture2DPtr >
-            textures;
+        std::map<unsigned int, SORE_Graphics::Texture2DPtr> textures;
         FT_Library library;
         FT_Face face;
         FT_Byte* fontInfo;

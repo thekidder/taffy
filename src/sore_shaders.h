@@ -47,7 +47,7 @@ namespace SORE_Graphics
         GLSLShader(const char* vertex, const char* fragment,
                    SORE_FileIO::PackageCache* pc = NULL);
         //loads shader as a INI file specifying vertex/shader files
-        GLSLShader(std::string shaderFile, SORE_FileIO::PackageCache* pc = NULL);
+        GLSLShader(const SORE_Resource::WatchedFileArray& wfa);
         ~GLSLShader();
 
         int  AddVertexFile(const char* vertex);
@@ -80,13 +80,15 @@ namespace SORE_Graphics
         //for sorting
         bool operator<(const GLSLShader& o) const;
         bool operator==(const GLSLShader& o) const;
+
+        static std::string ProcessFilename(const std::string& filename);
     private:
         char* LoadFile(const char* filename);
         void Load(); //load from *.shad file
         int  Init();
         int  AddShader(GLuint type, const char* src);
         GLint GetUniformLocation(std::string name);
-        virtual std::string ProcessFilename(std::string file) {return file;}
+
         std::vector<GLuint> vertexShaders, fragmentShaders;
         GLuint program;
         bool ok,linked;

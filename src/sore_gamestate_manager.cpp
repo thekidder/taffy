@@ -46,7 +46,6 @@ namespace SORE_Game
         gk.AddTask(10, &screen);
         gk.AddTask(20, &watcher);
 
-        SORE_Resource::Resource::SetRM(&pool);
         renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
         input.AddListener(

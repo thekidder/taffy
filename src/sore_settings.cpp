@@ -189,7 +189,9 @@ namespace SORE_Utility
 
     void IniSettingsBackend::ParseFile()
     {
-        std::map<std::string, std::map<std::string, std::string> > list = SORE_Utility::ParseIniFile(file.c_str());
+        SORE_FileIO::InFile ifile(file.c_str());
+        std::map<std::string, std::map<std::string, std::string> > list =
+            SORE_Utility::ParseIniFile(ifile);
         std::map<std::string, settingsList>::iterator it;
         std::map<std::string, Datum>::iterator it2;
 

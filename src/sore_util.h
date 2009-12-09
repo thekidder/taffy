@@ -31,18 +31,21 @@
 
 namespace SORE_Utility
 {
-    typedef SORE_EXPORT std::map<std::string, std::map<std::string, std::string> > settings_map;
+    typedef SORE_EXPORT std::map<std::string, std::map<std::string, std::string> >
+    settings_map;
 
-    int          SORE_EXPORT GetFileExt(const char* filename, char* ext); //returns 0 on success
+    //returns 0 on success
+    int          SORE_EXPORT GetFileExt(const char* filename, char* ext);
 
     double       SORE_EXPORT getRandomMinMax( double dMin, double fMax );
     float        SORE_EXPORT getRandomMinMax( float fMin, float fMax );
     int          SORE_EXPORT getRandomMinMax(int min, int max);
 
-    settings_map SORE_EXPORT ParseIniFile(const char* file, SORE_FileIO::PackageCache* pc = NULL);
+    settings_map SORE_EXPORT ParseIniFile(SORE_FileIO::InFile& file);
     //trims a string of whitespace: ' ', '\r', and '\t'
     std::string  SORE_EXPORT TrimString(std::string toTrim);
-    //breaks a string into a vector of strings delimited by , { and }. Each string is trimmed of whitespace.
+    //breaks a string into a vector of strings delimited by , { and }.
+    //Each string is trimmed of whitespace.
     std::vector<std::string> SORE_EXPORT ParseList(std::string list);
 }
 

@@ -77,26 +77,26 @@ namespace SORE_Utility
         return 0;
     }
 
-    SORE_Utility::settings_map ParseIniFile(const char* file, SORE_FileIO::PackageCache* pc)
+    SORE_Utility::settings_map ParseIniFile(SORE_FileIO::InFile& file)
     {
-        SORE_FileIO::InFile settingsFile(file, pc);
         std::map<std::string, std::map<std::string, std::string> > list;
         size_t len;
-        if(!settingsFile.strm().good())
+        if(!file.strm().good())
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Could not load INI file %s") % file);
+            ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                       boost::format("Could not load INI file"));
             return list;
         }
         else
         {
             const static unsigned int max_len = 128;
             char dataStr[max_len];
-            settingsFile.strm().getline(dataStr, max_len);
-            len = settingsFile.strm().gcount();
+            file.strm().getline(dataStr, max_len);
+            len = file.strm().gcount();
 
             std::string currSection;
 
-            while(len>0 || !settingsFile.strm().eof())
+            while(len>0 || !file.strm().eof())
             {
                 std::string name, value, oldValue;
                 std::string setting = dataStr;
@@ -109,7 +109,8 @@ namespace SORE_Utility
                     value=setting.substr(eqPos+1);
                     name = TrimString(name);
                     value = TrimString(value);
-                    list[currSection].insert(std::pair<std::string, std::string>(name, value));
+                    list[currSection].insert(
+                        std::pair<std::string, std::string>(name, value));
                 }
                 else
                 {
@@ -117,19 +118,23 @@ namespace SORE_Utility
                     //this describes a section heading
                     if(setting[0]=='[' && setting.find(']')!=std::string::npos)
                     {
-                        currSection = TrimString(setting.substr(1, setting.find(']')-1));
+                        currSection = TrimString(
+                            setting.substr(1, setting.find(']')-1));
                         list.insert(
-                            std::make_pair(currSection, std::map<std::string, std::string>() ));
+                            std::make_pair(
+                                currSection, std::map<std::string, std::string>() ));
                     }
-                    else if(!TrimString(setting).empty()) //treat this as a valueless setting
+                    //treat this as a valueless setting
+                    else if(!TrimString(setting).empty())
                     {
                         name = TrimString(setting);
                         value = "";
-                        list[currSection].insert(std::pair<std::string, std::string>(name, value));
+                        list[currSection].insert(
+                            std::pair<std::string, std::string>(name, value));
                     }
                 }
-                settingsFile.strm().getline(dataStr, max_len);
-                len = settingsFile.strm().gcount();
+                file.strm().getline(dataStr, max_len);
+                len = file.strm().gcount();
             }
         }
         return list;
