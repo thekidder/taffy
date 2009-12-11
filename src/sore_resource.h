@@ -35,6 +35,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/utility.hpp>
 
 #include "sore_input.h"
 #include "sore_fileio.h"
@@ -50,7 +51,7 @@ namespace SORE_Resource
     typedef boost::shared_ptr<WatchedFileArray> WatchedFileArrayPtr;
 }
 
-class SORE_EXPORT SORE_Resource::WatchedFileArray
+class SORE_EXPORT SORE_Resource::WatchedFileArray : boost::noncopyable
 {
 public:
     WatchedFileArray(const std::string& filename,
@@ -58,7 +59,6 @@ public:
                      SORE_FileIO::FilesystemNotifier* fn = NULL);
     WatchedFileArray(SORE_FileIO::PackageCache* pc = NULL,
                      SORE_FileIO::FilesystemNotifier* fn = NULL);
-
     ~WatchedFileArray();
 
     //Create new file and return it. The caller has the responsibility
@@ -68,9 +68,6 @@ public:
 
     void SetNotifyFunction(SORE_FileIO::file_callback notifyFunction);
 private:
-    WatchedFileArray(const WatchedFileArray& wfa);
-    WatchedFileArray& operator=(const WatchedFileArray& wfa);
-
     void InternalNotify(const std::string& file);
     void AddFile(const std::string& file);
     void RemoveWatches();

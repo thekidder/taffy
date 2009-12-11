@@ -20,11 +20,13 @@
 
 #include <map>
 
+#include <boost/utility.hpp>
+
 #include "3rdparty/inotify-cxx.h"
 
 namespace SORE_FileIO
 {
-    class LinuxInotifyWatcher : public FilesystemNotifier
+    class LinuxInotifyWatcher : public FilesystemNotifier, boost::noncopyable
     {
     public:
         LinuxInotifyWatcher();
@@ -39,9 +41,6 @@ namespace SORE_FileIO
         virtual void Notify(const std::string& filename, file_callback callback);
         virtual void Remove(const std::string& filename, file_callback callback);
     private:
-        LinuxInotifyWatcher& operator=(const LinuxInotifyWatcher& o);
-        LinuxInotifyWatcher(const LinuxInotifyWatcher& o);
-
         void RemoveWatch(InotifyWatch* iw);
 
         std::map<std::string, file_callback> callbacks;

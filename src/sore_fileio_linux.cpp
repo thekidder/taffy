@@ -107,7 +107,7 @@ void SORE_FileIO::LinuxInotifyWatcher::RemoveWatch(InotifyWatch* iw)
 void SORE_FileIO::LinuxInotifyWatcher::Notify(
     const std::string& filename, file_callback callback)
 {
-    std::string file = filename;//.substr(0, filename.rfind("/"));
+    std::string file = filename.substr(0, filename.rfind("/"));
     if(file.empty())
         file = "./";
     if(callbacks.find(file)==callbacks.end())

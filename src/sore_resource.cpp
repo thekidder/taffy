@@ -102,6 +102,7 @@ void SORE_Resource::WatchedFileArray::RemoveWatches()
         std::map<std::string, std::string>::iterator it;
         for(it = files.begin(); it != files.end(); ++it)
         {
+            ENGINE_LOG(SORE_Logging::LVL_INFO, "removing " + it->first);
             //TODO: fix |  :(
             //          v
             notifier->Remove(it->second,
@@ -119,7 +120,6 @@ SORE_Resource::Resource::Resource(WatchedFileArrayPtr wfa)
 
 SORE_Resource::Resource::~Resource()
 {
-    ENGINE_LOG(SORE_Logging::LVL_INFO, "removing " + GetFilename());
 }
 
 std::string SORE_Resource::Resource::GetFilename() const

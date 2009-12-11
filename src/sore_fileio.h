@@ -29,6 +29,7 @@
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 #include <zlib.h>
 
@@ -85,7 +86,7 @@ namespace SORE_FileIO
         std::map<std::string, std::ifstream*> openPackages;
     };
 
-    class SORE_EXPORT InFile
+    class SORE_EXPORT InFile : boost::noncopyable
     {
     public:
         InFile(const char* filename, PackageCache* cache = NULL);
@@ -94,10 +95,6 @@ namespace SORE_FileIO
         std::istream& strm();
         size_t size() const;
     private:
-        //a stream is non-copyable
-        /*InFile(const InFile& o);
-          InFile& operator=(const InFile& o);*/
-
         std::istream* in;
         PkgFileBuf* buf;
     };
