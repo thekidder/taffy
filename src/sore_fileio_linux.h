@@ -37,13 +37,14 @@ namespace SORE_FileIO
         const char* GetName() const { return "Linux Inotify watcher task"; }
 
         virtual void Notify(const std::string& filename, file_callback callback);
+        virtual void Remove(const std::string& filename, file_callback callback);
     private:
         LinuxInotifyWatcher& operator=(const LinuxInotifyWatcher& o);
         LinuxInotifyWatcher(const LinuxInotifyWatcher& o);
 
         void RemoveWatch(InotifyWatch* iw);
 
-        std::multimap<std::string, file_callback> callbacks;
+        std::map<std::string, file_callback> callbacks;
         std::vector<InotifyWatch*> watches;
 
         Inotify in;

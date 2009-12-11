@@ -30,7 +30,7 @@ namespace SORE_Graphics
     class SORE_EXPORT Texture2D : public SORE_Resource::Resource
     {
     public:
-        Texture2D(const SORE_Resource::WatchedFileArray& wfa);
+        Texture2D(SORE_Resource::WatchedFileArrayPtr wfa);
         Texture2D(const unsigned char* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
         void Bind(

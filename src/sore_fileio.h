@@ -114,6 +114,7 @@ namespace SORE_FileIO
           -If filename is deleted, notifies on next creation
         */
         virtual void Notify(const std::string& filename, file_callback callback) = 0;
+        virtual void Remove(const std::string& filename, file_callback callback) = 0;
     };
 }
 

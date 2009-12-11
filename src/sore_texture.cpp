@@ -216,7 +216,7 @@ namespace SORE_Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    Texture2D::Texture2D(const SORE_Resource::WatchedFileArray& wfa)
+    Texture2D::Texture2D(SORE_Resource::WatchedFileArrayPtr wfa)
         : Resource(wfa), handle(0)
     {
         Load();
@@ -224,7 +224,7 @@ namespace SORE_Graphics
 
     Texture2D::Texture2D(const unsigned char* data, GLint internalFormat,
                          GLenum format, unsigned int width, unsigned int height)
-        : Resource(SORE_Resource::WatchedFileArray()), handle(0)
+        : Resource(SORE_Resource::WatchedFileArrayPtr()), handle(0)
     {
         LoadFromData(data, internalFormat, format, width, height);
     }

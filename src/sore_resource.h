@@ -47,6 +47,7 @@ namespace SORE_Resource
     class SORE_EXPORT ResourcePool;
 
     typedef boost::shared_ptr<Resource> ResourcePtr;
+    typedef boost::shared_ptr<WatchedFileArray> WatchedFileArrayPtr;
 }
 
 class SORE_EXPORT SORE_Resource::WatchedFileArray
@@ -58,6 +59,8 @@ public:
     WatchedFileArray(SORE_FileIO::PackageCache* pc = NULL,
                      SORE_FileIO::FilesystemNotifier* fn = NULL);
 
+    ~WatchedFileArray();
+
     //Create new file and return it. The caller has the responsibility
     //to delete the file when finished
     SORE_FileIO::InFile* File(const std::string& name = "");
@@ -65,12 +68,12 @@ public:
 
     void SetNotifyFunction(SORE_FileIO::file_callback notifyFunction);
 private:
-    //WatchedFileArray(const WatchedFileArray& wfa);
-    //WatchedFileArray& operator=(const WatchedFileArray& wfa);
+    WatchedFileArray(const WatchedFileArray& wfa);
+    WatchedFileArray& operator=(const WatchedFileArray& wfa);
 
     void InternalNotify(const std::string& file);
-
     void AddFile(const std::string& file);
+    void RemoveWatches();
 
     //pair<filename, processed_filename>
     std::map<std::string, std::string> files;
@@ -85,7 +88,7 @@ private:
 class SORE_EXPORT SORE_Resource::Resource
 {
 public:
-    Resource(const WatchedFileArray& wfa);
+    Resource(WatchedFileArrayPtr wfa);
     virtual ~Resource();
     virtual const char* Type() const {return "generic resource";}
 
@@ -104,7 +107,7 @@ protected:
 private:
     void OnNotify(const std::string& file);
 
-    WatchedFileArray watchedFiles;
+    WatchedFileArrayPtr watchedFiles;
 };
 
 /*
@@ -165,7 +168,7 @@ boost::shared_ptr<T> SORE_Resource::ResourcePool::InsertResource(
     const std::string& filename, std::size_t hash)
 {
     std::string file = T::ProcessFilename(filename);
-    WatchedFileArray wfa(file, packageCache, notifier);
+    WatchedFileArrayPtr wfa(new WatchedFileArray(file, packageCache, notifier));
     ResourcePtr r(new T(wfa));
     r->SetResourcePool(this);
     boost::weak_ptr<Resource> temp = r;

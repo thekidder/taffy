@@ -37,7 +37,7 @@ namespace SORE_Game
                                        SORE_FileIO::PackageCache* pc,
                                        std::string windowTitle,
                                        std::string settingsFile)
-        : kernel(gk), pool(pc), ini(settingsFile), sm(&ini),
+        : kernel(gk), pool(pc, &watcher), ini(settingsFile), sm(&ini),
           screen(screenInfo, input, windowTitle, &sm), popFlag(false)
     {
         curr = gk.end();

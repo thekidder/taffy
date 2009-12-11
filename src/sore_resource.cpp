@@ -42,6 +42,11 @@ SORE_Resource::WatchedFileArray::WatchedFileArray(
 {
 }
 
+SORE_Resource::WatchedFileArray::~WatchedFileArray()
+{
+    RemoveWatches();
+}
+
 SORE_FileIO::InFile* SORE_Resource::WatchedFileArray::File(const std::string& name)
 {
     std::string file;
@@ -86,27 +91,49 @@ void SORE_Resource::WatchedFileArray::AddFile(const std::string& file)
 
 void SORE_Resource::WatchedFileArray::InternalNotify(const std::string& file)
 {
-    callback(file);
+    if(callback)
+        callback(file);
 }
 
-SORE_Resource::Resource::Resource(const WatchedFileArray& wfa)
+void SORE_Resource::WatchedFileArray::RemoveWatches()
+{
+    if(notifier)
+    {
+        std::map<std::string, std::string>::iterator it;
+        for(it = files.begin(); it != files.end(); ++it)
+        {
+            //TODO: fix |  :(
+            //          v
+            notifier->Remove(it->second,
+                             boost::bind(&WatchedFileArray::InternalNotify, this, _1));
+        }
+    }
+}
+
+SORE_Resource::Resource::Resource(WatchedFileArrayPtr wfa)
     : pool(0), watchedFiles(wfa)
 {
-    watchedFiles.SetNotifyFunction(boost::bind(&Resource::OnNotify, this, _1));
+    if(watchedFiles)
+        watchedFiles->SetNotifyFunction(boost::bind(&Resource::OnNotify, this, _1));
 }
 
 SORE_Resource::Resource::~Resource()
 {
+    ENGINE_LOG(SORE_Logging::LVL_INFO, "removing " + GetFilename());
 }
 
 std::string SORE_Resource::Resource::GetFilename() const
 {
-    return watchedFiles.GetFilename();
+    if(watchedFiles)
+        return watchedFiles->GetFilename();
+    else
+        return std::string("Not loaded from file");
 }
 
 SORE_FileIO::InFile* SORE_Resource::Resource::File(const std::string& name)
 {
-    return watchedFiles.File(name);
+    assert(watchedFiles);
+    return watchedFiles->File(name);
 }
 
 void SORE_Resource::Resource::SetResourcePool(ResourcePool* rp)

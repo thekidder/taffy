@@ -47,7 +47,7 @@ namespace SORE_Graphics
         GLSLShader(const char* vertex, const char* fragment,
                    SORE_FileIO::PackageCache* pc = NULL);
         //loads shader as a INI file specifying vertex/shader files
-        GLSLShader(const SORE_Resource::WatchedFileArray& wfa);
+        GLSLShader(SORE_Resource::WatchedFileArrayPtr wfa);
         ~GLSLShader();
 
         int  AddVertexFile(const char* vertex);

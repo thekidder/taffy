@@ -48,7 +48,7 @@ inline static int next_p2 (int a )
     return rval;
 }
 
-SORE_Font::Font::Font(const SORE_Resource::WatchedFileArray& wfa)
+SORE_Font::Font::Font(SORE_Resource::WatchedFileArrayPtr wfa)
     : Resource(wfa)
 {
     Load();

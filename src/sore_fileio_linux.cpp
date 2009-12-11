@@ -34,11 +34,6 @@ SORE_FileIO::LinuxInotifyWatcher::LinuxInotifyWatcher()
 
 SORE_FileIO::LinuxInotifyWatcher::~LinuxInotifyWatcher()
 {
-    std::vector<InotifyWatch*>::iterator it;
-    for(it = watches.begin(); it != watches.end(); ++it)
-    {
-        RemoveWatch(*it);
-    }
 }
 
 void SORE_FileIO::LinuxInotifyWatcher::Pause()
@@ -60,21 +55,20 @@ void SORE_FileIO::LinuxInotifyWatcher::Frame(int elapsedTime)
         if(in.GetEventCount()==0) return;
         in.GetEvent(ie);
         std::string types;
-        std::string path = ie.GetWatch()->GetPath().empty() ?
-            "" : ie.GetWatch()->GetPath();
+        std::string path = ie.GetWatch()->GetPath();
         ie.DumpTypes(types);
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
                    boost::format("Event path name: %s; event %s")
                    % path % types);
         if(ie.IsType(IN_DELETE_SELF))
         {
-            std::string path = ie.GetWatch()->GetPath();
+            /*std::string path = ie.GetWatch()->GetPath();
             std::string filename = path.substr(0, path.rfind('/')+1);
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
-                       "Adding watch on " + filename);
             InotifyWatch* iw = new InotifyWatch(filename, IN_CREATE);
             watches.push_back(iw);
             in.Add(iw);
+            ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
+            "Adding watch on " + filename);*/
             return;
         }
         if(ie.IsType(IN_IGNORED))
@@ -84,12 +78,10 @@ void SORE_FileIO::LinuxInotifyWatcher::Frame(int elapsedTime)
             RemoveWatch(ie.GetWatch());
             return;
         }
-        std::multimap<std::string, file_callback>::iterator it;
-        it = callbacks.find(path);
-        while(it!=callbacks.end() && it->first == path)
+        if(callbacks.find(path) != callbacks.end())
         {
-            it->second(it->first);
-            it++;
+            SORE_FileIO::file_callback c = callbacks.find(path)->second;
+            c(path);
         }
     }
     catch(InotifyException e)
@@ -115,10 +107,14 @@ void SORE_FileIO::LinuxInotifyWatcher::RemoveWatch(InotifyWatch* iw)
 void SORE_FileIO::LinuxInotifyWatcher::Notify(
     const std::string& filename, file_callback callback)
 {
-    if(callbacks.find(filename)==callbacks.end())
+    std::string file = filename;//.substr(0, filename.rfind("/"));
+    if(file.empty())
+        file = "./";
+    if(callbacks.find(file)==callbacks.end())
     {
         InotifyWatch* iw = new InotifyWatch(
-            filename, IN_MODIFY | IN_MOVE | IN_MOVE_SELF | IN_DELETE_SELF);
+            file, IN_MODIFY | IN_MOVE | IN_MOVE_SELF | IN_DELETE_SELF
+            | IN_CREATE | IN_DELETE);
         watches.push_back(iw);
         try
         {
@@ -137,5 +133,20 @@ void SORE_FileIO::LinuxInotifyWatcher::Notify(
                 boost::format("Watch path: %s") % iw->GetPath());
         }
     }
-    callbacks.insert(std::pair<std::string, file_callback >(filename, callback));
+    callbacks.insert(std::make_pair(file, callback));
+}
+
+void SORE_FileIO::LinuxInotifyWatcher::Remove(
+    const std::string& filename, file_callback callback)
+{
+    /*std::map<std::string, file_callback>::iterator it;
+    for(it = callbacks.begin(); it != callbacks.end(); ++it)
+    {
+        if(filename == it->first && callback == it->second)
+        {
+            callbacks.erase(it);
+            break;
+        }
+    }
+    */
 }

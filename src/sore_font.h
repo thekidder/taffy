@@ -78,7 +78,7 @@ namespace SORE_Font
     class SORE_EXPORT Font : public SORE_Resource::Resource
     {
     public:
-        Font(const SORE_Resource::WatchedFileArray& wfa);
+        Font(SORE_Resource::WatchedFileArrayPtr wfa);
         ~Font();
 
         const char* Type() {return "Font";}

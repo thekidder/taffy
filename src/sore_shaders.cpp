@@ -82,7 +82,8 @@ namespace SORE_Graphics
 
     GLSLShader::GLSLShader(const char* vertex, const char* fragment,
                            SORE_FileIO::PackageCache* pc)
-        : Resource(pc)
+        : Resource(SORE_Resource::WatchedFileArrayPtr(
+                       new SORE_Resource::WatchedFileArray(pc)))
     {
         ok = false;
         linked = false;
@@ -96,7 +97,7 @@ namespace SORE_Graphics
         ok = true;
     }
 
-    GLSLShader::GLSLShader(const SORE_Resource::WatchedFileArray& wfa) :
+    GLSLShader::GLSLShader(SORE_Resource::WatchedFileArrayPtr wfa) :
         Resource(wfa)
     {
         Load();
