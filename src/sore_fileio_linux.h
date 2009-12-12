@@ -44,7 +44,7 @@ namespace SORE_FileIO
         virtual void Remove(notify_handle handle);
     private:
         void AddWatch(const std::string& filename,
-                      int32_t mask = IN_MODIFY | IN_MOVE | IN_DELETE_SELF);
+                      int32_t mask = IN_MODIFY | IN_MOVE_SELF | IN_DELETE_SELF);
         void AddParentWatch(const std::string& filename);
         void RemoveWatch(InotifyWatch* iw);
 
