@@ -34,6 +34,7 @@ inline int next_p2 (int a )
 SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _pool)
     : pool(_pool)
 {
+    glEnable(GL_BLEND);
     PushState();
 }
 
