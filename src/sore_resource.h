@@ -68,12 +68,16 @@ public:
 
     void SetNotifyFunction(SORE_FileIO::file_callback notifyFunction);
 private:
+    struct WatchInfo
+    {
+        std::string realPath;
+        SORE_FileIO::notify_handle watch;
+    };
     void InternalNotify(const std::string& file);
     void AddFile(const std::string& file);
     void RemoveWatches();
 
-    //pair<filename, processed_filename>
-    std::map<std::string, std::string> files;
+    std::map<std::string, WatchInfo> files;
     std::string defaultFile;
 
     SORE_FileIO::file_callback callback;

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <list>
 #include <map>
 
 #include <boost/utility.hpp>
@@ -38,12 +39,23 @@ namespace SORE_FileIO
 
         const char* GetName() const { return "Linux Inotify watcher task"; }
 
-        virtual void Notify(const std::string& filename, file_callback callback);
-        virtual void Remove(const std::string& filename, file_callback callback);
+        virtual notify_handle Notify(
+            const std::string& filename, file_callback callback);
+        virtual void Remove(notify_handle handle);
     private:
+        void AddWatch(const std::string& filename,
+                      int32_t mask = IN_MODIFY | IN_MOVE | IN_DELETE_SELF);
+        void AddParentWatch(const std::string& filename);
         void RemoveWatch(InotifyWatch* iw);
 
-        std::map<std::string, file_callback> callbacks;
+        bool ParentWatchExists(const std::string& filename);
+        void PerformCallback(const std::string& path);
+
+        struct watch_info
+        {
+            std::list<file_callback> callbacks;
+        };
+        std::map<std::string, watch_info> watchedFiles;
         std::vector<InotifyWatch*> watches;
 
         Inotify in;

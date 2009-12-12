@@ -54,7 +54,7 @@ SORE_FileIO::InFile* SORE_Resource::WatchedFileArray::File(const std::string& na
         file = defaultFile;
     else
         file = name;
-    std::map<std::string, std::string>::iterator it = files.find(file);
+    std::map<std::string, WatchInfo>::iterator it = files.find(file);
     if(it == files.end())
         AddFile(file);
     it = files.find(file);
@@ -64,7 +64,7 @@ SORE_FileIO::InFile* SORE_Resource::WatchedFileArray::File(const std::string& na
 
 std::string SORE_Resource::WatchedFileArray::GetFilename() const
 {
-    std::map<std::string, std::string>::const_iterator it = files.find(defaultFile);
+    std::map<std::string, WatchInfo>::const_iterator it = files.find(defaultFile);
     if(it == files.end())
         return std::string("");
     return it->first;
@@ -81,10 +81,12 @@ void SORE_Resource::WatchedFileArray::AddFile(const std::string& file)
     std::string realFile = file;
     if(fileCache && fileCache->Contains(file.c_str()))
         realFile = fileCache->PackageFilename(file.c_str());
+    SORE_FileIO::notify_handle hnd;
     if(notifier)
-        notifier->Notify(realFile,
-                         boost::bind(&WatchedFileArray::InternalNotify, this, _1));
-    files.insert(std::make_pair(file, realFile));
+        hnd = notifier->Notify(
+            realFile, boost::bind(&WatchedFileArray::InternalNotify, this, _1));
+    WatchInfo wi = {realFile, hnd};
+    files.insert(std::make_pair(file, wi));
     if(defaultFile.empty())
         defaultFile = file;
 }
@@ -99,14 +101,10 @@ void SORE_Resource::WatchedFileArray::RemoveWatches()
 {
     if(notifier)
     {
-        std::map<std::string, std::string>::iterator it;
+        std::map<std::string, WatchInfo>::iterator it;
         for(it = files.begin(); it != files.end(); ++it)
         {
-            ENGINE_LOG(SORE_Logging::LVL_INFO, "removing " + it->first);
-            //TODO: fix |  :(
-            //          v
-            notifier->Remove(it->second,
-                             boost::bind(&WatchedFileArray::InternalNotify, this, _1));
+            notifier->Remove(it->second.watch);
         }
     }
 }

@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <iosfwd>
 #include <limits>
+#include <list>
 
 #include <boost/function.hpp>
 #include <boost/iostreams/concepts.hpp>
@@ -101,6 +102,25 @@ namespace SORE_FileIO
 
     typedef boost::function<void (const std::string&)> file_callback;
 
+#ifdef linux
+    class LinuxInotifyWatcher;
+
+    struct notify_handle
+    {
+        notify_handle() {}
+        notify_handle(const std::string& file,
+                      const std::list<file_callback>::iterator& i)
+            : filename(file), it(i) {}
+    private:
+        friend class LinuxInotifyWatcher;
+        std::string filename;
+        std::list<file_callback>::iterator it;
+    };
+
+#else
+    typedef NOTIMPLEMENTED notify_handle;
+#endif
+
     class FilesystemNotifier : public SORE_Kernel::Task
     {
     public:
@@ -110,8 +130,9 @@ namespace SORE_FileIO
           -Notifies if filename has been modified
           -If filename is deleted, notifies on next creation
         */
-        virtual void Notify(const std::string& filename, file_callback callback) = 0;
-        virtual void Remove(const std::string& filename, file_callback callback) = 0;
+        virtual notify_handle Notify(
+            const std::string& filename, file_callback callback) = 0;
+        virtual void Remove(notify_handle handle) = 0;
     };
 }
 
