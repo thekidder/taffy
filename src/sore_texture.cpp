@@ -205,15 +205,15 @@ namespace SORE_Graphics
         glGenTextures(1, &handle);
         glBindTexture(GL_TEXTURE_2D, handle);
 
-        glTexImage2D( GL_TEXTURE_2D, 0, internalFormat, width,
-                      height, 0, format,
-                      GL_UNSIGNED_BYTE, data);
+        gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, width, height, format,
+                          GL_UNSIGNED_BYTE, data);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                        GL_LINEAR_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     Texture2D::Texture2D(SORE_Resource::WatchedFileArrayPtr wfa)
