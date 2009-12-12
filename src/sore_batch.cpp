@@ -127,6 +127,7 @@ unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
             glDisable(GL_BLEND);
             blendSFactor = GL_ZERO;
             blendDFactor = GL_ONE;
+            break;
         case BLEND_ADDITIVE:
             glDisable(GL_DEPTH_TEST);
             glEnable(GL_BLEND);
