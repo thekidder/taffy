@@ -191,5 +191,8 @@ bool SORE_FileIO::LinuxInotifyWatcher::ParentWatchExists(const std::string& file
 
 void SORE_FileIO::LinuxInotifyWatcher::Remove(notify_handle handle)
 {
-    watchedFiles[GetParent(handle.filename)].callbacks.erase(handle.it);
+    std::string filename = GetParent(handle.filename);
+    watchedFiles[filename].callbacks.erase(handle.it);
+    if(watchedFiles[filename].callbacks.empty())
+        watchedFiles.erase(watchedFiles.find(filename));
 }
