@@ -55,7 +55,7 @@ void SORE_FileIO::LinuxInotifyWatcher::Resume()
 static std::string GetParent(const std::string& filename)
 {
     if(filename.rfind("/") == std::string::npos)
-        return std::string("./");
+        return std::string(".");
     std::string parent = filename.substr(0, filename.rfind("/"));
     if(parent.empty())
         parent = std::string("/");
@@ -64,15 +64,19 @@ static std::string GetParent(const std::string& filename)
 
 void SORE_FileIO::LinuxInotifyWatcher::PerformCallback(const std::string& path)
 {
+    std::string parent = GetParent(path);
     std::map<std::string, watch_info>::iterator it;
-    if((it = watchedFiles.find(path)) != watchedFiles.end())
+    if((it = watchedFiles.find(parent)) != watchedFiles.end())
     {
-        std::list<file_callback>::iterator jt;
+        std::list<std::pair<std::string, file_callback> >::iterator jt;
         for(jt = it->second.callbacks.begin();
             jt != it->second.callbacks.end(); ++jt)
         {
-            SORE_FileIO::file_callback c = *jt;
-            c(path);
+            if(jt->first == path)
+            {
+                SORE_FileIO::file_callback c = jt->second;
+                c(path);
+            }
         }
     }
 }
@@ -87,29 +91,20 @@ void SORE_FileIO::LinuxInotifyWatcher::Frame(int elapsedTime)
         in.WaitForEvents();
         if(in.GetEventCount()==0) return;
         in.GetEvent(ie);
+        std::string filename = ie.GetWatch()->GetPath() + "/" + ie.GetName();
         std::string types;
-        std::string path = ie.GetWatch()->GetPath();
         ie.DumpTypes(types);
         ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
-                   boost::format("Event path name: %s; event %s")
-                   % path % types);
+                   boost::format("%s received on %s")
+                   % types % filename);
 
-        if(ie.IsType(IN_CREATE))
+        if(!ie.IsType(IN_DELETE_SELF) && !ie.IsType(IN_IGNORED))
         {
-            std::string filename = path + "/" + ie.GetName();
-            AddWatch(filename);
             PerformCallback(filename);
-        }
-        else if(ie.IsType(IN_DELETE_SELF))
-        {
         }
         else if(ie.IsType(IN_IGNORED))
         {
             RemoveWatch(ie.GetWatch());
-        }
-        else
-        {
-            PerformCallback(path);
         }
     }
     catch(InotifyException e)
@@ -147,7 +142,7 @@ void SORE_FileIO::LinuxInotifyWatcher::AddWatch(const std::string& filename,
 void SORE_FileIO::LinuxInotifyWatcher::AddParentWatch(const std::string& filename)
 {
     if(!ParentWatchExists(filename))
-        AddWatch(GetParent(filename), IN_CREATE);
+        AddWatch(GetParent(filename), IN_CREATE | IN_MODIFY);
 }
 
 void SORE_FileIO::LinuxInotifyWatcher::RemoveWatch(InotifyWatch* iw)
@@ -168,14 +163,17 @@ SORE_FileIO::notify_handle SORE_FileIO::LinuxInotifyWatcher::Notify(
     const std::string& filename, file_callback callback)
 {
     std::string file = filename;
+    if(file.find("/") == std::string::npos)
+    {
+        file = "./" + file;
+    }
     if(watchedFiles.find(file)==watchedFiles.end())
     {
-        AddWatch(filename);
-        AddParentWatch(filename);
-        watchedFiles.insert(std::make_pair(filename, watch_info()));
+        AddParentWatch(file);
+        watchedFiles.insert(std::make_pair(file, watch_info()));
     }
-    watchedFiles[filename].callbacks.push_front(callback);
-    return notify_handle(filename, watchedFiles[filename].callbacks.begin());
+    watchedFiles[GetParent(file)].callbacks.push_front(std::make_pair(file, callback));
+    return notify_handle(file, watchedFiles[GetParent(file)].callbacks.begin());
 }
 
 bool SORE_FileIO::LinuxInotifyWatcher::ParentWatchExists(const std::string& filename)
@@ -193,5 +191,5 @@ bool SORE_FileIO::LinuxInotifyWatcher::ParentWatchExists(const std::string& file
 
 void SORE_FileIO::LinuxInotifyWatcher::Remove(notify_handle handle)
 {
-    watchedFiles[handle.filename].callbacks.erase(handle.it);
+    watchedFiles[GetParent(handle.filename)].callbacks.erase(handle.it);
 }

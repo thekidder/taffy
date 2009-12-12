@@ -108,13 +108,14 @@ namespace SORE_FileIO
     struct notify_handle
     {
         notify_handle() {}
-        notify_handle(const std::string& file,
-                      const std::list<file_callback>::iterator& i)
+        notify_handle(
+            const std::string& file,
+            const std::list<std::pair<std::string, file_callback> >::iterator& i)
             : filename(file), it(i) {}
     private:
         friend class LinuxInotifyWatcher;
         std::string filename;
-        std::list<file_callback>::iterator it;
+        std::list<std::pair<std::string, file_callback> >::iterator it;
     };
 
 #else

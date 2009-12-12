@@ -43,8 +43,7 @@ namespace SORE_FileIO
             const std::string& filename, file_callback callback);
         virtual void Remove(notify_handle handle);
     private:
-        void AddWatch(const std::string& filename,
-                      int32_t mask = IN_MODIFY | IN_MOVE_SELF | IN_DELETE_SELF);
+        void AddWatch(const std::string& filename, int32_t mask);
         void AddParentWatch(const std::string& filename);
         void RemoveWatch(InotifyWatch* iw);
 
@@ -53,7 +52,7 @@ namespace SORE_FileIO
 
         struct watch_info
         {
-            std::list<file_callback> callbacks;
+            std::list<std::pair<std::string, file_callback> > callbacks;
         };
         std::map<std::string, watch_info> watchedFiles;
         std::vector<InotifyWatch*> watches;
