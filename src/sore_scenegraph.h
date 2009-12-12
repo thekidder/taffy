@@ -33,7 +33,7 @@ namespace SORE_Graphics
 {
     const static ProjectionInfo defaultProjection(-1.0f, 1.0f);
 
-    class SORE_EXPORT SceneGraph : public GeometryProvider
+    class SORE_EXPORT SceneGraph : public GeometryProvider, boost::noncopyable
     {
     public:
         SceneGraph(

@@ -29,6 +29,10 @@ namespace SORE_Graphics
 
     SceneNode::~SceneNode()
     {
+        for(node_list::iterator it = children.begin(); it != children.end(); ++it)
+        {
+            delete *it;
+        }
     }
 
     void SceneNode::RemoveChild(node_list::iterator it)

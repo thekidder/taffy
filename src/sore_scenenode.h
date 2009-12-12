@@ -43,7 +43,7 @@ namespace SORE_Graphics
     /**
        @author Adam Kidder <thekidder@gmail.com>
     */
-    class SORE_EXPORT SceneNode
+    class SORE_EXPORT SceneNode : boost::noncopyable
     {
     public:
         SceneNode(Renderable r);
