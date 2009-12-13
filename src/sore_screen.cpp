@@ -160,7 +160,7 @@ namespace SORE_Kernel
     Screen::~Screen()
     {
         SDL_ShowCursor(SDL_ENABLE);
-        SDL_FreeSurface(drawContext);
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
         SDL_Quit();
     }
 
@@ -218,8 +218,6 @@ namespace SORE_Kernel
         {
             renderer->SetScreenInfo(screen);
         }
-        if(drawContext)
-            SDL_FreeSurface(drawContext);
         drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
     }
 

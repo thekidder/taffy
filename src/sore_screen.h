@@ -28,6 +28,7 @@
 #endif
 
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "sore_renderer.h"
 #include "sore_gamekernel.h"
@@ -40,11 +41,12 @@
 
 namespace SORE_Kernel
 {
-    class SORE_EXPORT Screen : public Task
+    class SORE_EXPORT Screen : public Task, boost::noncopyable
     {
     public:
         Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-               std::string windowTitle="SORE App", SORE_Utility::SettingsManager* _sm=NULL);
+               std::string windowTitle="SORE App",
+               SORE_Utility::SettingsManager* _sm=NULL);
         ~Screen();
 
         void Frame(int elapsedTime);
@@ -60,7 +62,6 @@ namespace SORE_Kernel
 
         const GLint* GetViewport() const;
         SORE_Graphics::ScreenInfo GetScreen() const;
-
     private:
         int  InitializeSDL(std::string windowTitle);
         int  InitializeGL();
@@ -76,7 +77,8 @@ namespace SORE_Kernel
         InputTask& input; //for injecting resize events
 
         SDL_Surface* drawContext;
-        //user's previous width and height so we can reset their screen after fullscreen mode
+        //user's previous width and height so we can reset
+        //the screen after fullscreen mode
         int width, height;
         Uint32 videoFlags;
 
