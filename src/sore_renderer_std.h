@@ -45,7 +45,7 @@
 */
 namespace SORE_Graphics
 {
-    class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer
+    class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer, boost::noncopyable
     {
     public:
         Renderer(SORE_Resource::ResourcePool& _pool);
@@ -67,9 +67,6 @@ namespace SORE_Graphics
     protected:
         virtual void OnScreenChange();
     private:
-        Renderer& operator=(const Renderer& o);
-        Renderer(const Renderer& o);
-
         void ClearGeometry();
         void Build();
 

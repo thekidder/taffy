@@ -40,7 +40,11 @@ SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _pool)
 
 SORE_Graphics::Renderer::~Renderer()
 {
-    ClearGeometry();
+    std::vector<GraphicsArray*>::iterator it;
+    for(it = geometry.begin(); it != geometry.end(); ++it)
+    {
+        delete *it;
+    }
 }
 
 void SORE_Graphics::Renderer::OnScreenChange()
@@ -52,9 +56,8 @@ void SORE_Graphics::Renderer::ClearGeometry()
     std::vector<GraphicsArray*>::iterator it;
     for(it = geometry.begin(); it != geometry.end(); ++it)
     {
-        delete *it;
+        (*it)->Clear();
     }
-    geometry.clear();
 }
 
 #ifndef SORE_NO_VBO
@@ -92,19 +95,28 @@ void SORE_Graphics::Renderer::Build()
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
     unsigned int vboSize = 0, numTris = 0, offset = 0;
-    GraphicsArray* ga = new GraphicsArrayClass(true, true);
-    geometry.push_back(ga);
+    if(geometry.empty())
+    {
+        GraphicsArray* ga = new GraphicsArrayClass(true, true);
+        geometry.push_back(ga);
+    }
     Renderable old = allRenderables.front();
+    std::vector<GraphicsArray*>::iterator thisGeometry = geometry.begin();
     for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
     {
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
-            geometry.back()->Build();
+            (*thisGeometry)->Build();
+            thisGeometry++;
             vboSize = numTris = offset = 0;
-            ga = new GraphicsArrayClass(true, true);
-            geometry.push_back(ga);
+            if(thisGeometry == geometry.end())
+            {
+                GraphicsArray* ga = new GraphicsArrayClass(true, true);
+                geometry.push_back(ga);
+                thisGeometry = geometry.end() - 1;
+            }
         }
-        geometry.back()->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
+        (*thisGeometry)->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
 
         UniformState u;
         if(r_it != allRenderables.begin())
@@ -135,7 +147,7 @@ void SORE_Graphics::Renderer::Build()
                 batches.back().SetNumTriangles(numTris);
                 batches.back().SetTriangleOffset(offset);
             }
-            batches.push_back(RenderBatch(geometry.back(),
+            batches.push_back(RenderBatch(*thisGeometry,
                                           bindVBO));
             offset += numTris;
 
@@ -157,7 +169,7 @@ void SORE_Graphics::Renderer::Build()
         numTris += r_it->GetGeometryChunk()->NumIndices()/3;
         old = *r_it;
     }
-    geometry.back()->Build();
+    (*thisGeometry)->Build();
     batches.back().SetNumTriangles(numTris);
     batches.back().SetTriangleOffset(offset);
 }
