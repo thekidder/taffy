@@ -1,6 +1,7 @@
 #ifndef RENDERSTATS_H
 #define RENDERSTATS_H
 
+#include "../sore_dll.h"
 #include "../sore_resource.h"
 
 namespace SORE_Graphics
@@ -14,7 +15,7 @@ namespace SORE_GUI
     class FrameWindow;
     class TextWidget;
 
-    class RenderStats
+    class SORE_EXPORT RenderStats
     {
     public:
         RenderStats(SORE_Resource::ResourcePool& pool, SORE_Graphics::Renderer* r,

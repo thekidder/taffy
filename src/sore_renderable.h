@@ -55,7 +55,7 @@ namespace SORE_Graphics
     typedef unsigned long long int64;
     typedef boost::shared_ptr<SORE_Math::Matrix4<float> > TransformationPtr;
 
-    class Renderable
+    class SORE_EXPORT Renderable
     {
     public:
         Renderable();
