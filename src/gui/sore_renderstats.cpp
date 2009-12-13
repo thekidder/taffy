@@ -50,8 +50,6 @@ namespace SORE_GUI
 
     RenderStats::~RenderStats()
     {
-        delete frame;
-
         delete drawsLabel;
         delete fpsLabel;
         delete polysLabel;
@@ -61,6 +59,8 @@ namespace SORE_GUI
         delete fps;
         delete polys;
         delete ms;
+
+		delete frame;
     }
 
     void RenderStats::SetVisible(bool visible)
