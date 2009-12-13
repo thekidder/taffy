@@ -21,18 +21,21 @@
 #ifndef SORE_TEXTURE_H
 #define SORE_TEXTURE_H
 
+#include <boost/utility.hpp>
+
 #include "sore_allgl.h"
 #include "sore_resource.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT Texture2D : public SORE_Resource::Resource
+    class SORE_EXPORT Texture2D : public SORE_Resource::Resource, boost::noncopyable
     {
     public:
         Texture2D(SORE_Resource::WatchedFileArrayPtr wfa);
         Texture2D(const unsigned char* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
+        ~Texture2D();
         void Bind(
             GLSLShaderPtr shader,
             const std::string& sampleName,

@@ -32,7 +32,7 @@ namespace SORE_Graphics
     void Texture2D::Load()
     {
         if(handle!=0)
-            glDeleteTextures(1, &handle);
+            Unload();
         char ext[10];
         SORE_Utility::GetFileExt(GetFilename().c_str(), ext);
         if(strcmp(ext, "tga")==0)
@@ -228,6 +228,12 @@ namespace SORE_Graphics
         : Resource(SORE_Resource::WatchedFileArrayPtr()), handle(0)
     {
         LoadFromData(data, internalFormat, format, width, height);
+
+    }
+
+    Texture2D::~Texture2D()
+    {
+        Unload();
     }
 
     bool Texture2D::operator<(const Texture2D& o) const
@@ -245,10 +251,9 @@ namespace SORE_Graphics
         return file;
     }
 
-    void Texture2D::Bind(
-        GLSLShaderPtr shader,
-        const std::string& sampleName,
-        unsigned int textureSlot) const
+    void Texture2D::Bind(GLSLShaderPtr shader,
+                         const std::string& sampleName,
+                         unsigned int textureSlot) const
     {
         assert(textureSlot < 8);
         shader->SetUniform1i(sampleName, textureSlot);
@@ -263,7 +268,7 @@ namespace SORE_Graphics
 
     void Texture2D::Unload()
     {
-        ENGINE_LOG(SORE_Logging::LVL_WARNING, "Unload() not completely implemented");
+        glDeleteTextures(1, &handle);
         handle = 0;
     }
 
