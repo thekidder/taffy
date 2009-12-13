@@ -26,6 +26,10 @@ SORE_Graphics::GraphicsArray::GraphicsArray(bool t, bool c, bool n) :
 {
 }
 
+SORE_Graphics::GraphicsArray::~GraphicsArray()
+{
+}
+
 void SORE_Graphics::GraphicsArray::Clear()
 {
     vertices.clear();

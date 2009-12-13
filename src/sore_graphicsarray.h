@@ -37,7 +37,7 @@ namespace SORE_Graphics
     {
     public:
         GraphicsArray(bool t = false, bool c = false, bool n = false);
-        virtual ~GraphicsArray() {}
+        virtual ~GraphicsArray();
 
         virtual void Build() = 0;
 
