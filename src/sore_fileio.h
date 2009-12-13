@@ -119,7 +119,12 @@ namespace SORE_FileIO
     };
 
 #else
-    typedef int notify_handle;
+    struct notify_handle
+	{
+		notify_handle() {}
+	private:
+        friend class LinuxInotifyWatcher;
+	};
 #endif
 
     class FilesystemNotifier : public SORE_Kernel::Task
