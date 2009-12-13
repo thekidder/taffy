@@ -119,7 +119,7 @@ namespace SORE_FileIO
     };
 
 #else
-    typedef NOTIMPLEMENTED notify_handle;
+    typedef int notify_handle;
 #endif
 
     class FilesystemNotifier : public SORE_Kernel::Task

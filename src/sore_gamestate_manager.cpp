@@ -37,14 +37,20 @@ namespace SORE_Game
                                        SORE_FileIO::PackageCache* pc,
                                        std::string windowTitle,
                                        std::string settingsFile)
-        : kernel(gk), pool(pc, &watcher), ini(settingsFile), sm(&ini),
+        : kernel(gk), pool(pc
+#ifdef linux
+		, &watcher
+#endif
+		), ini(settingsFile), sm(&ini),
           screen(screenInfo, input, windowTitle, &sm), popFlag(false)
     {
         curr = gk.end();
 
         gk.AddTask(0, &input);
         gk.AddTask(10, &screen);
+#ifdef linux
         gk.AddTask(20, &watcher);
+#endif
 
         renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
