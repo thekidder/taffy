@@ -130,7 +130,10 @@ void SORE_Graphics::Renderer::Build()
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
             bindShader = true;
-        if(r_it == allRenderables.begin() || *r_it->GetTexture() != *old.GetTexture())
+        if(r_it == allRenderables.begin()
+           || (r_it->GetTexture() && old.GetTexture()
+            && *r_it->GetTexture() != *old.GetTexture())
+           || (r_it->GetTexture() && !old.GetTexture()))
             bindTexture = true;
         if(r_it == allRenderables.begin() ||
            r_it->GetBlendMode() != old.GetBlendMode())
