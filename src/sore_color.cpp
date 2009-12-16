@@ -22,76 +22,82 @@
 
 namespace SORE_Graphics
 {
-	static inline float min(float lhs, float rhs)
-	{
-		return lhs < rhs ? lhs : rhs;
-	}
+    static inline float min(float lhs, float rhs)
+    {
+        return lhs < rhs ? lhs : rhs;
+    }
 
-	static inline float max(float lhs, float rhs)
-	{
-		return lhs > rhs ? lhs : rhs;
-	}
+    static inline float max(float lhs, float rhs)
+    {
+        return lhs > rhs ? lhs : rhs;
+    }
 
-	static inline float clamp(float value, float minValue,  float maxValue)
-	{
-		return min( max(minValue, value), maxValue);
-	}
+    static inline float clamp(float value, float minValue,  float maxValue)
+    {
+        return min( max(minValue, value), maxValue);
+    }
 
-	Color::Color()
-	{
-		color[0] = color[1] = color[2] = color[3] = 1.0f;
-	}
+    Color::Color()
+    {
+        color[0] = color[1] = color[2] = color[3] = 1.0f;
+    }
 
-	Color::Color(float r, float g, float b, float a)
-	{
-		color[0] = clamp(r, 0.0f, 1.0f);
-		color[1] = clamp(g, 0.0f, 1.0f);
-		color[2] = clamp(b, 0.0f, 1.0f);
-		color[3] = clamp(a, 0.0f, 1.0f);
-	}
+    Color::Color(float r, float g, float b, float a)
+    {
+        color[0] = clamp(r, 0.0f, 1.0f);
+        color[1] = clamp(g, 0.0f, 1.0f);
+        color[2] = clamp(b, 0.0f, 1.0f);
+        color[3] = clamp(a, 0.0f, 1.0f);
+    }
 
-	const float* Color::GetColor() const
-	{
-		return color;
-	}
+    const float* Color::GetColor() const
+    {
+        return color;
+    }
 
-	float Color::GetComponent(ColorComponent c) const
-	{
-		return color[c];
-	}
+    SORE_Math::Vector4<float> Color::GetColorVector() const
+    {
+        SORE_Math::Vector4<float> c(color[0], color[1], color[2], color[3]);
+        return c;
+    }
 
-	void Color::SetComponent(ColorComponent c, float v)
-	{
-		color[c] = clamp(v, 0.0f, 1.0f);
-	}
+    float Color::GetComponent(ColorComponent c) const
+    {
+        return color[c];
+    }
 
-	Color& Color::operator+=(const Color& c)
-	{
-		for(unsigned int i=0;i<4;++i)
-		{
-			color[i] = clamp(color[i]+c.color[i], 0.0f, 1.0f);
-		}
-		return *this;
-	}
+    void Color::SetComponent(ColorComponent c, float v)
+    {
+        color[c] = clamp(v, 0.0f, 1.0f);
+    }
 
-	Color& Color::operator-=(const Color& c)
-	{
-		for(unsigned int i=0;i<4;++i)
-		{
-			color[i] = clamp(color[i]-c.color[i], 0.0f, 1.0f);
-		}
-		return *this;
-	}
+    Color& Color::operator+=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]+c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
 
-	Color operator+(const Color& lhs, const Color& rhs)
-	{
-		Color temp = lhs;
-		return temp += rhs;
-	}
+    Color& Color::operator-=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]-c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
 
-	Color operator-(const Color& lhs, const Color& rhs)
-	{
-		Color temp = lhs;
-		return temp -= rhs;
-	}
+    Color operator+(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp += rhs;
+    }
+
+    Color operator-(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp -= rhs;
+    }
 }
