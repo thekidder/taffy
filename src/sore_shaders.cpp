@@ -129,12 +129,10 @@ namespace SORE_Graphics
                 std::string name = i2->first;
                 if(section=="Vertex")
                 {
-                    //AddDependentFile(name);
                     AddVertexFile(name.c_str());
                 }
                 else if(section=="Fragment")
                 {
-                    //AddDependentFile(name);
                     AddFragmentFile(name.c_str());
                 }
                 else
@@ -153,6 +151,7 @@ namespace SORE_Graphics
             ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
                        boost::format("Shader: GL Error: %d") % error);
         }
+        UnbindShaders();
     }
 
     GLSLShader::~GLSLShader()
