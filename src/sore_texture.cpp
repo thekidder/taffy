@@ -126,6 +126,7 @@ namespace SORE_Graphics
         }
         delete file;
 
+        //flip bytes to read in from BGR -> RGB
         for(size_t i=0;i<dataSize;i+=(bpp/8))
         {
             temp = imgData[i];
