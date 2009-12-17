@@ -124,7 +124,7 @@ unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
         {
         case BLEND_OPAQUE:
             glEnable(GL_DEPTH_TEST);
-            blendSFactor = GL_SRC_ALPHA;
+            blendSFactor = GL_ONE;
             blendDFactor = GL_ZERO;
             break;
         case BLEND_ADDITIVE:
