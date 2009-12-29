@@ -37,11 +37,6 @@ namespace SORE_Graphics
         return min( max(minValue, value), maxValue);
     }
 
-    Color::Color()
-    {
-        color[0] = color[1] = color[2] = color[3] = 1.0f;
-    }
-
     Color::Color(float r, float g, float b, float a)
     {
         color[0] = clamp(r, 0.0f, 1.0f);

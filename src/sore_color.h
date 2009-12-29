@@ -32,7 +32,6 @@ namespace SORE_Graphics
     class SORE_EXPORT Color
     {
     public:
-        Color();
         Color(float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
 
         SORE_Math::Vector4<float> GetColorVector() const;
@@ -46,7 +45,7 @@ namespace SORE_Graphics
     private:
         //stored in array to make passing to an OpenGL *fv function easier
         float color[4];
-    };
+	};
 
     Color operator+(const Color& lhs, const Color& rhs);
     Color operator-(const Color& lhs, const Color& rhs);
