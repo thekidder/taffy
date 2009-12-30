@@ -24,6 +24,7 @@
 #include <map>
 #include <string>
 
+#include "sore_dll.h"
 #include "math/sore_vector2.h"
 #include "math/sore_vector3.h"
 #include "math/sore_vector4.h"
@@ -47,7 +48,7 @@ namespace SORE_Graphics
     bool operator==(const uniform_var& one, const uniform_var& two);
     bool operator!=(const uniform_var& one, const uniform_var& two);
 
-    class UniformState
+    class SORE_EXPORT UniformState
     {
     public:
         void Bind(GLSLShaderPtr s) const;
