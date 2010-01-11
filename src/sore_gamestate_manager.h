@@ -37,8 +37,9 @@ namespace SORE_Game
     public:
         GamestateManager(SORE_Kernel::GameKernel& gk,
                          SORE_FileIO::PackageCache* pc = NULL,
-                         std::string windowTitle = "SORE Framework Application",
-                         std::string settingsFile = "");
+                         const std::string& windowTitle = "SORE Framework Application",
+						 const std::string& iconFilename = "",
+                         const std::string& settingsFile = "");
         ~GamestateManager();
 
         //use new to instantiate newState; the Manager will handle its deallocation

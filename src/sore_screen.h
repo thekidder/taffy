@@ -45,7 +45,8 @@ namespace SORE_Kernel
     {
     public:
         Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-               std::string windowTitle="SORE App",
+			   const std::string& windowTitle="SORE App", 
+			   const std::string& iconFilename="",
                SORE_Utility::SettingsManager* _sm=NULL);
         ~Screen();
 

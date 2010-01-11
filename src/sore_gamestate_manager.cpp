@@ -35,14 +35,15 @@ namespace SORE_Game
 
     GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk,
                                        SORE_FileIO::PackageCache* pc,
-                                       std::string windowTitle,
-                                       std::string settingsFile)
+                                       const std::string& windowTitle,
+									   const std::string& iconFilename,
+                                       const std::string& settingsFile)
         : kernel(gk), pool(pc
 #ifdef linux
 		, &watcher
 #endif
 		), ini(settingsFile), sm(&ini),
-          screen(screenInfo, input, windowTitle, &sm), popFlag(false)
+          screen(screenInfo, input, windowTitle, iconFilename, &sm), popFlag(false)
     {
         curr = gk.end();
 

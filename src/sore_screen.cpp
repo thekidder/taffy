@@ -32,7 +32,8 @@
 namespace SORE_Kernel
 {
     Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-                   std::string windowTitle, SORE_Utility::SettingsManager* _sm)
+		const std::string& windowTitle, const std::string& iconFilename, 
+		SORE_Utility::SettingsManager* _sm)
         : input(i), drawContext(0), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
@@ -88,6 +89,12 @@ namespace SORE_Kernel
         }
         best_w = SDL_GetVideoInfo()->current_w;
         best_h = SDL_GetVideoInfo()->current_h;
+	
+		if(iconFilename.size())
+		{
+			SDL_WM_SetIcon(SDL_LoadBMP(iconFilename.c_str()), NULL);
+		}
+
         SDLScreenChange(screen);
         if(InitializeGL()!=0)
         {
