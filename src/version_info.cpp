@@ -3,14 +3,11 @@
 
 #include <boost/format.hpp>
 
-const char* VERSION_DESC = "Pre-Alpha";
-
 std::string GetVersionString()
 {
     return boost::str(boost::format("%s %d.%d.%d (%s)")
-            % VERSION_NAME % VERSION_MAJOR % VERSION_MINOR % VERSION_PATCH % VERSION_DESC);
+            % VERSION_DISPLAY_NAME % VERSION_MAJOR % VERSION_MINOR % VERSION_PATCH % VERSION_COMMENT);
 }
-
 
 unsigned int GetVersionMajor()
 {
@@ -32,7 +29,12 @@ std::string  GetVersionName()
     return VERSION_NAME;
 }
 
-std::string  GetVersionDesc()
+std::string GetVersionDisplayName()
 {
-    return VERSION_DESC;
+	return VERSION_DISPLAY_NAME;
+}
+
+std::string  GetVersionComment()
+{
+    return VERSION_COMMENT;
 }

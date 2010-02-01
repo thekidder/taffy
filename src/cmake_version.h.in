@@ -5,10 +5,12 @@
 #ifndef CMAKE_VERSION_H
 #define CMAKE_VERSION_H
 
-const char*        VERSION_NAME  = "${CPACK_PACKAGE_NAME}";
+const static char*        VERSION_NAME         = "${PROJECT_NAME}";
+const static char*        VERSION_DISPLAY_NAME = "${PROJECT_DISPLAY_NAME}";
+const static char*        VERSION_COMMENT      = "${PROJECT_VERSION_COMMENT}";
 
-const unsigned int VERSION_MAJOR = ${CPACK_PACKAGE_VERSION_MAJOR};
-const unsigned int VERSION_MINOR = ${CPACK_PACKAGE_VERSION_MINOR};
-const unsigned int VERSION_PATCH = ${CPACK_PACKAGE_VERSION_PATCH};
+const static unsigned int VERSION_MAJOR        = ${CPACK_PACKAGE_VERSION_MAJOR};
+const static unsigned int VERSION_MINOR        = ${CPACK_PACKAGE_VERSION_MINOR};
+const static unsigned int VERSION_PATCH        = ${CPACK_PACKAGE_VERSION_PATCH};
 
 #endif

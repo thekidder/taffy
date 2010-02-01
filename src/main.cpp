@@ -12,10 +12,10 @@ SORE_Logging::Logger* mainLog;
 int main(int argc, char** argv)
 {
     srand(static_cast<unsigned int>(time(0)));
-    mainLog = new SORE_Logging::Logger("program_name");
-    SORE_Logging::XMLLogger fileLog(SORE_Logging::SHOW_ALL,
-                                    "logs/program_log.xml",
-                                    "program_name log");
+    mainLog = new SORE_Logging::Logger(GetVersionDisplayName().c_str());
+	std::string logName = "logs/" + GetVersionName() + "_log.xml";
+	std::string logTitle = GetVersionDisplayName() + " log";
+    SORE_Logging::XMLLogger fileLog(SORE_Logging::SHOW_ALL, logName, logTitle);
 
     mainLog->AddBackend(&fileLog);
 #ifdef DEBUG
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     pc.AddPackage("default_shaders.sdp");
     pc.AddPackage("ix_style.sdp");
 
-    SORE_Game::GamestateManager gsm(gk, &pc, "Program Name", "settings.ini");
+    SORE_Game::GamestateManager gsm(gk, &pc, GetVersionDisplayName(), "settings.ini");
 
     gsm.PushState(new DefaultState);
 

@@ -19,6 +19,7 @@ unsigned int GetVersionMinor();
 unsigned int GetVersionPatch();
 
 std::string  GetVersionName();
-std::string  GetVersionDesc();
+std::string  GetVersionDisplayName();
+std::string  GetVersionComment();
 
 #endif //APP_LOG_H
