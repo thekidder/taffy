@@ -1,8 +1,11 @@
 #ifndef STATE_DEFAULT
 #define STATE_DEFAULT
 
+#include <gui/sore_topwidget.h>
 #include <sore_gamestate.h>
 #include <sore_input.h>
+
+#include "debug_gui.h"
 
 class DefaultState : public SORE_Game::Gamestate
 {
@@ -16,6 +19,9 @@ private:
     bool HandleEscapeKey(SORE_Kernel::Event* e);
     void Init();
     void Quit();
+
+	SORE_GUI::TopWidget* top;
+    DebugGUI* debug;
 };
 
 #endif

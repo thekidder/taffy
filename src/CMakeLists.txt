@@ -21,9 +21,11 @@ SET(CMAKE_VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h)
 SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h.in)
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
-SET(${CMAKE_PROJECT_NAME}_SRCS main.cpp state_default.cpp version_info.cpp app.rc)
+SET(${CMAKE_PROJECT_NAME}_SRCS 
+  debug_gui.cpp main.cpp state_default.cpp version_info.cpp app.rc)
   
-SET(${CMAKE_PROJECT_NAME}_HEADERS app_log.h state_default.h ${CMAKE_VERSION_OUT})
+SET(${CMAKE_PROJECT_NAME}_HEADERS 
+  app_log.h debug_gui.h state_default.h ${CMAKE_VERSION_OUT})
 
 IF(UNIX)
   SET(CMAKE_CXX_FLAGS "-Wall")

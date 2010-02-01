@@ -4,22 +4,38 @@
 
 #include "state_default.h"
 
-DefaultState::DefaultState()
+DefaultState::DefaultState() : top(0), debug(0)
 {
 }
 
 DefaultState::~DefaultState()
 {
+	delete debug;
+	delete top;
 }
 
 void DefaultState::Init()
 {
     owner->GetInputTask()->AddListener(SORE_Kernel::KEYDOWN,
                                        boost::bind(&DefaultState::HandleEscapeKey, this, _1));
+
+	top = new gui::TopWidget(owner->GetRenderer()->GetScreenInfo().width,
+                             owner->GetRenderer()->GetScreenInfo().height);
+
+	SORE_Kernel::InputTask* input = owner->GetInputTask();
+    input->AddListener(SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
+                       std::bind1st(std::mem_fun(
+                                        &SORE_GUI::TopWidget::PropagateEvents), top));
+    input->AddListener(SORE_Kernel::RESIZE ,
+                       std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
+    debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
+                         owner->GetInputTask(), top);
+	owner->GetRenderer()->AddGeometryProvider(top);
 }
 
 void DefaultState::Frame(int elapsed)
 {
+	debug->Frame(elapsed);
 }
 
 void DefaultState::Quit()
