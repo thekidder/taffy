@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     pc.AddPackage("default_shaders.sdp");
     pc.AddPackage("ix_style.sdp");
 
-    SORE_Game::GamestateManager gsm(gk, &pc, GetVersionDisplayName(), "settings.ini");
+    SORE_Game::GamestateManager gsm(gk, &pc, GetVersionDisplayName(), "data/app.bmp", "settings.ini");
 
     gsm.PushState(new DefaultState);
 
