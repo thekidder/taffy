@@ -1,7 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(project_name)
+SET(PROJECT_NAME "project_name")
+SET(PROJECT_DISPLAY_NAME "Project Name")
+PROJECT(${PROJECT_NAME})
 
-SET(CPACK_PACKAGE_NAME "template")
+SET(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 SET(CPACK_PACKAGE_VENDOR "kidawi!")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/info.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/copyright.txt")
@@ -12,7 +14,7 @@ IF(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
   SET(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}\\\\bin/data/app.ico")
-  SET(CPACK_NSIS_DISPLAY_NAME "template")
+  SET(CPACK_NSIS_DISPLAY_NAME ${PROJECT_DISPLAY_NAME})
   SET(CPACK_NSIS_HELP_LINK "http://www.kidawi.com")
   SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kidawi.com")
   #SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
