@@ -42,7 +42,7 @@ namespace SORE_Graphics
     class SORE_EXPORT GeometryChunk
     {
     public:
-        GeometryChunk(unsigned short nVertices, unsigned short nIndices);
+        GeometryChunk(unsigned int nVertices, unsigned int nIndices);
         GeometryChunk(const GeometryChunk& o);
         ~GeometryChunk();
 

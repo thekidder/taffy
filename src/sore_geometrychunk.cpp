@@ -19,13 +19,19 @@
  ***************************************************************************/
 
 #include <cstring>
+#include <limits>
 
 #include "sore_geometrychunk.h"
+#include "sore_logger.h"
 
 SORE_Graphics::GeometryChunk::GeometryChunk(
-    unsigned short nVertices, unsigned short nIndices)
+    unsigned int nVertices, unsigned int nIndices)
     : numVertices(nVertices), numIndices(nIndices)
 {
+	if(nIndices > std::numeric_limits<unsigned short>::max())
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many indices in geometry chunk");
+	if(nVertices > std::numeric_limits<unsigned short>::max())
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many vertices in geometry chunk");
     data = new vertex[numVertices];
     indices = new unsigned short[numIndices];
 }
