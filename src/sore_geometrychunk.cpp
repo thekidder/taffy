@@ -32,6 +32,9 @@ SORE_Graphics::GeometryChunk::GeometryChunk(
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many indices in geometry chunk");
 	if(nVertices > std::numeric_limits<unsigned short>::max())
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many vertices in geometry chunk");
+	if(nIndices % 3 != 0)
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, 
+		           "Number of indices in geometry chunk is not divisible by three");
     data = new vertex[numVertices];
     indices = new unsigned short[numIndices];
 }
