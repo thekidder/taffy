@@ -63,6 +63,11 @@ namespace SORE_Graphics
         return projection;
     }
 
+	void SceneGraph::SetProjection(ProjectionInfo proj)
+	{
+		projection = proj;
+	}
+
     SceneNode& SceneGraph::GetParent()
     {
         return *parent;

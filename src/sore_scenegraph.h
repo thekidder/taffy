@@ -49,6 +49,7 @@ namespace SORE_Graphics
         //A geometry provider can optionally set a projection for any layer
         virtual bool HasProjection(geometry_layer layer);
         virtual ProjectionInfo GetProjection(geometry_layer layer);
+		void                   SetProjection(ProjectionInfo proj);
 
         SceneNode& GetParent();
 
