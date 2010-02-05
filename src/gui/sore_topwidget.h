@@ -32,16 +32,14 @@ namespace SORE_GUI
     {
     public:
         TopWidget(unsigned int width, unsigned int height);
-        SORE_Graphics::ProjectionInfo GetProjection(SORE_Graphics::ScreenInfo s);
+
         bool OnResize(SORE_Kernel::Event* e);
 
         virtual void MakeUpToDate();
         virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
         virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
-        virtual bool HasProjection(SORE_Graphics::geometry_layer layer);
-        virtual SORE_Graphics::ProjectionInfo GetProjection(
-            SORE_Graphics::geometry_layer layer);
+        SORE_Graphics::camera_info GetCamera();
     private:
         std::vector<SORE_Graphics::Renderable> GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);

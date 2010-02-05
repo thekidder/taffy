@@ -44,24 +44,17 @@ namespace SORE_GUI
         SetSize(SVec(SUnit(0.0, w), SUnit(0.0, h)));
     }
 
-    SORE_Graphics::ProjectionInfo TopWidget::GetProjection(SORE_Graphics::ScreenInfo s)
+    SORE_Graphics::camera_info TopWidget::GetCamera()
     {
-        if(s.width != GetSize().GetHorizontal().GetAbsolute() ||
-             s.height != GetSize().GetVertical().GetAbsolute())
-        {
-            ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                       "ScreenInfo dimensions do not match that of the "
-                       "top-level container");
-            UpdateResolution(s.width, s.height);
-        }
         SORE_Graphics::ProjectionInfo proj;
         proj.type = SORE_Graphics::ORTHO2D;
-        proj.left = 0;
-        proj.right = static_cast<float>(s.width);
-        proj.top = static_cast<float>(s.height);
-        proj.bottom = 0;
         proj.useScreenRatio = false;
-        return proj;
+        proj.useScreenCoords = true;
+
+        SORE_Math::Matrix4<float> identity;
+
+        SORE_Graphics::camera_info cam = {proj, identity};
+        return cam;
     }
 
     void TopWidget::MakeUpToDate()
@@ -78,31 +71,6 @@ namespace SORE_GUI
     std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryEnd()
     {
         return renderables.end();
-    }
-
-    bool TopWidget::HasProjection(SORE_Graphics::geometry_layer layer)
-    {
-        if(layer == GUI_LAYER)
-            return true;
-        return false;
-    }
-
-    SORE_Graphics::ProjectionInfo TopWidget::GetProjection(
-        SORE_Graphics::geometry_layer layer)
-    {
-        if(layer != GUI_LAYER)
-            return SORE_Graphics::ProjectionInfo();
-        SORE_Graphics::ProjectionInfo proj;
-        proj.type = SORE_Graphics::ORTHO2D;
-        proj.left = 0.0f;
-        proj.right = static_cast<float>(
-            GetPixels(HORIZONTAL, GetSize().GetHorizontal()));
-        proj.bottom = 0.0f;
-        proj.top = static_cast<float>(
-            GetPixels(VERTICAL, GetSize().GetVertical()));
-        proj.useScreenRatio = false;
-        proj.useScreenCoords = false;
-        return proj;
     }
 
     std::vector<SORE_Graphics::Renderable> TopWidget::GetThisRenderList()
