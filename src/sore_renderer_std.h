@@ -55,6 +55,7 @@ namespace SORE_Graphics
 
         void ClearGeometryProviders();
         void AddGeometryProvider(GeometryProvider* gp);
+        void SetCamera(geometry_layer layer, camera_callback camera);
 
         //Rendering Statistics
         float GetFPS() const;

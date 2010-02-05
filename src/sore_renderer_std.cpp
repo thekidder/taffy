@@ -205,6 +205,12 @@ void SORE_Graphics::Renderer::Render()
     PrintGLErrors(SORE_Logging::LVL_ERROR);
 }
 
+void SORE_Graphics::Renderer::SetCamera(
+    geometry_layer layer, camera_callback camera)
+{
+    currentState->cameras[layer] = camera;
+}
+
 SORE_Graphics::camera_info SORE_Graphics::Renderer::GetCamera(geometry_layer layer)
 {
     std::map<geometry_layer, camera_callback>::iterator it;
