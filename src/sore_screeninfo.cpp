@@ -34,9 +34,9 @@ namespace SORE_Graphics
             returnProj.zfar  =  1.0f;
             if(pi.useScreenCoords)
             {
-                returnProj.top = 0;
+                returnProj.top = static_cast<float>(si.height);
                 returnProj.left = 0;
-                returnProj.bottom = static_cast<float>(si.height);
+                returnProj.bottom = 0;
                 returnProj.right = static_cast<float>(si.width);
                 returnProj.ratio = si.ratio;
             }
