@@ -31,6 +31,9 @@ void DefaultState::Init()
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
                          owner->GetInputTask(), top);
 	owner->GetRenderer()->AddGeometryProvider(top);
+	owner->GetRenderer()->SetCamera(
+        SORE_GUI::GUI_LAYER, 
+        boost::bind(&SORE_GUI::TopWidget::GetCamera, boost::ref(top)));
 }
 
 void DefaultState::Frame(int elapsed)
