@@ -36,8 +36,7 @@ namespace SORE_Graphics
     class SORE_EXPORT SceneGraph : public GeometryProvider, boost::noncopyable
     {
     public:
-        SceneGraph(
-            geometry_layer l = LAYER5, ProjectionInfo proj = defaultProjection);
+        SceneGraph();
         ~SceneGraph();
 
         node_list::iterator AddNode(Renderable r);
@@ -46,19 +45,11 @@ namespace SORE_Graphics
         virtual std::vector<Renderable>::iterator GeometryBegin();
         virtual std::vector<Renderable>::iterator GeometryEnd();
 
-        //A geometry provider can optionally set a projection for any layer
-        virtual bool HasProjection(geometry_layer layer);
-        virtual ProjectionInfo GetProjection(geometry_layer layer);
-		void                   SetProjection(ProjectionInfo proj);
-
         SceneNode& GetParent();
 
     private:
         SceneNode* parent;
         std::vector<Renderable> renderList;
-
-        geometry_layer layer;
-        ProjectionInfo projection;
     };
 }
 #endif
