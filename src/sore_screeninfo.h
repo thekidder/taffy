@@ -60,6 +60,12 @@ namespace SORE_Graphics
         bool useNativeResolution; //supercedes width, height, ratio
     };
 
+    struct SORE_EXPORT camera_info
+    {
+        ProjectionInfo projection;
+        SORE_Math::Matrix4<float> viewMatrix;
+    };
+
     ProjectionInfo SORE_EXPORT SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
 
     SORE_Math::Vector2<float> SORE_EXPORT ScreenToProjection(
@@ -70,6 +76,7 @@ namespace SORE_Graphics
         SORE_Math::Vector2<float> pos);
 
     typedef boost::function<ProjectionInfo (ScreenInfo)> proj_callback;
+    typedef boost::function<camera_info ()> camera_callback;
 }
 
 #endif

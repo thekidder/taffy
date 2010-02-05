@@ -30,16 +30,12 @@ namespace SORE_Graphics
     class SORE_EXPORT GeometryProvider
     {
     public:
-        virtual ~GeometryProvider() {}
+        virtual ~GeometryProvider();
 
         //always called before calling GeometryBegin or GeometryEnd
-        virtual void MakeUpToDate() {}
+        virtual void MakeUpToDate();
         virtual std::vector<Renderable>::iterator GeometryBegin() = 0;
         virtual std::vector<Renderable>::iterator GeometryEnd() = 0;
-
-        //A geometry provider can optionally set a projection for any layer
-        virtual bool HasProjection(geometry_layer layer) {return false;}
-        virtual ProjectionInfo GetProjection(geometry_layer layer);
     };
 }
 

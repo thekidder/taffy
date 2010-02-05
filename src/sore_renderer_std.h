@@ -72,13 +72,18 @@ namespace SORE_Graphics
 
         void CalculateFPS();
 
-        ProjectionInfo GetProjection(geometry_layer layer);
+        camera_info GetCamera(geometry_layer layer);
 
         SORE_Resource::ResourcePool& pool;
 
+        struct render_info
+        {
+            std::vector<GeometryProvider*> providers;
+            std::map<geometry_layer, camera_callback> cameras;
+        };
         //acts as a stack: only providers on the top are called
-        std::vector<std::vector<GeometryProvider*> > geometryProviders;
-        std::vector<std::vector<GeometryProvider*> >::iterator currentState;
+        std::vector<render_info> geometryProviders;
+        std::vector<render_info>::iterator currentState;
 
         std::vector<GraphicsArray*> geometry;
         std::vector<RenderBatch> batches;

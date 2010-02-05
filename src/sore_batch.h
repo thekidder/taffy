@@ -31,7 +31,7 @@ namespace SORE_Graphics
 {
     const unsigned int RENDER_CMD_NONE              = 0;
     const unsigned int RENDER_CMD_BIND_VBO          = 1;
-    const unsigned int RENDER_CMD_CHANGE_PROJECTION = 2;
+    const unsigned int RENDER_CMD_CHANGE_CAMERA     = 2;
     const unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 4;
     const unsigned int RENDER_CMD_BIND_SHADER       = 8;
     const unsigned int RENDER_CMD_BIND_TEXTURE      = 16;
@@ -46,16 +46,17 @@ namespace SORE_Graphics
         void SetNumTriangles(unsigned int numTris);
         void SetTriangleOffset(unsigned int offset);
 
-        void AddChangeProjectionCommand(ProjectionInfo proj);
+        void AddChangeCameraCommand(camera_info cam);
         void AddChangeBlendModeCommand(blend_mode mode);
         void AddBindShaderCommand(GLSLShaderPtr shader);
         void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
         void AddChangeUniformsCommand(GLSLShaderPtr shader, UniformState uniforms);
 
         //returns number of polygons rendered
-        unsigned int Render(const ScreenInfo& si);
+        unsigned int Render();
     private:
-        void ChangeProjectionMatrix(ProjectionInfo& proj, const ScreenInfo& si);
+        void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera);
+        void ChangeProjectionMatrix(const ProjectionInfo& proj);
 
         unsigned int commands;
 
@@ -64,7 +65,7 @@ namespace SORE_Graphics
         unsigned int triangleOffset;
 
         blend_mode blend;
-        ProjectionInfo projection;
+        camera_info camera;
         GLSLShaderPtr shader;
         Texture2DPtr texture;
 

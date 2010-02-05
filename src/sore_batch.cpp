@@ -37,10 +37,10 @@ void SORE_Graphics::RenderBatch::SetTriangleOffset(unsigned int offset)
     triangleOffset = offset;
 }
 
-void SORE_Graphics::RenderBatch::AddChangeProjectionCommand(ProjectionInfo proj)
+void SORE_Graphics::RenderBatch::AddChangeCameraCommand(camera_info cam)
 {
-    projection = proj;
-    commands |= RENDER_CMD_CHANGE_PROJECTION;
+    camera = cam;
+    commands |= RENDER_CMD_CHANGE_CAMERA;
 }
 
 void SORE_Graphics::RenderBatch::AddChangeBlendModeCommand(blend_mode mode)
@@ -72,11 +72,10 @@ void SORE_Graphics::RenderBatch::AddChangeUniformsCommand(
 }
 
 void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
-    ProjectionInfo& projection, const ScreenInfo& si)
+    const ProjectionInfo& projection)
 {
-    projection = SetupProjection(projection, si);
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity( );
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     switch(projection.type)
     {
     case NONE:
@@ -92,9 +91,6 @@ void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
         break;
     case PERSPECTIVE:
         {
-            if(projection.useScreenRatio)
-                projection.ratio = static_cast<float>(si.width) /
-                    static_cast<float>(si.height);
             gluPerspective(projection.fov, projection.ratio,
                            projection.znear, projection.zfar );
             break;
@@ -102,20 +98,28 @@ void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
     default:
         break;
     }
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity( );
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void SORE_Graphics::RenderBatch::ChangeCameraMatrix(
+    const SORE_Math::Matrix4<float>& camera)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMultMatrixf(camera.GetData());
 }
 
 
-unsigned int SORE_Graphics::RenderBatch::Render(const ScreenInfo& si)
+unsigned int SORE_Graphics::RenderBatch::Render()
 {
     if(commands & RENDER_CMD_BIND_VBO && geometry)
     {
         geometry->BeginDraw();
     }
-    if(commands & RENDER_CMD_CHANGE_PROJECTION)
+    if(commands & RENDER_CMD_CHANGE_CAMERA)
     {
-        ChangeProjectionMatrix(projection, si);
+        ChangeProjectionMatrix(camera.projection);
+        ChangeCameraMatrix(camera.viewMatrix);
     }
     if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
     {

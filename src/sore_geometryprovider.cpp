@@ -20,10 +20,10 @@
 
 #include "sore_geometryprovider.h"
 
-SORE_Graphics::ProjectionInfo SORE_Graphics::GeometryProvider::GetProjection(
-    geometry_layer layer)
+SORE_Graphics::GeometryProvider::~GeometryProvider()
 {
-    ProjectionInfo pi;
-    pi.type = NONE;
-    return pi;
+}
+
+void SORE_Graphics::GeometryProvider::MakeUpToDate()
+{
 }

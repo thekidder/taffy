@@ -70,13 +70,14 @@ void SORE_Graphics::Renderer::Build()
 {
     ClearGeometry();
     batches.clear();
-    if(!currentState->size())
+    if(!currentState->providers.size())
         return;
 
     std::vector<Renderable> allRenderables;
 
     std::vector<GeometryProvider*>::iterator it;
-    for(it = currentState->begin(); it != currentState->end(); ++it)
+    for(it = currentState->providers.begin(); 
+        it != currentState->providers.end(); ++it)
     {
         (*it)->MakeUpToDate();
         std::copy((*it)->GeometryBegin(), (*it)->GeometryEnd(),
@@ -88,7 +89,7 @@ void SORE_Graphics::Renderer::Build()
     std::vector<Renderable>::iterator rit;
     for(rit = allRenderables.begin(); rit != allRenderables.end(); ++rit)
     {
-        rit->SetProjection(SetupProjection(GetProjection(rit->GetLayer()), screen));
+        rit->SetProjection(SetupProjection(GetCamera(rit->GetLayer()).projection, screen));
     }
     std::sort(allRenderables.begin(), allRenderables.end());
 
@@ -125,7 +126,7 @@ void SORE_Graphics::Renderer::Build()
             u = r_it->Uniforms();
 
         bool bindVBO = false, bindShader = false, bindTexture = false;
-        bool changeBlend = false, changeProjection = false, changeUniforms = false;
+        bool changeBlend = false, changeCamera = false, changeUniforms = false;
         if(vboSize == 0)
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
@@ -141,9 +142,9 @@ void SORE_Graphics::Renderer::Build()
         if(!u.Empty())
             changeUniforms = true;
         if(r_it == allRenderables.begin() || r_it->GetLayer() != old.GetLayer())
-            changeProjection = true;
+            changeCamera = true;
         if(bindVBO || bindShader || bindTexture || changeBlend
-           || changeProjection || changeUniforms)
+           || changeCamera || changeUniforms)
         {
             if(!batches.empty())
             {
@@ -154,9 +155,9 @@ void SORE_Graphics::Renderer::Build()
                                           bindVBO));
             offset += numTris;
 
-            if(changeProjection)
-                batches.back().AddChangeProjectionCommand(
-                    GetProjection(r_it->GetLayer()));
+            if(changeCamera)
+                batches.back().AddChangeCameraCommand(
+                    GetCamera(r_it->GetLayer()));
             if(changeBlend)
                 batches.back().AddChangeBlendModeCommand(r_it->GetBlendMode());
             if(bindShader)
@@ -193,7 +194,7 @@ void SORE_Graphics::Renderer::Render()
     {
         for(it = batches.begin(); it != batches.end(); ++it)
         {
-            numPolys += it->Render(screen);
+            numPolys += it->Render();
             drawCalls++;
         }
         geometry.back()->EndDraw();
@@ -204,19 +205,19 @@ void SORE_Graphics::Renderer::Render()
     PrintGLErrors(SORE_Logging::LVL_ERROR);
 }
 
-SORE_Graphics::ProjectionInfo SORE_Graphics::Renderer::GetProjection(
-    geometry_layer layer)
+SORE_Graphics::camera_info SORE_Graphics::Renderer::GetCamera(geometry_layer layer)
 {
-    std::vector<GeometryProvider*>::iterator it;
-    for(it = currentState->begin(); it != currentState->end(); ++it)
+    std::map<geometry_layer, camera_callback>::iterator it;
+    it = currentState->cameras.find(layer);
+    if(it != currentState->cameras.end())
     {
-        if((*it)->HasProjection(layer))
-            return (*it)->GetProjection(layer);
+        camera_info temp = it->second();
+        temp.projection = SetupProjection(temp.projection, screen);
     }
-    ProjectionInfo none;
-    none.type = NONE;
+    camera_info none;
     return none;
 }
+
 
 void SORE_Graphics::Renderer::CalculateFPS()
 {
@@ -261,25 +262,17 @@ unsigned int SORE_Graphics::Renderer::GetNumPolys() const
 
 void SORE_Graphics::Renderer::ClearGeometryProviders()
 {
-    currentState->clear();
+    currentState->providers.clear();
 }
 
 void SORE_Graphics::Renderer::AddGeometryProvider(GeometryProvider* gp)
 {
-    for(unsigned int i = 0; i < 8; ++i)
-    {
-        geometry_layer l = static_cast<geometry_layer>(LAYER0 + i);
-        if(gp->HasProjection(l) && GetProjection(l).type != NONE)
-            ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                       boost::format("GeometryProvider provides a projection for "
-                                     "layer %d that will be overridden") % i);
-    }
-    currentState->push_back(gp);
+    currentState->providers.push_back(gp);
 }
 
 void SORE_Graphics::Renderer::PushState()
 {
-    std::vector<GeometryProvider*> temp;
+    render_info temp;
     geometryProviders.push_back(temp);
     currentState = geometryProviders.end() - 1;
 }
