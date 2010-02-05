@@ -18,11 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SORE_UNIFORMSTATE_H
-#define SORE_UNIFORMSTATE_H
+#ifndef SORE_TEXTURESTATE_H
+#define SORE_TEXTURESTATE_H
 
 #include <map>
 #include <string>
+
+#include <boost/functional/hash.hpp>
 
 #include "sore_dll.h"
 #include "sore_shaders.h"
@@ -38,11 +40,14 @@ namespace SORE_Graphics
         void AddTexture(const std::string& samplerName, Texture2DPtr tex);
 
         bool Empty() const; //returns true if there are no uniforms
+        std::size_t GetSortKey() const;
 
         //returns all uniforms in this not in o
-        TextureState GetDiff(const TextureState& o);
+        TextureState GetDiff(const TextureState& o) const;
     private:
         std::map<std::string, Texture2DPtr> textures;
+
+        std::size_t cachedHash;
     };
 }
 #endif

@@ -34,6 +34,15 @@ void SORE_Graphics::TextureState::AddTexture(
     const std::string& samplerName, Texture2DPtr tex)
 {
     textures[samplerName] = tex;
+    cachedHash = 0;
+    std::map<std::string, Texture2DPtr>::const_iterator it;
+    for(it = textures.begin(); it != textures.end(); ++it)
+    {
+        if(it->second)
+        {
+            boost::hash_combine(cachedHash, it->second->GetHandle());
+        }
+    }
 }
 
 bool SORE_Graphics::TextureState::Empty() const
@@ -41,8 +50,13 @@ bool SORE_Graphics::TextureState::Empty() const
     return textures.empty();
 }
 
+std::size_t SORE_Graphics::TextureState::GetSortKey() const
+{
+    return cachedHash;
+}
+
 SORE_Graphics::TextureState SORE_Graphics::TextureState::GetDiff(
-    const TextureState& o)
+    const TextureState& o) const
 {
     TextureState r;
     std::map<std::string, Texture2DPtr>::const_iterator it;

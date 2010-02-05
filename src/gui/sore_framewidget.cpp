@@ -65,7 +65,7 @@ namespace SORE_GUI
         texture = tex;
         for(unsigned int i=0;i<9;++i)
         {
-            chunk[i].SetTexture(tex);
+            chunk[i].AddTexture("texture", tex);
         }
     }
 

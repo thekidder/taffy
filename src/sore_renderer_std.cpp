@@ -131,10 +131,12 @@ void SORE_Graphics::Renderer::Build()
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
             bindShader = true;
-        if(r_it == allRenderables.begin()
-           || (r_it->GetTexture() && old.GetTexture()
-            && *r_it->GetTexture() != *old.GetTexture())
-           || (r_it->GetTexture() && !old.GetTexture()))
+        TextureState t;
+        if(r_it != allRenderables.begin())
+            t = r_it->GetTextures().GetDiff(old.GetTextures());
+        else
+            t = r_it->GetTextures();
+        if(!t.Empty())
             bindTexture = true;
         if(r_it == allRenderables.begin() ||
            r_it->GetBlendMode() != old.GetBlendMode())
@@ -164,7 +166,7 @@ void SORE_Graphics::Renderer::Build()
                 batches.back().AddBindShaderCommand(r_it->GetShader());
             if(bindTexture)
                 batches.back().AddBindTextureCommand(
-                    r_it->GetShader(), r_it->GetTexture());
+                    r_it->GetShader(), t);
             if(changeUniforms)
                 batches.back().AddChangeUniformsCommand(r_it->GetShader(), u);
             numTris = 0;

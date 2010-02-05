@@ -25,9 +25,9 @@ SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
 }
 
 SORE_Graphics::Renderable::Renderable(
-    GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
-    TransformationPtr trans, geometry_layer l, blend_mode b)
-    : geometry(g), shader(s), texture(tex), transformation(trans),
+    GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans, 
+    geometry_layer l, blend_mode b)
+    : geometry(g), shader(s), transformation(trans),
       layer(l), blending(b), cachedDepth(0.0f), sortKey(0)
 {
     CalculateDepth();
@@ -179,9 +179,7 @@ void SORE_Graphics::Renderable::CalculateSortKey()
     sortKey |= (depth & 0xFFF) << (keyLen - 2 - 3 - 12);
     if(shader)
         sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
-    if(texture)
-        sortKey |= texture->GetHandle();
-
+    sortKey |= ((textures.GetSortKey() % 512)); //9 bits for texture
 }
 
 bool SORE_Graphics::operator<(const SORE_Graphics::Renderable& one,

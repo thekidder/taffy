@@ -59,8 +59,8 @@ namespace SORE_Graphics
     {
     public:
         Renderable();
-        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, Texture2DPtr tex,
-                   TransformationPtr trans, geometry_layer l, blend_mode b);
+        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans, 
+            geometry_layer l, blend_mode b);
 
         void SetGeometryChunk(GeometryChunkPtr g);
         GeometryChunkPtr GetGeometryChunk() const;

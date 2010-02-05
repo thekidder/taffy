@@ -49,7 +49,7 @@ namespace SORE_Graphics
         void AddChangeCameraCommand(camera_info cam);
         void AddChangeBlendModeCommand(blend_mode mode);
         void AddBindShaderCommand(GLSLShaderPtr shader);
-        void AddBindTextureCommand(GLSLShaderPtr shader, Texture2DPtr texture);
+        void AddBindTextureCommand(GLSLShaderPtr shader, TextureState textures);
         void AddChangeUniformsCommand(GLSLShaderPtr shader, UniformState uniforms);
 
         //returns number of polygons rendered
@@ -67,7 +67,7 @@ namespace SORE_Graphics
         blend_mode blend;
         camera_info camera;
         GLSLShaderPtr shader;
-        Texture2DPtr texture;
+        TextureState textures;
 
         UniformState uniforms;
     };

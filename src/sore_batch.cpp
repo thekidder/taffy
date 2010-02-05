@@ -56,10 +56,10 @@ void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
 }
 
 void SORE_Graphics::RenderBatch::AddBindTextureCommand(
-    GLSLShaderPtr shader, Texture2DPtr texture)
+    GLSLShaderPtr shader, TextureState textures)
 {
     this->shader = shader;
-    this->texture = texture;
+    this->textures = textures;
     commands |= RENDER_CMD_BIND_TEXTURE;
 }
 
@@ -151,7 +151,7 @@ unsigned int SORE_Graphics::RenderBatch::Render()
     }
     if(commands & RENDER_CMD_BIND_TEXTURE)
     {
-        texture->Bind(shader, "texture", 0);
+        textures.Bind(shader);
     }
     if(commands & RENDER_CMD_CHANGE_UNIFORMS)
     {

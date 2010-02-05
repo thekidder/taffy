@@ -67,6 +67,8 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
     g->SetColor(White);
 
     TransformationPtr transformation(new SORE_Math::Matrix4<float>());
-    Renderable r(g, shader, texture, transformation, l, b);
+    Renderable r(g, shader, transformation, l, b);
+    if(texture)
+        r.AddTexture("texture", texture);
     return r;
 }
