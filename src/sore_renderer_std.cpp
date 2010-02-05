@@ -219,6 +219,7 @@ SORE_Graphics::camera_info SORE_Graphics::Renderer::GetCamera(geometry_layer lay
     {
         camera_info temp = it->second();
         temp.projection = SetupProjection(temp.projection, screen);
+        return temp;
     }
     camera_info none;
     return none;
