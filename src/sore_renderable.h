@@ -25,7 +25,7 @@
 
 #include "math/sore_matrix4x4.h"
 #include "sore_geometrychunk.h"
-#include "sore_texture.h"
+#include "sore_texturestate.h"
 #include "sore_screeninfo.h"
 #include "sore_shaders.h"
 #include "sore_uniformstate.h"
@@ -68,8 +68,8 @@ namespace SORE_Graphics
         void SetShader(GLSLShaderPtr s);
         GLSLShaderPtr GetShader() const;
 
-        void SetTexture(Texture2DPtr t);
-        Texture2DPtr GetTexture() const;
+        void AddTexture(const std::string& samplerName, Texture2DPtr t);
+        const TextureState& GetTextures() const;
 
         void MulitplyTransform(TransformationPtr t);
         void SetTransform(TransformationPtr t);
@@ -92,7 +92,7 @@ namespace SORE_Graphics
 
         GeometryChunkPtr geometry;
         GLSLShaderPtr shader;
-        Texture2DPtr texture;
+        TextureState textures;
         TransformationPtr transformation;
         geometry_layer layer;
         blend_mode blending;

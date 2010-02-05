@@ -56,15 +56,16 @@ SORE_Graphics::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
     return shader;
 }
 
-void SORE_Graphics::Renderable::SetTexture(Texture2DPtr t)
+void SORE_Graphics::Renderable::AddTexture(
+    const std::string& samplerName, Texture2DPtr t)
 {
-    texture = t;
+    textures.AddTexture(samplerName, t);
     CalculateSortKey();
 }
 
-SORE_Graphics::Texture2DPtr SORE_Graphics::Renderable::GetTexture() const
+const SORE_Graphics::TextureState& SORE_Graphics::Renderable::GetTextures() const
 {
-    return texture;
+    return textures;
 }
 
 void SORE_Graphics::Renderable::MulitplyTransform(TransformationPtr t)
