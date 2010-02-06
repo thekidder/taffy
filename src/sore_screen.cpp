@@ -32,8 +32,8 @@
 namespace SORE_Kernel
 {
     Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-		const std::string& windowTitle, const std::string& iconFilename, 
-		SORE_Utility::SettingsManager* _sm)
+        const std::string& windowTitle, const std::string& iconFilename,
+        SORE_Utility::SettingsManager* _sm)
         : input(i), drawContext(0), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
@@ -89,11 +89,11 @@ namespace SORE_Kernel
         }
         best_w = SDL_GetVideoInfo()->current_w;
         best_h = SDL_GetVideoInfo()->current_h;
-	
-		if(iconFilename.size())
-		{
-			SDL_WM_SetIcon(SDL_LoadBMP(iconFilename.c_str()), NULL);
-		}
+
+        if(iconFilename.size())
+        {
+            SDL_WM_SetIcon(SDL_LoadBMP(iconFilename.c_str()), NULL);
+        }
 
         SDLScreenChange(screen);
         if(InitializeGL()!=0)
@@ -285,8 +285,24 @@ namespace SORE_Kernel
         glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
         glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
         InitExtensions();
+#ifdef WIN32
+        if(WGLEW_EXT_swap_control)
+        {
+            wglSwapIntervalEXT(0); //turn off vsync
+        }
+        else
+        {
+            ENGINE_LOG(SORE_Logging::LVL_WARNING, "Vsync control not available");
+        }
+#endif
+        PrintGLDiagnostics();
+        return 0;
+    }
+
+    void Screen::PrintGLDiagnostics()
+    {
         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                   boost::format("OpenGL Rendering information\n"
+                   boost::format("OpenGL Diagnostics\n"
                                  "Renderer   : %s\n"
                                  "Vender     : %s\n"
                                  "API Version: %s")
@@ -301,19 +317,30 @@ namespace SORE_Kernel
         {
             extensions.replace(pos, 1, "\n");
         }
-        ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("OpenGL extension string:\n%s")
-                   % extensions);
-#ifdef WIN32
-        if(WGLEW_EXT_swap_control)
-        {
-            wglSwapIntervalEXT(0); //turn off vsync
-        }
-        else
-        {
-            ENGINE_LOG(SORE_Logging::LVL_WARNING, "Vsync control not available");
-        }
-#endif
-        return 0;
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("OpenGL extension string:\n%s") % extensions);
+        int maxVertexTextureImageUnits;
+        glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
+                      &maxVertexTextureImageUnits);
+        int maxCombinedTextureImageUnits;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+                      &maxCombinedTextureImageUnits);
+         ENGINE_LOG(SORE_Logging::LVL_INFO,
+                    boost::format("Maximum Vertex Texture Units: %d; "
+                                  "maximum combined texture units: %d")
+                    % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
+         int width[2];
+         glGetIntegerv(GL_LINE_WIDTH_RANGE, width);
+         ENGINE_LOG(SORE_Logging::LVL_INFO,
+                    boost::format("Minimum line width: %d; "
+                                  "maximum line width: %d")
+                    % width[0] % width[1]);
+         glGetIntegerv(GL_POINT_SIZE_RANGE, width);
+         ENGINE_LOG(SORE_Logging::LVL_INFO,
+                    boost::format("Minimum point size: %d; "
+                                  "maximum point size: %d")
+                    % width[0] % width[1]);
+
     }
 
     void Screen::InitExtensions()
