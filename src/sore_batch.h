@@ -44,8 +44,8 @@ namespace SORE_Graphics
         RenderBatch(GraphicsArray* vertices, bool bindVBO = false);
 
         void SetType(GLenum type);
-        void SetNumTriangles(unsigned int numTris);
-        void SetTriangleOffset(unsigned int offset);
+        void SetNumIndices(unsigned int numIndices);
+        void SetIndexOffset(unsigned int offset);
 
         void AddChangeCameraCommand(camera_info cam);
         void AddChangeBlendModeCommand(blend_mode mode);
@@ -62,8 +62,8 @@ namespace SORE_Graphics
         unsigned int commands;
 
         GraphicsArray* geometry;
-        unsigned int numberTriangles;
-        unsigned int triangleOffset;
+        unsigned int numberIndices;
+        unsigned int indexOffset;
         GLenum type;
 
         blend_mode blend;

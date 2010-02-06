@@ -32,14 +32,14 @@ void SORE_Graphics::RenderBatch::SetType(GLenum type)
     this->type = type;
 }
 
-void SORE_Graphics::RenderBatch::SetNumTriangles(unsigned int numTris)
+void SORE_Graphics::RenderBatch::SetNumIndices(unsigned int numIndices)
 {
-    numberTriangles = numTris;
+    numberIndices = numIndices;
 }
 
-void SORE_Graphics::RenderBatch::SetTriangleOffset(unsigned int offset)
+void SORE_Graphics::RenderBatch::SetIndexOffset(unsigned int offset)
 {
-    triangleOffset = offset;
+    indexOffset = offset;
 }
 
 void SORE_Graphics::RenderBatch::AddChangeCameraCommand(camera_info cam)
@@ -164,8 +164,17 @@ unsigned int SORE_Graphics::RenderBatch::Render()
     }
     if(geometry)
     {
-        geometry->DrawElements(numberTriangles, triangleOffset, type);
-        return numberTriangles;
+        unsigned int trisPerPoly;
+        if(type == GL_POINTS)
+            trisPerPoly = 1;
+        else if(type == GL_LINES)
+            trisPerPoly = 2;
+        else if(type == GL_TRIANGLES)
+            trisPerPoly = 3;
+        else
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unsupported primitive type");
+        geometry->DrawElements(numberIndices, indexOffset, type);
+        return numberIndices/trisPerPoly;
     }
     return 0;
 }

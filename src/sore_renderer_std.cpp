@@ -95,7 +95,7 @@ void SORE_Graphics::Renderer::Build()
 
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
-    unsigned int vboSize = 0, numTris = 0, offset = 0;
+    unsigned int vboSize = 0, numIndices = 0, offset = 0;
     if(geometry.empty())
     {
         GraphicsArray* ga = new GraphicsArrayClass(true, true);
@@ -109,7 +109,7 @@ void SORE_Graphics::Renderer::Build()
         {
             (*thisGeometry)->Build();
             thisGeometry++;
-            vboSize = numTris = offset = 0;
+            vboSize = numIndices = offset = 0;
             if(thisGeometry == geometry.end())
             {
                 GraphicsArray* ga = new GraphicsArrayClass(true, true);
@@ -153,12 +153,12 @@ void SORE_Graphics::Renderer::Build()
         {
             if(!batches.empty())
             {
-                batches.back().SetNumTriangles(numTris);
-                batches.back().SetTriangleOffset(offset);
+                batches.back().SetNumIndices(numIndices);
+                batches.back().SetIndexOffset(offset);
             }
             batches.push_back(RenderBatch(*thisGeometry,
                                           bindVBO));
-            offset += numTris;
+            offset += numIndices;
 
             if(changeCamera)
                 batches.back().AddChangeCameraCommand(
@@ -173,15 +173,15 @@ void SORE_Graphics::Renderer::Build()
             if(changeUniforms)
                 batches.back().AddChangeUniformsCommand(r_it->GetShader(), u);
             batches.back().SetType(r_it->GetGeometryChunk()->Type());
-            numTris = 0;
+            numIndices = 0;
         }
         vboSize += r_it->GetGeometryChunk()->NumIndices();
-        numTris += r_it->GetGeometryChunk()->NumIndices()/3;
+        numIndices += r_it->GetGeometryChunk()->NumIndices();
         old = *r_it;
     }
     (*thisGeometry)->Build();
-    batches.back().SetNumTriangles(numTris);
-    batches.back().SetTriangleOffset(offset);
+    batches.back().SetNumIndices(numIndices);
+    batches.back().SetIndexOffset(offset);
 }
 
 void SORE_Graphics::Renderer::Render()

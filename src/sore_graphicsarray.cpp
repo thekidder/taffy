@@ -114,10 +114,10 @@ void SORE_Graphics::GraphicsArray::DrawAll(GLenum type)
 }
 
 void SORE_Graphics::GraphicsArray::DrawElements(
-    unsigned int numTris, unsigned short triOffset, GLenum type)
+    unsigned int numIndices, unsigned short indexOffset, GLenum type)
 {
-    glDrawElements(type, numTris*3, GL_UNSIGNED_SHORT,
-                   GetOffset(&(indices[0]), triOffset*3*sizeof(unsigned short)));
+    glDrawElements(type, numIndices, GL_UNSIGNED_SHORT,
+                   GetOffset(&(indices[0]), indexOffset*sizeof(unsigned short)));
 }
 
 bool SORE_Graphics::GraphicsArray::Empty() const
