@@ -76,6 +76,16 @@ void SORE_Graphics::RenderBatch::AddChangeUniformsCommand(
     commands |= RENDER_CMD_CHANGE_UNIFORMS;
 }
 
+void SORE_Graphics::RenderBatch::SetLayer(geometry_layer layer)
+{
+    this->layer = layer;
+}
+
+SORE_Graphics::geometry_layer SORE_Graphics::RenderBatch::GetLayer() const
+{
+    return layer;
+}
+
 void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
     const ProjectionInfo& projection)
 {

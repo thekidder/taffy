@@ -53,6 +53,9 @@ namespace SORE_Graphics
         void AddBindTextureCommand(GLSLShaderPtr shader, TextureState textures);
         void AddChangeUniformsCommand(GLSLShaderPtr shader, UniformState uniforms);
 
+        void SetLayer(geometry_layer layer);
+        geometry_layer GetLayer() const;
+
         //returns number of polygons rendered
         unsigned int Render();
     private:
@@ -67,6 +70,7 @@ namespace SORE_Graphics
         GLenum type;
 
         blend_mode blend;
+        geometry_layer layer;
         camera_info camera;
         GLSLShaderPtr shader;
         TextureState textures;

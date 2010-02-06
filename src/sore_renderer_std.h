@@ -69,8 +69,13 @@ namespace SORE_Graphics
     protected:
         virtual void OnScreenChange();
     private:
-        void ClearGeometry();
+        void ClearGeometry(std::vector<GraphicsArray*>& geometry);
         void Build();
+        void BuildStatic();
+        void MakeBatches(std::vector<Renderable>& allRenderables, 
+                         std::vector<RenderBatch>& batches,
+                         std::vector<GraphicsArray*>& geometry,
+                         bool isStatic);
 
         void CalculateFPS();
 
@@ -89,7 +94,10 @@ namespace SORE_Graphics
 
         std::vector<GraphicsArray*> geometry;
         std::vector<RenderBatch> batches;
-        std::vector<Renderable> staticGeometry;
+
+        std::vector<GraphicsArray*> staticGeometry;
+        std::vector<Renderable> staticRenderables;
+        std::vector<RenderBatch> staticBatches;
 
         //statistics: get info about current rendering
         float fps;

@@ -45,13 +45,17 @@ SORE_Graphics::Renderer::~Renderer()
     {
         delete *it;
     }
+    for(it = staticGeometry.begin(); it != staticGeometry.end(); ++it)
+    {
+        delete *it;
+    }
 }
 
 void SORE_Graphics::Renderer::OnScreenChange()
 {
 }
 
-void SORE_Graphics::Renderer::ClearGeometry()
+void SORE_Graphics::Renderer::ClearGeometry(std::vector<GraphicsArray*>& geometry)
 {
     std::vector<GraphicsArray*>::iterator it;
     for(it = geometry.begin(); it != geometry.end(); ++it)
@@ -62,7 +66,8 @@ void SORE_Graphics::Renderer::ClearGeometry()
 
 void SORE_Graphics::Renderer::AddStaticGeometry(SORE_Graphics::Renderable r)
 {
-    staticGeometry.push_back(r);
+    staticRenderables.push_back(r);
+    BuildStatic();
 }
 
 #ifndef SORE_NO_VBO
@@ -73,7 +78,7 @@ void SORE_Graphics::Renderer::AddStaticGeometry(SORE_Graphics::Renderable r)
 
 void SORE_Graphics::Renderer::Build()
 {
-    ClearGeometry();
+    ClearGeometry(geometry);
     batches.clear();
     if(!currentState->providers.size())
         return;
@@ -88,8 +93,6 @@ void SORE_Graphics::Renderer::Build()
         std::copy((*it)->GeometryBegin(), (*it)->GeometryEnd(),
                   std::back_inserter(allRenderables));
     }
-    std::copy(staticGeometry.begin(), staticGeometry.end(), 
-              std::back_inserter(allRenderables));
 
     if(allRenderables.empty())
         return;
@@ -98,14 +101,32 @@ void SORE_Graphics::Renderer::Build()
     {
         rit->SetProjection(SetupProjection(GetCamera(rit->GetLayer()).projection, screen));
     }
-    std::sort(allRenderables.begin(), allRenderables.end());
+
+    MakeBatches(allRenderables, batches, geometry, false);
+}
+
+void SORE_Graphics::Renderer::BuildStatic()
+{
+    staticBatches.clear();
+    ClearGeometry(staticGeometry);
+    staticGeometry.clear();
+    MakeBatches(staticRenderables, staticBatches, staticGeometry, true);
+}
+
+void SORE_Graphics::Renderer::MakeBatches(
+    std::vector<Renderable>& allRenderables, 
+    std::vector<RenderBatch>& batches,
+    std::vector<GraphicsArray*>& geometry,
+    bool isStatic)
+{
+        std::sort(allRenderables.begin(), allRenderables.end());
 
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
     unsigned int vboSize = 0, numIndices = 0, offset = 0;
     if(geometry.empty())
     {
-        GraphicsArray* ga = new GraphicsArrayClass(false, true, true);
+        GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
         geometry.push_back(ga);
     }
     Renderable old = allRenderables.front();
@@ -121,7 +142,7 @@ void SORE_Graphics::Renderer::Build()
             vboSize = numIndices = offset = 0;
             if(thisGeometry == geometry.end())
             {
-                GraphicsArray* ga = new GraphicsArrayClass(false, true, true);
+                GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
                 geometry.push_back(ga);
                 thisGeometry = geometry.end() - 1;
             }
@@ -167,6 +188,7 @@ void SORE_Graphics::Renderer::Build()
             }
             batches.push_back(RenderBatch(*thisGeometry,
                                           bindVBO));
+            batches.back().SetLayer(r_it->GetLayer());
             offset += numIndices;
 
             if(changeCamera)
@@ -204,17 +226,26 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    std::vector<RenderBatch>::iterator it;
-    if(batches.size())
+    std::vector<RenderBatch>::iterator it, prev;
+    for(it = prev = staticBatches.begin(); it != staticBatches.end(); ++it)
     {
-        for(it = batches.begin(); it != batches.end(); ++it)
+        if((it != prev && it->GetLayer() != prev->GetLayer()) || it == prev)
         {
-            numPolys += it->Render();
-            drawCalls++;
+            it->AddChangeCameraCommand(GetCamera(it->GetLayer()));
+            ENGINE_LOG(SORE_Logging::LVL_INFO, "setting camera");
         }
-        geometry.back()->EndDraw();
-    }
+        numPolys += it->Render();
+        drawCalls++;
 
+        prev = it;
+    }
+    for(it = batches.begin(); it != batches.end(); ++it)
+    {
+        numPolys += it->Render();
+        drawCalls++;
+    }
+    if(drawCalls > 0)
+        geometry.back()->EndDraw();
     CalculateFPS();
 
     PrintGLErrors(SORE_Logging::LVL_ERROR);
