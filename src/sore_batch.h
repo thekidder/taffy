@@ -43,6 +43,7 @@ namespace SORE_Graphics
         //sets command to either NONE or BIND_VBO
         RenderBatch(GraphicsArray* vertices, bool bindVBO = false);
 
+        void SetType(GLenum type);
         void SetNumTriangles(unsigned int numTris);
         void SetTriangleOffset(unsigned int offset);
 
@@ -63,6 +64,7 @@ namespace SORE_Graphics
         GraphicsArray* geometry;
         unsigned int numberTriangles;
         unsigned int triangleOffset;
+        GLenum type;
 
         blend_mode blend;
         camera_info camera;

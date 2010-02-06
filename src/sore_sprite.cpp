@@ -29,7 +29,7 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
         geometry_layer l,
         blend_mode b)
 {
-    GeometryChunkPtr g(new GeometryChunk(4, 6));
+    GeometryChunkPtr g(new GeometryChunk(4, 6, GL_TRIANGLES));
     unsigned short* const indices = g->GetIndices();
     vertex* const vertices = g->GetVertices();
 

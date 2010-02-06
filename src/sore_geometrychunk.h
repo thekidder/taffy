@@ -23,6 +23,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "sore_allgl.h"
 #include "sore_color.h"
 #include "sore_dll.h"
 
@@ -42,7 +43,7 @@ namespace SORE_Graphics
     class SORE_EXPORT GeometryChunk
     {
     public:
-        GeometryChunk(unsigned int nVertices, unsigned int nIndices);
+        GeometryChunk(unsigned int nVertices, unsigned int nIndices, GLenum type);
         GeometryChunk(const GeometryChunk& o);
         ~GeometryChunk();
 
@@ -55,6 +56,7 @@ namespace SORE_Graphics
         unsigned short* const GetIndices();
         unsigned short& GetIndex(unsigned short i);
 
+        GLenum         Type() const;
         unsigned short NumVertices() const;
         unsigned short NumIndices() const;
 
@@ -66,6 +68,7 @@ namespace SORE_Graphics
         unsigned short numVertices, numIndices;
         vertex* data;
         unsigned short* indices;
+        GLenum type;
 
     };
 

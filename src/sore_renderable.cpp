@@ -146,7 +146,7 @@ void SORE_Graphics::Renderable::CalculateDepth()
 void SORE_Graphics::Renderable::CalculateSortKey()
 {
     const unsigned int keyLen = 32;
-    const unsigned int depthBits = 12;
+    const unsigned int depthBits = 11;
     unsigned int depth;
 
     float z = 0.0f;

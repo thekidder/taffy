@@ -107,16 +107,16 @@ void SORE_Graphics::GraphicsArray::EndDraw()
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void SORE_Graphics::GraphicsArray::DrawAll()
+void SORE_Graphics::GraphicsArray::DrawAll(GLenum type)
 {
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT,
+    glDrawElements(type, indices.size(), GL_UNSIGNED_SHORT,
                    GetOffset(&(indices[0]), 0));
 }
 
 void SORE_Graphics::GraphicsArray::DrawElements(
-    unsigned int numTris, unsigned short triOffset)
+    unsigned int numTris, unsigned short triOffset, GLenum type)
 {
-    glDrawElements(GL_TRIANGLES, numTris*3, GL_UNSIGNED_SHORT,
+    glDrawElements(type, numTris*3, GL_UNSIGNED_SHORT,
                    GetOffset(&(indices[0]), triOffset*3*sizeof(unsigned short)));
 }
 

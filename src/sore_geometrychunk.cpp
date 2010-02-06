@@ -25,16 +25,17 @@
 #include "sore_logger.h"
 
 SORE_Graphics::GeometryChunk::GeometryChunk(
-    unsigned int nVertices, unsigned int nIndices)
-    : numVertices(nVertices), numIndices(nIndices)
+    unsigned int nVertices, unsigned int nIndices, GLenum type)
+    : numVertices(nVertices), numIndices(nIndices), type(type)
 {
 	if(nIndices > std::numeric_limits<unsigned short>::max())
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many indices in geometry chunk");
 	if(nVertices > std::numeric_limits<unsigned short>::max())
 		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many vertices in geometry chunk");
-	if(nIndices % 3 != 0)
-		ENGINE_LOG(SORE_Logging::LVL_ERROR, 
-		           "Number of indices in geometry chunk is not divisible by three");
+	if((type == GL_TRIANGLES && nIndices % 3 != 0) ||
+       (type == GL_LINES     && nIndices % 2 != 0) ||
+       (type == GL_QUADS     && nIndices % 4 != 0))
+		ENGINE_LOG(SORE_Logging::LVL_ERROR, "Number of indices is invalid");
     data = new vertex[numVertices];
     indices = new unsigned short[numIndices];
 }
@@ -63,6 +64,7 @@ SORE_Graphics::GeometryChunk& SORE_Graphics::GeometryChunk::operator=(
 
 void SORE_Graphics::GeometryChunk::Init(const GeometryChunk& o)
 {
+    type = o.type;
     numVertices = o.numVertices;
     numIndices = o.numIndices;
     data = new vertex[numVertices];
@@ -91,6 +93,11 @@ SORE_Graphics::vertex& SORE_Graphics::GeometryChunk::GetVertex(unsigned short i)
 {
     assert(i < numVertices);
     return data[i];
+}
+
+GLenum SORE_Graphics::GeometryChunk::Type() const
+{
+    return type;
 }
 
 unsigned short SORE_Graphics::GeometryChunk::NumVertices() const

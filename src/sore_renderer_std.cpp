@@ -127,6 +127,7 @@ void SORE_Graphics::Renderer::Build()
 
         bool bindVBO = false, bindShader = false, bindTexture = false;
         bool changeBlend = false, changeCamera = false, changeUniforms = false;
+        bool changeType = false;
         if(vboSize == 0)
             bindVBO = true;
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
@@ -136,6 +137,8 @@ void SORE_Graphics::Renderer::Build()
             t = r_it->GetTextures().GetDiff(old.GetTextures());
         else
             t = r_it->GetTextures();
+        if(r_it->GetGeometryChunk()->Type() != old.GetGeometryChunk()->Type())
+            changeType = true;
         if(!t.Empty())
             bindTexture = true;
         if(r_it == allRenderables.begin() ||
@@ -146,7 +149,7 @@ void SORE_Graphics::Renderer::Build()
         if(r_it == allRenderables.begin() || r_it->GetLayer() != old.GetLayer())
             changeCamera = true;
         if(bindVBO || bindShader || bindTexture || changeBlend
-           || changeCamera || changeUniforms)
+           || changeCamera || changeUniforms || changeType)
         {
             if(!batches.empty())
             {
@@ -169,6 +172,7 @@ void SORE_Graphics::Renderer::Build()
                     r_it->GetShader(), t);
             if(changeUniforms)
                 batches.back().AddChangeUniformsCommand(r_it->GetShader(), u);
+            batches.back().SetType(r_it->GetGeometryChunk()->Type());
             numTris = 0;
         }
         vboSize += r_it->GetGeometryChunk()->NumIndices();

@@ -48,8 +48,8 @@ namespace SORE_Graphics
         void BeginDraw();
         void EndDraw();
 
-        void DrawAll();
-        void DrawElements(unsigned int numTris, unsigned short triOffset);
+        void DrawAll(GLenum type);
+        void DrawElements(unsigned int numTris, unsigned short triOffset, GLenum type);
 
         bool Empty() const;
     protected:

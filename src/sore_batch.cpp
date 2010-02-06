@@ -27,6 +27,11 @@ SORE_Graphics::RenderBatch::RenderBatch(GraphicsArray* vertices, bool bindVBO)
         commands |= RENDER_CMD_BIND_VBO;
 }
 
+void SORE_Graphics::RenderBatch::SetType(GLenum type)
+{
+    this->type = type;
+}
+
 void SORE_Graphics::RenderBatch::SetNumTriangles(unsigned int numTris)
 {
     numberTriangles = numTris;
@@ -159,7 +164,7 @@ unsigned int SORE_Graphics::RenderBatch::Render()
     }
     if(geometry)
     {
-        geometry->DrawElements(numberTriangles, triangleOffset);
+        geometry->DrawElements(numberTriangles, triangleOffset, type);
         return numberTriangles;
     }
     return 0;
