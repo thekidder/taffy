@@ -86,5 +86,14 @@ namespace SORE_GUI
         draws->UpdateText(boost::str(boost::format("%d") % renderer->GetDrawCalls()));
         polys->UpdateText(boost::str(boost::format("%d") % renderer->GetNumPolys()));
         ms->UpdateText(boost::str(boost::format("%d") % renderer->GetFrameMS()));
+
+        fps->SetPosition(SVec(SUnit(1.0, -10 - fps->GetSize(HORIZONTAL)), 
+                              SUnit(0.0, 0)));
+        draws->SetPosition(SVec(SUnit(1.0, -10 - draws->GetSize(HORIZONTAL)), 
+                                SUnit(0.0, 16)));
+        polys->SetPosition(SVec(SUnit(1.0, -10 - polys->GetSize(HORIZONTAL)), 
+                                SUnit(0.0, 32)));
+        ms->SetPosition(SVec(SUnit(1.0, -10 - ms->GetSize(HORIZONTAL)), 
+                             SUnit(0.0, 48)));
     }
 }
