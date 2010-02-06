@@ -108,6 +108,8 @@ void SORE_Graphics::Renderer::Build()
         if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
         {
             (*thisGeometry)->Build();
+            batches.back().SetNumIndices(numIndices);
+            batches.back().SetIndexOffset(offset);
             thisGeometry++;
             vboSize = numIndices = offset = 0;
             if(thisGeometry == geometry.end())
@@ -151,7 +153,7 @@ void SORE_Graphics::Renderer::Build()
         if(bindVBO || bindShader || bindTexture || changeBlend
            || changeCamera || changeUniforms || changeType)
         {
-            if(!batches.empty())
+            if(!batches.empty() && !bindVBO)
             {
                 batches.back().SetNumIndices(numIndices);
                 batches.back().SetIndexOffset(offset);
