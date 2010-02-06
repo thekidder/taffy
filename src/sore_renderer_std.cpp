@@ -232,7 +232,6 @@ void SORE_Graphics::Renderer::Render()
         if((it != prev && it->GetLayer() != prev->GetLayer()) || it == prev)
         {
             it->AddChangeCameraCommand(GetCamera(it->GetLayer()));
-            ENGINE_LOG(SORE_Logging::LVL_INFO, "setting camera");
         }
         numPolys += it->Render();
         drawCalls++;
