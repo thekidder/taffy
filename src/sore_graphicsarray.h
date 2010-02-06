@@ -36,7 +36,7 @@ namespace SORE_Graphics
     class SORE_EXPORT GraphicsArray
     {
     public:
-        GraphicsArray(bool t = false, bool c = false, bool n = false);
+        GraphicsArray(bool isStatic, bool t = false, bool c = false, bool n = false);
         virtual ~GraphicsArray();
 
         virtual void Build() = 0;
@@ -60,6 +60,7 @@ namespace SORE_Graphics
         std::vector<unsigned short> indices;
 
         bool hasTexCoords, hasNormals, hasColors;
+        bool isStatic;
     };
 }
 

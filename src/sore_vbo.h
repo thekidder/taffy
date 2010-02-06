@@ -38,7 +38,7 @@ namespace SORE_Graphics
     class SORE_EXPORT VBO : public GraphicsArray
     {
     public:
-        VBO(bool t = false, bool c = false, bool n = false);
+        VBO(bool s, bool t = false, bool c = false, bool n = false);
         ~VBO();
 
         virtual void Build();

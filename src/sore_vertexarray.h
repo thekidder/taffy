@@ -28,7 +28,7 @@ namespace SORE_Graphics
     class SORE_EXPORT VertexArray : public GraphicsArray
     {
     public:
-        VertexArray(bool t = false, bool c = false, bool n = false);
+        VertexArray(bool s, bool t = false, bool c = false, bool n = false);
 
         void Build() {}
     private:

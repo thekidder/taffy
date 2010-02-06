@@ -24,8 +24,8 @@
 
 namespace SORE_Graphics
 {
-    VBO::VBO(bool t, bool c, bool n) :
-        GraphicsArray(t, c, n), vbo(0), vboIndices(0)
+    VBO::VBO(bool s, bool t, bool c, bool n) :
+        GraphicsArray(s, t, c, n), vbo(0), vboIndices(0)
     {
         glGenBuffersARB(1, &vbo);
         if(!vbo)
@@ -57,6 +57,8 @@ namespace SORE_Graphics
         if(!indices.size()) return;
 
         unsigned int usage = GL_STREAM_DRAW_ARB;
+        if(isStatic)
+            usage = GL_STATIC_DRAW_ARB;
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
         glBufferDataARB(GL_ARRAY_BUFFER_ARB,
                         vertices.size()*sizeof(vertex),

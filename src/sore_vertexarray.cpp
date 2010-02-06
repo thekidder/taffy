@@ -22,7 +22,8 @@
 
 namespace SORE_Graphics
 {
-    VertexArray::VertexArray(bool t, bool c, bool n) : GraphicsArray(t, c, n)
+    VertexArray::VertexArray(bool s, bool t, bool c, bool n) 
+        : GraphicsArray(s, t, c, n)
     {
     }
 

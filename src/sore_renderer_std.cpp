@@ -98,7 +98,7 @@ void SORE_Graphics::Renderer::Build()
     unsigned int vboSize = 0, numIndices = 0, offset = 0;
     if(geometry.empty())
     {
-        GraphicsArray* ga = new GraphicsArrayClass(true, true);
+        GraphicsArray* ga = new GraphicsArrayClass(false, true, true);
         geometry.push_back(ga);
     }
     Renderable old = allRenderables.front();
@@ -114,7 +114,7 @@ void SORE_Graphics::Renderer::Build()
             vboSize = numIndices = offset = 0;
             if(thisGeometry == geometry.end())
             {
-                GraphicsArray* ga = new GraphicsArrayClass(true, true);
+                GraphicsArray* ga = new GraphicsArrayClass(false, true, true);
                 geometry.push_back(ga);
                 thisGeometry = geometry.end() - 1;
             }

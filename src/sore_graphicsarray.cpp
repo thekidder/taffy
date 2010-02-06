@@ -21,8 +21,8 @@
 #include "sore_graphicsarray.h"
 #include "sore_logger.h"
 
-SORE_Graphics::GraphicsArray::GraphicsArray(bool t, bool c, bool n) :
-    hasTexCoords(t), hasNormals(n), hasColors(c)
+SORE_Graphics::GraphicsArray::GraphicsArray(bool isStatic, bool t, bool c, bool n) 
+  : hasTexCoords(t), hasNormals(n), hasColors(c), isStatic(isStatic)
 {
 }
 
