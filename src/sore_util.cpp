@@ -83,8 +83,7 @@ namespace SORE_Utility
         size_t len;
         if(!file.strm().good())
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Could not load INI file"));
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not load INI file");
             return list;
         }
         else
