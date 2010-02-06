@@ -33,7 +33,7 @@ namespace SORE_Graphics
     {
     public:
         Texture2D(SORE_Resource::WatchedFileArrayPtr wfa);
-        Texture2D(const unsigned char* data, GLint internalFormat,
+        Texture2D(const void* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
         ~Texture2D();
         void Bind(
@@ -53,7 +53,7 @@ namespace SORE_Graphics
     protected:
         void Load();
         void LoadTGA(const char* filename);
-        void LoadFromData(const unsigned char* data, GLint internalFormat,
+        void LoadFromData(const void* data, GLint internalFormat,
                           GLenum format, unsigned int width, unsigned int height);
         void Unload();
 

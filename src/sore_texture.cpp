@@ -198,7 +198,7 @@ namespace SORE_Graphics
         file.close();
     }
 
-    void Texture2D::LoadFromData(const unsigned char* data, GLint internalFormat,
+    void Texture2D::LoadFromData(const void* data, GLint internalFormat,
                                  GLenum format, unsigned int width, unsigned height)
     {
         w = width;
@@ -213,9 +213,31 @@ namespace SORE_Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
         glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+        GLenum type = GL_UNSIGNED_BYTE;
+        //interpret data as unsigned bytes unless a float format is specified
+        const unsigned int NUM_FLOAT_FORMATS = 12;
+        GLint floatFormats[NUM_FLOAT_FORMATS] = {
+            GL_RGBA32F_ARB,
+            GL_RGB32F_ARB,
+            GL_ALPHA32F_ARB,
+            GL_INTENSITY32F_ARB,
+            GL_LUMINANCE32F_ARB,
+            GL_LUMINANCE_ALPHA32F_ARB,
+            GL_RGBA16F_ARB,
+            GL_RGB16F_ARB,
+            GL_ALPHA16F_ARB,
+            GL_INTENSITY16F_ARB,
+            GL_LUMINANCE16F_ARB,
+            GL_LUMINANCE_ALPHA16F_ARB
+        };
+        for(int i = 0; i < NUM_FLOAT_FORMATS; ++i)
+        {
+            if(internalFormat == floatFormats[i])
+                type = GL_FLOAT;
+        }
         glTexImage2D( GL_TEXTURE_2D, 0, internalFormat, width,
                       height, 0, format,
-                      GL_UNSIGNED_BYTE, data);
+                      type, data);
     }
 
     Texture2D::Texture2D(SORE_Resource::WatchedFileArrayPtr wfa)
@@ -224,7 +246,7 @@ namespace SORE_Graphics
         Load();
     }
 
-    Texture2D::Texture2D(const unsigned char* data, GLint internalFormat,
+    Texture2D::Texture2D(const void* data, GLint internalFormat,
                          GLenum format, unsigned int width, unsigned int height)
         : Resource(SORE_Resource::WatchedFileArrayPtr()), handle(0)
     {
