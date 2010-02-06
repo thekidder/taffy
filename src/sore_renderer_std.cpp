@@ -60,6 +60,11 @@ void SORE_Graphics::Renderer::ClearGeometry()
     }
 }
 
+void SORE_Graphics::Renderer::AddStaticGeometry(SORE_Graphics::Renderable r)
+{
+    staticGeometry.push_back(r);
+}
+
 #ifndef SORE_NO_VBO
 #define GraphicsArrayClass VBO
 #else
@@ -83,6 +88,8 @@ void SORE_Graphics::Renderer::Build()
         std::copy((*it)->GeometryBegin(), (*it)->GeometryEnd(),
                   std::back_inserter(allRenderables));
     }
+    std::copy(staticGeometry.begin(), staticGeometry.end(), 
+              std::back_inserter(allRenderables));
 
     if(allRenderables.empty())
         return;

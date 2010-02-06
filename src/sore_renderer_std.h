@@ -54,6 +54,7 @@ namespace SORE_Graphics
         virtual void Render();
 
         void ClearGeometryProviders();
+        void AddStaticGeometry(Renderable r);
         void AddGeometryProvider(GeometryProvider* gp);
         void SetCamera(geometry_layer layer, camera_callback camera);
 
@@ -88,6 +89,7 @@ namespace SORE_Graphics
 
         std::vector<GraphicsArray*> geometry;
         std::vector<RenderBatch> batches;
+        std::vector<Renderable> staticGeometry;
 
         //statistics: get info about current rendering
         float fps;
