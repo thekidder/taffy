@@ -72,3 +72,31 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
         r.AddTexture("texture", texture);
     return r;
 }
+
+SORE_Graphics::Renderable SORE_Graphics::MakePointSprite(
+        SORE_Math::Vector3<float> position,
+        float size,
+        Texture2DPtr texture,
+        GLSLShaderPtr shader,
+        geometry_layer l,
+        blend_mode b)
+{
+    GeometryChunkPtr g(new GeometryChunk(1, 1, GL_POINTS));
+    unsigned short* const indices = g->GetIndices();
+    vertex* const vertices = g->GetVertices();
+
+    indices[0] = 0;
+
+    vertices[0].x = position[0];
+    vertices[0].y = position[1];
+    vertices[0].z = position[2];
+   
+    g->SetColor(White);
+
+    TransformationPtr transformation(new SORE_Math::Matrix4<float>());
+    Renderable r(g, shader, transformation, l, b);
+    if(texture)
+        r.AddTexture("texture", texture);
+    r.Uniforms().SetVariable("pointSize", size);
+    return r;
+}
