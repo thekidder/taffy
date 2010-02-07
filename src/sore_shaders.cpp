@@ -31,17 +31,9 @@ namespace SORE_Graphics
         initCalled = true;
         char* version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
         if(version==NULL)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Card reports GLSL not supported");
             supported = false;
-        }
         else
-        {
-            ENGINE_LOG(SORE_Logging::LVL_INFO,
-                       boost::format("OpenGL Shading language version: %s")
-                       % version);
             supported = true;
-        }
         if(supported)
         {
             if(!(GLEW_VERSION_2_0 ||

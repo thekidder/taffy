@@ -309,6 +309,17 @@ namespace SORE_Kernel
                    % (char*)glGetString(GL_RENDERER) % (char*)glGetString(GL_VENDOR)
                    % (char*)glGetString(GL_VERSION));
         char* glExtensions = (char*)glGetString(GL_EXTENSIONS);
+        char* version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+        if(version==NULL)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "No GLSL Support Available");
+        }
+        else
+        {
+            ENGINE_LOG(SORE_Logging::LVL_INFO,
+                       boost::format("OpenGL Shading language version: %s")
+                       % version);
+        }
         std::string extensions;
         if(glExtensions==NULL) extensions = "";
         else extensions = glExtensions;
@@ -319,28 +330,42 @@ namespace SORE_Kernel
         }
         ENGINE_LOG(SORE_Logging::LVL_INFO,
                    boost::format("OpenGL extension string:\n%s") % extensions);
+        int maxTextureSize;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+        ENGINE_LOG(SORE_Logging::LVL_INFO, 
+                   boost::format("Maximum texture size: %dx%d") 
+                   % maxTextureSize % maxTextureSize);
+        int maxTextureUnits;
+        int maxFragmentTextureImageUnits;
         int maxVertexTextureImageUnits;
+        int maxCombinedTextureImageUnits;
+        glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTextureUnits);
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxFragmentTextureImageUnits);
         glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
                       &maxVertexTextureImageUnits);
-        int maxCombinedTextureImageUnits;
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
                       &maxCombinedTextureImageUnits);
-         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                    boost::format("Maximum Vertex Texture Units: %d; "
-                                  "maximum combined texture units: %d")
-                    % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
-         int width[2];
-         glGetIntegerv(GL_LINE_WIDTH_RANGE, width);
-         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                    boost::format("Minimum line width: %d; "
-                                  "maximum line width: %d")
-                    % width[0] % width[1]);
-         glGetIntegerv(GL_POINT_SIZE_RANGE, width);
-         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                    boost::format("Minimum point size: %d; "
-                                  "maximum point size: %d")
-                    % width[0] % width[1]);
-
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Maximum (complete) texture units: %d\n"
+                                 "Maximum fragment texture units: %d\n"
+                                 "Maximum vertex texture units: %d\n"
+                                 "Maximum combined texture units: %d")
+                   % maxTextureUnits % maxFragmentTextureImageUnits 
+                   % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
+        int maxVertexAttribs;
+        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+        ENGINE_LOG(SORE_Logging::LVL_INFO, 
+                   boost::format("Maximum vertex attributes: %d") 
+                   % maxVertexAttribs);
+        int width[2];
+        glGetIntegerv(GL_LINE_WIDTH_RANGE, width);
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Line width range: %d - %d")              
+                   % width[0] % width[1]);
+        glGetIntegerv(GL_POINT_SIZE_RANGE, width);
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Point size range: %d - %d")
+                   % width[0] % width[1]);
     }
 
     void Screen::InitExtensions()
