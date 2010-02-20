@@ -251,7 +251,6 @@ namespace SORE_Graphics
         : Resource(SORE_Resource::WatchedFileArrayPtr()), handle(0)
     {
         LoadFromData(data, internalFormat, format, width, height);
-
     }
 
     Texture2D::~Texture2D()
