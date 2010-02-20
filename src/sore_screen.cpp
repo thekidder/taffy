@@ -352,6 +352,11 @@ namespace SORE_Kernel
                                  "Maximum combined texture units: %d")
                    % maxTextureUnits % maxFragmentTextureImageUnits 
                    % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
+        int maxMRT;
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &maxMRT);
+        ENGINE_LOG(SORE_Logging::LVL_INFO, 
+                   boost::format("Maximum color attachments: %d") 
+                   % maxMRT);
         int maxVertexAttribs;
         glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
         ENGINE_LOG(SORE_Logging::LVL_INFO, 
