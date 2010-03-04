@@ -18,38 +18,49 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SORE_TEXTURESTATE_H
-#define SORE_TEXTURESTATE_H
+#ifndef SORE_RENDERERSTATE_H
+#define SORE_RENDERERSTATE_H
 
-#include <map>
-#include <string>
-
-#include <boost/functional/hash.hpp>
-
-#include "sore_dll.h"
-#include "sore_shaders.h"
-#include "sore_texture.h"
+#include "sore_renderable.h"
+#include "sore_screeninfo.h"
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT TextureState
+    class RenderState
     {
     public:
-        void Bind(GLSLShaderPtr s) const;
+        //create an empty RenderState
+        RenderState();
+        //set up state for rendering a single renderable
+        RenderState(const Renderable& r, camera_info cam);
 
-        void AddTexture(const std::string& samplerName, Texture2DPtr tex);
-
-        bool Empty() const; //returns true if there are no uniforms
-        std::size_t GetSortKey() const;
-
-        //returns all uniforms in this not in o
-        TextureState GetDiff(const TextureState& o) const;
+        //create state based upon the differences between a previous state 
+        //and a renderable
+        RenderState Difference(const Renderable& r, camera_info cam) const;
+        bool Empty() const;
+        void Apply() const;
     private:
-        std::map<std::string, Texture2DPtr> textures;
+        const static unsigned int RENDER_CMD_NONE              = 0;
+        const static unsigned int RENDER_CMD_CHANGE_CAMERA     = 1;
+        const static unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 2;
+        const static unsigned int RENDER_CMD_BIND_SHADER       = 4;
+        const static unsigned int RENDER_CMD_BIND_TEXTURE      = 8;
+        const static unsigned int RENDER_CMD_CHANGE_UNIFORMS   = 16;
 
-        std::size_t cachedHash;
+        void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera);
+        void ChangeProjectionMatrix(const ProjectionInfo& proj);
+
+        unsigned int commands;
+
+        UniformState uniforms;
+        TextureState textures;
+        GLSLShaderPtr shader;
+
+        camera_info camera;
+        blend_mode blend;
+
+        GLenum primitiveType;
     };
-
-    typedef boost::shared_ptr<TextureState> TextureStatePtr;
 }
+
 #endif

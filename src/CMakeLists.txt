@@ -56,6 +56,7 @@ set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
   sore_input.cpp sore_interpolater.cpp sore_logger.cpp
   sore_logginginit.cpp sore_math.cpp sore_profiler.cpp
   sore_renderable.cpp sore_renderer.cpp sore_renderer_std.cpp
+  sore_renderstate.cpp
   sore_resource.cpp sore_scenegraph.cpp sore_scenenode.cpp
   sore_screen.cpp sore_screeninfo.cpp sore_settings.cpp
   sore_shaders.cpp sore_sprite.cpp sore_task.cpp sore_text.cpp
@@ -70,7 +71,7 @@ set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_geometrychunk.h sore_geometryprovider.h sore_graphics.h
   sore_graphicsarray.h sore_input.h sore_interpolater.h sore_logger.h
   sore_logginginit.h sore_math.h sore_profiler.h sore_renderable.h
-  sore_renderer.h sore_renderer_std.h sore_resource.h
+  sore_renderer.h sore_renderer_std.h sore_renderstate.h sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_sprite.h sore_task.h sore_text.h
   sore_texture.h sore_texturestate.h sore_timing.h sore_uniformstate.h 

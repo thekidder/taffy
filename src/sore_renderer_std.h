@@ -22,6 +22,7 @@
 #define SORE_RENDERER2D_H
 
 #include <boost/function.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "sore_batch.h"
 #include "sore_fbo.h"
@@ -69,13 +70,26 @@ namespace SORE_Graphics
     protected:
         virtual void OnScreenChange();
     private:
+        struct geometry_entry
+        {
+            GraphicsArray* geometry;
+            unsigned int offset;
+            unsigned int num;
+        };
+
         void ClearGeometry(std::vector<GraphicsArray*>& geometry);
         void Build();
         void BuildStatic();
-        void MakeBatches(std::vector<Renderable>& allRenderables, 
-                         std::vector<RenderBatch>& batches,
-                         std::vector<GraphicsArray*>& geometry,
-                         bool isStatic);
+        void MakeBatches(
+            std::vector<Renderable>& allRenderables, 
+            std::vector<RenderBatch>& batches,
+            boost::unordered_map<Renderable, geometry_entry>& geometryMap,
+            bool isStatic);
+        void BuildGeometryBuffers(
+            std::vector<Renderable>& allRenderables,
+            std::vector<GraphicsArray*>& geometry,
+            bool isStatic,
+            boost::unordered_map<Renderable, geometry_entry>& result);
 
         void CalculateFPS();
 

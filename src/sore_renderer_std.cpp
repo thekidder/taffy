@@ -102,7 +102,10 @@ void SORE_Graphics::Renderer::Build()
         rit->SetProjection(SetupProjection(GetCamera(rit->GetLayer()).projection, screen));
     }
 
-    MakeBatches(allRenderables, batches, geometry, false);
+    std::sort(allRenderables.begin(), allRenderables.end());
+    boost::unordered_map<Renderable, geometry_entry> geometryMap;
+    BuildGeometryBuffers(allRenderables, geometry, false, geometryMap);
+    MakeBatches(allRenderables, batches, geometryMap, false);
 }
 
 void SORE_Graphics::Renderer::BuildStatic()
@@ -110,44 +113,27 @@ void SORE_Graphics::Renderer::BuildStatic()
     staticBatches.clear();
     ClearGeometry(staticGeometry);
     staticGeometry.clear();
-    MakeBatches(staticRenderables, staticBatches, staticGeometry, true);
+
+    std::sort(staticRenderables.begin(), staticRenderables.end());
+    boost::unordered_map<Renderable, geometry_entry> geometryMap;
+    BuildGeometryBuffers(staticRenderables, staticGeometry, true, geometryMap);
+    MakeBatches(staticRenderables, staticBatches, geometryMap, true);
 }
 
 void SORE_Graphics::Renderer::MakeBatches(
     std::vector<Renderable>& allRenderables, 
     std::vector<RenderBatch>& batches,
-    std::vector<GraphicsArray*>& geometry,
+    boost::unordered_map<Renderable, geometry_entry>& geometryMap,
     bool isStatic)
 {
-        std::sort(allRenderables.begin(), allRenderables.end());
-
     //loop through all renderables, building VBOs and draw call commands
     std::vector<Renderable>::iterator r_it;
-    unsigned int vboSize = 0, numIndices = 0, offset = 0;
-    if(geometry.empty())
-    {
-        GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
-        geometry.push_back(ga);
-    }
+    unsigned int numIndices = 0, offset = 0;
     Renderable old = allRenderables.front();
-    std::vector<GraphicsArray*>::iterator thisGeometry = geometry.begin();
+    GraphicsArray* gaOld = geometryMap[allRenderables.front()].geometry;
     for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
     {
-        if(r_it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
-        {
-            (*thisGeometry)->Build();
-            batches.back().SetNumIndices(numIndices);
-            batches.back().SetIndexOffset(offset);
-            thisGeometry++;
-            vboSize = numIndices = offset = 0;
-            if(thisGeometry == geometry.end())
-            {
-                GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
-                geometry.push_back(ga);
-                thisGeometry = geometry.end() - 1;
-            }
-        }
-        (*thisGeometry)->AddObject(r_it->GetGeometryChunk(), r_it->GetTransform());
+        geometry_entry current = geometryMap[*r_it];
 
         UniformState u;
         if(r_it != allRenderables.begin())
@@ -158,8 +144,12 @@ void SORE_Graphics::Renderer::MakeBatches(
         bool bindVBO = false, bindShader = false, bindTexture = false;
         bool changeBlend = false, changeCamera = false, changeUniforms = false;
         bool changeType = false;
-        if(vboSize == 0)
+        if(numIndices == 0 || gaOld != current.geometry)
+        {
             bindVBO = true;
+            offset = current.offset;
+            numIndices = 0;
+        }
         if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
             bindShader = true;
         TextureState t;
@@ -186,7 +176,7 @@ void SORE_Graphics::Renderer::MakeBatches(
                 batches.back().SetNumIndices(numIndices);
                 batches.back().SetIndexOffset(offset);
             }
-            batches.push_back(RenderBatch(*thisGeometry,
+            batches.push_back(RenderBatch(current.geometry,
                                           bindVBO));
             batches.back().SetLayer(r_it->GetLayer());
             offset += numIndices;
@@ -206,13 +196,70 @@ void SORE_Graphics::Renderer::MakeBatches(
             batches.back().SetType(r_it->GetGeometryChunk()->Type());
             numIndices = 0;
         }
-        vboSize += r_it->GetGeometryChunk()->NumIndices();
         numIndices += r_it->GetGeometryChunk()->NumIndices();
         old = *r_it;
     }
-    (*thisGeometry)->Build();
     batches.back().SetNumIndices(numIndices);
     batches.back().SetIndexOffset(offset);
+}
+
+namespace boost
+{
+    static std::size_t hash_value(const SORE_Graphics::Renderable& r)
+    {
+        std::size_t seed = 0;
+        boost::hash_combine(seed, r.GetGeometryChunk());
+
+        return seed;
+    }
+}
+
+namespace SORE_Graphics
+{
+    static bool operator==(const SORE_Graphics::Renderable& one,
+                           const SORE_Graphics::Renderable& two)
+    {
+        return one.GetGeometryChunk() == two.GetGeometryChunk()
+            && *one.GetTransform() == *two.GetTransform();
+    }
+}
+
+void SORE_Graphics::Renderer::BuildGeometryBuffers(
+    std::vector<Renderable>& allRenderables,
+    std::vector<GraphicsArray*>& geometry,
+    bool isStatic,
+    boost::unordered_map<Renderable, geometry_entry>& result)
+{
+    unsigned int vboSize = 0;
+    if(geometry.empty())
+    {
+        GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
+        geometry.push_back(ga);
+    }
+
+    std::vector<GraphicsArray*>::iterator thisGeometry = geometry.begin();
+    std::vector<Renderable>::iterator it;
+    for(it = allRenderables.begin(); it != allRenderables.end(); ++it)
+    {
+        if(it->GetGeometryChunk()->NumIndices() + vboSize > 65535)
+        {
+            (*thisGeometry)->Build();
+            thisGeometry++;
+            vboSize = 0;
+            if(thisGeometry == geometry.end())
+            {
+                GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
+                geometry.push_back(ga);
+                thisGeometry = geometry.end() - 1;
+            }
+        }
+        (*thisGeometry)->AddObject(it->GetGeometryChunk(), it->GetTransform());
+        geometry_entry e = {*thisGeometry, vboSize, it->GetGeometryChunk()->NumIndices()};
+        const Renderable& r = *it;
+        result[r] = e;
+        vboSize += it->GetGeometryChunk()->NumIndices();
+    }
+    geometry.back()->Build();
 }
 
 void SORE_Graphics::Renderer::Render()

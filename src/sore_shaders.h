@@ -74,6 +74,8 @@ namespace SORE_Graphics
 
         void SetUniform1fv(
             std::string name, unsigned int count, const GLfloat* values);
+        void SetUniformMatrix4fv(
+            std::string name, const GLfloat * values);
 
         GLint GetAttributeLocation(std::string name);
 

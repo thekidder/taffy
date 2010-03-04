@@ -29,13 +29,7 @@
 
 namespace SORE_Graphics
 {
-    const unsigned int RENDER_CMD_NONE              = 0;
-    const unsigned int RENDER_CMD_BIND_VBO          = 1;
-    const unsigned int RENDER_CMD_CHANGE_CAMERA     = 2;
-    const unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 4;
-    const unsigned int RENDER_CMD_BIND_SHADER       = 8;
-    const unsigned int RENDER_CMD_BIND_TEXTURE      = 16;
-    const unsigned int RENDER_CMD_CHANGE_UNIFORMS   = 32;
+
 
     class RenderBatch
     {
@@ -59,11 +53,6 @@ namespace SORE_Graphics
         //returns number of polygons rendered
         unsigned int Render();
     private:
-        void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera);
-        void ChangeProjectionMatrix(const ProjectionInfo& proj);
-
-        unsigned int commands;
-
         GraphicsArray* geometry;
         unsigned int numberIndices;
         unsigned int indexOffset;

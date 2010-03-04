@@ -51,7 +51,9 @@ void SORE_Graphics::UniformState::Bind(GLSLShaderPtr s) const
                             it->second.v4.GetValue()[2],
                             it->second.v4.GetValue()[3]);
             break;
-
+        case MAT4:
+            s->SetUniformMatrix4fv(it->first, it->second.m4.GetData());
+            break;
         }
     }
 }
@@ -89,6 +91,13 @@ void SORE_Graphics::UniformState::SetVariable(
     uniforms[name].v4 = v;
 }
 
+void SORE_Graphics::UniformState::SetVariable(
+    std::string name, SORE_Math::Matrix4<float> m)
+{
+    uniforms[name].type = MAT4;
+    uniforms[name].m4 = m;
+}
+
 void SORE_Graphics::UniformState::SetVariable(std::string name, uniform_var v)
 {
     switch(v.type)
@@ -107,6 +116,9 @@ void SORE_Graphics::UniformState::SetVariable(std::string name, uniform_var v)
         break;
     case VEC4:
         SetVariable(name, v.v4);
+        break;
+    case MAT4:
+        SetVariable(name, v.m4);
         break;
     }
 }
@@ -151,6 +163,8 @@ bool SORE_Graphics::operator==(
         return (two.type == SORE_Graphics::VEC3 && one.v3 == two.v3);
     case SORE_Graphics::VEC4:
         return (two.type == SORE_Graphics::VEC4 && one.v4 == two.v4);
+    case SORE_Graphics::MAT4:
+        return (two.type == SORE_Graphics::MAT4 && one.m4 == two.m4);
     default:
         return false;
     }

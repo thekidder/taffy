@@ -506,6 +506,21 @@ namespace SORE_Graphics
         }
     }
 
+    void GLSLShader::SetUniformMatrix4fv(
+        std::string name, const GLfloat * values)
+    {
+        if(!ShadersSupported() || program==0)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+            return;
+        }
+        GLint location = GetUniformLocation(name);
+        if(location!=-1)
+        {
+            glUniformMatrix4fvARB(location, 1, false, values);
+        }
+    }
+
     std::string GLSLShader::ProcessFilename(const std::string& filename)
     {
         return filename;

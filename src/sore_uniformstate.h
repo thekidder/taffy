@@ -28,11 +28,12 @@
 #include "math/sore_vector2.h"
 #include "math/sore_vector3.h"
 #include "math/sore_vector4.h"
+#include "math/sore_matrix4x4.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-    enum uniform_type {INT, FLOAT, VEC2, VEC3, VEC4};
+    enum uniform_type {INT, FLOAT, VEC2, VEC3, VEC4, MAT4};
 
     struct uniform_var
     {
@@ -43,6 +44,7 @@ namespace SORE_Graphics
         SORE_Math::Vector2<float> v2;
         SORE_Math::Vector3<float> v3;
         SORE_Math::Vector4<float> v4;
+        SORE_Math::Matrix4<float> m4;
     };
 
     bool operator==(const uniform_var& one, const uniform_var& two);
@@ -58,6 +60,7 @@ namespace SORE_Graphics
         void SetVariable(std::string name, SORE_Math::Vector2<float> v);
         void SetVariable(std::string name, SORE_Math::Vector3<float> v);
         void SetVariable(std::string name, SORE_Math::Vector4<float> v);
+        void SetVariable(std::string name, SORE_Math::Matrix4<float> m);
 
         void SetVariable(std::string name, uniform_var v);
 
@@ -68,5 +71,7 @@ namespace SORE_Graphics
     private:
         std::map<std::string, uniform_var> uniforms;
     };
+
+    typedef boost::shared_ptr<UniformState> UniformStatePtr;
 }
 #endif

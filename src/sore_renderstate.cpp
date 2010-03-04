@@ -18,83 +18,84 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_batch.h"
+#include "sore_renderstate.h"
 
-SORE_Graphics::RenderBatch::RenderBatch(GraphicsArray* vertices, bool bindVBO)
-    : commands(RENDER_CMD_NONE), geometry(vertices)
+SORE_Graphics::RenderState::RenderState() : commands(0)
 {
-    if(bindVBO)
-        commands |= RENDER_CMD_BIND_VBO;
 }
 
-void SORE_Graphics::RenderBatch::SetType(GLenum type)
+SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam) 
+  : commands(0)
 {
-    this->type = type;
-}
-
-void SORE_Graphics::RenderBatch::SetNumIndices(unsigned int numIndices)
-{
-    numberIndices = numIndices;
-}
-
-void SORE_Graphics::RenderBatch::SetIndexOffset(unsigned int offset)
-{
-    indexOffset = offset;
-}
-
-void SORE_Graphics::RenderBatch::AddChangeCameraCommand(camera_info cam)
-{
-    camera = cam;
     commands |= RENDER_CMD_CHANGE_CAMERA;
-}
+    camera = cam;
 
-void SORE_Graphics::RenderBatch::AddChangeBlendModeCommand(blend_mode mode)
-{
-    blend = mode;
     commands |= RENDER_CMD_CHANGE_BLEND_MODE;
-}
+    blend = r.GetBlendMode();
 
-void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
-{
-    this->shader = shader;
-    commands |= RENDER_CMD_BIND_SHADER;
-}
-
-void SORE_Graphics::RenderBatch::AddBindTextureCommand(
-    GLSLShaderPtr shader, TextureState textures)
-{
-    this->shader = shader;
-    this->textures = textures;
-    commands |= RENDER_CMD_BIND_TEXTURE;
-}
-
-void SORE_Graphics::RenderBatch::AddChangeUniformsCommand(
-    GLSLShaderPtr shader, UniformState uniforms)
-{
-    this->shader = shader;
-    this->uniforms = uniforms;
-    commands |= RENDER_CMD_CHANGE_UNIFORMS;
-}
-
-void SORE_Graphics::RenderBatch::SetLayer(geometry_layer layer)
-{
-    this->layer = layer;
-}
-
-SORE_Graphics::geometry_layer SORE_Graphics::RenderBatch::GetLayer() const
-{
-    return layer;
-}
-
-
-
-
-unsigned int SORE_Graphics::RenderBatch::Render()
-{
-    if(commands & RENDER_CMD_BIND_VBO && geometry)
+    if(r.GetShader())
     {
-        geometry->BeginDraw();
+        commands |= RENDER_CMD_BIND_SHADER;
+        shader = r.GetShader();
     }
+
+    if(!r.GetTextures().Empty())
+    {
+        commands |= RENDER_CMD_BIND_TEXTURE;
+        textures = &r.GetTextures();
+    }
+
+    if(!r.Uniforms().Empty())
+    {
+        commands |= RENDER_CMD_CHANGE_UNIFORMS;
+        uniforms = &r.Uniforms();
+    }
+}
+
+SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(
+    const Renderable& r, camera_info cam) const
+{
+    RenderState newState;
+    if(camera != cam)
+    {
+        newState.commands |= RENDER_CMD_CHANGE_CAMERA;
+        newState.camera = cam;
+    }
+
+    if(r.GetBlendMode() != blend)
+    {
+        newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
+        newState.blend = r.GetBlendMode();
+    }
+
+    if(r.GetShader() != shader)
+    {
+        newState.commands |= RENDER_CMD_BIND_SHADER;
+        newState.shader = r.GetShader();
+    }
+
+    if(r.GetTextures() != textures)
+    {
+        newState.commands |= RENDER_CMD_BIND_TEXTURE;
+        newState.textures = r.GetTextures();
+    }
+
+    if(r.Uniforms() !] uniforms)
+    {
+        newState.commands |= RENDER_CMD_CHANGE_UNIFORMS;
+        newState.uniforms = r.Uniforms();
+    }
+
+    return newState;
+}
+
+bool SORE_Graphics::RenderState::Empty() const
+{
+    return commands == 0;
+}
+
+void SORE_Graphics::RenderState::Apply() const
+{
     if(commands & RENDER_CMD_CHANGE_CAMERA)
     {
         ChangeProjectionMatrix(camera.projection);
@@ -136,20 +137,42 @@ unsigned int SORE_Graphics::RenderBatch::Render()
     {
         uniforms.Bind(shader);
     }
-    if(geometry)
-    {
-        unsigned int trisPerPoly;
-        if(type == GL_POINTS)
-            trisPerPoly = 1;
-        else if(type == GL_LINES)
-            trisPerPoly = 2;
-        else if(type == GL_TRIANGLES)
-            trisPerPoly = 3;
-        else
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unsupported primitive type");
-        geometry->DrawElements(numberIndices, indexOffset, type);
-        return numberIndices/trisPerPoly;
-    }
-    return 0;
 }
 
+void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
+    const ProjectionInfo& projection)
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    switch(projection.type)
+    {
+    case NONE:
+        ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                   "No projection type set, could not initialize projection");
+        break;
+    case ORTHO2D:
+        gluOrtho2D(projection.left, projection.right,
+                   projection.top, projection.bottom);
+        break;
+    case ORTHO:
+        //TODO: finish ortho projection
+        break;
+    case PERSPECTIVE:
+        {
+            gluPerspective(projection.fov, projection.ratio,
+                           projection.znear, projection.zfar );
+            break;
+        }
+    default:
+        break;
+    }
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void SORE_Graphics::RenderBatch::ChangeCameraMatrix(
+    const SORE_Math::Matrix4<float>& camera)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMultMatrixf(camera.GetData());
+}

@@ -92,11 +92,11 @@ namespace SORE_Graphics
 
         GeometryChunkPtr geometry;
         GLSLShaderPtr shader;
-        TextureState textures;
+        TextureStatePtr textures;
         TransformationPtr transformation;
         geometry_layer layer;
         blend_mode blending;
-        UniformState uniforms;
+        UniformStatePtr uniforms;
 
         float cachedDepth;
 

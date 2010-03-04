@@ -272,6 +272,27 @@ namespace SORE_Math
 		Vector2<T> result(temp[0], temp[1]);
 		return result;
 	}
+
+    template<typename T>
+    bool operator==(const Matrix4<T>& one, const Matrix4<T>& two)
+    {
+        return one.GetData()[ 0] == two.GetData()[ 0] 
+            && one.GetData()[ 1] == two.GetData()[ 1]
+            && one.GetData()[ 2] == two.GetData()[ 2] 
+            && one.GetData()[ 3] == two.GetData()[ 3]
+            && one.GetData()[ 4] == two.GetData()[ 4]
+            && one.GetData()[ 5] == two.GetData()[ 5]
+            && one.GetData()[ 6] == two.GetData()[ 6]
+            && one.GetData()[ 7] == two.GetData()[ 7]
+            && one.GetData()[ 8] == two.GetData()[ 8]
+            && one.GetData()[ 9] == two.GetData()[ 9]
+            && one.GetData()[10] == two.GetData()[10]
+            && one.GetData()[11] == two.GetData()[11]
+            && one.GetData()[12] == two.GetData()[12]
+            && one.GetData()[13] == two.GetData()[13]
+            && one.GetData()[14] == two.GetData()[14]
+            && one.GetData()[15] == two.GetData()[15];
+    }
 }
 
 #endif
