@@ -70,7 +70,8 @@ set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_gamestate.h sore_gamestate_manager.h sore_gamekernel.h
   sore_geometrychunk.h sore_geometryprovider.h sore_graphics.h
   sore_graphicsarray.h sore_input.h sore_interpolater.h sore_logger.h
-  sore_logginginit.h sore_math.h sore_profiler.h sore_renderable.h
+  sore_logginginit.h sore_math.h sore_noncopyable.h sore_profiler.h 
+  sore_renderable.h
   sore_renderer.h sore_renderer_std.h sore_renderstate.h sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
   sore_settings.h sore_shaders.h sore_sprite.h sore_task.h sore_text.h

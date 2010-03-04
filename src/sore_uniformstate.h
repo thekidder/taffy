@@ -67,7 +67,7 @@ namespace SORE_Graphics
         bool Empty() const; //returns true if there are no uniforms
 
         //returns all uniforms in this not in o
-        UniformState GetDiff(const UniformState& o);
+        UniformState GetDiff(const UniformState& o) const;
     private:
         std::map<std::string, uniform_var> uniforms;
     };

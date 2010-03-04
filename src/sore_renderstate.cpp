@@ -42,13 +42,13 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
     if(!r.GetTextures().Empty())
     {
         commands |= RENDER_CMD_BIND_TEXTURE;
-        textures = &r.GetTextures();
+        textures = r.GetTextures();
     }
 
     if(!r.Uniforms().Empty())
     {
         commands |= RENDER_CMD_CHANGE_UNIFORMS;
-        uniforms = &r.Uniforms();
+        uniforms = r.Uniforms();
     }
 }
 
@@ -56,34 +56,45 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(
     const Renderable& r, camera_info cam) const
 {
     RenderState newState;
+    newState.camera = cam;
+    newState.blend = r.GetBlendMode();
+    newState.shader = r.GetShader();
+
     if(camera != cam)
     {
         newState.commands |= RENDER_CMD_CHANGE_CAMERA;
-        newState.camera = cam;
     }
 
     if(r.GetBlendMode() != blend)
     {
         newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
-        newState.blend = r.GetBlendMode();
     }
 
     if(r.GetShader() != shader)
     {
         newState.commands |= RENDER_CMD_BIND_SHADER;
-        newState.shader = r.GetShader();
     }
 
-    if(r.GetTextures() != textures)
+    TextureState tDiff = r.GetTextures().GetDiff(textures);
+    if(!tDiff.Empty())
     {
         newState.commands |= RENDER_CMD_BIND_TEXTURE;
-        newState.textures = r.GetTextures();
+        newState.textures = tDiff;
+    }
+    else
+    {
+        newState.textures = textures;
     }
 
-    if(r.Uniforms() !] uniforms)
+    UniformState uDiff = r.Uniforms().GetDiff(uniforms);
+    if(!uDiff.Empty())
     {
         newState.commands |= RENDER_CMD_CHANGE_UNIFORMS;
-        newState.uniforms = r.Uniforms();
+        newState.uniforms = uDiff;
+    }
+    else
+    {
+        newState.uniforms = uniforms;
     }
 
     return newState;
@@ -139,8 +150,8 @@ void SORE_Graphics::RenderState::Apply() const
     }
 }
 
-void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
-    const ProjectionInfo& projection)
+void SORE_Graphics::RenderState::ChangeProjectionMatrix(
+    const ProjectionInfo& projection) const
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -169,8 +180,8 @@ void SORE_Graphics::RenderBatch::ChangeProjectionMatrix(
     glMatrixMode(GL_MODELVIEW);
 }
 
-void SORE_Graphics::RenderBatch::ChangeCameraMatrix(
-    const SORE_Math::Matrix4<float>& camera)
+void SORE_Graphics::RenderState::ChangeCameraMatrix(
+    const SORE_Math::Matrix4<float>& camera) const
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

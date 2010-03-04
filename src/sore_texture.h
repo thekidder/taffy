@@ -24,12 +24,13 @@
 #include <boost/utility.hpp>
 
 #include "sore_allgl.h"
+#include "sore_noncopyable.h"
 #include "sore_resource.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT Texture2D : public SORE_Resource::Resource, boost::noncopyable
+    class SORE_EXPORT Texture2D : public SORE_Resource::Resource, SORE_Utility::Noncopyable
     {
     public:
         Texture2D(SORE_Resource::WatchedFileArrayPtr wfa);

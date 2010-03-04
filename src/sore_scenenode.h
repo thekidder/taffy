@@ -32,6 +32,7 @@
 #include "math/sore_matrix4x4.h"
 #include "math/sore_vector3.h"
 #include "sore_dll.h"
+#include "sore_noncopyable.h"
 #include "sore_renderable.h"
 
 namespace SORE_Graphics
@@ -43,7 +44,7 @@ namespace SORE_Graphics
     /**
        @author Adam Kidder <thekidder@gmail.com>
     */
-    class SORE_EXPORT SceneNode : boost::noncopyable
+    class SORE_EXPORT SceneNode : SORE_Utility::Noncopyable
     {
     public:
         SceneNode(Renderable r);

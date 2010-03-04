@@ -36,12 +36,13 @@
 #include "sore_allgl.h"
 #include "sore_logger.h"
 #include "sore_input.h"
+#include "sore_noncopyable.h"
 #include "sore_settings.h"
 #include "sore_screeninfo.h"
 
 namespace SORE_Kernel
 {
-    class SORE_EXPORT Screen : public Task, boost::noncopyable
+    class SORE_EXPORT Screen : public Task, SORE_Utility::Noncopyable
     {
     public:
         Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,

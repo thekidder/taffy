@@ -30,6 +30,7 @@
 #include "sore_geometryprovider.h"
 #include "sore_graphics.h"
 #include "sore_graphicsarray.h"
+#include "sore_noncopyable.h"
 #include "sore_renderable.h"
 #include "sore_renderer.h"
 #include "sore_resource.h"
@@ -46,7 +47,7 @@
 */
 namespace SORE_Graphics
 {
-    class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer, boost::noncopyable
+    class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer, SORE_Utility::Noncopyable
     {
     public:
         Renderer(SORE_Resource::ResourcePool& _pool);
@@ -70,13 +71,6 @@ namespace SORE_Graphics
     protected:
         virtual void OnScreenChange();
     private:
-        struct geometry_entry
-        {
-            GraphicsArray* geometry;
-            unsigned int offset;
-            unsigned int num;
-        };
-
         void ClearGeometry(std::vector<GraphicsArray*>& geometry);
         void Build();
         void BuildStatic();
@@ -110,6 +104,7 @@ namespace SORE_Graphics
         std::vector<RenderBatch> batches;
 
         std::vector<GraphicsArray*> staticGeometry;
+        boost::unordered_map<Renderable, geometry_entry> staticMap;
         std::vector<Renderable> staticRenderables;
         std::vector<RenderBatch> staticBatches;
 

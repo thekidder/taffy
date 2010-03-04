@@ -40,6 +40,7 @@
 #include "sore_input.h"
 #include "sore_fileio.h"
 #include "sore_logger.h"
+#include "sore_noncopyable.h"
 
 namespace SORE_Resource
 {
@@ -51,7 +52,7 @@ namespace SORE_Resource
     typedef boost::shared_ptr<WatchedFileArray> WatchedFileArrayPtr;
 }
 
-class SORE_EXPORT SORE_Resource::WatchedFileArray : boost::noncopyable
+class SORE_EXPORT SORE_Resource::WatchedFileArray : SORE_Utility::Noncopyable
 {
 public:
     WatchedFileArray(const std::string& filename,

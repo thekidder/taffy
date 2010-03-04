@@ -70,6 +70,44 @@ namespace SORE_Graphics
         return returnProj;
     }
 
+    bool operator==(const ProjectionInfo& one, const ProjectionInfo& two)
+    {
+        switch(one.type)
+        {
+        case NONE:
+            return two.type == NONE;
+        case ORTHO2D:
+            return two.type == ORTHO2D
+                && one.left == two.left && one.right == two.right
+                && one.top == two.top && one.bottom == two.bottom;
+        case ORTHO:
+            //TODO: finish ortho projection
+            return two.type == ORTHO;
+        case PERSPECTIVE:
+            return two.type == PERSPECTIVE
+                && one.fov == two.fov && one.ratio == two.ratio
+                && one.znear == two.znear && one.zfar == two.zfar;
+        default:
+            return false;
+        }
+    }
+
+    bool operator!=(const ProjectionInfo& one, const ProjectionInfo& two)
+    {
+        return !(one == two);
+    }
+
+    bool operator==(const camera_info& one, const camera_info& two)
+    {
+        return one.projection == two.projection
+            && one.viewMatrix == two.viewMatrix;
+    }
+
+    bool operator!=(const camera_info& one, const camera_info& two)
+    {
+        return !(one == two);
+    }
+
     SORE_Math::Vector2<float> ScreenToProjection(
         ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
     {

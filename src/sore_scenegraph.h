@@ -26,6 +26,7 @@
 #include "math/sore_matrix4x4.h"
 #include "math/sore_vector3.h"
 #include "sore_geometryprovider.h"
+#include "sore_noncopyable.h"
 #include "sore_renderable.h"
 #include "sore_scenenode.h"
 
@@ -33,7 +34,7 @@ namespace SORE_Graphics
 {
     const static ProjectionInfo defaultProjection(-1.0f, 1.0f);
 
-    class SORE_EXPORT SceneGraph : public GeometryProvider, boost::noncopyable
+    class SORE_EXPORT SceneGraph : public GeometryProvider, SORE_Utility::Noncopyable
     {
     public:
         SceneGraph();

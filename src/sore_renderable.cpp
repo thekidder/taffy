@@ -119,6 +119,11 @@ SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms()
     return *uniforms;
 }
 
+const SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms() const
+{
+    return *uniforms;
+}
+
 int SORE_Graphics::Renderable::GetSortKey() const
 {
     return sortKey;

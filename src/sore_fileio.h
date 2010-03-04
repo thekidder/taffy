@@ -35,6 +35,7 @@
 #include <zlib.h>
 
 #include "sore_gamekernel.h"
+#include "sore_noncopyable.h"
 #include "sore_task.h"
 
 namespace SORE_FileIO
@@ -87,7 +88,7 @@ namespace SORE_FileIO
         std::map<std::string, std::ifstream*> openPackages;
     };
 
-    class SORE_EXPORT InFile : boost::noncopyable
+    class SORE_EXPORT InFile : SORE_Utility::Noncopyable
     {
     public:
         InFile(const char* filename, PackageCache* cache = NULL);

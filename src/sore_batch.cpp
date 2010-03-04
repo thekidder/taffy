@@ -20,121 +20,25 @@
 
 #include "sore_batch.h"
 
-SORE_Graphics::RenderBatch::RenderBatch(GraphicsArray* vertices, bool bindVBO)
-    : commands(RENDER_CMD_NONE), geometry(vertices)
+SORE_Graphics::RenderBatch::RenderBatch(
+    const geometry_entry& geometry,
+    const RenderState& state, bool bindVBO)
+    : geometry(geometry.geometry), bind(bindVBO), numberIndices(geometry.num),
+      indexOffset(geometry.offset), type(geometry.type), state(state)
 {
-    if(bindVBO)
-        commands |= RENDER_CMD_BIND_VBO;
 }
 
-void SORE_Graphics::RenderBatch::SetType(GLenum type)
+void SORE_Graphics::RenderBatch::AddIndices(unsigned int numIndices)
 {
-    this->type = type;
+    numberIndices += numIndices;
 }
-
-void SORE_Graphics::RenderBatch::SetNumIndices(unsigned int numIndices)
-{
-    numberIndices = numIndices;
-}
-
-void SORE_Graphics::RenderBatch::SetIndexOffset(unsigned int offset)
-{
-    indexOffset = offset;
-}
-
-void SORE_Graphics::RenderBatch::AddChangeCameraCommand(camera_info cam)
-{
-    camera = cam;
-    commands |= RENDER_CMD_CHANGE_CAMERA;
-}
-
-void SORE_Graphics::RenderBatch::AddChangeBlendModeCommand(blend_mode mode)
-{
-    blend = mode;
-    commands |= RENDER_CMD_CHANGE_BLEND_MODE;
-}
-
-void SORE_Graphics::RenderBatch::AddBindShaderCommand(GLSLShaderPtr shader)
-{
-    this->shader = shader;
-    commands |= RENDER_CMD_BIND_SHADER;
-}
-
-void SORE_Graphics::RenderBatch::AddBindTextureCommand(
-    GLSLShaderPtr shader, TextureState textures)
-{
-    this->shader = shader;
-    this->textures = textures;
-    commands |= RENDER_CMD_BIND_TEXTURE;
-}
-
-void SORE_Graphics::RenderBatch::AddChangeUniformsCommand(
-    GLSLShaderPtr shader, UniformState uniforms)
-{
-    this->shader = shader;
-    this->uniforms = uniforms;
-    commands |= RENDER_CMD_CHANGE_UNIFORMS;
-}
-
-void SORE_Graphics::RenderBatch::SetLayer(geometry_layer layer)
-{
-    this->layer = layer;
-}
-
-SORE_Graphics::geometry_layer SORE_Graphics::RenderBatch::GetLayer() const
-{
-    return layer;
-}
-
-
-
 
 unsigned int SORE_Graphics::RenderBatch::Render()
 {
-    if(commands & RENDER_CMD_BIND_VBO && geometry)
+    state.Apply();
+    if(bind)
     {
         geometry->BeginDraw();
-    }
-    if(commands & RENDER_CMD_CHANGE_CAMERA)
-    {
-        ChangeProjectionMatrix(camera.projection);
-        ChangeCameraMatrix(camera.viewMatrix);
-    }
-    if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
-    {
-        unsigned int blendSFactor, blendDFactor;
-        switch(blend)
-        {
-        case BLEND_OPAQUE:
-            glEnable(GL_DEPTH_TEST);
-            blendSFactor = GL_ONE;
-            blendDFactor = GL_ZERO;
-            break;
-        case BLEND_ADDITIVE:
-            glDisable(GL_DEPTH_TEST);
-            blendSFactor = GL_SRC_ALPHA;
-            blendDFactor = GL_DST_ALPHA;
-            break;
-        case BLEND_SUBTRACTIVE:
-        default: //treat unknown type as subtractive by default
-            glDisable(GL_DEPTH_TEST);
-            blendSFactor = GL_SRC_ALPHA;
-            blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
-            break;
-        }
-        glBlendFunc(blendSFactor, blendDFactor);
-    }
-    if(commands & RENDER_CMD_BIND_SHADER)
-    {
-        shader->Bind();
-    }
-    if(commands & RENDER_CMD_BIND_TEXTURE)
-    {
-        textures.Bind(shader);
-    }
-    if(commands & RENDER_CMD_CHANGE_UNIFORMS)
-    {
-        uniforms.Bind(shader);
     }
     if(geometry)
     {
@@ -150,6 +54,9 @@ unsigned int SORE_Graphics::RenderBatch::Render()
         geometry->DrawElements(numberIndices, indexOffset, type);
         return numberIndices/trisPerPoly;
     }
-    return 0;
+    else
+    {
+        return 0;
+    }
 }
 

@@ -50,6 +50,9 @@ namespace SORE_Graphics
         bool useScreenRatio;
     };
 
+    bool operator==(const ProjectionInfo& one, const ProjectionInfo& two);
+    bool operator!=(const ProjectionInfo& one, const ProjectionInfo& two);
+
     struct ScreenInfo
     {
         int width, height;
@@ -65,6 +68,9 @@ namespace SORE_Graphics
         ProjectionInfo projection;
         SORE_Math::Matrix4<float> viewMatrix;
     };
+
+    bool operator==(const camera_info& one, const camera_info& two);
+    bool operator!=(const camera_info& one, const camera_info& two);
 
     ProjectionInfo SORE_EXPORT SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
 

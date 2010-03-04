@@ -129,7 +129,7 @@ bool SORE_Graphics::UniformState::Empty() const
 }
 
 SORE_Graphics::UniformState SORE_Graphics::UniformState::GetDiff(
-    const UniformState& o)
+    const UniformState& o) const
 {
     UniformState r;
     std::map<std::string, uniform_var>::const_iterator it;

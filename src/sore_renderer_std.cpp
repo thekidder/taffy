@@ -106,6 +106,9 @@ void SORE_Graphics::Renderer::Build()
     boost::unordered_map<Renderable, geometry_entry> geometryMap;
     BuildGeometryBuffers(allRenderables, geometry, false, geometryMap);
     MakeBatches(allRenderables, batches, geometryMap, false);
+
+    staticBatches.clear();
+    MakeBatches(staticRenderables, staticBatches, staticMap, true);
 }
 
 void SORE_Graphics::Renderer::BuildStatic()
@@ -115,9 +118,7 @@ void SORE_Graphics::Renderer::BuildStatic()
     staticGeometry.clear();
 
     std::sort(staticRenderables.begin(), staticRenderables.end());
-    boost::unordered_map<Renderable, geometry_entry> geometryMap;
-    BuildGeometryBuffers(staticRenderables, staticGeometry, true, geometryMap);
-    MakeBatches(staticRenderables, staticBatches, geometryMap, true);
+    BuildGeometryBuffers(staticRenderables, staticGeometry, true, staticMap);
 }
 
 void SORE_Graphics::Renderer::MakeBatches(
@@ -127,80 +128,36 @@ void SORE_Graphics::Renderer::MakeBatches(
     bool isStatic)
 {
     //loop through all renderables, building VBOs and draw call commands
-    std::vector<Renderable>::iterator r_it;
-    unsigned int numIndices = 0, offset = 0;
-    Renderable old = allRenderables.front();
-    GraphicsArray* gaOld = geometryMap[allRenderables.front()].geometry;
-    for(r_it = allRenderables.begin(); r_it != allRenderables.end(); ++r_it)
+    unsigned int numIndices = 0, currentOffset = 0;
+    std::vector<Renderable>::iterator it, prev = allRenderables.begin();
+    RenderState oldState;
+    geometry_entry previous;
+    previous.geometry = NULL;
+    for(it = allRenderables.begin(); it != allRenderables.end(); ++it)
     {
-        geometry_entry current = geometryMap[*r_it];
+        geometry_entry current = geometryMap[*it];
+        RenderState newState = oldState.Difference(*it, GetCamera(it->GetLayer()));
 
-        UniformState u;
-        if(r_it != allRenderables.begin())
-            u = r_it->Uniforms().GetDiff(old.Uniforms());
-        else
-            u = r_it->Uniforms();
-
-        bool bindVBO = false, bindShader = false, bindTexture = false;
-        bool changeBlend = false, changeCamera = false, changeUniforms = false;
-        bool changeType = false;
-        if(numIndices == 0 || gaOld != current.geometry)
+        if(previous.geometry != current.geometry)
         {
-            bindVBO = true;
-            offset = current.offset;
-            numIndices = 0;
+            batches.push_back(RenderBatch(current, newState, true));
         }
-        if(r_it == allRenderables.begin() || *r_it->GetShader() != *old.GetShader())
-            bindShader = true;
-        TextureState t;
-        if(r_it != allRenderables.begin())
-            t = r_it->GetTextures().GetDiff(old.GetTextures());
-        else
-            t = r_it->GetTextures();
-        if(r_it->GetGeometryChunk()->Type() != old.GetGeometryChunk()->Type())
-            changeType = true;
-        if(!t.Empty())
-            bindTexture = true;
-        if(r_it == allRenderables.begin() ||
-           r_it->GetBlendMode() != old.GetBlendMode())
-            changeBlend = true;
-        if(!u.Empty())
-            changeUniforms = true;
-        if(r_it == allRenderables.begin() || r_it->GetLayer() != old.GetLayer())
-            changeCamera = true;
-        if(bindVBO || bindShader || bindTexture || changeBlend
-           || changeCamera || changeUniforms || changeType)
+        else if(current.offset != (previous.offset + previous.num))
         {
-            if(!batches.empty() && !bindVBO)
-            {
-                batches.back().SetNumIndices(numIndices);
-                batches.back().SetIndexOffset(offset);
-            }
-            batches.push_back(RenderBatch(current.geometry,
-                                          bindVBO));
-            batches.back().SetLayer(r_it->GetLayer());
-            offset += numIndices;
-
-            if(changeCamera)
-                batches.back().AddChangeCameraCommand(
-                    GetCamera(r_it->GetLayer()));
-            if(changeBlend)
-                batches.back().AddChangeBlendModeCommand(r_it->GetBlendMode());
-            if(bindShader)
-                batches.back().AddBindShaderCommand(r_it->GetShader());
-            if(bindTexture)
-                batches.back().AddBindTextureCommand(
-                    r_it->GetShader(), t);
-            if(changeUniforms)
-                batches.back().AddChangeUniformsCommand(r_it->GetShader(), u);
-            batches.back().SetType(r_it->GetGeometryChunk()->Type());
-            numIndices = 0;
+            batches.push_back(RenderBatch(current, newState, false));
         }
-        numIndices += r_it->GetGeometryChunk()->NumIndices();
-        old = *r_it;
+        else if(!newState.Empty())
+        {
+            batches.push_back(RenderBatch(current, newState, false));
+        }
+        else
+        {
+            batches.back().AddIndices(current.num);
+        }
+
+        previous = current;
+        oldState = newState;
     }
-    batches.back().SetNumIndices(numIndices);
-    batches.back().SetIndexOffset(offset);
 }
 
 namespace boost
@@ -254,7 +211,11 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
             }
         }
         (*thisGeometry)->AddObject(it->GetGeometryChunk(), it->GetTransform());
-        geometry_entry e = {*thisGeometry, vboSize, it->GetGeometryChunk()->NumIndices()};
+        geometry_entry e = {
+            *thisGeometry, 
+            vboSize, 
+            it->GetGeometryChunk()->NumIndices(),
+            it->GetGeometryChunk()->Type()};
         const Renderable& r = *it;
         result[r] = e;
         vboSize += it->GetGeometryChunk()->NumIndices();
@@ -273,17 +234,11 @@ void SORE_Graphics::Renderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    std::vector<RenderBatch>::iterator it, prev;
-    for(it = prev = staticBatches.begin(); it != staticBatches.end(); ++it)
+    std::vector<RenderBatch>::iterator it;
+    for(it = staticBatches.begin(); it != staticBatches.end(); ++it)
     {
-        if((it != prev && it->GetLayer() != prev->GetLayer()) || it == prev)
-        {
-            it->AddChangeCameraCommand(GetCamera(it->GetLayer()));
-        }
         numPolys += it->Render();
         drawCalls++;
-
-        prev = it;
     }
     for(it = batches.begin(); it != batches.end(); ++it)
     {

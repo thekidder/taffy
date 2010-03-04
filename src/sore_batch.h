@@ -24,32 +24,28 @@
 #include "sore_graphicsarray.h"
 #include "sore_renderable.h"
 #include "sore_texture.h"
+#include "sore_renderstate.h"
 #include "sore_screeninfo.h"
 #include "sore_shaders.h"
 
 namespace SORE_Graphics
 {
-
+    struct geometry_entry
+    {
+        GraphicsArray* geometry;
+        unsigned int offset;
+        unsigned int num;
+        GLenum type;
+    };
 
     class RenderBatch
     {
     public:
         //sets command to either NONE or BIND_VBO
-        RenderBatch(GraphicsArray* vertices, bool bindVBO = false);
+        RenderBatch(const geometry_entry& geometry,
+                    const RenderState& state, bool bindVBO = false);
 
-        void SetType(GLenum type);
-        void SetNumIndices(unsigned int numIndices);
-        void SetIndexOffset(unsigned int offset);
-
-        void AddChangeCameraCommand(camera_info cam);
-        void AddChangeBlendModeCommand(blend_mode mode);
-        void AddBindShaderCommand(GLSLShaderPtr shader);
-        void AddBindTextureCommand(GLSLShaderPtr shader, TextureState textures);
-        void AddChangeUniformsCommand(GLSLShaderPtr shader, UniformState uniforms);
-
-        void SetLayer(geometry_layer layer);
-        geometry_layer GetLayer() const;
-
+        void AddIndices(unsigned int numIndices);
         //returns number of polygons rendered
         unsigned int Render();
     private:
@@ -57,14 +53,9 @@ namespace SORE_Graphics
         unsigned int numberIndices;
         unsigned int indexOffset;
         GLenum type;
+        bool bind;
 
-        blend_mode blend;
-        geometry_layer layer;
-        camera_info camera;
-        GLSLShaderPtr shader;
-        TextureState textures;
-
-        UniformState uniforms;
+        RenderState state;
     };
 }
 

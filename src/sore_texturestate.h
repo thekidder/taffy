@@ -42,7 +42,7 @@ namespace SORE_Graphics
         bool Empty() const; //returns true if there are no uniforms
         std::size_t GetSortKey() const;
 
-        //returns all uniforms in this not in o
+        //returns all textures in this not in o
         TextureState GetDiff(const TextureState& o) const;
     private:
         std::map<std::string, Texture2DPtr> textures;

@@ -82,6 +82,7 @@ namespace SORE_Graphics
         geometry_layer GetLayer() const;
 
         UniformState& Uniforms();
+        const UniformState& Uniforms() const;
 
         int GetSortKey() const;
 
