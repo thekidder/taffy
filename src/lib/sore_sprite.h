@@ -22,8 +22,8 @@
 #define SORE_SPRITE_H
 
 #include "math/sore_geometry.h"
-#include "sore_dll.h"
-#include "sore_renderable.h"
+#include <sore_dll.h>
+#include <sore_renderable.h>
 
 namespace SORE_Graphics
 {

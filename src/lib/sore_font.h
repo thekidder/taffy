@@ -28,10 +28,10 @@
 #endif
 
 #include "math/sore_matrix4x4.h"
-#include "sore_allgl.h"
-#include "sore_renderable.h"
-#include "sore_resource.h"
-#include "sore_texture.h"
+#include <sore_allgl.h>
+#include <sore_renderable.h>
+#include <sore_resource.h>
+#include <sore_texture.h>
 
 //freetype
 #include <ft2build.h>

@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_input.h"
-#include "sore_logger.h"
+#include <sore_input.h>
+#include <sore_logger.h>
 namespace SORE_Kernel
 {
 	InputTask::InputTask() : quitEvent(false)

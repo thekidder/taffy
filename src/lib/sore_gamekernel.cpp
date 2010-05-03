@@ -24,9 +24,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "sore_gamekernel.h"
-#include "sore_logger.h"
-#include "sore_timing.h"
+#include <sore_gamekernel.h>
+#include <sore_logger.h>
+#include <sore_timing.h>
 
 namespace SORE_Kernel
 {

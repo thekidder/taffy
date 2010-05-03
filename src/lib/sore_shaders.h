@@ -30,10 +30,10 @@
 #include <vector>
 #include <string>
 
-#include "sore_fileio.h"
-#include "sore_allgl.h"
-#include "sore_logger.h"
-#include "sore_resource.h"
+#include <sore_fileio.h>
+#include <sore_allgl.h>
+#include <sore_logger.h>
+#include <sore_resource.h>
 
 namespace SORE_Graphics
 {

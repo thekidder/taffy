@@ -29,8 +29,8 @@
 #include <psapi.h>
 #include <strsafe.h>
 
-#include "sore_fileio.h"
-#include "sore_logger.h"
+#include <sore_fileio.h>
+#include <sore_logger.h>
 
 namespace SORE_FileIO
 {

@@ -22,13 +22,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "sore_defines.h"
+#include <sore_defines.h>
 
-#include "sore_allgl.h"
-#include "sore_logger.h"
-#include "sore_timing.h"
+#include <sore_allgl.h>
+#include <sore_logger.h>
+#include <sore_timing.h>
 
-#include "sore_logginginit.h"
+#include <sore_logginginit.h>
 
 #include <cstring>
 #include <string>

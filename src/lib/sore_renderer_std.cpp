@@ -20,9 +20,9 @@
 
 #include <algorithm>
 
-#include "sore_allgl.h"
-#include "sore_renderer_std.h"
-#include "sore_shaders.h"
+#include <sore_allgl.h>
+#include <sore_renderer_std.h>
+#include <sore_shaders.h>
 
 inline int next_p2 (int a )
 {

@@ -34,9 +34,9 @@
 
 #include <zlib.h>
 
-#include "sore_gamekernel.h"
-#include "sore_noncopyable.h"
-#include "sore_task.h"
+#include <sore_gamekernel.h>
+#include <sore_noncopyable.h>
+#include <sore_task.h>
 
 namespace SORE_FileIO
 {
@@ -144,7 +144,7 @@ namespace SORE_FileIO
 }
 
 #ifdef linux
-#include "sore_fileio_linux.h"
+#include <sore_fileio_linux.h>
 #else
 #endif
 

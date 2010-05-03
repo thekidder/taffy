@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_task.h"
+#include <sore_task.h>
 
 namespace SORE_Kernel
 {

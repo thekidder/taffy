@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_batch.h"
+#include <sore_batch.h>
 
 SORE_Graphics::RenderBatch::RenderBatch(
     const geometry_entry& geometry,

@@ -21,8 +21,8 @@
 #include <cassert>
 #include <enet/enet.h>
 
-#include "../sore_logger.h"
-#include "sore_network_common.h"
+#include <sore_logger.h>
+#include <sore_network_common.h>
 
 namespace SORE_Network
 {

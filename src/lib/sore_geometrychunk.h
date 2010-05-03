@@ -23,9 +23,9 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "sore_allgl.h"
-#include "sore_color.h"
-#include "sore_dll.h"
+#include <sore_allgl.h>
+#include <sore_color.h>
+#include <sore_dll.h>
 
 /**
    @author Adam Kidder <thekidder@gmail.com>

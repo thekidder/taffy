@@ -21,12 +21,12 @@
 #ifndef SORE_BATCH_H
 #define SORE_BATCH_H
 
-#include "sore_graphicsarray.h"
-#include "sore_renderable.h"
-#include "sore_texture.h"
-#include "sore_renderstate.h"
-#include "sore_screeninfo.h"
-#include "sore_shaders.h"
+#include <sore_graphicsarray.h>
+#include <sore_renderable.h>
+#include <sore_texture.h>
+#include <sore_renderstate.h>
+#include <sore_screeninfo.h>
+#include <sore_shaders.h>
 
 namespace SORE_Graphics
 {

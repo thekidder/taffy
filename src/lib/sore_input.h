@@ -35,7 +35,7 @@
 #include <SDL/SDL_keysym.h>
 #include <SDL/SDL_events.h>
 
-#include "sore_task.h"
+#include <sore_task.h>
 
 namespace SORE_Kernel
 {

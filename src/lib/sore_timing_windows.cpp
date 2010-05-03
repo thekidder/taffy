@@ -22,8 +22,8 @@
 #include <windows.h>
 #include <cassert>
 
-#include "sore_timing.h"
-#include "sore_logger.h"
+#include <sore_timing.h>
+#include <sore_logger.h>
 
 namespace SORE_Timing
 {

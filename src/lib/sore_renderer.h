@@ -21,7 +21,7 @@
 #ifndef  SORE_RENDERER_H
 #define  SORE_RENDERER_H
 
-#include "sore_screeninfo.h"
+#include <sore_screeninfo.h>
 
 namespace SORE_Graphics
 {

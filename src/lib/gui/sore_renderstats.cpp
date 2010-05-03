@@ -1,10 +1,10 @@
 #include <boost/format.hpp>
 
-#include "sore_framewindow.h"
-#include "sore_textwidget.h"
-#include "../sore_renderer_std.h"
+#include <sore_framewindow.h>
+#include <sore_textwidget.h>
+#include <sore_renderer_std.h>
 
-#include "sore_renderstats.h"
+#include <sore_renderstats.h>
 
 namespace SORE_GUI
 {

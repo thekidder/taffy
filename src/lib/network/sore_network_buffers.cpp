@@ -22,8 +22,8 @@
 #include <string.h>
 #include <zlib.h>
 
-#include "../sore_logger.h"
-#include "sore_network_buffers.h"
+#include <sore_logger.h>
+#include <sore_network_buffers.h>
 
 namespace SORE_Network
 {

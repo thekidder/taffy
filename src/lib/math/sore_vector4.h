@@ -23,7 +23,7 @@
 
 #include <cassert>
 
-#include "sore_vector3.h"
+#include <sore_vector3.h>
 
 namespace SORE_Math
 {

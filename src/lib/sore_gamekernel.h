@@ -30,8 +30,8 @@
 #include <vector>
 #include <map>
 
-#include "sore_dll.h"
-#include "sore_task.h"
+#include <sore_dll.h>
+#include <sore_task.h>
 
 namespace SORE_Kernel
 {

@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_uniformstate.h"
+#include <sore_uniformstate.h>
 
 void SORE_Graphics::UniformState::Bind(GLSLShaderPtr s) const
 {

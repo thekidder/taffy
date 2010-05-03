@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "../sore_logger.h"
-#include "sore_topwidget.h"
+#include <sore_logger.h>
+#include <sore_topwidget.h>
 
 namespace SORE_GUI
 {

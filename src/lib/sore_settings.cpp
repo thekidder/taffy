@@ -22,9 +22,9 @@
 #include <cassert>
 #include <algorithm>
 #include <functional>
-#include "sore_settings.h"
-#include "sore_logger.h"
-#include "sore_util.h"
+#include <sore_settings.h>
+#include <sore_logger.h>
+#include <sore_util.h>
 
 namespace SORE_Utility
 {

@@ -27,7 +27,7 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include "sore_graphicsarray.h"
+#include <sore_graphicsarray.h>
 
 namespace SORE_Graphics
 {

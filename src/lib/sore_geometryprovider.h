@@ -21,9 +21,9 @@
 #ifndef SORE_GEOMETRYPROVIDER_H
 #define SORE_GEOMETRYPROVIDER_H
 
-#include "sore_dll.h"
-#include "sore_renderable.h"
-#include "sore_screeninfo.h"
+#include <sore_dll.h>
+#include <sore_renderable.h>
+#include <sore_screeninfo.h>
 
 namespace SORE_Graphics
 {

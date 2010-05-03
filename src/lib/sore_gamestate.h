@@ -22,7 +22,7 @@
 #ifndef SORE_GAMESTATE_H
 #define SORE_GAMESTATE_H
 
-#include "sore_task.h"
+#include <sore_task.h>
 
 namespace SORE_Game
 {

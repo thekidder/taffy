@@ -21,7 +21,7 @@
 #ifndef  SORE_TIMING_H
 #define  SORE_TIMING_H
 
-#include "sore_dll.h"
+#include <sore_dll.h>
 
 namespace SORE_Timing
 {

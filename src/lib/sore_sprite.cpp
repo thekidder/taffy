@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_sprite.h"
+#include <sore_sprite.h>
 
 SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
         SORE_Math::Rect<float> bounds,

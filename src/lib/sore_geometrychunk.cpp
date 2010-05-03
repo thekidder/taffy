@@ -21,8 +21,8 @@
 #include <cstring>
 #include <limits>
 
-#include "sore_geometrychunk.h"
-#include "sore_logger.h"
+#include <sore_geometrychunk.h>
+#include <sore_logger.h>
 
 SORE_Graphics::GeometryChunk::GeometryChunk(
     unsigned int nVertices, unsigned int nIndices, GLenum type)

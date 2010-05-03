@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_renderstate.h"
+#include <sore_renderstate.h>
 
 SORE_Graphics::RenderState::RenderState() : commands(0)
 {

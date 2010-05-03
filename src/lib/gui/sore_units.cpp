@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 
-#include "sore_units.h"
+#include <sore_units.h>
 
 namespace SORE_GUI
 {

@@ -21,7 +21,7 @@
 #ifndef SORE_NONCOPYABLE_H
 #define SORE_NONCOPYABLE_H
 
-#include "sore_dll.h"
+#include <sore_dll.h>
 
 namespace SORE_Utility
 {

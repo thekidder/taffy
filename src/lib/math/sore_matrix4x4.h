@@ -23,9 +23,9 @@
 
 #include <cmath>
 
-#include "sore_vector2.h"
-#include "sore_vector3.h"
-#include "sore_vector4.h"
+#include <sore_vector2.h>
+#include <sore_vector3.h>
+#include <sore_vector4.h>
 
 namespace SORE_Math
 {

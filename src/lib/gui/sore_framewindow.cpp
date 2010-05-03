@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_framewindow.h"
+#include <sore_framewindow.h>
 
 namespace SORE_GUI
 {
@@ -51,7 +51,8 @@ namespace SORE_GUI
         float left = static_cast<float>(
             (GetSize(HORIZONTAL) - titleText->GetSize(HORIZONTAL)) / 2);
         float up = 2.0f;
-        titleText->SetPosition(SVec(SUnit(0.0, left-4), SUnit(0.0, up-32)));
+        titleText->SetPosition(SVec(SUnit(0.0, static_cast<int>(left-4)), 
+                                    SUnit(0.0, static_cast<int>(up-32))));
     }
 
     unsigned int FrameWindow::GetClientSize(unit_type type) const

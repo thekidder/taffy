@@ -23,12 +23,12 @@
 
 #include <vector>
 
-#include "sore_renderer_std.h"
-#include "sore_input.h"
-#include "sore_resource.h"
-#include "sore_screen.h"
-#include "sore_gamestate.h"
-#include "sore_gamekernel.h"
+#include <sore_renderer_std.h>
+#include <sore_input.h>
+#include <sore_resource.h>
+#include <sore_screen.h>
+#include <sore_gamestate.h>
+#include <sore_gamekernel.h>
 
 namespace SORE_Game
 {

@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_resource.h"
-#include "sore_util.h"
-#include "sore_fileio.h"
+#include <sore_resource.h>
+#include <sore_util.h>
+#include <sore_fileio.h>
 
 #include <functional>
 #include <algorithm>

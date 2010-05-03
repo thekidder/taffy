@@ -30,8 +30,8 @@
 #include <boost/signals.hpp>
 #include <boost/function.hpp>
 
-#include "../sore_resource.h"
-#include "sore_framewidget.h"
+#include <sore_resource.h>
+#include <sore_framewidget.h>
 
 namespace SORE_GUI
 {

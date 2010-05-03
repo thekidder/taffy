@@ -24,9 +24,9 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "sore_util.h"
-#include "sore_logger.h"
-#include "sore_fileio.h"
+#include <sore_util.h>
+#include <sore_logger.h>
+#include <sore_fileio.h>
 
 using namespace std;
 

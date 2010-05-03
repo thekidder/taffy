@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_geometryprovider.h"
+#include <sore_geometryprovider.h>
 
 SORE_Graphics::GeometryProvider::~GeometryProvider()
 {

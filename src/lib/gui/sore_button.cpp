@@ -20,7 +20,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "sore_button.h"
+#include <sore_button.h>
 
 namespace SORE_GUI
 {

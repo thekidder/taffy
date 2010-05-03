@@ -25,10 +25,10 @@
 
 #include "math/sore_matrix4x4.h"
 #include "math/sore_vector3.h"
-#include "sore_geometryprovider.h"
-#include "sore_noncopyable.h"
-#include "sore_renderable.h"
-#include "sore_scenenode.h"
+#include <sore_geometryprovider.h>
+#include <sore_noncopyable.h>
+#include <sore_renderable.h>
+#include <sore_scenenode.h>
 
 namespace SORE_Graphics
 {

@@ -21,8 +21,8 @@
 #ifndef  SORE_UTIL_H
 #define  SORE_UTIL_H
 
-#include "sore_dll.h"
-#include "sore_fileio.h"
+#include <sore_dll.h>
+#include <sore_fileio.h>
 
 #include <cmath>
 #include <map>

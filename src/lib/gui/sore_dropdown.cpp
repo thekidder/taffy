@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "../math/sore_geometry.h"
-#include "sore_dropdown.h"
+#include <sore_dropdown.h>
 
 namespace SORE_GUI
 {

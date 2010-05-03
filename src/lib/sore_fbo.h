@@ -21,8 +21,8 @@
 #ifndef SORE_FBO_H
 #define SORE_FBO_H
 
-#include "sore_allgl.h"
-#include "sore_dll.h"
+#include <sore_allgl.h>
+#include <sore_dll.h>
 
 namespace SORE_Graphics
 {

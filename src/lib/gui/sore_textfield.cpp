@@ -20,8 +20,8 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "../sore_timing.h"
-#include "sore_textfield.h"
+#include <sore_timing.h>
+#include <sore_textfield.h>
 
 namespace SORE_GUI
 {

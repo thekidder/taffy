@@ -19,8 +19,8 @@
  ***************************************************************************/
 
 #include "../math/sore_geometry.h"
-#include "../sore_logger.h"
-#include "sore_sliderwidget.h"
+#include <sore_logger.h>
+#include <sore_sliderwidget.h>
 
 namespace SORE_GUI
 {

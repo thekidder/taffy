@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_logger.h"
-#include "sore_profiler.h"
-#include "sore_allgl.h"
-#include "sore_timing.h"
+#include <sore_logger.h>
+#include <sore_profiler.h>
+#include <sore_allgl.h>
+#include <sore_timing.h>
 
 unsigned int SORE_Profiler::Sample::numSamples = 0;
 unsigned int SORE_Profiler::Sample::lastOpened = 0;

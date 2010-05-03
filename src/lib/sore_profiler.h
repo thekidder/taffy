@@ -29,7 +29,7 @@
 
 #include <string>
 
-#include "sore_dll.h"
+#include <sore_dll.h>
 
 namespace SORE_Profiler
 {

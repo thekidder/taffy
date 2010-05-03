@@ -22,7 +22,7 @@
 #ifndef SORE_UNITS_H
 #define SORE_UNITS_H
 
-#include "../sore_dll.h"
+#include <sore_dll.h>
 
 //inspired by the CEGUI system of "unified size and positioning"
 

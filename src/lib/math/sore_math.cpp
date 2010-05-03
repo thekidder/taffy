@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_math.h"
+#include <sore_math.h>
 
 namespace SORE_Math
 {

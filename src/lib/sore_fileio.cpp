@@ -29,8 +29,8 @@
 
 #include <zlib.h>
 
-#include "sore_fileio.h"
-#include "sore_logger.h"
+#include <sore_fileio.h>
+#include <sore_logger.h>
 
 #define MODULE_FILEIO 1
 

@@ -30,12 +30,12 @@
 #include <vector>
 
 #include "../math/sore_matrix4x4.h"
-#include "../sore_dll.h"
-#include "../sore_geometrychunk.h"
-#include "../sore_input.h"
-#include "../sore_renderable.h"
+#include <sore_dll.h>
+#include <sore_geometrychunk.h>
+#include <sore_input.h>
+#include <sore_renderable.h>
 
-#include "sore_units.h"
+#include <sore_units.h>
 
 namespace SORE_GUI
 {

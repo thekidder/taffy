@@ -21,9 +21,9 @@
 #ifndef SORE_FRAMEWINDOW_H
 #define SORE_FRAMEWINDOW_H
 
-#include "../sore_text.h"
-#include "sore_framewidget.h"
-#include "sore_textwidget.h"
+#include <sore_text.h>
+#include <sore_framewidget.h>
+#include <sore_textwidget.h>
 
 namespace SORE_GUI
 {

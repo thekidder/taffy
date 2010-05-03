@@ -36,10 +36,15 @@ ELSE()
   ADD_DEFINITIONS(-DSORE_NO_VBO)
 ENDIF()
 
-ADD_SUBDIRECTORY("math")
-ADD_SUBDIRECTORY("gui")
+INCLUDE_DIRECTORIES(. gui math)
 IF(ENET_FOUND)
-  ADD_SUBDIRECTORY("network")
+  INCLUDE_DIRECTORIES(network)
+ENDIF()
+
+ADD_SUBDIRECTORY(gui)
+ADD_SUBDIRECTORY(math)
+IF(ENET_FOUND)
+  ADD_SUBDIRECTORY(network)
 ENDIF()
 
 SET(CMAKE_VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h)
@@ -52,7 +57,7 @@ set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
   sore_gamestate_manager.cpp sore_geometrychunk.cpp
   sore_geometryprovider.cpp sore_graphics.cpp sore_graphicsarray.cpp
   sore_input.cpp sore_interpolater.cpp sore_logger.cpp
-  sore_logginginit.cpp sore_math.cpp sore_profiler.cpp
+  sore_logginginit.cpp sore_profiler.cpp
   sore_renderable.cpp sore_renderer.cpp sore_renderer_std.cpp
   sore_renderstate.cpp
   sore_resource.cpp sore_scenegraph.cpp sore_scenenode.cpp
@@ -60,15 +65,14 @@ set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
   sore_shaders.cpp sore_sprite.cpp sore_task.cpp sore_text.cpp
   sore_texture.cpp sore_texturestate.cpp sore_timing.cpp 
   sore_uniformstate.cpp sore_util.cpp
-  sore_vbo.cpp sore_vertexarray.cpp ${SORE_GUI_SRCS}
-  ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS})
+  sore_vbo.cpp sore_vertexarray.cpp)
 
 set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
   sore_gamestate.h sore_gamestate_manager.h sore_gamekernel.h
   sore_geometrychunk.h sore_geometryprovider.h sore_graphics.h
   sore_graphicsarray.h sore_input.h sore_interpolater.h sore_logger.h
-  sore_logginginit.h sore_math.h sore_noncopyable.h sore_profiler.h 
+  sore_logginginit.h sore_noncopyable.h sore_profiler.h 
   sore_renderable.h
   sore_renderer.h sore_renderer_std.h sore_renderstate.h sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
@@ -76,8 +80,21 @@ set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
   sore_texture.h sore_texturestate.h sore_timing.h sore_uniformstate.h 
   sore_util.h sore_vbo.h sore_vertexarray.h) 
 
+SOURCE_GROUP("Source Files" FILES ${SORE_SRCS})
+SOURCE_GROUP("Header Files" FILES ${SORE_HEADERS})
+
+SOURCE_GROUP("Source Files\\Math" FILES ${SORE_MATH_SRCS})
+SOURCE_GROUP("Header Files\\Math" FILES ${SORE_MATH_HEADERS})
+
+SOURCE_GROUP("Source Files\\GUI" FILES ${SORE_GUI_SRCS})
+SOURCE_GROUP("Header Files\\GUI" FILES ${SORE_GUI_HEADERS})
+
+SOURCE_GROUP("Source Files\\Network" FILES ${SORE_NETWORK_SRCS})
+SOURCE_GROUP("Header Files\\Network" FILES ${SORE_NETWORK_HEADERS})
+
 ADD_LIBRARY(sore_lib SHARED
-  ${SORE_SRCS} ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS}
+  ${SORE_SRCS} ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS} 
+  ${SORE_PLATFORM_SPECIFIC} ${SORE_HEADERS}
   ${SORE_GUI_HEADERS} ${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS}
   ${SORE_PLATFORM_HEADERS} ${SORE_3RDPARTY_HEADERS})
 

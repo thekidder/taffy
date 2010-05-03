@@ -21,7 +21,7 @@
 #ifndef _SORE_GEOMETRY_H_
 #define _SORE_GEOMETRY_H_
 
-#include "sore_vector2.h"
+#include <sore_vector2.h>
 
 namespace SORE_Math
 {

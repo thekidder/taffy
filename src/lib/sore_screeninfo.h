@@ -23,7 +23,7 @@
 
 #include <boost/function.hpp>
 
-#include "sore_math.h"
+#include <sore_math.h>
 
 namespace SORE_Graphics
 {

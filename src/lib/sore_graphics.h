@@ -21,8 +21,8 @@
 #ifndef SORE_GRAPHICS_H
 #define SORE_GRAPHICS_H
 
-#include "sore_logger.h"
-#include "sore_screeninfo.h"
+#include <sore_logger.h>
+#include <sore_screeninfo.h>
 
 namespace SORE_Graphics
 {

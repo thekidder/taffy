@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_graphicsarray.h"
-#include "sore_logger.h"
+#include <sore_graphicsarray.h>
+#include <sore_logger.h>
 
 SORE_Graphics::GraphicsArray::GraphicsArray(bool isStatic, bool t, bool c, bool n) 
   : hasTexCoords(t), hasNormals(n), hasColors(c), isStatic(isStatic)

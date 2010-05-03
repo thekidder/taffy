@@ -21,7 +21,7 @@
 #ifndef SORE_VERTEX_ARRAY_H
 #define SORE_VERTEX_ARRAY_H
 
-#include "sore_graphicsarray.h"
+#include <sore_graphicsarray.h>
 
 namespace SORE_Graphics
 {

@@ -24,7 +24,7 @@
 #include <cassert>
 #include <cmath>
 
-#include "../sore_dll.h"
+#include <sore_dll.h>
 
 namespace SORE_Math
 {

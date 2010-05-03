@@ -21,9 +21,9 @@
 #ifndef SORE_FRAMEWIDGET_H
 #define SORE_FRAMEWIDGET_H
 
-#include "../sore_texture.h"
-#include "../sore_shaders.h"
-#include "sore_widget.h"
+#include <sore_texture.h>
+#include <sore_shaders.h>
+#include <sore_widget.h>
 
 namespace SORE_GUI
 {

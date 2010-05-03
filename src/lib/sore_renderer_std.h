@@ -24,22 +24,22 @@
 #include <boost/function.hpp>
 #include <boost/unordered_map.hpp>
 
-#include "sore_batch.h"
-#include "sore_fbo.h"
-#include "sore_geometrychunk.h"
-#include "sore_geometryprovider.h"
-#include "sore_graphics.h"
-#include "sore_graphicsarray.h"
-#include "sore_noncopyable.h"
-#include "sore_renderable.h"
-#include "sore_renderer.h"
-#include "sore_resource.h"
-#include "sore_shaders.h"
-#include "sore_timing.h"
+#include <sore_batch.h>
+#include <sore_fbo.h>
+#include <sore_geometrychunk.h>
+#include <sore_geometryprovider.h>
+#include <sore_graphics.h>
+#include <sore_graphicsarray.h>
+#include <sore_noncopyable.h>
+#include <sore_renderable.h>
+#include <sore_renderer.h>
+#include <sore_resource.h>
+#include <sore_shaders.h>
+#include <sore_timing.h>
 #ifndef SORE_NO_VBO
-#include "sore_vbo.h"
+#include <sore_vbo.h>
 #else
-#include "sore_vertexarray.h"
+#include <sore_vertexarray.h>
 #endif
 
 /**

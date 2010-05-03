@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_texturestate.h"
+#include <sore_texturestate.h>
 
 void SORE_Graphics::TextureState::Bind(GLSLShaderPtr s) const
 {

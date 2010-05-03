@@ -27,9 +27,9 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include "sore_color.h"
-#include "sore_font.h"
-#include "sore_geometrychunk.h"
+#include <sore_color.h>
+#include <sore_font.h>
+#include <sore_geometrychunk.h>
 #include "math/sore_matrix4x4.h"
 
 namespace SORE_Graphics

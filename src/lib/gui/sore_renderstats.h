@@ -1,8 +1,8 @@
 #ifndef RENDERSTATS_H
 #define RENDERSTATS_H
 
-#include "../sore_dll.h"
-#include "../sore_resource.h"
+#include <sore_dll.h>
+#include <sore_resource.h>
 
 namespace SORE_Graphics
 {

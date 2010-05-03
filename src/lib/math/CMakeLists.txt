@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-set(SORE_MATH_SRCS
+SET(SORE_MATH_SRCS
+  math/sore_math.cpp
   PARENT_SCOPE)
-set(SORE_MATH_HEADERS
+SET(SORE_MATH_HEADERS
+  math/sore_math.h
   math/sore_geometry.h math/sore_vector2.h math/sore_vector3.h
   math/sore_vector4.h math/sore_matrix4x4.h math/sore_quaternion.h
   PARENT_SCOPE)

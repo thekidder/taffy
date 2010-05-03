@@ -1,17 +1,18 @@
-cmake_minimum_required(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-set(SORE_NETWORK_SRCS
+SET(NETWORK_SRCS
 	network/sore_network_buffers.cpp
-	network/sore_network_common.cpp
-	PARENT_SCOPE)
-set(SORE_NETWORK_HEADERS
+	network/sore_network_common.cpp)
+SET(NETWORK_HEADERS
 	network/sore_network_buffers.h
-	network/sore_network_common.h
-	PARENT_SCOPE)
+	network/sore_network_common.h)
 	
 IF(UNIX)
-set(SORE_PLATFORM_SPECIFIC ${SORE_PLATFORM_SPECIFIC} network/sore_network_common_linux.cpp PARENT_SCOPE)
+	LIST(APPEND NETWORK_SRCS network/sore_network_common_linux.cpp)
 ENDIF(UNIX)
 IF(WIN32)
-set(SORE_PLATFORM_SPECIFIC ${SORE_PLATFORM_SPECIFIC} network/sore_network_common_windows.cpp PARENT_SCOPE)
+	LIST(APPEND NETWORK_SRCS network/sore_network_common_windows.cpp)
 ENDIF(WIN32)
+
+SET(SORE_NETWORK_SRCS ${NETWORK_SRCS} PARENT_SCOPE)
+SET(SORE_NETWORK_HEADERS ${NETWORK_HEADERS} PARENT_SCOPE)

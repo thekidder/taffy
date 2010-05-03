@@ -21,10 +21,10 @@
 #ifndef SORE_TOPWIDGET_H
 #define SORE_TOPWIDGET_H
 
-#include "../sore_geometryprovider.h"
-#include "../sore_input.h"
-#include "../sore_screeninfo.h"
-#include "sore_widget.h"
+#include <sore_geometryprovider.h>
+#include <sore_input.h>
+#include <sore_screeninfo.h>
+#include <sore_widget.h>
 
 namespace SORE_GUI
 {

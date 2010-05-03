@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "sore_gamestate_manager.h"
-#include "sore_logger.h"
-#include "sore_gamestate.h"
+#include <sore_gamestate_manager.h>
+#include <sore_logger.h>
+#include <sore_gamestate.h>
 
 namespace SORE_Game
 {

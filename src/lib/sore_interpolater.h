@@ -32,8 +32,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 
-#include "sore_logger.h"
-#include "sore_task.h"
+#include <sore_logger.h>
+#include <sore_task.h>
 
 namespace SORE_Utility
 {

@@ -20,14 +20,14 @@
 
 #include <GL/glew.h>
 
-#include "sore_screen.h"
-#include "sore_profiler.h"
-#include "sore_util.h"
-#include "sore_timing.h"
+#include <sore_screen.h>
+#include <sore_profiler.h>
+#include <sore_util.h>
+#include <sore_timing.h>
 #include <cassert>
 #include <boost/format.hpp>
 #include <functional>
-#include "sore_allgl.h"
+#include <sore_allgl.h>
 
 namespace SORE_Kernel
 {

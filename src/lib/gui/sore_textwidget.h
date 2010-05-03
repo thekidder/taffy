@@ -21,9 +21,9 @@
 #ifndef SORE_TEXTWIDGET_H
 #define SORE_TEXTWIDGET_H
 
-#include "../sore_font.h"
-#include "../sore_text.h"
-#include "sore_widget.h"
+#include <sore_font.h>
+#include <sore_text.h>
+#include <sore_widget.h>
 
 namespace SORE_GUI
 {

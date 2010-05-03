@@ -37,10 +37,10 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include "sore_input.h"
-#include "sore_fileio.h"
-#include "sore_logger.h"
-#include "sore_noncopyable.h"
+#include <sore_input.h>
+#include <sore_fileio.h>
+#include <sore_logger.h>
+#include <sore_noncopyable.h>
 
 namespace SORE_Resource
 {

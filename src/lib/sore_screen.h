@@ -30,15 +30,15 @@
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "sore_renderer.h"
-#include "sore_gamekernel.h"
-#include "sore_font.h"
-#include "sore_allgl.h"
-#include "sore_logger.h"
-#include "sore_input.h"
-#include "sore_noncopyable.h"
-#include "sore_settings.h"
-#include "sore_screeninfo.h"
+#include <sore_renderer.h>
+#include <sore_gamekernel.h>
+#include <sore_font.h>
+#include <sore_allgl.h>
+#include <sore_logger.h>
+#include <sore_input.h>
+#include <sore_noncopyable.h>
+#include <sore_settings.h>
+#include <sore_screeninfo.h>
 
 namespace SORE_Kernel
 {
