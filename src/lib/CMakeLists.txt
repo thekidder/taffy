@@ -67,7 +67,7 @@ set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
   sore_uniformstate.cpp sore_util.cpp
   sore_vbo.cpp sore_vertexarray.cpp)
 
-set(SORE_HEADERS sore.h sore_allgl.h sore_batch.h sore_color.h
+set(SORE_HEADERS sore_allgl.h sore_batch.h sore_color.h
   sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
   sore_gamestate.h sore_gamestate_manager.h sore_gamekernel.h
   sore_geometrychunk.h sore_geometryprovider.h sore_graphics.h
