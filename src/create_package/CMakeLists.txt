@@ -1,7 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
-
 FIND_PACKAGE(Boost COMPONENTS program_options filesystem system REQUIRED)
-
 
 SET(CREATE_PACKAGE_SRCS main.cpp walker.h walker.cpp)
 ADD_EXECUTABLE(sore_create_package ${CREATE_PACKAGE_SRCS})

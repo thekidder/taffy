@@ -1,5 +1,3 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
 SET(NETWORK_SRCS
 	network/sore_network_buffers.cpp
 	network/sore_network_common.cpp)
