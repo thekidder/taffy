@@ -1,4 +1,7 @@
 FIND_PACKAGE(Boost COMPONENTS program_options filesystem system REQUIRED)
+FIND_PACKAGE(ZLIB REQUIRED)
+
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
 
 SET(CREATE_PACKAGE_SRCS main.cpp walker.h walker.cpp)
 ADD_EXECUTABLE(sore_create_package ${CREATE_PACKAGE_SRCS})
