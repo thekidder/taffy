@@ -66,23 +66,6 @@ namespace SORE_Math
 			Matrix4<T> GetMatrix()
 			{
 				T values[16];
-				/*values[ 0] = real*real + imaginary[0]*imaginary[0] - imaginary[1]*imaginary[1] - imaginary[2]*imaginary[2];
-				values[ 1] = 2*imaginary[0]*imaginary[1] - 2*real*imaginary[2];
-				values[ 2] = 2*imaginary[0]*imaginary[2] + 2*real*imaginary[1];
-				values[ 3] = 0;
-				values[ 4] = 2*imaginary[0]*imaginary[1] + 2*real*imaginary[2];
-				values[ 5] = real*real - imaginary[0]*imaginary[0] + imaginary[1]*imaginary[1] - imaginary[2]*imaginary[2];;
-				values[ 6] = 2*imaginary[1]*imaginary[2] - 2*real*imaginary[0];
-				values[ 7] = 0;
-				values[ 8] = 2*imaginary[0]*imaginary[2] + 2*real*imaginary[1];
-				values[ 9] = 2*imaginary[1]*imaginary[2] + 2*real*imaginary[0];
-				values[10] = real*real - imaginary[0]*imaginary[0] - imaginary[1]*imaginary[1] + imaginary[2]*imaginary[2];
-				values[11] = 0;
-				values[12] = 0;
-				values[13] = 0;
-				values[14] = 0;
-				values[15] = real*real + imaginary[0]*imaginary[0] + imaginary[1]*imaginary[1] + imaginary[2]*imaginary[2];*/
-				
 				values[ 0] = 1.0f - 2.0f * ( imaginary[1] * imaginary[1] + imaginary[2] * imaginary[2] );
 				values[ 1] = 2.0f * (imaginary[0] * imaginary[1] + imaginary[2] * real);
 				values[ 2] = 2.0f * (imaginary[0] * imaginary[2] - imaginary[1] * real);
@@ -103,7 +86,6 @@ namespace SORE_Math
 				values[14] = 0.0f;
 				values[15] = 1.0f;
 
-				
 				return Matrix4<T>(values);
 			}
 			
