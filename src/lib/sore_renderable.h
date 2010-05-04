@@ -23,7 +23,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "math/sore_matrix4x4.h"
+#include <sore_matrix4x4.h>
 #include <sore_geometrychunk.h>
 #include <sore_texturestate.h>
 #include <sore_screeninfo.h>

@@ -25,10 +25,10 @@
 #include <string>
 
 #include <sore_dll.h>
-#include "math/sore_vector2.h"
-#include "math/sore_vector3.h"
-#include "math/sore_vector4.h"
-#include "math/sore_matrix4x4.h"
+#include <sore_vector2.h>
+#include <sore_vector3.h>
+#include <sore_vector4.h>
+#include <sore_matrix4x4.h>
 #include <sore_shaders.h>
 
 namespace SORE_Graphics

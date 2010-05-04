@@ -30,7 +30,7 @@
 #include <sore_color.h>
 #include <sore_font.h>
 #include <sore_geometrychunk.h>
-#include "math/sore_matrix4x4.h"
+#include <sore_matrix4x4.h>
 
 namespace SORE_Graphics
 {

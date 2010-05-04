@@ -23,8 +23,8 @@
 
 #include <vector>
 
-#include "math/sore_matrix4x4.h"
-#include "math/sore_vector3.h"
+#include <sore_matrix4x4.h>
+#include <sore_vector3.h>
 #include <sore_geometryprovider.h>
 #include <sore_noncopyable.h>
 #include <sore_renderable.h>

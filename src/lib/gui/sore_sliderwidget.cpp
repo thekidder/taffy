@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "../math/sore_geometry.h"
+#include <sore_geometry.h>
 #include <sore_logger.h>
 #include <sore_sliderwidget.h>
 

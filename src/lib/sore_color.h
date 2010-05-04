@@ -22,7 +22,7 @@
 #define SORE_COLOR_H
 
 #include <sore_dll.h>
-#include "math/sore_vector4.h"
+#include <sore_vector4.h>
 
 namespace SORE_Graphics
 {

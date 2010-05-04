@@ -29,7 +29,7 @@
 
 #include <vector>
 
-#include "../math/sore_matrix4x4.h"
+#include <sore_matrix4x4.h>
 #include <sore_dll.h>
 #include <sore_geometrychunk.h>
 #include <sore_input.h>

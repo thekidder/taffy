@@ -21,7 +21,7 @@
 #ifndef SORE_SPRITE_H
 #define SORE_SPRITE_H
 
-#include "math/sore_geometry.h"
+#include <sore_geometry.h>
 #include <sore_dll.h>
 #include <sore_renderable.h>
 

@@ -20,7 +20,7 @@
 
 #include <sore_fileio.h>
 #include <sore_font.h>
-#include "math/sore_geometry.h"
+#include <sore_geometry.h>
 #include <sore_geometrychunk.h>
 #include <sore_logger.h>
 #include <sore_shaders.h>
