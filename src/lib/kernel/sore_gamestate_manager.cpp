@@ -53,7 +53,7 @@ namespace SORE_Game
 									   const std::string& iconFilename,
                                        const std::string& settingsFile)
         : kernel(gk), pool(pc
-#ifdef linux
+#ifdef FilesystemWatcherTask
 		, &watcher
 #endif
 		), ini(settingsFile), sm(&ini),
@@ -63,7 +63,7 @@ namespace SORE_Game
 
         gk.AddTask(0, &input);
         gk.AddTask(10, &screen);
-#ifdef linux
+#ifdef FilesystemWatcherTask
         gk.AddTask(20, &watcher);
 #endif
 
@@ -175,5 +175,14 @@ namespace SORE_Game
         while(states.size()) Pop();
 
         return 0;
+    }
+
+    bool GamestateManager::FileNotifySupported() const
+    {
+#ifdef FilesystemWatcherTask
+        return true;
+#else
+        return false;
+#endif
     }
 }

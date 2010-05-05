@@ -66,6 +66,8 @@ namespace SORE_Game
         SORE_Kernel::InputTask* GetInputTask();
         SORE_Resource::ResourcePool& GetPool();
         SORE_Kernel::Screen* GetScreen();
+
+        bool FileNotifySupported() const;
     private:
         void Pop();
 
@@ -73,7 +75,7 @@ namespace SORE_Game
         SORE_Graphics::Renderer* renderer;
         SORE_Kernel::InputTask input;
 #ifdef FilesystemWatcherTask
-       FilesystemWatcherTask watcher;
+        SORE_FileIO::FilesystemWatcherTask watcher;
 #endif
         SORE_Resource::ResourcePool pool;
         SORE_Utility::IniSettingsBackend ini;
