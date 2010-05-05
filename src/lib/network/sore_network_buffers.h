@@ -44,7 +44,7 @@
 #include <vector>
 #include <string>
 #ifdef _WIN32
-#include <windows.h>
+#include <sore_defines.h> //for windows.h
 #endif
 #include <enet/enet.h>
 

@@ -33,7 +33,7 @@
  **************************************************************************/
 
 
-#include <windows.h>
+#include <sore_defines.h> //for windows.h
 #include <cassert>
 
 #include <sore_timing.h>

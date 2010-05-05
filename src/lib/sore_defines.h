@@ -43,9 +43,10 @@
 
 #ifdef _WIN32
 //We need M_PI
-#include <windows.h>
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #define _USE_MATH_DEFINES
-#else /* GLX */
+#include <windows.h>
 #endif
 
 #endif /*__SORE_DEFINES_H__*/

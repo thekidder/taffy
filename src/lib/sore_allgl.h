@@ -33,13 +33,10 @@
  **************************************************************************/
 
 
-#ifndef  __ALLGL_H__
-#define  __ALLGL_H__
+#ifndef  ALLGL_H
+#define  ALLGL_H
 
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
-#endif
+#include <sore_defines.h> //for windows.h
 
 #include <GL/glew.h>
 
@@ -55,4 +52,4 @@
     //Linux-specific to find system fonts
     #include <fontconfig/fontconfig.h>
 #endif
-#endif //__ALLGL_H__
+#endif //ALLGL_H

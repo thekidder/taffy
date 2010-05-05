@@ -36,7 +36,7 @@
 #pragma warning( push )
 #pragma warning( disable : 4995 )
 
-#include <windows.h>
+#include <sore_defines.h> //for windows.h
 #include <stdio.h>
 #include <tchar.h>
 #include <string.h>
