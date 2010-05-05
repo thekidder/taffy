@@ -34,7 +34,7 @@ IF(NOT SORE_WITH_VBO)
 	ADD_DEFINITIONS(-DSORE_NO_VBO)
 ENDIF()
 
-INCLUDE_DIRECTORIES(. gui kernel math)
+INCLUDE_DIRECTORIES(. gui kernel math renderer)
 IF(ENET_FOUND)
 	INCLUDE_DIRECTORIES(network)
 ENDIF()
@@ -42,6 +42,7 @@ ENDIF()
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(kernel)
 ADD_SUBDIRECTORY(math)
+ADD_SUBDIRECTORY(renderer)
 IF(ENET_FOUND)
 	ADD_SUBDIRECTORY(network)
 ENDIF()
@@ -51,31 +52,21 @@ SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h.in)
 
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
-set(SORE_SRCS sore_batch.cpp sore_color.cpp sore_fbo.cpp
-	sore_fileio.cpp sore_font.cpp sore_geometrychunk.cpp
-	sore_geometryprovider.cpp sore_graphics.cpp sore_graphicsarray.cpp
+set(SORE_SRCS sore_color.cpp
+	sore_fileio.cpp sore_font.cpp
 	sore_input.cpp sore_interpolater.cpp sore_logger.cpp
 	sore_logginginit.cpp sore_profiler.cpp
-	sore_renderable.cpp sore_renderer.cpp sore_renderer_std.cpp
-	sore_renderstate.cpp
 	sore_resource.cpp sore_scenegraph.cpp sore_scenenode.cpp
 	sore_screen.cpp sore_screeninfo.cpp sore_settings.cpp
-	sore_shaders.cpp sore_sprite.cpp sore_text.cpp
-	sore_texture.cpp sore_texturestate.cpp sore_timing.cpp 
-	sore_uniformstate.cpp sore_util.cpp
-	sore_vbo.cpp sore_vertexarray.cpp)
+	sore_text.cpp sore_timing.cpp sore_util.cpp)
 
-set(SORE_HEADERS sore_allgl.h sore_batch.h sore_color.h
-	sore_dll.h sore_defines.h sore_fbo.h sore_fileio.h sore_font.h
-	sore_geometrychunk.h sore_geometryprovider.h sore_graphics.h 
-	sore_graphicsarray.h sore_input.h sore_interpolater.h sore_logger.h
+set(SORE_HEADERS sore_color.h
+	sore_dll.h sore_defines.h sore_fileio.h sore_font.h
+	sore_input.h sore_interpolater.h sore_logger.h
 	sore_logginginit.h sore_noncopyable.h sore_profiler.h 
-	sore_renderable.h
-	sore_renderer.h sore_renderer_std.h sore_renderstate.h sore_resource.h
+	sore_resource.h
 	sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
-	sore_settings.h sore_shaders.h sore_sprite.h sore_text.h
-	sore_texture.h sore_texturestate.h sore_timing.h sore_uniformstate.h 
-	sore_util.h sore_vbo.h sore_vertexarray.h) 
+	sore_settings.h sore_text.h sore_timing.h sore_util.h) 
 
 SOURCE_GROUP("Source Files" FILES ${SORE_SRCS})
 SOURCE_GROUP("Header Files" FILES ${SORE_HEADERS})
@@ -92,11 +83,14 @@ SOURCE_GROUP("Header Files\\Kernel" FILES ${SORE_KERNEL_HEADERS})
 SOURCE_GROUP("Source Files\\Network" FILES ${SORE_NETWORK_SRCS})
 SOURCE_GROUP("Header Files\\Network" FILES ${SORE_NETWORK_HEADERS})
 
+SOURCE_GROUP("Source Files\\Renderer" FILES ${SORE_RENDERER_SRCS})
+SOURCE_GROUP("Header Files\\Renderer" FILES ${SORE_RENDERER_HEADERS})
+
 ADD_LIBRARY(sore_lib SHARED
 	${SORE_SRCS} ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS} 
-	${SORE_KERNEL_SRCS} ${SORE_PLATFORM_SPECIFIC} 
+	${SORE_KERNEL_SRCS} ${SORE_RENDERER_SRCS} ${SORE_PLATFORM_SPECIFIC} 
 	${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_KERNEL_HEADERS}
-	${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS}
+	${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS} ${SORE_RENDERER_HEADERS}
 	${SORE_PLATFORM_HEADERS} ${SORE_3RDPARTY_HEADERS})
 
 SET_TARGET_PROPERTIES(
