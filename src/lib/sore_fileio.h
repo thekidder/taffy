@@ -80,9 +80,9 @@ namespace SORE_FileIO
             std::string        package;
             std::string        filename;
 
-            size_t       pos;
-            size_t       size;
-            size_t       sizeRaw;
+            size_t             pos;
+            size_t             size;
+            size_t             sizeRaw;
         };
         typedef std::map<std::string, file_info> cache_type;
 
