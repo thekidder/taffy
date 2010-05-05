@@ -34,7 +34,7 @@ IF(NOT SORE_WITH_VBO)
 	ADD_DEFINITIONS(-DSORE_NO_VBO)
 ENDIF()
 
-INCLUDE_DIRECTORIES(. gui kernel math renderer)
+INCLUDE_DIRECTORIES(. 3rdparty gui kernel math renderer)
 IF(ENET_FOUND)
 	INCLUDE_DIRECTORIES(network)
 ENDIF()
