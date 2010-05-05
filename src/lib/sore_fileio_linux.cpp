@@ -34,8 +34,8 @@
 
 #include <algorithm>
 
-#include "sore_logger.h"
-#include "sore_fileio.h"
+#include <sore_logger.h>
+#include <sore_fileio.h>
 
 SORE_FileIO::LinuxInotifyWatcher::LinuxInotifyWatcher()
 {

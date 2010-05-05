@@ -37,7 +37,7 @@
 
 #include <boost/utility.hpp>
 
-#include "3rdparty/inotify-cxx.h"
+#include <inotify-cxx.h>
 
 namespace SORE_FileIO
 {
@@ -74,5 +74,5 @@ namespace SORE_FileIO
         Inotify in;
     };
 
-#define FilesystemWatcher LinuxInotifyWatcher
+#define FilesystemWatcherTask LinuxInotifyWatcher
 }

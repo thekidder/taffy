@@ -32,7 +32,7 @@
 * Adam Kidder.                                                           *
 **************************************************************************/
 
-#include "sore_font.h"
+#include <sore_font.h>
 
 void SORE_Font::FontPaths::InitPaths()
 {

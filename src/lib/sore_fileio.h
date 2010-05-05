@@ -160,6 +160,7 @@ namespace SORE_FileIO
 #ifdef linux
 #include <sore_fileio_linux.h>
 #else
+#include <sore_fileio_windows.h>
 #endif
 
 
