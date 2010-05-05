@@ -75,7 +75,7 @@ set(SORE_HEADERS sore_color.h
 SOURCE_GROUP("Source Files" FILES ${SORE_SRCS})
 SOURCE_GROUP("Header Files" FILES ${SORE_HEADERS})
 
-SOURCE_GROUP("Source Files\\Platform Specific" FILES ${SORE_PLATFFRM_SRCS})
+SOURCE_GROUP("Source Files\\Platform Specific" FILES ${SORE_PLATFORM_SRCS})
 SOURCE_GROUP("Header Files\\Platform Specific" FILES ${SORE_PLATFORM_HEADERS})
 
 SOURCE_GROUP("Source Files\\GUI" FILES ${SORE_GUI_SRCS})
