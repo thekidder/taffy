@@ -18,18 +18,6 @@ ENDIF()
 INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${ENET_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR})
 
-IF(UNIX)
-	SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
-		sore_timing_linux.cpp 3rdparty/inotify-cxx.cpp)
-	SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h)
-	SET(SORE_3RDPARTY_HEADERS 3rdparty/inotify-cxx.h)
-ENDIF()
-
-IF(WIN32)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
-	sore_timing_windows.cpp)
-ENDIF()
-
 IF(NOT SORE_WITH_VBO)
 	ADD_DEFINITIONS(-DSORE_NO_VBO)
 ENDIF()
@@ -51,6 +39,21 @@ SET(CMAKE_VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h)
 SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h.in)
 
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
+
+SET(SORE_JSON_SRCS 3rdparty/json/json_reader.cpp 3rdparty/json/json_value.cpp
+	3rdparty/json/json_writer.cpp)
+
+IF(UNIX)
+	SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
+		sore_timing_linux.cpp 3rdparty/inotify-cxx.cpp)
+	SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h)
+	SET(SORE_3RDPARTY_HEADERS 3rdparty/inotify-cxx.h)
+ENDIF()
+
+IF(WIN32)
+SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
+	sore_timing_windows.cpp)
+ENDIF()
 
 set(SORE_SRCS sore_color.cpp
 	sore_fileio.cpp sore_font.cpp
@@ -86,9 +89,12 @@ SOURCE_GROUP("Header Files\\Network" FILES ${SORE_NETWORK_HEADERS})
 SOURCE_GROUP("Source Files\\Renderer" FILES ${SORE_RENDERER_SRCS})
 SOURCE_GROUP("Header Files\\Renderer" FILES ${SORE_RENDERER_HEADERS})
 
+SOURCE_GROUP("Source Files\\3rd Party" FILES ${SORE_JSON_SRCS})
+
 ADD_LIBRARY(sore_lib SHARED
 	${SORE_SRCS} ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS} 
 	${SORE_KERNEL_SRCS} ${SORE_RENDERER_SRCS} ${SORE_PLATFORM_SPECIFIC} 
+	${SORE_JSON_SRCS}
 	${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_KERNEL_HEADERS}
 	${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS} ${SORE_RENDERER_HEADERS}
 	${SORE_PLATFORM_HEADERS} ${SORE_3RDPARTY_HEADERS})
