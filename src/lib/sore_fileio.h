@@ -117,7 +117,6 @@ namespace SORE_FileIO
 
     typedef boost::function<void (const std::string&)> file_callback;
 
-#ifdef linux
     class LinuxInotifyWatcher;
 
     struct notify_handle
@@ -128,19 +127,14 @@ namespace SORE_FileIO
             const std::list<std::pair<std::string, file_callback> >::iterator& i)
             : filename(file), it(i) {}
     private:
+#ifdef linux
         friend class LinuxInotifyWatcher;
+#else
+        friend class WindowsFileWatcher;
+#endif
         std::string filename;
         std::list<std::pair<std::string, file_callback> >::iterator it;
     };
-
-#else
-    struct notify_handle
-	{
-		notify_handle() {}
-	private:
-        friend class LinuxInotifyWatcher;
-	};
-#endif
 
     class FilesystemNotifier : public SORE_Kernel::Task
     {
