@@ -41,7 +41,7 @@
 #include <sore_geometrychunk.h>
 #include <sore_texturestate.h>
 #include <sore_screeninfo.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 #include <sore_uniformstate.h>
 
 namespace SORE_Graphics

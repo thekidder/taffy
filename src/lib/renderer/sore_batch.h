@@ -40,7 +40,7 @@
 #include <sore_texture.h>
 #include <sore_renderstate.h>
 #include <sore_screeninfo.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 
 namespace SORE_Graphics
 {

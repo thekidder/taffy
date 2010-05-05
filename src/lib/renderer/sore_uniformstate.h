@@ -43,7 +43,7 @@
 #include <sore_vector3.h>
 #include <sore_vector4.h>
 #include <sore_matrix4x4.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 
 namespace SORE_Graphics
 {

@@ -48,7 +48,7 @@
 #include <sore_renderable.h>
 #include <sore_renderer.h>
 #include <sore_resource.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 #include <sore_timing.h>
 #ifndef SORE_NO_VBO
 #include <sore_vbo.h>

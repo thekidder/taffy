@@ -41,7 +41,7 @@
 #include <boost/functional/hash.hpp>
 
 #include <sore_dll.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 #include <sore_texture.h>
 
 namespace SORE_Graphics

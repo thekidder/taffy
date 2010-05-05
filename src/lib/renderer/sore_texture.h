@@ -40,7 +40,7 @@
 #include <sore_allgl.h>
 #include <sore_noncopyable.h>
 #include <sore_resource.h>
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 
 namespace SORE_Graphics
 {

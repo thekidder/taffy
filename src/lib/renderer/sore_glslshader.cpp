@@ -32,7 +32,7 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_shaders.h>
+#include <sore_glslshader.h>
 #include <sore_util.h>
 
 namespace SORE_Graphics
