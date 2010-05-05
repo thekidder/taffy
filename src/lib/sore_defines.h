@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  __SORE_DEFINES_H__
-#define  __SORE_DEFINES_H__
+#ifndef  SORE_DEFINES_H
+#define  SORE_DEFINES_H
 
 #ifdef NDEBUG
 #undef DEBUG
@@ -49,4 +49,4 @@
 #include <windows.h>
 #endif
 
-#endif /*__SORE_DEFINES_H__*/
+#endif /*SORE_DEFINES_H*/

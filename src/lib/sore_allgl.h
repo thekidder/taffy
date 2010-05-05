@@ -33,8 +33,8 @@
  **************************************************************************/
 
 
-#ifndef  ALLGL_H
-#define  ALLGL_H
+#ifndef  SORE_ALLGL_H
+#define  SORE_ALLGL_H
 
 #include <sore_defines.h> //for windows.h
 
@@ -52,4 +52,4 @@
     //Linux-specific to find system fonts
     #include <fontconfig/fontconfig.h>
 #endif
-#endif //ALLGL_H
+#endif //SORE_ALLGL_H
