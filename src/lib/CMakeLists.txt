@@ -44,15 +44,15 @@ SET(SORE_JSON_SRCS 3rdparty/json/json_reader.cpp 3rdparty/json/json_value.cpp
 	3rdparty/json/json_writer.cpp)
 
 IF(UNIX)
-	SET(SORE_PLATFORM_SPECIFIC sore_fileio_linux.cpp sore_font_linux.cpp 
+	SET(SORE_PLATFORM_SRCS sore_fileio_linux.cpp sore_font_linux.cpp 
 		sore_timing_linux.cpp 3rdparty/inotify-cxx.cpp)
 	SET(SORE_PLATFORM_HEADERS sore_fileio_linux.h)
-	SET(SORE_3RDPARTY_HEADERS 3rdparty/inotify-cxx.h)
 ENDIF()
 
 IF(WIN32)
-SET(SORE_PLATFORM_SPECIFIC sore_fileio_windows.cpp sore_font_windows.cpp 
-	sore_timing_windows.cpp)
+	SET(SORE_PLATFORM_SRCS sore_fileio_windows.cpp sore_font_windows.cpp 
+		sore_timing_windows.cpp)
+	SET(SORE_PLATFORM_HEADERS sore_fileio_windows.h)
 ENDIF()
 
 set(SORE_SRCS sore_color.cpp
@@ -71,8 +71,12 @@ set(SORE_HEADERS sore_color.h
 	sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
 	sore_settings.h sore_text.h sore_timing.h sore_util.h) 
 
+#set up source groups to create VS folders
 SOURCE_GROUP("Source Files" FILES ${SORE_SRCS})
 SOURCE_GROUP("Header Files" FILES ${SORE_HEADERS})
+
+SOURCE_GROUP("Source Files\\Platform Specific" FILES ${SORE_PLATFFRM_SRCS})
+SOURCE_GROUP("Header Files\\Platform Specific" FILES ${SORE_PLATFORM_HEADERS})
 
 SOURCE_GROUP("Source Files\\GUI" FILES ${SORE_GUI_SRCS})
 SOURCE_GROUP("Header Files\\GUI" FILES ${SORE_GUI_HEADERS})
@@ -93,7 +97,7 @@ SOURCE_GROUP("Source Files\\3rd Party" FILES ${SORE_JSON_SRCS})
 
 ADD_LIBRARY(sore_lib SHARED
 	${SORE_SRCS} ${SORE_GUI_SRCS} ${SORE_NETWORK_SRCS} ${SORE_MATH_SRCS} 
-	${SORE_KERNEL_SRCS} ${SORE_RENDERER_SRCS} ${SORE_PLATFORM_SPECIFIC} 
+	${SORE_KERNEL_SRCS} ${SORE_RENDERER_SRCS} ${SORE_PLATFORM_SRCS} 
 	${SORE_JSON_SRCS}
 	${SORE_HEADERS} ${SORE_GUI_HEADERS} ${SORE_KERNEL_HEADERS}
 	${SORE_MATH_HEADERS} ${SORE_NETWORK_HEADERS} ${SORE_RENDERER_HEADERS}
