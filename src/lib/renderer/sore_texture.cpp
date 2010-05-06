@@ -42,11 +42,8 @@
 
 namespace SORE_Graphics
 {
-
     void Texture2D::Load()
     {
-        if(handle!=0)
-            Unload();
         char ext[10];
         SORE_Utility::GetFileExt(GetFilename().c_str(), ext);
         if(strcmp(ext, "tga")==0)
@@ -62,7 +59,8 @@ namespace SORE_Graphics
 
     void Texture2D::LoadTGA(const char* filename)
     {
-        handle = 0;
+        if(handle!=0)
+            Unload();
         bool failed = false;
         GLubyte header[18];
 
@@ -215,6 +213,9 @@ namespace SORE_Graphics
     void Texture2D::LoadFromData(const void* data, GLint internalFormat,
                                  GLenum format, unsigned int width, unsigned height)
     {
+        if(handle!=0)
+            Unload();
+
         w = width;
         h = height;
         glGenTextures(1, &handle);

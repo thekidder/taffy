@@ -51,6 +51,11 @@ namespace SORE_Graphics
         Texture2D(const void* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
         ~Texture2D();
+
+        void LoadTGA(const char* filename);
+        void LoadFromData(const void* data, GLint internalFormat,
+                          GLenum format, unsigned int width, unsigned int height);
+
         void Bind(
             GLSLShaderPtr shader,
             const std::string& sampleName,
@@ -67,9 +72,6 @@ namespace SORE_Graphics
         static std::string ProcessFilename(const std::string& file);
     protected:
         void Load();
-        void LoadTGA(const char* filename);
-        void LoadFromData(const void* data, GLint internalFormat,
-                          GLenum format, unsigned int width, unsigned int height);
         void Unload();
 
         GLuint handle;

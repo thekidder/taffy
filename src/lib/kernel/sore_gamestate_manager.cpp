@@ -69,13 +69,6 @@ namespace SORE_Game
 
         renderer = new SORE_Graphics::Renderer(pool);
         screen.SetRenderer(renderer);
-        input.AddListener(
-            SORE_Kernel::WINDOWRESIZE,
-            std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-        input.AddListener(
-            SORE_Kernel::RESIZE,
-            std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
-                          &pool));
     }
 
     GamestateManager::~GamestateManager()
@@ -119,6 +112,15 @@ namespace SORE_Game
         else
             curr = kernel.AddConstTask(50, newState->GetInterval(), newState);
         states.push_back(std::make_pair(curr, newState));
+
+        //ugly hack! get proper resize in every state
+        input.AddListener(
+            SORE_Kernel::WINDOWRESIZE,
+            std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
+        input.AddListener(
+            SORE_Kernel::RESIZE,
+            std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
+                          &pool));
     }
 
     SORE_Graphics::Renderer* GamestateManager::GetRenderer()

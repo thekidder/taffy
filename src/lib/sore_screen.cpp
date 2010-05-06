@@ -120,18 +120,15 @@ namespace SORE_Kernel
     void Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
     {
         SetupScreenInfo(_screen);
-        screen.fullscreen = _screen.fullscreen;
-        screen.showCursor = _screen.showCursor;
-        screen.resizable  = _screen.resizable;
-        if(screen.fullscreen)
+        if(_screen.fullscreen)
             videoFlags |= SDL_FULLSCREEN;
         else
             if(videoFlags & SDL_FULLSCREEN) videoFlags ^= SDL_FULLSCREEN;
-        if(screen.showCursor)
+        if(_screen.showCursor)
             SDL_ShowCursor(SDL_ENABLE);
         else
             SDL_ShowCursor(SDL_DISABLE);
-        if(screen.resizable)
+        if(_screen.resizable)
             videoFlags |= SDL_RESIZABLE;
         else
             if(videoFlags & SDL_RESIZABLE) videoFlags ^= SDL_RESIZABLE;
@@ -141,15 +138,18 @@ namespace SORE_Kernel
     void Screen::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
     {
         SDLScreenChange(_screen);
-        if(renderer)
-            renderer->SetScreenInfo(screen);
 
-        glViewport( 0, 0, ( GLsizei )screen.width, ( GLsizei )screen.height );
+        glViewport( 0, 0, ( GLsizei )_screen.width, ( GLsizei )_screen.height );
+        if(renderer)
+            renderer->SetScreenInfo(_screen);
+
+        screen = _screen;
+
         glGetIntegerv(GL_VIEWPORT, viewport);
         Event e;
         e.type = RESIZE;
-        e.resize.w = screen.width;
-        e.resize.h = screen.height;
+        e.resize.w = _screen.width;
+        e.resize.h = _screen.height;
         input.InjectEvent(e);
     }
 
@@ -189,7 +189,7 @@ namespace SORE_Kernel
     {
         SORE_Profiler::Sample graphics("graphics");
         if(renderer)
-            renderer->Render();
+        renderer->Render();
         SDL_GL_SwapBuffers();
     }
 
@@ -235,11 +235,7 @@ namespace SORE_Kernel
         ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
                    boost::format("resizing from (%d, %d) to (%d, %d)")
                    % screen.width % screen.height % width % height);
-        if(renderer)
-        {
-            renderer->SetScreenInfo(screen);
-        }
-        drawContext = SDL_SetVideoMode(screen.width, screen.height, 0, videoFlags);
+        drawContext = SDL_SetVideoMode(width, height, 0, videoFlags);
     }
 
     int Screen::InitializeSDL(std::string windowTitle)
@@ -260,9 +256,6 @@ namespace SORE_Kernel
                        % SDL_GetError());
             return 1;
         }
-        //save current resolution
-        width = videoInfo->current_w;
-        height = videoInfo->current_h;
 
         videoFlags = SDL_OPENGL;
         videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
@@ -310,6 +303,9 @@ namespace SORE_Kernel
         }
 #endif
         PrintGLDiagnostics();
+
+        glViewport( 0, 0, ( GLsizei )screen.width, ( GLsizei )screen.height );
+
         return 0;
     }
 

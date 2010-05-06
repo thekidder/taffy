@@ -94,9 +94,6 @@ namespace SORE_Kernel
         InputTask& input; //for injecting resize events
 
         SDL_Surface* drawContext;
-        //user's previous width and height so we can reset
-        //the screen after fullscreen mode
-        int width, height;
         Uint32 videoFlags;
 
         SORE_Graphics::IRenderer* renderer;

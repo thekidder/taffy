@@ -191,9 +191,16 @@ void SORE_Font::Font::LoadFace(unsigned int height)
         }
     }
 
-    textures[height] = SORE_Graphics::Texture2DPtr(
-        new SORE_Graphics::Texture2D(
+    if(textures.find(height) == textures.end())
+    {
+        textures[height] = SORE_Graphics::Texture2DPtr(
+            new SORE_Graphics::Texture2D(
             texture, GL_RGBA, GL_RGBA, texWidth, texHeight));
+    }
+    else
+    {
+        textures[height]->LoadFromData(texture, GL_RGBA, GL_RGBA, texWidth, texHeight);
+    }
 
     for(unsigned int i = 0; i < NUM_CHARACTERS; ++i)
     {
