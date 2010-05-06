@@ -71,5 +71,5 @@ namespace SORE_FileIO
         bool finished; //true when watcher is done
     };
 
-#define FilesystemWatcherTask WindowsFileWatcher
+//#define FilesystemWatcherTask WindowsFileWatcher
 }

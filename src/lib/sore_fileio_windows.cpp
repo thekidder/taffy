@@ -36,19 +36,24 @@
 #pragma warning( push )
 #pragma warning( disable : 4995 )
 
-#include <process.h>
-
+#define _WIN32_WINNT 0x0400
 #include <sore_defines.h> //for windows.h
+
+#include <windowsx.h>
+#include <commctrl.h>
+#include <shlwapi.h>
+
 #include <sore_fileio.h>
 #include <sore_logger.h>
 
-struct thread_info
+struct HDIR_MONITOR
 {
-    CRITICAL_SECTION* cs;
-    bool* finished;
-
+    OVERLAPPED ol;
     HANDLE hDir;
-    std::queue<std::string>* notifyEvents;
+    BYTE buffer[32 * 1024];
+    LPARAM lParam;
+    BOOL fStop;
+    SORE_FileIO::file_callback callback;
 };
 
 static std::string GetFullName(const std::string& filename)
@@ -73,33 +78,22 @@ static std::string GetParent(const std::string& filename)
     return parent;
 }
 
-static DWORD WINAPI ThreadFunc(void* args)
+bool RefreshMonitoring(HDIR_MONITOR* pMonitor);
+
+static void CALLBACK MonitorCallback(DWORD dwErrorCode, 
+                                     DWORD dwNumberOfBytesTransferred, 
+                                     LPOVERLAPPED lpOverlapped)
 {
-    thread_info* ti = reinterpret_cast<thread_info*>(args);
+    HDIR_MONITOR* pMonitor = (HDIR_MONITOR*)lpOverlapped;
+    DWORD offset = 0;
+    PFILE_NOTIFY_INFORMATION info;
+    TCHAR szFile[MAX_PATH];
 
-    while(true)
+    if(dwErrorCode == ERROR_SUCCESS)
     {
-        EnterCriticalSection(ti->cs);
-        if(*(ti->finished))
-        {
-            LeaveCriticalSection(ti->cs);
-            break;
-        }
-        LeaveCriticalSection(ti->cs);
-
-        BYTE buffer[32 * 1024];
-        DWORD offset = 0;
-        DWORD bytes;
-        PFILE_NOTIFY_INFORMATION info;
-        TCHAR szFile[MAX_PATH];
-
-        ReadDirectoryChangesW(ti->hDir, buffer, 32*1024, 0,
-            FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
-            &bytes, NULL, NULL);
-
         do
         {
-            info = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(&buffer[offset]);
+            info = (PFILE_NOTIFY_INFORMATION) &pMonitor->buffer[offset];
             offset += info->NextEntryOffset;
 
 #if defined(UNICODE)
@@ -116,20 +110,77 @@ static DWORD WINAPI ThreadFunc(void* args)
             }
 #endif
 
-            std::string filename(reinterpret_cast<char*>(info->FileName));
+            std::string filename(reinterpret_cast<char*>(szFile));
             filename = GetFullName(filename);
 
             ENGINE_LOG(SORE_Logging::LVL_INFO, std::string("change on ") + filename);
 
         } while(info->NextEntryOffset != 0);
     }
-    delete ti;
-    return 0;
+    if(!pMonitor->fStop)
+    {
+        RefreshMonitoring(pMonitor);
+    }
 }
+
+static bool RefreshMonitoring(HDIR_MONITOR* pMonitor)
+{
+    return ReadDirectoryChangesW(pMonitor->hDir, pMonitor->buffer, 32*1024, FALSE,
+        FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
+        NULL, &pMonitor->ol, MonitorCallback);
+}
+
+void StopMonitoring(HDIR_MONITOR* pMonitor)
+{
+    if(pMonitor)
+    {
+        pMonitor->fStop = true;
+
+        CancelIo(pMonitor->hDir);
+
+        if(!HasOverlappedIoCompleted(&pMonitor->ol))
+        {
+            SleepEx(5, TRUE);
+        }
+
+        CloseHandle(pMonitor->ol.hEvent);
+        CloseHandle(pMonitor->hDir);
+        delete pMonitor;
+    }
+}
+
+HDIR_MONITOR* StartMonitoring(const char* directory, SORE_FileIO::file_callback callback)
+{
+    HDIR_MONITOR* pMonitor = new HDIR_MONITOR;
+    memset(pMonitor, 0, sizeof(HDIR_MONITOR));
+
+    pMonitor->hDir = CreateFile(directory, 
+        FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
+
+    if (pMonitor->hDir != INVALID_HANDLE_VALUE)
+    {
+        pMonitor->ol.hEvent    = CreateEvent(NULL, TRUE, FALSE, NULL);
+        pMonitor->callback     = callback;
+
+        if (RefreshMonitoring(pMonitor))
+        {
+			return pMonitor;
+		}
+		else
+		{
+			CloseHandle(pMonitor->ol.hEvent);
+			CloseHandle(pMonitor->hDir);
+		}
+	}
+
+    delete pMonitor;
+	return NULL;
+}
+
 
 SORE_FileIO::WindowsFileWatcher::WindowsFileWatcher() : finished(false)
 {
-    InitializeCriticalSection(&synchronization);
 }
 
 static void CloseWatchHandle(std::pair<std::string, HANDLE> p)
@@ -140,13 +191,7 @@ static void CloseWatchHandle(std::pair<std::string, HANDLE> p)
 
 SORE_FileIO::WindowsFileWatcher::~WindowsFileWatcher()
 {
-    EnterCriticalSection(&synchronization);
     finished = true;
-    LeaveCriticalSection(&synchronization);
-
-    std::for_each(watches.begin(), watches.end(), &CloseWatchHandle);
-
-    DeleteCriticalSection(&synchronization);
 }
 
 void SORE_FileIO::WindowsFileWatcher::Pause()
@@ -159,12 +204,26 @@ void SORE_FileIO::WindowsFileWatcher::Resume()
 
 void SORE_FileIO::WindowsFileWatcher::Frame(int elapsedTime)
 {
+    if(finished) return;
+
+    MSG msg = {0};
+    while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
+        if (msg.message == WM_QUIT)
+        {
+            finished = true;
+            break;
+        }
+
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 }
 
 SORE_FileIO::notify_handle SORE_FileIO::WindowsFileWatcher::Notify(
     const std::string& filename, file_callback callback)
 {
-    if(watches.find(GetParent(filename)) == watches.end())
+    /*if(watches.find(GetParent(filename)) == watches.end())
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, std::string("watching ") + GetParent(filename));
         HANDLE hDir = CreateFile(
@@ -179,34 +238,21 @@ SORE_FileIO::notify_handle SORE_FileIO::WindowsFileWatcher::Notify(
             ENGINE_LOG(SORE_Logging::LVL_ERROR, "Invalid handle received");
         watches.insert(std::make_pair(GetParent(filename), hDir));
 
-        thread_info* ti = new thread_info;
-        ti->cs = &synchronization;
-        ti->hDir = hDir;
-        ti->finished = &finished;
-        ti->notifyEvents = &notifyEvents;
-
-        HANDLE hThread = CreateThread(
-            NULL,
-            0,
-            &ThreadFunc, 
-            ti,
-            0,
-            0);
-
-        threads.push_back(hThread);
+        StartMonitoring(TEXT(GetParent(filename).c_str()), callback);
 
         return notify_handle();
     }
     else
     {
         return notify_handle();
-    }
+    }*/
+    return notify_handle();
 }
 
 void SORE_FileIO::WindowsFileWatcher::Remove(notify_handle handle)
 {
-    std::string filename = GetParent(handle.filename);
-    /*watchedFiles[filename].callbacks.erase(handle.it);
+    /*std::string filename = GetParent(handle.filename);
+    watchedFiles[filename].callbacks.erase(handle.it);
     if(watchedFiles[filename].callbacks.empty())
         watchedFiles.erase(watchedFiles.find(filename));*/
 }
