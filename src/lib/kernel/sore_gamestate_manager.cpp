@@ -67,19 +67,17 @@ namespace SORE_Game
         gk.AddTask(20, &watcher);
 #endif
 
-        renderer = new SORE_Graphics::Renderer(pool);
-        screen.SetRenderer(renderer);
+        screen.SetRenderer(&renderer);
     }
 
     GamestateManager::~GamestateManager()
     {
-        delete renderer;
     }
 
     void GamestateManager::Pop()
     {
         input.PopState();
-        renderer->PopState();
+        renderer.PopState();
         kernel.RemoveTask(states.back().first);
         delete states.back().second;
         states.pop_back();
@@ -102,7 +100,7 @@ namespace SORE_Game
     void GamestateManager::PushState(Gamestate* newState)
     {
         input.PushState();
-        renderer->PushState();
+        renderer.PushState();
         newState->Initialize(this);
 
         kernel.PauseTask(curr);
@@ -123,19 +121,19 @@ namespace SORE_Game
                           &pool));
     }
 
-    SORE_Graphics::Renderer* GamestateManager::GetRenderer()
+    SORE_Graphics::Renderer& GamestateManager::GetRenderer()
     {
         return renderer;
     }
 
-    SORE_Kernel::InputTask* GamestateManager::GetInputTask()
+    SORE_Kernel::InputTask& GamestateManager::GetInputTask()
     {
-        return &input;
+        return input;
     }
 
-    SORE_Kernel::Screen* GamestateManager::GetScreen()
+    SORE_Kernel::Screen& GamestateManager::GetScreen()
     {
-        return &screen;
+        return screen;
     }
 
     SORE_Resource::ResourcePool& GamestateManager::GetPool()

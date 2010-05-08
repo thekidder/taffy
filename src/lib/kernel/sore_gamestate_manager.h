@@ -62,17 +62,17 @@ namespace SORE_Game
         //run until a task requests exit or until there are no states left
         int Run();
 
-        SORE_Graphics::Renderer* GetRenderer();
-        SORE_Kernel::InputTask* GetInputTask();
+        SORE_Graphics::Renderer& GetRenderer();
+        SORE_Kernel::InputTask& GetInputTask();
         SORE_Resource::ResourcePool& GetPool();
-        SORE_Kernel::Screen* GetScreen();
+        SORE_Kernel::Screen& GetScreen();
 
         bool FileNotifySupported() const;
     private:
         void Pop();
 
         SORE_Kernel::GameKernel& kernel;
-        SORE_Graphics::Renderer* renderer;
+        SORE_Graphics::Renderer renderer;
         SORE_Kernel::InputTask input;
 #ifdef FilesystemWatcherTask
         SORE_FileIO::FilesystemWatcherTask watcher;
