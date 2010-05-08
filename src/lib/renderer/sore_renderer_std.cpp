@@ -45,8 +45,7 @@ inline int next_p2 (int a )
     return rval;
 }
 
-SORE_Graphics::Renderer::Renderer(SORE_Resource::ResourcePool& _pool)
-    : pool(_pool)
+SORE_Graphics::Renderer::Renderer()
 {
     glEnable(GL_BLEND);
     PushState();

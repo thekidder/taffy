@@ -64,7 +64,7 @@ namespace SORE_Graphics
     class SORE_EXPORT Renderer : public SORE_Graphics::IRenderer, SORE_Utility::Noncopyable
     {
     public:
-        Renderer(SORE_Resource::ResourcePool& _pool);
+        Renderer();
         ~Renderer();
 
         virtual void Render();
@@ -102,8 +102,6 @@ namespace SORE_Graphics
         void CalculateFPS();
 
         camera_info GetCamera(geometry_layer layer);
-
-        SORE_Resource::ResourcePool& pool;
 
         struct render_info
         {
