@@ -51,17 +51,15 @@ SORE_Graphics::Renderer::Renderer()
     PushState();
 }
 
+static void DeleteGraphicsArray(SORE_Graphics::GraphicsArray* ga)
+{
+    delete ga;
+}
+
 SORE_Graphics::Renderer::~Renderer()
 {
-    std::vector<GraphicsArray*>::iterator it;
-    for(it = geometry.begin(); it != geometry.end(); ++it)
-    {
-        delete *it;
-    }
-    for(it = staticGeometry.begin(); it != staticGeometry.end(); ++it)
-    {
-        delete *it;
-    }
+    std::for_each(geometry.begin(), geometry.end(), &DeleteGraphicsArray);
+    std::for_each(staticGeometry.begin(), staticGeometry.end(), &DeleteGraphicsArray);
 }
 
 void SORE_Graphics::Renderer::OnScreenChange()
