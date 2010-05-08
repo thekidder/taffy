@@ -52,12 +52,13 @@ namespace SORE_Game
                                        const std::string& windowTitle,
 									   const std::string& iconFilename,
                                        const std::string& settingsFile)
-        : kernel(gk), pool(pc
+        : kernel(gk), ini(settingsFile), sm(&ini), 
+        screen(screenInfo, input, windowTitle, iconFilename, &sm),
+        pool(pc
 #ifdef FilesystemWatcherTask
 		, &watcher
 #endif
-		), ini(settingsFile), sm(&ini),
-          screen(screenInfo, input, windowTitle, iconFilename, &sm), popFlag(false)
+		), popFlag(false)
     {
         curr = gk.end();
 

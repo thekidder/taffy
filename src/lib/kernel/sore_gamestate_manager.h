@@ -72,16 +72,19 @@ namespace SORE_Game
         void Pop();
 
         SORE_Kernel::GameKernel& kernel;
-        SORE_Graphics::Renderer renderer;
-        SORE_Kernel::InputTask input;
-#ifdef FilesystemWatcherTask
-        SORE_FileIO::FilesystemWatcherTask watcher;
-#endif
-        SORE_Resource::ResourcePool pool;
+
         SORE_Utility::IniSettingsBackend ini;
         SORE_Utility::SettingsManager sm;
 
-        SORE_Kernel::Screen screen;
+        SORE_Kernel::InputTask input;
+
+        SORE_Kernel::Screen screen; //depends on input, sm
+        SORE_Graphics::Renderer renderer; //must be init after screen
+
+#ifdef FilesystemWatcherTask
+        SORE_FileIO::FilesystemWatcherTask watcher;
+#endif
+        SORE_Resource::ResourcePool pool; //needs watcher (if defined)
 
         SORE_Kernel::task_ref curr;
         std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
