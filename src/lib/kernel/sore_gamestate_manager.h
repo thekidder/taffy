@@ -49,8 +49,7 @@ namespace SORE_Game
     class SORE_EXPORT GamestateManager
     {
     public:
-        GamestateManager(SORE_Kernel::GameKernel& gk,
-                         SORE_FileIO::PackageCache* pc = NULL,
+        GamestateManager(SORE_FileIO::PackageCache* pc = NULL,
                          const std::string& windowTitle = "SORE Framework Application",
 						 const std::string& iconFilename = "",
                          const std::string& settingsFile = "");
@@ -71,7 +70,7 @@ namespace SORE_Game
     private:
         void Pop();
 
-        SORE_Kernel::GameKernel& kernel;
+        SORE_Kernel::GameKernel kernel;
 
         SORE_Utility::IniSettingsBackend ini;
         SORE_Utility::SettingsManager sm;

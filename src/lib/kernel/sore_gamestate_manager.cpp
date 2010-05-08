@@ -47,12 +47,11 @@ namespace SORE_Game
         false
     };
 
-    GamestateManager::GamestateManager(SORE_Kernel::GameKernel& gk,
-                                       SORE_FileIO::PackageCache* pc,
+    GamestateManager::GamestateManager(SORE_FileIO::PackageCache* pc,
                                        const std::string& windowTitle,
 									   const std::string& iconFilename,
                                        const std::string& settingsFile)
-        : kernel(gk), ini(settingsFile), sm(&ini), 
+        : ini(settingsFile), sm(&ini), 
         screen(screenInfo, input, windowTitle, iconFilename, &sm),
         pool(pc
 #ifdef FilesystemWatcherTask
@@ -60,12 +59,12 @@ namespace SORE_Game
 #endif
 		), popFlag(false)
     {
-        curr = gk.end();
+        curr = kernel.end();
 
-        gk.AddTask(0, &input);
-        gk.AddTask(10, &screen);
+        kernel.AddTask(0, &input);
+        kernel.AddTask(10, &screen);
 #ifdef FilesystemWatcherTask
-        gk.AddTask(20, &watcher);
+        kernel.AddTask(20, &watcher);
 #endif
 
         screen.SetRenderer(&renderer);
