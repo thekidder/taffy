@@ -9,7 +9,7 @@
 namespace SORE_GUI
 {
     RenderStats::RenderStats(SORE_Resource::ResourcePool& pool,
-                             SORE_Graphics::Renderer *r,
+                             SORE_Graphics::Renderer& r,
                              SORE_GUI::Widget *parent) :
         renderer(r), frame(0), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
         polys(0), polysLabel(0), ms(0), msLabel(0)
@@ -70,7 +70,7 @@ namespace SORE_GUI
 
     void RenderStats::Frame(int elapsed)
     {
-        int rendererFPS = static_cast<int>(renderer->GetFPS());
+        int rendererFPS = static_cast<int>(renderer.GetFPS());
 
         const int FPS_HIGH = 60;
         const int FPS_MID  = 30;
@@ -83,9 +83,9 @@ namespace SORE_GUI
             fps->SetColor(SORE_Graphics::Red);
 
         fps->UpdateText(boost::str(boost::format("%d") % rendererFPS));
-        draws->UpdateText(boost::str(boost::format("%d") % renderer->GetDrawCalls()));
-        polys->UpdateText(boost::str(boost::format("%d") % renderer->GetNumPolys()));
-        ms->UpdateText(boost::str(boost::format("%d") % renderer->GetFrameMS()));
+        draws->UpdateText(boost::str(boost::format("%d") % renderer.GetDrawCalls()));
+        polys->UpdateText(boost::str(boost::format("%d") % renderer.GetNumPolys()));
+        ms->UpdateText(boost::str(boost::format("%d") % renderer.GetFrameMS()));
 
         fps->SetPosition(SVec(SUnit(1.0, -10 - fps->GetSize(HORIZONTAL)), 
                               SUnit(0.0, 0)));
