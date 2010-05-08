@@ -63,7 +63,7 @@ inline static int next_p2 (int a )
 }
 
 SORE_Font::Font::Font(SORE_Resource::WatchedFileArrayPtr wfa)
-    : Resource(wfa)
+    : Resource(wfa), libraryInit(false)
 {
     Load();
 }
@@ -81,11 +81,21 @@ SORE_Font::Font::~Font()
     FT_Done_FreeType(library);
 }
 
+void DeleteCharacters(std::pair<unsigned int, SORE_Font::CharInfo*> chars)
+{
+    delete[] chars.second;
+}
+
 void SORE_Font::Font::Load()
 {
+    for_each(characters.begin(), characters.end(), &DeleteCharacters);
     characters.clear();
-    if (FT_Init_FreeType( &library ))
-        return;
+    if(!libraryInit)
+    {
+        if (FT_Init_FreeType( &library ))
+            return;
+        libraryInit = true;
+    }
 
     SORE_FileIO::InFile* fontObj = File();
 
@@ -307,7 +317,10 @@ const SORE_Font::CharInfo& SORE_Font::Font::GetCharacter(unsigned int height, ch
     else
     {
         if(characters.find(height)==characters.end())
+        {
+            ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Loading face for height %d: %c") % height % c);
             LoadFace(height);
+        }
         return characters[height][static_cast<unsigned int>(c)];
     }
 }

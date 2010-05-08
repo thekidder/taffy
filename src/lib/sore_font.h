@@ -89,7 +89,7 @@ namespace SORE_Font
         SORE_Graphics::TransformationPtr transform;
     };
 
-    class SORE_EXPORT Font : public SORE_Resource::Resource
+    class SORE_EXPORT Font : public SORE_Resource::Resource, SORE_Utility::Noncopyable
     {
     public:
         Font(SORE_Resource::WatchedFileArrayPtr wfa);
@@ -117,6 +117,7 @@ namespace SORE_Font
         std::map<unsigned int, CharInfo*> characters;
         std::map<unsigned int, SORE_Graphics::Texture2DPtr> textures;
         FT_Library library;
+        bool libraryInit;
         FT_Face face;
         FT_Byte* fontInfo;
     };
