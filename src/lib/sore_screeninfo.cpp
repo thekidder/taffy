@@ -111,17 +111,6 @@ namespace SORE_Graphics
         return !(one == two);
     }
 
-    bool operator==(const camera_info& one, const camera_info& two)
-    {
-        return one.projection == two.projection
-            && one.viewMatrix == two.viewMatrix;
-    }
-
-    bool operator!=(const camera_info& one, const camera_info& two)
-    {
-        return !(one == two);
-    }
-
     SORE_Math::Vector2<float> ScreenToProjection(
         ScreenInfo screen, ProjectionInfo proj, SORE_Math::Vector2<int> pos)
     {

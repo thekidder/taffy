@@ -55,7 +55,7 @@ IF(WIN32)
 	SET(SORE_PLATFORM_HEADERS sore_fileio_windows.h)
 ENDIF()
 
-set(SORE_SRCS sore_color.cpp
+set(SORE_SRCS sore_camera.cpp sore_color.cpp
 	sore_fileio.cpp sore_font.cpp
 	sore_input.cpp sore_interpolater.cpp sore_logger.cpp
 	sore_logginginit.cpp sore_profiler.cpp
@@ -63,7 +63,7 @@ set(SORE_SRCS sore_color.cpp
 	sore_screen.cpp sore_screeninfo.cpp sore_settings.cpp
 	sore_text.cpp sore_timing.cpp sore_util.cpp)
 
-set(SORE_HEADERS sore_color.h
+set(SORE_HEADERS sore_camera.h sore_color.h
 	sore_dll.h sore_defines.h sore_fileio.h sore_font.h
 	sore_input.h sore_interpolater.h sore_logger.h
 	sore_logginginit.h sore_noncopyable.h sore_profiler.h 

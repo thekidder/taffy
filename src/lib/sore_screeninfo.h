@@ -35,8 +35,6 @@
 #ifndef  SORE_SCREENINFO_H
 #define  SORE_SCREENINFO_H
 
-#include <boost/function.hpp>
-
 #include <sore_math.h>
 
 namespace SORE_Graphics
@@ -77,15 +75,6 @@ namespace SORE_Graphics
         bool useNativeResolution; //supercedes width, height, ratio
     };
 
-    struct SORE_EXPORT camera_info
-    {
-        ProjectionInfo projection;
-        SORE_Math::Matrix4<float> viewMatrix;
-    };
-
-    bool operator==(const camera_info& one, const camera_info& two);
-    bool operator!=(const camera_info& one, const camera_info& two);
-
     ProjectionInfo SORE_EXPORT SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
 
     SORE_Math::Vector2<float> SORE_EXPORT ScreenToProjection(
@@ -94,9 +83,6 @@ namespace SORE_Graphics
     SORE_Math::Vector2<int> SORE_EXPORT ProjectionToScreen(
         ScreenInfo screen, ProjectionInfo proj,
         SORE_Math::Vector2<float> pos);
-
-    typedef boost::function<ProjectionInfo (ScreenInfo)> proj_callback;
-    typedef boost::function<camera_info ()> camera_callback;
 }
 
 #endif

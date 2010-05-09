@@ -32,35 +32,18 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_TOPWIDGET_H
-#define SORE_TOPWIDGET_H
-
 #include <sore_camera.h>
-#include <sore_geometryprovider.h>
-#include <sore_input.h>
-#include <sore_widget.h>
 
-namespace SORE_GUI
+namespace SORE_Graphics
 {
-    class SORE_EXPORT TopWidget : public Widget, public SORE_Graphics::GeometryProvider
+    bool operator==(const camera_info& one, const camera_info& two)
     {
-    public:
-        TopWidget(unsigned int width, unsigned int height);
+        return one.projection == two.projection
+            && one.viewMatrix == two.viewMatrix;
+    }
 
-        bool OnResize(SORE_Kernel::Event* e);
-
-        virtual void MakeUpToDate();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
-
-        SORE_Graphics::camera_info GetCamera();
-    private:
-        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdateResolution(unsigned int w, unsigned int h);
-
-        std::vector<SORE_Graphics::Renderable> renderables;
-    };
+    bool operator!=(const camera_info& one, const camera_info& two)
+    {
+        return !(one == two);
+    }
 }
-
-#endif

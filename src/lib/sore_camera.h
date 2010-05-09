@@ -32,35 +32,28 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_TOPWIDGET_H
-#define SORE_TOPWIDGET_H
+#ifndef SORE_CAMERA_H
+#define SORE_CAMERA_H
 
-#include <sore_camera.h>
-#include <sore_geometryprovider.h>
-#include <sore_input.h>
-#include <sore_widget.h>
+#include <boost/function.hpp>
+#include <boost/unordered_map.hpp>
 
-namespace SORE_GUI
+#include <sore_screeninfo.h>
+
+namespace SORE_Graphics
 {
-    class SORE_EXPORT TopWidget : public Widget, public SORE_Graphics::GeometryProvider
+    struct SORE_EXPORT camera_info
     {
-    public:
-        TopWidget(unsigned int width, unsigned int height);
-
-        bool OnResize(SORE_Kernel::Event* e);
-
-        virtual void MakeUpToDate();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
-
-        SORE_Graphics::camera_info GetCamera();
-    private:
-        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdateResolution(unsigned int w, unsigned int h);
-
-        std::vector<SORE_Graphics::Renderable> renderables;
+        ProjectionInfo projection;
+        SORE_Math::Matrix4<float> viewMatrix;
     };
+
+    bool operator==(const camera_info& one, const camera_info& two);
+    bool operator!=(const camera_info& one, const camera_info& two);
+
+    typedef boost::function<camera_info ()> camera_callback;
+    typedef boost::unordered_map<std::string, camera_info> camera_table;
+    typedef boost::unordered_map<std::string, camera_callback> camera_callback_table;
 }
 
 #endif
