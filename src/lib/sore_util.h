@@ -35,13 +35,14 @@
 #ifndef  SORE_UTIL_H
 #define  SORE_UTIL_H
 
-#include <sore_dll.h>
-#include <sore_fileio.h>
-
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <map>
 #include <string>
 #include <vector>
+
+#include <sore_dll.h>
+#include <sore_fileio.h>
 
 namespace SORE_Utility
 {

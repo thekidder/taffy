@@ -45,7 +45,6 @@
 //We need M_PI
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
-#define _USE_MATH_DEFINES
 #include <windows.h>
 #endif
 

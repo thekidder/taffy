@@ -35,10 +35,7 @@
 #ifndef  SORE_MATH_H
 #define  SORE_MATH_H
 
-#ifndef M_PI
-#define M_PI 3.14159265358979
-#endif
-
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <sore_vector2.h>
@@ -49,8 +46,6 @@
 
 namespace SORE_Math
 {
-	const double M_PI_180 = M_PI/180.0;	
-	
 	typedef Vector3<double> Vector3d;
 	typedef Vector3<float>  Vector3f;
 	typedef Vector3<int>    Vector3i;

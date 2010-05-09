@@ -35,6 +35,7 @@
 #ifndef _SORE_MATRIX4X4_H_
 #define _SORE_MATRIX4X4_H_
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <sore_vector2.h>

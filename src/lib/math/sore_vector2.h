@@ -35,6 +35,7 @@
 #ifndef _SORE_VECTOR2_H_
 #define _SORE_VECTOR2_H_
 
+#define _USE_MATH_DEFINES
 #include <cassert>
 #include <cmath>
 
