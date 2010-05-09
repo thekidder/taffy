@@ -55,9 +55,18 @@ namespace SORE_Graphics
         //current state should be rendered
         virtual void PushState() = 0;
         virtual void PopState() = 0;
+
+        //Rendering Statistics
+        float GetFPS() const { return fps; }
+        float GetFrameMS() const { return ms; }
+        unsigned int GetDrawCalls() const { return numDrawCalls; }
+        unsigned int GetNumPolys() const { return numPolys; }
     protected:
         virtual void OnScreenChange() {}
         ScreenInfo screen;
+
+        float fps, ms;
+        unsigned int numDrawCalls, numPolys;
     };
 }
 

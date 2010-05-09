@@ -74,12 +74,6 @@ namespace SORE_Graphics
         void AddGeometryProvider(GeometryProvider* gp);
         void SetCamera(geometry_layer layer, camera_callback camera);
 
-        //Rendering Statistics
-        float GetFPS() const;
-        float GetFrameMS() const;
-        unsigned int GetDrawCalls() const;
-        unsigned int GetNumPolys() const;
-
         void PushState();
         void PopState();
     protected:
@@ -119,12 +113,6 @@ namespace SORE_Graphics
         boost::unordered_map<Renderable, geometry_entry> staticMap;
         std::vector<Renderable> staticRenderables;
         std::vector<RenderBatch> staticBatches;
-
-        //statistics: get info about current rendering
-        float fps;
-        float ms;
-        unsigned int drawCalls;
-        unsigned int numPolys;
     };
 }
 

@@ -239,7 +239,7 @@ void SORE_Graphics::Renderer::Render()
     Build();
 
     numPolys = 0;
-    drawCalls = 0;
+    numDrawCalls = 0;
 
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -249,14 +249,14 @@ void SORE_Graphics::Renderer::Render()
     for(it = staticBatches.begin(); it != staticBatches.end(); ++it)
     {
         numPolys += it->Render();
-        drawCalls++;
+        numDrawCalls++;
     }
     for(it = batches.begin(); it != batches.end(); ++it)
     {
         numPolys += it->Render();
-        drawCalls++;
+        numDrawCalls++;
     }
-    if(drawCalls > 0)
+    if(numDrawCalls > 0)
         geometry.back()->EndDraw();
     CalculateFPS();
 
@@ -303,26 +303,6 @@ void SORE_Graphics::Renderer::CalculateFPS()
         frames = 0;
     }
     last = t;
-}
-
-float SORE_Graphics::Renderer::GetFPS() const
-{
-    return fps;
-}
-
-float SORE_Graphics::Renderer::GetFrameMS() const
-{
-    return ms;
-}
-
-unsigned int SORE_Graphics::Renderer::GetDrawCalls() const
-{
-    return drawCalls;
-}
-
-unsigned int SORE_Graphics::Renderer::GetNumPolys() const
-{
-    return numPolys;
 }
 
 void SORE_Graphics::Renderer::ClearGeometryProviders()
