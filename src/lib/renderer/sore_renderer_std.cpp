@@ -97,7 +97,7 @@ void SORE_Graphics::Renderer::Build()
     std::vector<Renderable> allRenderables;
 
     std::vector<GeometryProvider*>::iterator it;
-    for(it = currentState->providers.begin(); 
+    for(it = currentState->providers.begin();
         it != currentState->providers.end(); ++it)
     {
         (*it)->MakeUpToDate();
@@ -132,8 +132,21 @@ void SORE_Graphics::Renderer::BuildStatic()
     BuildGeometryBuffers(staticRenderables, staticGeometry, true, staticMap);
 }
 
+namespace SORE_Graphics
+{
+    static std::size_t hash_value(const Renderable& r);
+}
+
+static std::size_t SORE_Graphics::hash_value(const Renderable& r)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, r.GetGeometryChunk());
+
+    return seed;
+}
+
 void SORE_Graphics::Renderer::MakeBatches(
-    std::vector<Renderable>& allRenderables, 
+    std::vector<Renderable>& allRenderables,
     std::vector<RenderBatch>& batches,
     boost::unordered_map<Renderable, geometry_entry>& geometryMap,
     bool isStatic)
@@ -168,17 +181,6 @@ void SORE_Graphics::Renderer::MakeBatches(
 
         previous = current;
         oldState = newState;
-    }
-}
-
-namespace boost
-{
-    static std::size_t hash_value(const SORE_Graphics::Renderable& r)
-    {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, r.GetGeometryChunk());
-
-        return seed;
     }
 }
 
@@ -223,8 +225,8 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
         }
         (*thisGeometry)->AddObject(it->GetGeometryChunk(), it->GetTransform());
         geometry_entry e = {
-            *thisGeometry, 
-            vboSize, 
+            *thisGeometry,
+            vboSize,
             it->GetGeometryChunk()->NumIndices(),
             it->GetGeometryChunk()->Type()};
         const Renderable& r = *it;
