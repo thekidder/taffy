@@ -7,7 +7,7 @@
 # SORE_DLL - set to the DLL path if on Windows and building a shared library
 # 
 
-FIND_PATH(SORE_INCLUDE_DIR sore.h
+FIND_PATH(INCLUDE_DIR sore/sore_defines.h
     PATHS
     /usr/include
     /usr/local/include
@@ -39,7 +39,9 @@ IF(WIN32)
 	)
 ENDIF()
 
-
+IF(INCLUDE_DIR)
+	SET(SORE_INCLUDE_DIR ${INCLUDE_DIR}/sore)
+ENDIF()
 IF(SORE_LIBRARY_DEBUG AND NOT SORE_LIBRARY_RELEASE)
     SET(SORE_LIBRARY ${SORE_LIBRARY_DEBUG})
 ELSEIF(SORE_LIBRARY_RELEASE AND NOT SORE_LIBRARY_DEBUG)
