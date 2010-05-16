@@ -66,7 +66,7 @@ namespace SORE_Resource
     typedef boost::shared_ptr<WatchedFileArray> WatchedFileArrayPtr;
 }
 
-class SORE_EXPORT SORE_Resource::WatchedFileArray : SORE_Utility::Noncopyable
+class SORE_EXPORT SORE_Resource::WatchedFileArray : public SORE_Utility::Noncopyable
 {
 public:
     WatchedFileArray(const std::string& filename,
