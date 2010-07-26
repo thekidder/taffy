@@ -52,7 +52,7 @@ namespace SORE_Graphics
     class SORE_EXPORT VBO : public GraphicsArray
     {
     public:
-        VBO(bool s, bool t = false, bool c = false, bool n = false);
+        VBO(geometry_type type, bool t = false, bool c = false, bool n = false);
         ~VBO();
 
         virtual void Build();

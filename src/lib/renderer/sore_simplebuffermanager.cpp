@@ -32,57 +32,79 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_SCREENINFO_H
-#define  SORE_SCREENINFO_H
+#include <limits>
 
-#include <sore_math.h>
+#include <boost/foreach.hpp>
 
-namespace SORE_Graphics
+#include <sore_simplebuffermanager.h>
+#include <sore_vbo.h>
+
+#ifndef SORE_NO_VBO
+#define GraphicsArrayClass VBO
+#else
+#define GraphicsArrayClass VertexArray
+#endif
+
+SORE_Graphics::SimpleBufferManager::SimpleBufferManager()
 {
-    enum ProjectionType {NONE, ORTHO, ORTHO2D, PERSPECTIVE};
-
-    struct SORE_EXPORT ProjectionInfo
-    {
-        ProjectionInfo(float left, float right) { type = ORTHO2D;
-            this->left = left; this->right = right;
-            useScreenCoords = false;
-            useScreenRatio = true; }
-        ProjectionInfo() {type = NONE;
-            fov = ratio = znear = zfar = top = bottom = left = right = 0.0;
-            useScreenCoords = useScreenRatio = false; }
-        ProjectionType type;
-        float fov,ratio;
-        float znear, zfar;
-        float top, bottom, left, right;
-        //if this is true, and type of projection is ortho2d, use width/height
-        //for projection
-        bool useScreenCoords;
-        //if true, uses screen ratio (for ortho, gets top/bottom by dividing
-        //left/right by ratio)
-        bool useScreenRatio;
-    };
-
-    bool operator==(const ProjectionInfo& one, const ProjectionInfo& two);
-    bool operator!=(const ProjectionInfo& one, const ProjectionInfo& two);
-
-    struct SORE_EXPORT ScreenInfo
-    {
-        int width, height;
-        float ratio; //set by SORE_Screen after screen is created
-        bool showCursor;
-        bool fullscreen;
-        bool resizable;
-        bool useNativeResolution; //supercedes width, height, ratio
-    };
-
-    ProjectionInfo SORE_EXPORT SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
-
-    SORE_Math::Vector2<float> SORE_EXPORT ScreenToProjection(
-        ScreenInfo screen, ProjectionInfo proj,
-        SORE_Math::Vector2<int> pos);
-    SORE_Math::Vector2<int> SORE_EXPORT ProjectionToScreen(
-        ScreenInfo screen, ProjectionInfo proj,
-        SORE_Math::Vector2<float> pos);
 }
 
-#endif
+SORE_Graphics::SimpleBufferManager::~SimpleBufferManager()
+{
+    for(unsigned int i = 0; i < 3; ++i)
+    {
+        std::vector<geometry_buffer>& b = buffers[i];
+        BOOST_FOREACH(geometry_buffer ga, b)
+        {
+            delete ga.buffer;
+        }
+    }
+}
+
+SORE_Graphics::render_queue SORE_Graphics::SimpleBufferManager::GetRenderList()
+{
+    render_queue rq = {allRenderables, rMap};
+    rq.renderables = allRenderables;
+    rq.buffers = rMap;
+
+    return rq;
+}
+
+void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geometry_type type)
+{
+    allRenderables.push_back(r);
+
+    if(rMap.find(r.GetGeometryChunk()) == rMap.end())
+    {
+        Insert(r.GetGeometryChunk(), type);
+    }
+}
+
+void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
+{
+}
+
+void SORE_Graphics::SimpleBufferManager::GeometryRemoved(GeometryChunkPtr gc)
+{
+}
+
+void SORE_Graphics::SimpleBufferManager::Insert(GeometryChunkPtr g, geometry_type type)
+{
+    std::vector<geometry_buffer>& buffer = buffers[type];
+    GraphicsArray* current = buffer.back().buffer;
+    if(current->NumIndices() + g->NumIndices() > std::numeric_limits<unsigned short>::max() ||
+        current->NumVertices() + g->NumVertices() > std::numeric_limits<unsigned short>::max())
+    {
+        current = new GraphicsArrayClass(type, true, true, false);
+        buffer.push_back(current);
+    }
+
+    current->AddObject(g);
+    /*geometry_entry e = 
+    {
+        *thisGeometry,
+        vboSize,
+        it->GetGeometryChunk()->NumIndices(),
+        it->GetGeometryChunk()->Type()
+    };*/
+}

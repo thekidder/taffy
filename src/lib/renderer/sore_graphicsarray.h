@@ -43,6 +43,13 @@
 
 namespace SORE_Graphics
 {
+    enum geometry_type
+    {
+        STATIC,  //geometry will never change
+        DYNAMIC, //geoemtry will change occasionally
+        STREAM   //geometry will change every frame
+    };
+
     /**
        @author Adam Kidder <thekidder@gmail.com>
        Class abstracting the details of Vertex Arrays and VBOs
@@ -50,7 +57,7 @@ namespace SORE_Graphics
     class SORE_EXPORT GraphicsArray
     {
     public:
-        GraphicsArray(bool isStatic, bool t = false, bool c = false, bool n = false);
+        GraphicsArray(geometry_type type, bool t = false, bool c = false, bool n = false);
         virtual ~GraphicsArray();
 
         virtual void Build() = 0;
@@ -66,6 +73,8 @@ namespace SORE_Graphics
         void DrawElements(unsigned int numIndices, unsigned short indexOffset, GLenum type);
 
         bool Empty() const;
+        size_t NumIndices() const;
+        size_t NumVertices() const;
     protected:
         virtual void BeginDrawHook() = 0;
         virtual void* GetOffset(void* pointer, unsigned int offset) = 0;
@@ -74,7 +83,7 @@ namespace SORE_Graphics
         std::vector<unsigned short> indices;
 
         bool hasTexCoords, hasNormals, hasColors;
-        bool isStatic;
+        geometry_type type;
     };
 }
 

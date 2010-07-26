@@ -32,57 +32,49 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_SCREENINFO_H
-#define  SORE_SCREENINFO_H
+#ifndef SORE_SIMPLEBUFFERMANAGER_H
+#define SORE_SIMPLEBUFFERMANAGER_H
 
-#include <sore_math.h>
+#include <boost/unordered_set.hpp>
+
+#include <sore_buffermanager.h>
+#include <sore_util.h>
 
 namespace SORE_Graphics
 {
-    enum ProjectionType {NONE, ORTHO, ORTHO2D, PERSPECTIVE};
-
-    struct SORE_EXPORT ProjectionInfo
+    class SORE_EXPORT SimpleBufferManager : public BufferManager, SORE_Utility::Noncopyable
     {
-        ProjectionInfo(float left, float right) { type = ORTHO2D;
-            this->left = left; this->right = right;
-            useScreenCoords = false;
-            useScreenRatio = true; }
-        ProjectionInfo() {type = NONE;
-            fov = ratio = znear = zfar = top = bottom = left = right = 0.0;
-            useScreenCoords = useScreenRatio = false; }
-        ProjectionType type;
-        float fov,ratio;
-        float znear, zfar;
-        float top, bottom, left, right;
-        //if this is true, and type of projection is ortho2d, use width/height
-        //for projection
-        bool useScreenCoords;
-        //if true, uses screen ratio (for ortho, gets top/bottom by dividing
-        //left/right by ratio)
-        bool useScreenRatio;
+    public:
+        SimpleBufferManager();
+        ~SimpleBufferManager();
+
+        //renderer interface
+        //virtual render_queue GetRenderList();
+        virtual geometry_entry LookupGC(GeometryChunkPtr gc);
+
+        //game interface
+        void GeometryAdded(GeometryChunkPtr gc, geometry_type type);
+        void GeometryChanged(GeometryChunkPtr gc);
+        void GeometryRemoved(GeometryChunkPtr gc);
+
+    private:
+        struct geometry_buffer
+        {
+            GraphicsArray* buffer;
+            std::vector<Renderable> renderables;
+        };
+
+        void MakeCurrent();
+        void Insert(GeometryChunkPtr g, geometry_type type); 
+
+        renderable_map rMap;
+        boost::unordered_map<GeometryChunkPtr, geometry_buffer> geometryMapping;
+
+        std::vector<geometry_buffer> buffers[3];
+
+        typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> renderable_map;
+        renderable_map renderables;
     };
-
-    bool operator==(const ProjectionInfo& one, const ProjectionInfo& two);
-    bool operator!=(const ProjectionInfo& one, const ProjectionInfo& two);
-
-    struct SORE_EXPORT ScreenInfo
-    {
-        int width, height;
-        float ratio; //set by SORE_Screen after screen is created
-        bool showCursor;
-        bool fullscreen;
-        bool resizable;
-        bool useNativeResolution; //supercedes width, height, ratio
-    };
-
-    ProjectionInfo SORE_EXPORT SetupProjection(const ProjectionInfo& pi, const ScreenInfo& si);
-
-    SORE_Math::Vector2<float> SORE_EXPORT ScreenToProjection(
-        ScreenInfo screen, ProjectionInfo proj,
-        SORE_Math::Vector2<int> pos);
-    SORE_Math::Vector2<int> SORE_EXPORT ProjectionToScreen(
-        ScreenInfo screen, ProjectionInfo proj,
-        SORE_Math::Vector2<float> pos);
 }
 
 #endif

@@ -203,7 +203,7 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
     unsigned int vboSize = 0;
     if(geometry.empty())
     {
-        GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
+        GraphicsArray* ga = new GraphicsArrayClass(isStatic ? STATIC : STREAM, true, true);
         geometry.push_back(ga);
     }
 
@@ -218,7 +218,7 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
             vboSize = 0;
             if(thisGeometry == geometry.end())
             {
-                GraphicsArray* ga = new GraphicsArrayClass(isStatic, true, true);
+                GraphicsArray* ga = new GraphicsArrayClass(isStatic ? STATIC : STREAM, true, true);
                 geometry.push_back(ga);
                 thisGeometry = geometry.end() - 1;
             }

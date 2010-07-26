@@ -35,8 +35,8 @@
 #include <sore_graphicsarray.h>
 #include <sore_logger.h>
 
-SORE_Graphics::GraphicsArray::GraphicsArray(bool isStatic, bool t, bool c, bool n) 
-  : hasTexCoords(t), hasNormals(n), hasColors(c), isStatic(isStatic)
+SORE_Graphics::GraphicsArray::GraphicsArray(geometry_type type, bool t, bool c, bool n) 
+  : hasTexCoords(t), hasNormals(n), hasColors(c), type(type)
 {
 }
 
@@ -137,4 +137,14 @@ void SORE_Graphics::GraphicsArray::DrawElements(
 bool SORE_Graphics::GraphicsArray::Empty() const
 {
     return indices.empty();
+}
+
+size_t SORE_Graphics::GraphicsArray::NumIndices() const
+{
+    return indices.size();
+}
+
+size_t SORE_Graphics::GraphicsArray::NumVertices() const
+{
+    return vertices.size();
 }

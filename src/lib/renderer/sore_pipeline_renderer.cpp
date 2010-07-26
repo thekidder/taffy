@@ -32,12 +32,15 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
  
+#include <boost/foreach.hpp>
+
 #include <sore_pipelineitem.h>
 #include <sore_pipeline_renderer.h>
 
 #include <sore_timing.h>
 
-SORE_Graphics::PipelineRenderer::PipelineRenderer()
+SORE_Graphics::PipelineRenderer::PipelineRenderer(boost::shared_ptr<BufferManager> bm)
+: bufferManager(bm)
 {
 }
 
@@ -49,6 +52,13 @@ void SORE_Graphics::PipelineRenderer::Render()
 {
     fps = ms = 0.0f;
     numPolys = numDrawCalls = 0;
+
+    render_queue queue = bufferManager->GetRenderList();
+
+    BOOST_FOREACH(Renderable r, queue.renderables)
+    {
+        //render r
+    }
 
     CalculateFPS();
 }

@@ -38,6 +38,7 @@
 #include <stack>
 #include <vector>
 
+#include <sore_buffermanager.h>
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
 #include <sore_renderer.h>
@@ -49,7 +50,7 @@ namespace SORE_Graphics
     class SORE_EXPORT PipelineRenderer : public IRenderer, SORE_Utility::Noncopyable
 	{
     public:
-        PipelineRenderer();
+        PipelineRenderer(boost::shared_ptr<BufferManager> bm);
         ~PipelineRenderer();
 
         virtual void Render();
@@ -68,6 +69,7 @@ namespace SORE_Graphics
 
         std::stack<renderer_state> states;
 
+        boost::shared_ptr<BufferManager> bufferManager;
 	};
 }
  

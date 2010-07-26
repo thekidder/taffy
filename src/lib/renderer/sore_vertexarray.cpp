@@ -36,8 +36,8 @@
 
 namespace SORE_Graphics
 {
-    VertexArray::VertexArray(bool s, bool t, bool c, bool n) 
-        : GraphicsArray(s, t, c, n)
+    VertexArray::VertexArray(geometry_type type, bool t, bool c, bool n) 
+        : GraphicsArray(type, t, c, n)
     {
     }
 
