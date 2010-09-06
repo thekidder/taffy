@@ -32,12 +32,45 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_pipelineitem.h>
+#ifndef SORE_RENDERER2D_H
+#define SORE_RENDERER2D_H
 
-SORE_Graphics::PipelineItem::PipelineItem()
+#include <vector>
+
+#include <sore_dll.h>
+#include <sore_batch.h>
+#include <sore_matrix4x4.h>
+#include <sore_renderstate.h>
+
+namespace SORE_Graphics
 {
+    /*
+     Generates a list of GL commands to send to the GPU from an ordered list
+     of renderables. Handles state changes, draw calls, and some rudimentary 
+     optimizations
+    */
+    class SORE_EXPORT GLCommandList
+    {
+    public:
+        void AddRenderable(const Renderable& r, const geometry_entry& geometry, const camera_info& cam);
+
+        void Render();
+
+        unsigned int NumPolygons() const;
+        unsigned int NumDrawCalls() const;
+    private:
+        //current state
+        RenderState currentState;
+        geometry_entry currentGeometry;
+        SORE_Math::Matrix4<float> currentTransform;
+
+        //command list
+        std::vector<RenderBatch> commandList;
+
+        //stats
+        unsigned int numPolygons;
+        unsigned int numDrawCalls;
+    };
 }
 
-SORE_Graphics::PipelineItem::~PipelineItem()
-{
-}
+#endif

@@ -32,6 +32,7 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <cassert>
 #include <limits>
 
 #include <boost/foreach.hpp>
@@ -51,60 +52,110 @@ SORE_Graphics::SimpleBufferManager::SimpleBufferManager()
 
 SORE_Graphics::SimpleBufferManager::~SimpleBufferManager()
 {
-    for(unsigned int i = 0; i < 3; ++i)
+    for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
-        std::vector<geometry_buffer>& b = buffers[i];
-        BOOST_FOREACH(geometry_buffer ga, b)
+        BOOST_FOREACH(geometry_buffer* buf, heaps[i])
         {
-            delete ga.buffer;
+            delete buf;
         }
     }
 }
 
-SORE_Graphics::render_queue SORE_Graphics::SimpleBufferManager::GetRenderList()
+/*SORE_Graphics::render_queue SORE_Graphics::SimpleBufferManager::GetRenderList()
 {
     render_queue rq = {allRenderables, rMap};
     rq.renderables = allRenderables;
     rq.buffers = rMap;
 
     return rq;
+}*/
+
+SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(GeometryChunkPtr gc)
+{
+    if(geometryMapping.find(gc) == geometryMapping.end())
+    {
+        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not find geometry");
+        geometry_entry ge;
+        return ge;
+    }
+    geometry_buffer* gb = geometryMapping[gc];
+    if(gb->geometryMap.find(gc) == gb->geometryMap.end())
+    {
+        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not lookup GC in buffer");
+        geometry_entry ge;
+        return ge;
+    }
+    return gb->geometryMap[gc];
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geometry_type type)
 {
-    allRenderables.push_back(r);
-
-    if(rMap.find(r.GetGeometryChunk()) == rMap.end())
+    geometry_buffer* buffer = Insert(gc, type);
+    
+    geometry_entry e = 
     {
-        Insert(r.GetGeometryChunk(), type);
-    }
+        &buffer->buffer,
+        buffer->buffer.NumIndices() - gc->NumIndices(),
+        gc->NumIndices(),
+        gc->NumVertices(),
+        gc->Type()
+    };
+    buffer->geometryMap[gc] = e;
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
 {
+    geometry_buffer* buffer = geometryMapping[gc];
+    /*if(buffer->geometryMap[gc].indices != gc->NumIndices() || 
+       buffer->geometryMap[gc].vertices != gc->NumVertices())
+    {
+        //size of the geometry has changed, reload the entire VBO
+    }
+    else
+    {
+        //do an in-place upload of the changed data
+    }*/
+    //too big for current heap?
+    size_t newIndices = gc->NumIndices() - buffer->geometryMap[gc].indices;
+    size_t newVertices = gc->NumVertices() - buffer->geometryMap[gc].vertices;
+    if(!buffer->buffer.HasRoomFor(newIndices, newVertices))
+    {
+        assert(0);
+        buffer->geometryMap.erase(gc);
+        GeometryAdded(gc, DYNAMIC); //placeholder
+    }
+    RebuildBuffer(buffer);
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryRemoved(GeometryChunkPtr gc)
 {
+    geometry_buffer* buffer = geometryMapping[gc];
+    buffer->geometryMap.erase(gc);
+    RebuildBuffer(buffer);
 }
 
-void SORE_Graphics::SimpleBufferManager::Insert(GeometryChunkPtr g, geometry_type type)
+void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
 {
-    std::vector<geometry_buffer>& buffer = buffers[type];
-    GraphicsArray* current = buffer.back().buffer;
-    if(current->NumIndices() + g->NumIndices() > std::numeric_limits<unsigned short>::max() ||
-        current->NumVertices() + g->NumVertices() > std::numeric_limits<unsigned short>::max())
+    buffer->buffer.Clear();
+    boost::unordered_map<GeometryChunkPtr, geometry_entry>::iterator it;
+    for(it = buffer->geometryMap.begin(); it != buffer->geometryMap.end(); ++it)
     {
-        current = new GraphicsArrayClass(type, true, true, false);
-        buffer.push_back(current);
+        buffer->buffer.AddObject(it->first);
+        buffer->geometryMap[it->first].offset = buffer->buffer.NumIndices() - it->first->NumIndices();
+    }
+}
+
+SORE_Graphics::SimpleBufferManager::geometry_buffer* SORE_Graphics::SimpleBufferManager::Insert(GeometryChunkPtr g, geometry_type type)
+{
+    std::vector<geometry_buffer*>& heap = heaps[type];
+    geometry_buffer* current = heap.back();
+    if(!current->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
+    {
+        current = new geometry_buffer(type);
+        heap.push_back(current);
     }
 
-    current->AddObject(g);
-    /*geometry_entry e = 
-    {
-        *thisGeometry,
-        vboSize,
-        it->GetGeometryChunk()->NumIndices(),
-        it->GetGeometryChunk()->Type()
-    };*/
+    current->buffer.AddObject(g);
+
+    return current;
 }

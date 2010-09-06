@@ -34,18 +34,17 @@
  
 #include <boost/foreach.hpp>
 
-#include <sore_pipelineitem.h>
 #include <sore_pipeline_renderer.h>
-
 #include <sore_timing.h>
 
-SORE_Graphics::PipelineRenderer::PipelineRenderer(boost::shared_ptr<BufferManager> bm)
+SORE_Graphics::PipelineRenderer::PipelineRenderer(BufferManager* bm)
 : bufferManager(bm)
 {
 }
 
 SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 {
+    delete bufferManager;
 }
 
 void SORE_Graphics::PipelineRenderer::Render()
@@ -53,14 +52,25 @@ void SORE_Graphics::PipelineRenderer::Render()
     fps = ms = 0.0f;
     numPolys = numDrawCalls = 0;
 
-    render_queue queue = bufferManager->GetRenderList();
-
-    BOOST_FOREACH(Renderable r, queue.renderables)
+    //collect geometry
+    std::vector<Renderable> renderables;
+    BOOST_FOREACH(GeometryProvider* gp, states.top().geometry)
     {
-        //render r
+        gp->MakeUpToDate();
+        std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
     }
 
     CalculateFPS();
+}
+
+void SORE_Graphics::PipelineRenderer::ClearGeometryProviders()
+{
+    states.top().geometry.clear();
+}
+
+void SORE_Graphics::PipelineRenderer::AddGeometryProvider(GeometryProvider* gp)
+{
+    states.top().geometry.push_back(gp);
 }
 
 void SORE_Graphics::PipelineRenderer::PushState()

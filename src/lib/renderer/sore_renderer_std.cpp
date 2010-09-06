@@ -166,7 +166,7 @@ void SORE_Graphics::Renderer::MakeBatches(
         {
             batches.push_back(RenderBatch(current, newState, true));
         }
-        else if(current.offset != (previous.offset + previous.num))
+        else if(current.offset != (previous.offset + previous.indices))
         {
             batches.push_back(RenderBatch(current, newState, false));
         }
@@ -176,7 +176,7 @@ void SORE_Graphics::Renderer::MakeBatches(
         }
         else
         {
-            batches.back().AddIndices(current.num);
+            batches.back().AddIndices(current.indices);
         }
 
         previous = current;
@@ -223,7 +223,7 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
                 thisGeometry = geometry.end() - 1;
             }
         }
-        (*thisGeometry)->AddObject(it->GetGeometryChunk(), it->GetTransform());
+        (*thisGeometry)->AddObject(it->GetGeometryChunk());
         geometry_entry e = {
             *thisGeometry,
             vboSize,

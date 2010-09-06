@@ -47,7 +47,8 @@ namespace SORE_Graphics
     {
         STATIC,  //geometry will never change
         DYNAMIC, //geoemtry will change occasionally
-        STREAM   //geometry will change every frame
+        STREAM,   //geometry will change every frame
+        MAX_GEOMETRY_TYPE
     };
 
     /**
@@ -63,8 +64,10 @@ namespace SORE_Graphics
         virtual void Build() = 0;
 
         void Clear();
-        void AddObject(GeometryChunkPtr geometry,
-                       boost::shared_ptr<SORE_Math::Matrix4<float> > transform);
+        void AddObject(GeometryChunkPtr geometry);
+        //updates the geometry currently in the buffer.
+        //only call if it has not changed size (either vertex or index)
+        void UpdateObject(GeometryChunkPtr geometry);
 
         void BeginDraw();
         void EndDraw();
@@ -73,11 +76,17 @@ namespace SORE_Graphics
         void DrawElements(unsigned int numIndices, unsigned short indexOffset, GLenum type);
 
         bool Empty() const;
+        bool HasRoomFor(size_t numIndices, size_t numVertices) const;
         size_t NumIndices() const;
         size_t NumVertices() const;
     protected:
         virtual void BeginDrawHook() = 0;
         virtual void* GetOffset(void* pointer, unsigned int offset) = 0;
+        virtual void BuildSubData(
+            size_t vertexOffset,
+            size_t numVertices,
+            size_t indexOffset,
+            size_t numIndices) = 0;
 
         std::vector<vertex> vertices;
         std::vector<unsigned short> indices;

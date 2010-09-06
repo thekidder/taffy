@@ -32,31 +32,42 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_PIPELINEITEM_H
-#define SORE_PIPELINEITEM_H
+#include <boost/foreach.hpp>
 
-#include <vector>
+#include <sore_pipe.h>
 
-#include <boost/unordered_map.hpp>
-
-#include <sore_camera.h>
-#include <sore_dll.h>
-#include <sore_geometrychunk.h>
-
-namespace SORE_Graphics
+SORE_Graphics::Pipe::Pipe()
 {
-    typedef GeometryChunk render_item;
-    typedef std::vector<render_item> render_list;
-
-    class SORE_EXPORT PipelineItem
-    {
-    public:
-        PipelineItem();
-        virtual ~PipelineItem();
-
-        virtual void Setup(const camera_table& cameras, render_list& list) = 0;
-        virtual void Render(const camera_table& cameras, render_list& list) = 0;
-    };
 }
 
-#endif
+SORE_Graphics::Pipe::~Pipe()
+{
+}
+
+void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)
+{
+    children.push_back(child);
+}
+
+void SORE_Graphics::Pipe::Setup()
+{
+    doSetup();
+
+    pipe_vector::iterator i;
+    for(i = children.begin(); i != children.end(); ++i)
+    {
+        i->Setup();
+    }
+}
+
+void SORE_Graphics::Pipe::Render(const camera_table& cameras, render_list& list)
+{
+    /*render_list& newList = doRender(cameras, list);
+
+    pipe_vector::iterator i;
+    for(i = children.begin(); i != children.end(); ++i)
+    {
+        i->Render(cameras, list);
+    }*/
+
+}

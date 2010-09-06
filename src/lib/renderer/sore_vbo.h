@@ -59,6 +59,11 @@ namespace SORE_Graphics
     private:
         virtual void BeginDrawHook();
         virtual void* GetOffset(void* pointer, unsigned int offset);
+        virtual void BuildSubData(
+            size_t vertexOffset,
+            size_t numVertices,
+            size_t indexOffset,
+            size_t numIndices);
 
         GLuint vbo, vboIndices;
     };

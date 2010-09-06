@@ -32,75 +32,52 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_vbo.h>
-#include <sore_logger.h>
-#include <algorithm>
+#include <sore_gl_command_list.h>
 
-namespace SORE_Graphics
+void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geometry_entry& geometry, const camera_info& cam)
 {
-    VBO::VBO(geometry_type type, bool t, bool c, bool n) :
-        GraphicsArray(type, t, c, n), vbo(0), vboIndices(0)
+    RenderState newState = currentState.Difference(r, cam);
+    if(currentGeometry.geometry != geometry.geometry)
     {
-        glGenBuffersARB(1, &vbo);
-        if(!vbo)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
-        glGenBuffersARB(1, &vboIndices);
-        if(!vboIndices)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create index buffer");
+        commandList.push_back(RenderBatch(geometry, newState, true));
+    }
+    else if(currentGeometry.offset != (geometry.offset + geometry.indices))
+    {
+        commandList.push_back(RenderBatch(geometry, newState, false));
+    }
+    else if(!newState.Empty())
+    {
+        commandList.push_back(RenderBatch(geometry, newState, false));
+    }
+    else
+    {
+        commandList.back().AddIndices(geometry.indices);
     }
 
-    VBO::~VBO()
+    currentState = newState;
+    currentGeometry = geometry;
+    currentTransform = *r.GetTransform();
+}
+
+void SORE_Graphics::GLCommandList::Render()
+{
+    numPolygons = 0;
+    numDrawCalls = 0;
+
+    std::vector<RenderBatch>::iterator it;
+    for(it = commandList.begin(); it != commandList.end(); ++it)
     {
-        glDeleteBuffersARB(1, &vbo);
-        glDeleteBuffersARB(1, &vboIndices);
+        numPolygons += it->Render();
+        numDrawCalls++;
     }
+}
 
-    void VBO::BeginDrawHook()
-    {
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-    }
+unsigned int SORE_Graphics::GLCommandList::NumPolygons() const
+{
+    return numPolygons;
+}
 
-    void* VBO::GetOffset(void* pointer, unsigned int offset)
-    {
-        return ((char*)NULL + (offset));
-    }
-
-    void VBO::Build()
-    {
-        if(!indices.size()) return;
-
-        unsigned int usage;
-        switch(type)
-        {
-        case STATIC:
-            usage = GL_STATIC_DRAW_ARB;
-            break;
-        case DYNAMIC:
-            usage = GL_DYNAMIC_DRAW_ARB;
-            break;
-        case STREAM:
-            usage = GL_STREAM_DRAW_ARB;
-            break;
-        }
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB,
-                        vertices.size()*sizeof(vertex),
-                        &(vertices[0]), usage);
-
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                        indices.size()*sizeof(unsigned short),
-                        &(indices[0]), usage);
-
-    }
-
-    void VBO::BuildSubData(
-        size_t vertexOffset,
-        size_t numVertices,
-        size_t indexOffset,
-        size_t numIndices)
-    {
-    }
+unsigned int SORE_Graphics::GLCommandList::NumDrawCalls() const
+{
+    return numDrawCalls;
 }

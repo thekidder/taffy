@@ -50,15 +50,14 @@ void SORE_Graphics::GraphicsArray::Clear()
     indices.clear();
 }
 
-void SORE_Graphics::GraphicsArray::AddObject(
-    GeometryChunkPtr geometry, boost::shared_ptr<SORE_Math::Matrix4<float> > transform)
+void SORE_Graphics::GraphicsArray::AddObject(GeometryChunkPtr geometry)
 {
     size_t oldSize = vertices.size();
 
     vertices.resize(vertices.size() + geometry->NumVertices());
     memcpy(&vertices[oldSize], geometry->GetVertices(),
            geometry->NumVertices()*sizeof(vertex));
-    for(unsigned int i=0; i<geometry->NumVertices(); ++i)
+    /*for(unsigned int i=0; i<geometry->NumVertices(); ++i)
     {
         SORE_Math::Vector4<float> pos(
             geometry->GetVertex(i).x,
@@ -70,7 +69,7 @@ void SORE_Graphics::GraphicsArray::AddObject(
         vertices[oldSize + i].x = pos[0];
         vertices[oldSize + i].y = pos[1];
         vertices[oldSize + i].z = pos[2];
-    }
+    }*/
 
     //copy vertices into VBO, taking into account index renumbering
     for(unsigned short j=0;j<geometry->NumIndices();++j)
@@ -78,6 +77,10 @@ void SORE_Graphics::GraphicsArray::AddObject(
         unsigned short index = geometry->GetIndex(j) + oldSize;
         indices.push_back(index);
     }
+}
+
+void SORE_Graphics::GraphicsArray::UpdateObject(GeometryChunkPtr geometry)
+{
 }
 
 void SORE_Graphics::GraphicsArray::BeginDraw()
@@ -137,6 +140,12 @@ void SORE_Graphics::GraphicsArray::DrawElements(
 bool SORE_Graphics::GraphicsArray::Empty() const
 {
     return indices.empty();
+}
+
+bool SORE_Graphics::GraphicsArray::HasRoomFor(size_t numIndices, size_t numVertices) const
+{
+    return !(NumIndices() + numIndices > std::numeric_limits<unsigned short>::max() ||
+             NumVertices() + numVertices > std::numeric_limits<unsigned short>::max());
 }
 
 size_t SORE_Graphics::GraphicsArray::NumIndices() const

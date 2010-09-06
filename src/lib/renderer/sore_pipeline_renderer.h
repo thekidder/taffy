@@ -41,6 +41,7 @@
 #include <sore_buffermanager.h>
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
+#include <sore_pipe.h>
 #include <sore_renderer.h>
 #include <sore_screeninfo.h>
 #include <sore_util.h>
@@ -50,8 +51,11 @@ namespace SORE_Graphics
     class SORE_EXPORT PipelineRenderer : public IRenderer, SORE_Utility::Noncopyable
 	{
     public:
-        PipelineRenderer(boost::shared_ptr<BufferManager> bm);
+        PipelineRenderer(BufferManager* bm);
         ~PipelineRenderer();
+
+        void ClearGeometryProviders();
+        void AddGeometryProvider(GeometryProvider* gp);
 
         virtual void Render();
 
@@ -59,17 +63,18 @@ namespace SORE_Graphics
         virtual void PopState();
 
     private:
+        //call once per frame to keep fps numbers up to date
         void CalculateFPS();
 
+        //state management
         struct renderer_state
         {
             camera_callback_table cameras;
             std::vector<GeometryProvider*> geometry;
         };
-
         std::stack<renderer_state> states;
 
-        boost::shared_ptr<BufferManager> bufferManager;
+        BufferManager* bufferManager;
 	};
 }
  

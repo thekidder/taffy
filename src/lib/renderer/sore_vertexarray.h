@@ -48,6 +48,11 @@ namespace SORE_Graphics
     private:
         void* GetOffset(void* pointer, unsigned int offset);
         void BeginDrawHook() {}
+        virtual void BuildSubData(
+            size_t vertexOffset,
+            size_t numVertices,
+            size_t indexOffset,
+            size_t numIndices) {}
     };
 }
 

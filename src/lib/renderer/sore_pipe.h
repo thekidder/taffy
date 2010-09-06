@@ -32,75 +32,48 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_vbo.h>
-#include <sore_logger.h>
-#include <algorithm>
+#ifndef SORE_PIPELINEITEM_H
+#define SORE_PIPELINEITEM_H
+
+#include <vector>
+
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/unordered_map.hpp>
+
+#include <sore_camera.h>
+#include <sore_dll.h>
+#include <sore_renderable.h>
 
 namespace SORE_Graphics
 {
-    VBO::VBO(geometry_type type, bool t, bool c, bool n) :
-        GraphicsArray(type, t, c, n), vbo(0), vboIndices(0)
+    typedef std::vector<Renderable> render_list;
+
+    class SORE_EXPORT Pipe
     {
-        glGenBuffersARB(1, &vbo);
-        if(!vbo)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
-        glGenBuffersARB(1, &vboIndices);
-        if(!vboIndices)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create index buffer");
-    }
+    public:
+        Pipe();
+        virtual ~Pipe();
 
-    VBO::~VBO()
-    {
-        glDeleteBuffersARB(1, &vbo);
-        glDeleteBuffersARB(1, &vboIndices);
-    }
+        /*
+          Tree functions: Used to build a tree of pipes for the renderer to
+          iterate through and render the scene. Pipes maintain ownership of their
+          children and delete them when they are deconstructed. Always call as:
+          AddChildPipe(new SomePipeClass(...));
+        */
+        void AddChildPipe(Pipe* pipe);
 
-    void VBO::BeginDrawHook()
-    {
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-    }
+        void Setup();
+        void Render(const camera_table& cameras, render_list& list);
+    private:
+        typedef boost::ptr_vector<Pipe> pipe_vector;
+        /*
+          Virtual setup/render functions to be implemented by Pipe implementations
+        */
+        virtual void doSetup() = 0;
+        virtual render_list& doRender(const camera_table& cameras, render_list& list) = 0;
 
-    void* VBO::GetOffset(void* pointer, unsigned int offset)
-    {
-        return ((char*)NULL + (offset));
-    }
-
-    void VBO::Build()
-    {
-        if(!indices.size()) return;
-
-        unsigned int usage;
-        switch(type)
-        {
-        case STATIC:
-            usage = GL_STATIC_DRAW_ARB;
-            break;
-        case DYNAMIC:
-            usage = GL_DYNAMIC_DRAW_ARB;
-            break;
-        case STREAM:
-            usage = GL_STREAM_DRAW_ARB;
-            break;
-        }
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB,
-                        vertices.size()*sizeof(vertex),
-                        &(vertices[0]), usage);
-
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndices);
-        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                        indices.size()*sizeof(unsigned short),
-                        &(indices[0]), usage);
-
-    }
-
-    void VBO::BuildSubData(
-        size_t vertexOffset,
-        size_t numVertices,
-        size_t indexOffset,
-        size_t numIndices)
-    {
-    }
+        pipe_vector children;
+    };
 }
+
+#endif

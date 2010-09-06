@@ -40,6 +40,14 @@
 #include <sore_buffermanager.h>
 #include <sore_util.h>
 
+#ifndef SORE_NO_VBO
+#include <sore_vbo.h>
+#define GraphicsArrayClass VBO
+#else
+#include <sore_vertexarray.h>
+#define GraphicsArrayClass VertexArray
+#endif
+
 namespace SORE_Graphics
 {
     class SORE_EXPORT SimpleBufferManager : public BufferManager, SORE_Utility::Noncopyable
@@ -58,21 +66,25 @@ namespace SORE_Graphics
         void GeometryRemoved(GeometryChunkPtr gc);
 
     private:
+        //typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> renderable_map;
+        //renderable_map rMap;
+
         struct geometry_buffer
         {
-            GraphicsArray* buffer;
-            std::vector<Renderable> renderables;
+            geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
+            GraphicsArrayClass buffer;
+
+            //generated from renderables
+            boost::unordered_map<GeometryChunkPtr, geometry_entry> geometryMap;
         };
 
-        void MakeCurrent();
-        void Insert(GeometryChunkPtr g, geometry_type type); 
+        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
+        void RebuildBuffer(geometry_buffer* buffer);
 
-        renderable_map rMap;
-        boost::unordered_map<GeometryChunkPtr, geometry_buffer> geometryMapping;
+        std::vector<geometry_buffer*> heaps[3];
+        //indexes a GC into one of the buffers above ^
+        boost::unordered_map<GeometryChunkPtr, geometry_buffer*> geometryMapping;
 
-        std::vector<geometry_buffer> buffers[3];
-
-        typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> renderable_map;
         renderable_map renderables;
     };
 }

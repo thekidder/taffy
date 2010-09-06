@@ -37,7 +37,7 @@
 SORE_Graphics::RenderBatch::RenderBatch(
     const geometry_entry& geometry,
     const RenderState& state, bool bindVBO)
-    : geometry(geometry.geometry), bind(bindVBO), numberIndices(geometry.num),
+    : geometry(geometry.geometry), bind(bindVBO), numberIndices(geometry.indices),
       indexOffset(geometry.offset), type(geometry.type), state(state)
 {
 }

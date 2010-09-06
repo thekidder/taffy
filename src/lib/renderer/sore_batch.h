@@ -48,7 +48,8 @@ namespace SORE_Graphics
     {
         GraphicsArray* geometry;
         unsigned int offset;
-        unsigned int num;
+        unsigned int indices;
+        unsigned int vertices;
         GLenum type;
     };
 
