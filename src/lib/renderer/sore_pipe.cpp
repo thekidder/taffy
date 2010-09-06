@@ -62,12 +62,11 @@ void SORE_Graphics::Pipe::Setup()
 
 void SORE_Graphics::Pipe::Render(const camera_table& cameras, render_list& list)
 {
-    /*render_list& newList = doRender(cameras, list);
+    render_list& newList = doRender(cameras, list);
 
     pipe_vector::iterator i;
     for(i = children.begin(); i != children.end(); ++i)
     {
         i->Render(cameras, list);
-    }*/
-
+    }
 }

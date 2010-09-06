@@ -82,6 +82,9 @@ namespace SORE_Graphics
         case STREAM:
             usage = GL_STREAM_DRAW_ARB;
             break;
+        case MAX_GEOMETRY_TYPE:
+        default:
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unrecognized switch case");
         }
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
