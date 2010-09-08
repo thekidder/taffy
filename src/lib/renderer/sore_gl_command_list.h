@@ -45,9 +45,9 @@
 namespace SORE_Graphics
 {
     /*
-     Generates a list of GL commands to send to the GPU from an ordered list
-     of renderables. Handles state changes, draw calls, and some rudimentary 
-     optimizations
+      Generates a list of GL commands to send to the GPU from an ordered list
+      of renderables. Handles state changes, draw calls, and some rudimentary
+      optimizations
     */
     class SORE_EXPORT GLCommandList
     {
