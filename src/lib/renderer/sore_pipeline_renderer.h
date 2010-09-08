@@ -31,12 +31,14 @@
  * representing official policies, either expressed or implied, of        *
  * Adam Kidder.                                                           *
  **************************************************************************/
- 
+
 #ifndef SORE_PIPELINE_RENDERER_H
 #define SORE_PIPELINE_RENDERER_H
 
 #include <stack>
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 #include <sore_buffermanager.h>
 #include <sore_camera.h>
@@ -45,11 +47,11 @@
 #include <sore_renderer.h>
 #include <sore_screeninfo.h>
 #include <sore_util.h>
- 
+
 namespace SORE_Graphics
 {
     class SORE_EXPORT PipelineRenderer : public IRenderer, SORE_Utility::Noncopyable
-	{
+    {
     public:
         PipelineRenderer(BufferManager* bm);
         ~PipelineRenderer();
@@ -69,13 +71,15 @@ namespace SORE_Graphics
         //state management
         struct renderer_state
         {
+            renderer_state() : pipeline(new NullPipe) {}
             camera_callback_table cameras;
             std::vector<GeometryProvider*> geometry;
+            boost::shared_ptr<Pipe> pipeline;
         };
         std::stack<renderer_state> states;
 
         BufferManager* bufferManager;
-	};
+    };
 }
- 
+
  #endif

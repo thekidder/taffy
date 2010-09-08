@@ -31,7 +31,7 @@
  * representing official policies, either expressed or implied, of        *
  * Adam Kidder.                                                           *
  **************************************************************************/
- 
+
 #include <boost/foreach.hpp>
 
 #include <sore_pipeline_renderer.h>
@@ -53,12 +53,25 @@ void SORE_Graphics::PipelineRenderer::Render()
     numPolys = numDrawCalls = 0;
 
     //collect geometry
-    std::vector<Renderable> renderables;
+    render_list renderables;
     BOOST_FOREACH(GeometryProvider* gp, states.top().geometry)
     {
         gp->MakeUpToDate();
         std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
     }
+
+    renderer_state& state = states.top();
+    //get current cameras
+    camera_table cameras;
+    typedef std::pair<std::string, camera_callback> cam;
+    BOOST_FOREACH(cam c, state.cameras)
+    {
+        cameras[c.first] = c.second();
+    }
+
+    //render using current pipeline
+    state.pipeline->Setup();
+    state.pipeline->Render(cameras, renderables);
 
     CalculateFPS();
 }
