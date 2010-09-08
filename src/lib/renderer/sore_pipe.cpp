@@ -67,6 +67,37 @@ void SORE_Graphics::Pipe::Render(const camera_table& cameras, render_list& list)
     pipe_vector::iterator i;
     for(i = children.begin(); i != children.end(); ++i)
     {
-        i->Render(cameras, list);
+        i->Render(cameras, newList);
     }
+}
+
+void SORE_Graphics::NullPipe::doSetup()
+{
+}
+
+SORE_Graphics::render_list& SORE_Graphics::NullPipe::doRender
+(
+    const camera_table& cameras,
+    render_list& list
+)
+{
+    return list;
+}
+
+void SORE_Graphics::RenderPipe::doSetup()
+{
+}
+
+SORE_Graphics::render_list& SORE_Graphics::RenderPipe::doRender
+(
+    const camera_table& cameras,
+    render_list& list
+)
+{
+    BOOST_FOREACH(Renderable r, list)
+    {
+
+    }
+
+    return list;
 }

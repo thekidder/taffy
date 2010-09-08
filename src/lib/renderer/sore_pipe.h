@@ -64,16 +64,37 @@ namespace SORE_Graphics
 
         void Setup();
         void Render(const camera_table& cameras, render_list& list);
-    private:
-        typedef boost::ptr_vector<Pipe> pipe_vector;
+    protected:
         /*
           Virtual setup/render functions to be implemented by Pipe implementations
         */
         virtual void doSetup() = 0;
         virtual render_list& doRender(const camera_table& cameras, render_list& list) = 0;
-
+    private:
+        typedef boost::ptr_vector<Pipe> pipe_vector;
         pipe_vector children;
     };
+
+    /*
+      Collection of basic pipes:
+        NullPipe: does nothing; passes geometry through
+        RenderPipe: renders geometry with the default shader
+        SortingPipe: sorts geometry according to a callback
+    */
+
+    class SORE_EXPORT NullPipe : public Pipe
+    {
+    protected:
+        virtual void doSetup();
+        virtual render_list& doRender(const camera_table& cameras, render_list& list);
+    };
+
+    class SORE_EXPORT RenderPipe: public Pipe
+    {
+    protected:
+        virtual void doSetup();
+        virtual render_list& doRender(const camera_table& cameras, render_list& list);
+    }
 }
 
 #endif
