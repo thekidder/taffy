@@ -52,7 +52,10 @@ namespace SORE_Graphics
     class SORE_EXPORT GLCommandList
     {
     public:
-        void AddRenderable(const Renderable& r, const geometry_entry& geometry, const camera_info& cam);
+        void AddRenderable(
+            const Renderable& r,
+            const geometry_entry& geometry,
+            const camera_info& cam);
 
         void Render();
 
