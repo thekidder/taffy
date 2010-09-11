@@ -71,7 +71,7 @@ namespace SORE_Graphics
         //state management
         struct renderer_state
         {
-            renderer_state() : pipeline(new NullPipe) {}
+            renderer_state() {}
             camera_callback_table cameras;
             std::vector<GeometryProvider*> geometry;
             boost::shared_ptr<Pipe> pipeline;

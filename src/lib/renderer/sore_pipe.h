@@ -63,7 +63,10 @@ namespace SORE_Graphics
         void AddChildPipe(Pipe* pipe);
 
         void Setup();
-        void Render(const camera_table& cameras, render_list& list);
+        //returns final render list to pass to parse and render
+        render_list& Render(
+            const camera_table& cameras,
+            render_list& list);
     protected:
         /*
           Virtual setup/render functions to be implemented by Pipe implementations
@@ -81,7 +84,6 @@ namespace SORE_Graphics
         RenderPipe: renders geometry with the default shader
         SortingPipe: sorts geometry according to a callback
     */
-
     class SORE_EXPORT NullPipe : public Pipe
     {
     protected:
@@ -94,7 +96,7 @@ namespace SORE_Graphics
     protected:
         virtual void doSetup();
         virtual render_list& doRender(const camera_table& cameras, render_list& list);
-    }
+    };
 }
 
 #endif

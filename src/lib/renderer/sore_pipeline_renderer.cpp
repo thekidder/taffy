@@ -89,6 +89,8 @@ void SORE_Graphics::PipelineRenderer::AddGeometryProvider(GeometryProvider* gp)
 void SORE_Graphics::PipelineRenderer::PushState()
 {
     states.push(renderer_state());
+    states.top().pipeline = boost::shared_ptr<Pipe>(new NullPipe());
+    states.top().pipeline->AddChildPipe(new RenderPipe());
 }
 
 void SORE_Graphics::PipelineRenderer::PopState()

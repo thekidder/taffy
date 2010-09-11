@@ -60,7 +60,9 @@ void SORE_Graphics::Pipe::Setup()
     }
 }
 
-void SORE_Graphics::Pipe::Render(const camera_table& cameras, render_list& list)
+SORE_Graphics::render_list& SORE_Graphics::Pipe::Render(
+    const camera_table& cameras,
+    render_list& list)
 {
     render_list& newList = doRender(cameras, list);
 
