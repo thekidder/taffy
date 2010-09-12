@@ -228,6 +228,7 @@ void SORE_Graphics::Renderer::BuildGeometryBuffers(
             *thisGeometry,
             vboSize,
             it->GetGeometryChunk()->NumIndices(),
+            it->GetGeometryChunk()->NumVertices(),
             it->GetGeometryChunk()->Type()};
         const Renderable& r = *it;
         result[r] = e;
