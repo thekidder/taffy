@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_RENDERER2D_H
-#define SORE_RENDERER2D_H
+#ifndef SORE_GL_COMMAND_LIST_H
+#define SORE_GL_COMMAND_LIST_H
 
 #include <vector>
 
