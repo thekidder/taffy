@@ -189,7 +189,7 @@ namespace SORE_Kernel
     {
         SORE_Profiler::Sample graphics("graphics");
         if(renderer)
-        renderer->Render();
+            renderer->Render();
         SDL_GL_SwapBuffers();
     }
 
@@ -342,8 +342,8 @@ namespace SORE_Kernel
                    boost::format("OpenGL extension string:\n%s") % extensions);
         int maxTextureSize;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-        ENGINE_LOG(SORE_Logging::LVL_INFO, 
-                   boost::format("Maximum texture size: %dx%d") 
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Maximum texture size: %dx%d")
                    % maxTextureSize % maxTextureSize);
         int maxTextureUnits;
         int maxFragmentTextureImageUnits;
@@ -360,22 +360,22 @@ namespace SORE_Kernel
                                  "Maximum fragment texture units: %d\n"
                                  "Maximum vertex texture units: %d\n"
                                  "Maximum combined texture units: %d")
-                   % maxTextureUnits % maxFragmentTextureImageUnits 
+                   % maxTextureUnits % maxFragmentTextureImageUnits
                    % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
         int maxMRT;
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &maxMRT);
-        ENGINE_LOG(SORE_Logging::LVL_INFO, 
-                   boost::format("Maximum color attachments: %d") 
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Maximum color attachments: %d")
                    % maxMRT);
         int maxVertexAttribs;
         glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
-        ENGINE_LOG(SORE_Logging::LVL_INFO, 
-                   boost::format("Maximum vertex attributes: %d") 
+        ENGINE_LOG(SORE_Logging::LVL_INFO,
+                   boost::format("Maximum vertex attributes: %d")
                    % maxVertexAttribs);
         int width[2];
         glGetIntegerv(GL_LINE_WIDTH_RANGE, width);
         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                   boost::format("Line width range: %d - %d")              
+                   boost::format("Line width range: %d - %d")
                    % width[0] % width[1]);
         glGetIntegerv(GL_POINT_SIZE_RANGE, width);
         ENGINE_LOG(SORE_Logging::LVL_INFO,
