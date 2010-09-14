@@ -91,8 +91,8 @@ SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(Geome
 void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geometry_type type)
 {
     geometry_buffer* buffer = Insert(gc, type);
-    
-    geometry_entry e = 
+
+    geometry_entry e =
     {
         &buffer->buffer,
         buffer->buffer.NumIndices() - gc->NumIndices(),
@@ -101,12 +101,14 @@ void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geom
         gc->Type()
     };
     buffer->geometryMap[gc] = e;
+
+    RebuildBuffer(buffer);
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
 {
     geometry_buffer* buffer = geometryMapping[gc];
-    /*if(buffer->geometryMap[gc].indices != gc->NumIndices() || 
+    /*if(buffer->geometryMap[gc].indices != gc->NumIndices() ||
        buffer->geometryMap[gc].vertices != gc->NumVertices())
     {
         //size of the geometry has changed, reload the entire VBO
@@ -143,19 +145,25 @@ void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
         buffer->buffer.AddObject(it->first);
         buffer->geometryMap[it->first].offset = buffer->buffer.NumIndices() - it->first->NumIndices();
     }
+    buffer->buffer.Build();
 }
 
-SORE_Graphics::SimpleBufferManager::geometry_buffer* SORE_Graphics::SimpleBufferManager::Insert(GeometryChunkPtr g, geometry_type type)
+SORE_Graphics::SimpleBufferManager::geometry_buffer* SORE_Graphics::SimpleBufferManager::Insert
+(
+    GeometryChunkPtr g,
+    geometry_type type
+)
 {
     std::vector<geometry_buffer*>& heap = heaps[type];
-    geometry_buffer* current = heap.back();
-    if(!current->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
+    geometry_buffer* current = heap.size() ? heap.back() : 0;
+    if(heap.size() == 0 || !current->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
     {
         current = new geometry_buffer(type);
         heap.push_back(current);
     }
 
     current->buffer.AddObject(g);
+    geometryMapping[g] = current;
 
     return current;
 }

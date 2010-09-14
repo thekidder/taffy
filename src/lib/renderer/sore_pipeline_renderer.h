@@ -53,11 +53,15 @@ namespace SORE_Graphics
     class SORE_EXPORT PipelineRenderer : public IRenderer, SORE_Utility::Noncopyable
     {
     public:
+        PipelineRenderer();
         PipelineRenderer(BufferManager* bm);
         ~PipelineRenderer();
 
-        void ClearGeometryProviders();
-        void AddGeometryProvider(GeometryProvider* gp);
+        virtual void ClearGeometryProviders();
+        virtual void AddGeometryProvider(GeometryProvider* gp);
+        virtual void SetCameraTable(camera_callback_table cameras);
+
+        virtual void SetBufferManager(BufferManager* bm);
 
         virtual void Render();
 

@@ -35,13 +35,16 @@
 #ifndef SORE_PIPELINEITEM_H
 #define SORE_PIPELINEITEM_H
 
+#include <string>
 #include <vector>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/unordered_map.hpp>
 
+#include <sore_buffermanager.h>
 #include <sore_camera.h>
 #include <sore_dll.h>
+#include <sore_gl_command_list.h>
 #include <sore_renderable.h>
 
 namespace SORE_Graphics
@@ -63,16 +66,21 @@ namespace SORE_Graphics
         void AddChildPipe(Pipe* pipe);
 
         void Setup();
-        //returns final render list to pass to parse and render
-        render_list& Render(
+        void Render(
             const camera_table& cameras,
-            render_list& list);
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm);
     protected:
         /*
           Virtual setup/render functions to be implemented by Pipe implementations
         */
         virtual void doSetup() = 0;
-        virtual render_list& doRender(const camera_table& cameras, render_list& list) = 0;
+        virtual render_list& doRender(
+            const camera_table& cameras,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm) = 0;
     private:
         typedef boost::ptr_vector<Pipe> pipe_vector;
         pipe_vector children;
@@ -80,22 +88,22 @@ namespace SORE_Graphics
 
     /*
       Collection of basic pipes:
-        NullPipe: does nothing; passes geometry through
-        RenderPipe: renders geometry with the default shader
+        RenderPipe: renders geometry with the default shader and given camera name
         SortingPipe: sorts geometry according to a callback
     */
-    class SORE_EXPORT NullPipe : public Pipe
-    {
-    protected:
-        virtual void doSetup();
-        virtual render_list& doRender(const camera_table& cameras, render_list& list);
-    };
-
     class SORE_EXPORT RenderPipe: public Pipe
     {
+    public:
+        RenderPipe(std::string cameraName);
     protected:
         virtual void doSetup();
-        virtual render_list& doRender(const camera_table& cameras, render_list& list);
+        virtual render_list& doRender(
+            const camera_table& cameras,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm);
+    private:
+        std::string camera;
     };
 }
 

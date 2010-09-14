@@ -69,9 +69,9 @@ namespace SORE_Graphics
 
         virtual void Render();
 
-        void ClearGeometryProviders();
+        virtual void ClearGeometryProviders();
         void AddStaticGeometry(Renderable r);
-        void AddGeometryProvider(GeometryProvider* gp);
+        virtual void AddGeometryProvider(GeometryProvider* gp);
         void SetCamera(geometry_layer layer, camera_callback camera);
 
         void PushState();
@@ -83,7 +83,7 @@ namespace SORE_Graphics
         void Build();
         void BuildStatic();
         void MakeBatches(
-            std::vector<Renderable>& allRenderables, 
+            std::vector<Renderable>& allRenderables,
             std::vector<RenderBatch>& batches,
             boost::unordered_map<Renderable, geometry_entry>& geometryMap,
             bool isStatic);

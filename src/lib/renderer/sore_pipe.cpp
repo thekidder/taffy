@@ -60,30 +60,25 @@ void SORE_Graphics::Pipe::Setup()
     }
 }
 
-SORE_Graphics::render_list& SORE_Graphics::Pipe::Render(
+void SORE_Graphics::Pipe::Render
+(
     const camera_table& cameras,
-    render_list& list)
+    render_list& list,
+    GLCommandList& renderQueue,
+    BufferManager* bm
+)
 {
-    render_list& newList = doRender(cameras, list);
+    render_list& newList = doRender(cameras, list, renderQueue, bm);
 
     pipe_vector::iterator i;
     for(i = children.begin(); i != children.end(); ++i)
     {
-        i->Render(cameras, newList);
+        i->Render(cameras, newList, renderQueue, bm);
     }
 }
 
-void SORE_Graphics::NullPipe::doSetup()
+SORE_Graphics::RenderPipe::RenderPipe(std::string cameraName) : camera(cameraName)
 {
-}
-
-SORE_Graphics::render_list& SORE_Graphics::NullPipe::doRender
-(
-    const camera_table& cameras,
-    render_list& list
-)
-{
-    return list;
 }
 
 void SORE_Graphics::RenderPipe::doSetup()
@@ -93,12 +88,22 @@ void SORE_Graphics::RenderPipe::doSetup()
 SORE_Graphics::render_list& SORE_Graphics::RenderPipe::doRender
 (
     const camera_table& cameras,
-    render_list& list
+    render_list& list,
+    GLCommandList& renderQueue,
+    BufferManager* bm
 )
 {
+    if(cameras.find(camera) == cameras.end())
+    {
+        ENGINE_LOG(SORE_Logging::LVL_ERROR,
+                   boost::format("Could not find named camera %s") % camera);
+    }
+
+    const camera_info& cam = cameras.find(camera)->second;
+
     BOOST_FOREACH(Renderable r, list)
     {
-
+        renderQueue.AddRenderable(r, bm->LookupGC(r.GetGeometryChunk()), cam);
     }
 
     return list;

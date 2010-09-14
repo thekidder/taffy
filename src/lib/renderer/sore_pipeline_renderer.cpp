@@ -34,8 +34,15 @@
 
 #include <boost/foreach.hpp>
 
+#include <sore_gl_command_list.h>
 #include <sore_pipeline_renderer.h>
 #include <sore_timing.h>
+
+SORE_Graphics::PipelineRenderer::PipelineRenderer()
+: bufferManager(0)
+{
+}
+
 
 SORE_Graphics::PipelineRenderer::PipelineRenderer(BufferManager* bm)
 : bufferManager(bm)
@@ -45,6 +52,11 @@ SORE_Graphics::PipelineRenderer::PipelineRenderer(BufferManager* bm)
 SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 {
     delete bufferManager;
+}
+
+void SORE_Graphics::PipelineRenderer::SetBufferManager(BufferManager* bm)
+{
+    bufferManager = bm;
 }
 
 void SORE_Graphics::PipelineRenderer::Render()
@@ -67,11 +79,21 @@ void SORE_Graphics::PipelineRenderer::Render()
     BOOST_FOREACH(cam c, state.cameras)
     {
         cameras[c.first] = c.second();
+
+        cameras[c.first].projection = SetupProjection(cameras[c.first].projection, screen);
     }
+
+    GLCommandList renderQueue;
 
     //render using current pipeline
     state.pipeline->Setup();
-    state.pipeline->Render(cameras, renderables);
+    state.pipeline->Render(cameras, renderables, renderQueue, bufferManager);
+
+    renderQueue.Render();
+
+    //collect rendering stats
+    numPolys = renderQueue.NumPolygons();
+    numDrawCalls = renderQueue.NumDrawCalls();
 
     CalculateFPS();
 }
@@ -86,11 +108,16 @@ void SORE_Graphics::PipelineRenderer::AddGeometryProvider(GeometryProvider* gp)
     states.top().geometry.push_back(gp);
 }
 
+void SORE_Graphics::PipelineRenderer::SetCameraTable(camera_callback_table cameras)
+{
+    states.top().cameras = cameras;
+}
+
 void SORE_Graphics::PipelineRenderer::PushState()
 {
     states.push(renderer_state());
-    states.top().pipeline = boost::shared_ptr<Pipe>(new NullPipe());
-    states.top().pipeline->AddChildPipe(new RenderPipe());
+    states.top().pipeline = boost::shared_ptr<Pipe>(new RenderPipe("normal"));
+    //states.top().pipeline->AddChildPipe(new RenderPipe());
 }
 
 void SORE_Graphics::PipelineRenderer::PopState()
