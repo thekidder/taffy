@@ -48,7 +48,7 @@ namespace SORE_Graphics
         //set up state for rendering a single renderable
         RenderState(const Renderable& r, camera_info cam);
 
-        //create state based upon the differences between a previous state 
+        //create state based upon the differences between a previous state
         //and a renderable
         RenderState Difference(const Renderable& r, camera_info cam) const;
         bool Empty() const;
