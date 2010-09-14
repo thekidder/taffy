@@ -35,7 +35,10 @@
 #ifndef  SORE_RENDERER_H
 #define  SORE_RENDERER_H
 
+#include <sore_buffermanager.h>
+#include <sore_geometryprovider.h>
 #include <sore_screeninfo.h>
+#include <sore_camera.h>
 
 namespace SORE_Graphics
 {
@@ -50,6 +53,14 @@ namespace SORE_Graphics
         virtual void Render() = 0;
         void SetScreenInfo(ScreenInfo _screen);
         ScreenInfo GetScreenInfo() const;
+
+        //interface between game logic and rendering
+        virtual void AddGeometryProvider(GeometryProvider* gp) = 0;
+        virtual void ClearGeometryProviders() = 0;
+
+        virtual void SetCameraTable(camera_callback_table cameras) = 0;
+
+        virtual void SetBufferManager(BufferManager* bm) = 0;
 
         //Renderer has a "state": used by Gamestate. Only geometry in the
         //current state should be rendered

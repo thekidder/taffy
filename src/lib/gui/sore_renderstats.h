@@ -18,7 +18,7 @@ namespace SORE_GUI
     class SORE_EXPORT RenderStats
     {
     public:
-        RenderStats(SORE_Resource::ResourcePool& pool, SORE_Graphics::Renderer& r,
+        RenderStats(SORE_Resource::ResourcePool& pool, SORE_Graphics::IRenderer* r,
                        SORE_GUI::Widget* parent = 0);
         ~RenderStats();
 
@@ -26,7 +26,7 @@ namespace SORE_GUI
 
         void Frame(int elapsed);
     private:
-        SORE_Graphics::Renderer& renderer;
+        SORE_Graphics::IRenderer* renderer;
 
         SORE_GUI::FrameWindow* frame;
         SORE_GUI::TextWidget* draws, *drawsLabel;

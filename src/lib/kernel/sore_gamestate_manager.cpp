@@ -49,15 +49,15 @@ namespace SORE_Game
 
     GamestateManager::GamestateManager(SORE_FileIO::PackageCache* pc,
                                        const std::string& windowTitle,
-									   const std::string& iconFilename,
+                                       const std::string& iconFilename,
                                        const std::string& settingsFile)
-        : ini(settingsFile), sm(&ini), 
+        : ini(settingsFile), sm(&ini),
         screen(screenInfo, input, windowTitle, iconFilename, &sm),
         pool(pc
 #ifdef FilesystemWatcherTask
-		, &watcher
+        , &watcher
 #endif
-		), popFlag(false)
+        ), popFlag(false)
     {
         curr = kernel.end();
 
@@ -121,9 +121,9 @@ namespace SORE_Game
                           &pool));
     }
 
-    SORE_Graphics::Renderer& GamestateManager::GetRenderer()
+    SORE_Graphics::IRenderer* GamestateManager::GetRenderer()
     {
-        return renderer;
+        return &renderer;
     }
 
     SORE_Kernel::InputTask& GamestateManager::GetInputTask()

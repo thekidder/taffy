@@ -37,7 +37,7 @@
 
 #include <vector>
 
-#include <sore_renderer_std.h>
+#include <sore_pipeline_renderer.h>
 #include <sore_input.h>
 #include <sore_resource.h>
 #include <sore_screen.h>
@@ -51,7 +51,7 @@ namespace SORE_Game
     public:
         GamestateManager(SORE_FileIO::PackageCache* pc = NULL,
                          const std::string& windowTitle = "SORE Framework Application",
-						 const std::string& iconFilename = "",
+                         const std::string& iconFilename = "",
                          const std::string& settingsFile = "");
         ~GamestateManager();
 
@@ -61,7 +61,7 @@ namespace SORE_Game
         //run until a task requests exit or until there are no states left
         int Run();
 
-        SORE_Graphics::Renderer& GetRenderer();
+        SORE_Graphics::IRenderer* GetRenderer();
         SORE_Kernel::InputTask& GetInputTask();
         SORE_Resource::ResourcePool& GetPool();
         SORE_Kernel::Screen& GetScreen();
@@ -78,7 +78,7 @@ namespace SORE_Game
         SORE_Kernel::InputTask input;
 
         SORE_Kernel::Screen screen; //depends on input, sm
-        SORE_Graphics::Renderer renderer; //must be init after screen
+        SORE_Graphics::PipelineRenderer renderer; //must be init after screen
 
 #ifdef FilesystemWatcherTask
         SORE_FileIO::FilesystemWatcherTask watcher;
