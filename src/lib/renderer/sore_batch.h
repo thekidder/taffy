@@ -63,6 +63,8 @@ namespace SORE_Graphics
         void AddIndices(unsigned int numIndices);
         //returns number of polygons rendered
         unsigned int Render();
+
+        void EndDraw() const; //call at end of frame
     private:
         GraphicsArray* geometry;
         unsigned int numberIndices;

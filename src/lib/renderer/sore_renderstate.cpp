@@ -38,7 +38,7 @@ SORE_Graphics::RenderState::RenderState() : commands(0)
 {
 }
 
-SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam) 
+SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
   : commands(0)
 {
     commands |= RENDER_CMD_CHANGE_CAMERA;
@@ -59,37 +59,39 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
         textures = r.GetTextures();
     }
 
-    if(!r.Uniforms().Empty())
+    UniformState copy = r.Uniforms();
+    copy.SetVariable("transform", *r.GetTransform());
+
+    if(!copy.Empty())
     {
         commands |= RENDER_CMD_CHANGE_UNIFORMS;
-        uniforms = r.Uniforms();
+        uniforms = copy;
     }
 }
 
-SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(
-    const Renderable& r, camera_info cam) const
+SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderState& old) const
 {
     RenderState newState;
-    newState.camera = cam;
-    newState.blend = r.GetBlendMode();
-    newState.shader = r.GetShader();
+    newState.camera = camera;
+    newState.blend = blend;
+    newState.shader = shader;
 
-    if(camera != cam)
+    if(old.camera != camera)
     {
         newState.commands |= RENDER_CMD_CHANGE_CAMERA;
     }
 
-    if(r.GetBlendMode() != blend)
+    if(old.blend != blend)
     {
         newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
     }
 
-    if(r.GetShader() != shader)
+    if(old.shader != shader)
     {
         newState.commands |= RENDER_CMD_BIND_SHADER;
     }
 
-    TextureState tDiff = r.GetTextures().GetDiff(textures);
+    TextureState tDiff = textures.GetDiff(old.textures);
     if(!tDiff.Empty())
     {
         newState.commands |= RENDER_CMD_BIND_TEXTURE;
@@ -100,7 +102,7 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(
         newState.textures = textures;
     }
 
-    UniformState uDiff = r.Uniforms().GetDiff(uniforms);
+    UniformState uDiff = uniforms.GetDiff(old.uniforms);
     if(!uDiff.Empty())
     {
         newState.commands |= RENDER_CMD_CHANGE_UNIFORMS;
@@ -199,5 +201,8 @@ void SORE_Graphics::RenderState::ChangeCameraMatrix(
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glMultMatrixf(camera.GetData());
+    if(camera != SORE_Math::Matrix4<float>())
+    {
+        glMultMatrixf(camera.GetData());
+    }
 }

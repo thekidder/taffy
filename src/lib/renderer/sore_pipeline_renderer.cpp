@@ -41,6 +41,7 @@
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
 : bufferManager(0)
 {
+    glEnable(GL_BLEND);
 }
 
 
@@ -79,13 +80,17 @@ void SORE_Graphics::PipelineRenderer::Render()
     BOOST_FOREACH(cam c, state.cameras)
     {
         cameras[c.first] = c.second();
-
         cameras[c.first].projection = SetupProjection(cameras[c.first].projection, screen);
     }
 
     GLCommandList renderQueue;
 
     //render using current pipeline
+
+    glClearColor(0.0,0.0,0.0,1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
     state.pipeline->Setup();
     state.pipeline->Render(cameras, renderables, renderQueue, bufferManager);
 

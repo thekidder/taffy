@@ -70,7 +70,7 @@ namespace SORE_Graphics
         void UpdateObject(GeometryChunkPtr geometry);
 
         void BeginDraw();
-        void EndDraw();
+        void EndDraw() const;
 
         void DrawAll(GLenum type);
         void DrawElements(unsigned int numIndices, unsigned short indexOffset, GLenum type);

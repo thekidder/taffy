@@ -160,7 +160,9 @@ void SORE_Graphics::Renderer::MakeBatches(
     for(it = allRenderables.begin(); it != allRenderables.end(); ++it)
     {
         geometry_entry current = geometryMap[*it];
-        RenderState newState = oldState.Difference(*it, GetCamera(it->GetLayer()));
+        //RenderState newState = oldState.Difference(*it, GetCamera(it->GetLayer()));
+        RenderState newState(*it, GetCamera(it->GetLayer()));
+        newState = newState.Difference(oldState);
 
         if(previous.geometry != current.geometry)
         {

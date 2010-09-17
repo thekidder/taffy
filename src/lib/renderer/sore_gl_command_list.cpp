@@ -36,25 +36,26 @@
 
 void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geometry_entry& geometry, const camera_info& cam)
 {
-    RenderState newState = currentState.Difference(r, cam);
+    RenderState state(r, cam);
+    state = state.Difference(currentState);
     if(currentGeometry.geometry != geometry.geometry)
     {
-        commandList.push_back(RenderBatch(geometry, newState, true));
+        commandList.push_back(RenderBatch(geometry, state, true));
     }
     else if(currentGeometry.offset != (geometry.offset + geometry.indices))
     {
-        commandList.push_back(RenderBatch(geometry, newState, false));
+        commandList.push_back(RenderBatch(geometry, state, false));
     }
-    else if(!newState.Empty())
+    else if(!state.Empty())
     {
-        commandList.push_back(RenderBatch(geometry, newState, false));
+        commandList.push_back(RenderBatch(geometry, state, false));
     }
     else
     {
         commandList.back().AddIndices(geometry.indices);
     }
 
-    currentState = newState;
+    currentState = state;
     currentGeometry = geometry;
     currentTransform = *r.GetTransform();
 }
@@ -69,6 +70,10 @@ void SORE_Graphics::GLCommandList::Render()
     {
         numPolygons += it->Render();
         numDrawCalls++;
+    }
+    if(numDrawCalls > 0)
+    {
+        commandList.back().EndDraw();
     }
 }
 

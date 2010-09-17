@@ -50,7 +50,7 @@ namespace SORE_Graphics
 
         //create state based upon the differences between a previous state
         //and a renderable
-        RenderState Difference(const Renderable& r, camera_info cam) const;
+        RenderState Difference(const RenderState& old) const;
         bool Empty() const;
         void Apply() const;
     private:

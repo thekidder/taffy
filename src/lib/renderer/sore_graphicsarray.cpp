@@ -35,7 +35,7 @@
 #include <sore_graphicsarray.h>
 #include <sore_logger.h>
 
-SORE_Graphics::GraphicsArray::GraphicsArray(geometry_type type, bool t, bool c, bool n) 
+SORE_Graphics::GraphicsArray::GraphicsArray(geometry_type type, bool t, bool c, bool n)
   : hasTexCoords(t), hasNormals(n), hasColors(c), type(type)
 {
 }
@@ -113,7 +113,7 @@ void SORE_Graphics::GraphicsArray::BeginDraw()
 
 }
 
-void SORE_Graphics::GraphicsArray::EndDraw()
+void SORE_Graphics::GraphicsArray::EndDraw() const
 {
     if(hasColors)
         glDisableClientState(GL_COLOR_ARRAY);
