@@ -61,48 +61,63 @@ SORE_Graphics::SimpleBufferManager::~SimpleBufferManager()
     }
 }
 
-/*SORE_Graphics::render_queue SORE_Graphics::SimpleBufferManager::GetRenderList()
+bool SORE_Graphics::SimpleBufferManager::Contains(GeometryChunkPtr gc)
 {
-    render_queue rq = {allRenderables, rMap};
-    rq.renderables = allRenderables;
-    rq.buffers = rMap;
-
-    return rq;
-}*/
+    return !(geometryMapping.find(gc) == geometryMapping.end());
+}
 
 SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(GeometryChunkPtr gc)
 {
-    if(geometryMapping.find(gc) == geometryMapping.end())
+    if(!Contains(gc))
     {
         ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not find geometry");
-        geometry_entry ge;
-        return ge;
+        return geometry_entry();
     }
     geometry_buffer* gb = geometryMapping[gc];
     if(gb->geometryMap.find(gc) == gb->geometryMap.end())
     {
         ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not lookup GC in buffer");
-        geometry_entry ge;
-        return ge;
+        geometry_entry ge();
+        return geometry_entry();
     }
     return gb->geometryMap[gc];
 }
 
+void SORE_Graphics::SimpleBufferManager::MakeUpToDate()
+{
+    for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
+    {
+        BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
+        {
+            if(buffer->needsRebuild)
+            {
+                RebuildBuffer(buffer);
+                buffer->needsRebuild = false;
+            }
+        }
+    }
+}
+
 void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geometry_type type)
 {
-    geometry_buffer* buffer = Insert(gc, type);
-
-    geometry_entry e =
+    if(Contains(gc))
     {
-        &buffer->buffer,
-        buffer->buffer.NumIndices() - gc->NumIndices(),
-        gc->NumIndices(),
-        gc->NumVertices(),
-        gc->Type()
-    };
-    buffer->geometryMap[gc] = e;
+        GeometryChanged(gc);
+    }
+    else
+    {
+        geometry_buffer* buffer = Insert(gc, type);
 
-    RebuildBuffer(buffer);
+        geometry_entry e(
+            &buffer->buffer,
+            buffer->buffer.NumIndices() - gc->NumIndices(),
+            gc->NumIndices(),
+            gc->NumVertices(),
+            gc->Type());
+        buffer->geometryMap[gc] = e;
+
+        buffer->needsRebuild = true;
+    }
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
@@ -122,24 +137,39 @@ void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
     size_t newVertices = gc->NumVertices() - buffer->geometryMap[gc].vertices;
     if(!buffer->buffer.HasRoomFor(newIndices, newVertices))
     {
-        assert(0);
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "readding geometry: not enough room");
         buffer->geometryMap.erase(gc);
         GeometryAdded(gc, DYNAMIC); //placeholder
     }
-    RebuildBuffer(buffer);
+    buffer->needsRebuild = true;
 }
 
 void SORE_Graphics::SimpleBufferManager::GeometryRemoved(GeometryChunkPtr gc)
 {
     geometry_buffer* buffer = geometryMapping[gc];
     buffer->geometryMap.erase(gc);
-    RebuildBuffer(buffer);
+    buffer->needsRebuild = true;
+}
+
+void SORE_Graphics::SimpleBufferManager::Clear()
+{
+    geometryMapping.clear();
+    for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
+    {
+        BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
+        {
+            delete buffer;
+        }
+        heaps[i].clear();
+    }
 }
 
 void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
 {
+    //ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("rebuilding geometry buffer %p") % buffer);
     buffer->buffer.Clear();
-    boost::unordered_map<GeometryChunkPtr, geometry_entry>::iterator it;
+    buffer->geometryMap.rehash(buffer->geometryMap.size());
+    geometry_buffer::geometry_map::iterator it;
     for(it = buffer->geometryMap.begin(); it != buffer->geometryMap.end(); ++it)
     {
         buffer->buffer.AddObject(it->first);

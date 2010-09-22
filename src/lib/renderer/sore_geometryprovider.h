@@ -35,6 +35,7 @@
 #ifndef SORE_GEOMETRYPROVIDER_H
 #define SORE_GEOMETRYPROVIDER_H
 
+#include <sore_buffermanager.h>
 #include <sore_dll.h>
 #include <sore_renderable.h>
 #include <sore_screeninfo.h>
@@ -50,6 +51,8 @@ namespace SORE_Graphics
         virtual void MakeUpToDate();
         virtual std::vector<Renderable>::iterator GeometryBegin() = 0;
         virtual std::vector<Renderable>::iterator GeometryEnd() = 0;
+
+        virtual BufferManager* GetBufferManager() = 0;
     };
 }
 

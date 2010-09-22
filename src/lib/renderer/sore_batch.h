@@ -46,6 +46,15 @@ namespace SORE_Graphics
 {
     struct geometry_entry
     {
+        geometry_entry() : geometry(0), offset(0), indices(0), vertices(0), type(0) {}
+        geometry_entry(
+            GraphicsArray* geometry,
+            unsigned int offset,
+            unsigned int indices,
+            unsigned int vertices,
+            GLenum type)
+            : geometry(geometry), offset(offset), indices(indices), vertices(vertices), type(type)
+        {}
         GraphicsArray* geometry;
         unsigned int offset;
         unsigned int indices;

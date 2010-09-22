@@ -32,63 +32,35 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SIMPLEBUFFERMANAGER_H
-#define SORE_SIMPLEBUFFERMANAGER_H
+#include <boost/foreach.hpp>
 
-#include <boost/unordered_set.hpp>
-#include <boost/pool/pool_alloc.hpp>
+#include <sore_aggregatebuffermanager.h>
 
-#include <sore_buffermanager.h>
-#include <sore_util.h>
-
-#ifndef SORE_NO_VBO
-#include <sore_vbo.h>
-#define GraphicsArrayClass VBO
-#else
-#include <sore_vertexarray.h>
-#define GraphicsArrayClass VertexArray
-#endif
-
-namespace SORE_Graphics
+void SORE_Graphics::AggregateBufferManager::AddBufferManager(BufferManager* bm)
 {
-    class SORE_EXPORT SimpleBufferManager : public BufferManager, SORE_Utility::Noncopyable
-    {
-    public:
-        SimpleBufferManager();
-        ~SimpleBufferManager();
-
-        //renderer interface
-        virtual void MakeUpToDate();
-        virtual geometry_entry LookupGC(GeometryChunkPtr gc);
-        virtual bool Contains(GeometryChunkPtr gc);
-
-        //game interface
-        void Clear();
-        void GeometryAdded(GeometryChunkPtr gc, geometry_type type);
-        void GeometryChanged(GeometryChunkPtr gc);
-        void GeometryRemoved(GeometryChunkPtr gc);
-
-    private:
-        struct geometry_buffer
-        {
-            geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
-
-            GraphicsArrayClass buffer;
-            bool needsRebuild;
-            //generated from renderables
-            typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-            geometry_map geometryMap;
-        };
-
-        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
-        void RebuildBuffer(geometry_buffer* buffer);
-
-        std::vector<geometry_buffer*> heaps[MAX_GEOMETRY_TYPE];
-        //indexes a GC into one of the buffers above ^
-        boost::unordered_map<GeometryChunkPtr, geometry_buffer*> geometryMapping;
-
-        renderable_map renderables;
-    };
+    bufferManagers.push_back(bm);
 }
 
-#endif
+SORE_Graphics::geometry_entry SORE_Graphics::AggregateBufferManager::LookupGC(GeometryChunkPtr gc)
+{
+    BOOST_FOREACH(BufferManager* bm, bufferManagers)
+    {
+        if(bm->Contains(gc))
+        {
+            return bm->LookupGC(gc);
+        }
+    }
+    return geometry_entry();
+}
+
+bool SORE_Graphics::AggregateBufferManager::Contains(GeometryChunkPtr gc)
+{
+    BOOST_FOREACH(BufferManager* bm, bufferManagers)
+    {
+        if(bm->Contains(gc))
+        {
+            return true;
+        }
+    }
+    return true;
+}

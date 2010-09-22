@@ -32,62 +32,23 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SIMPLEBUFFERMANAGER_H
-#define SORE_SIMPLEBUFFERMANAGER_H
-
-#include <boost/unordered_set.hpp>
-#include <boost/pool/pool_alloc.hpp>
+#ifndef SORE_AGGREGATEBUFFERMANAGER_H
+#define SORE_AGGREGATEBUFFERMANAGER_H
 
 #include <sore_buffermanager.h>
-#include <sore_util.h>
-
-#ifndef SORE_NO_VBO
-#include <sore_vbo.h>
-#define GraphicsArrayClass VBO
-#else
-#include <sore_vertexarray.h>
-#define GraphicsArrayClass VertexArray
-#endif
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT SimpleBufferManager : public BufferManager, SORE_Utility::Noncopyable
+    class SORE_EXPORT AggregateBufferManager : public BufferManager
     {
     public:
-        SimpleBufferManager();
-        ~SimpleBufferManager();
+        void AddBufferManager(BufferManager* bm);
 
-        //renderer interface
-        virtual void MakeUpToDate();
+        virtual void MakeUpToDate() {}
         virtual geometry_entry LookupGC(GeometryChunkPtr gc);
         virtual bool Contains(GeometryChunkPtr gc);
-
-        //game interface
-        void Clear();
-        void GeometryAdded(GeometryChunkPtr gc, geometry_type type);
-        void GeometryChanged(GeometryChunkPtr gc);
-        void GeometryRemoved(GeometryChunkPtr gc);
-
     private:
-        struct geometry_buffer
-        {
-            geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
-
-            GraphicsArrayClass buffer;
-            bool needsRebuild;
-            //generated from renderables
-            typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-            geometry_map geometryMap;
-        };
-
-        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
-        void RebuildBuffer(geometry_buffer* buffer);
-
-        std::vector<geometry_buffer*> heaps[MAX_GEOMETRY_TYPE];
-        //indexes a GC into one of the buffers above ^
-        boost::unordered_map<GeometryChunkPtr, geometry_buffer*> geometryMapping;
-
-        renderable_map renderables;
+        std::vector<BufferManager*> bufferManagers;
     };
 }
 

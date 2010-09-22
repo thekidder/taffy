@@ -57,21 +57,9 @@ void SORE_Graphics::GraphicsArray::AddObject(GeometryChunkPtr geometry)
     vertices.resize(vertices.size() + geometry->NumVertices());
     memcpy(&vertices[oldSize], geometry->GetVertices(),
            geometry->NumVertices()*sizeof(vertex));
-    /*for(unsigned int i=0; i<geometry->NumVertices(); ++i)
-    {
-        SORE_Math::Vector4<float> pos(
-            geometry->GetVertex(i).x,
-            geometry->GetVertex(i).y,
-            geometry->GetVertex(i).z,
-            1.0f);
-        pos = *transform * pos;
-
-        vertices[oldSize + i].x = pos[0];
-        vertices[oldSize + i].y = pos[1];
-        vertices[oldSize + i].z = pos[2];
-    }*/
 
     //copy vertices into VBO, taking into account index renumbering
+    indices.resize(indices.size() + geometry->NumIndices());
     for(unsigned short j=0;j<geometry->NumIndices();++j)
     {
         unsigned short index = geometry->GetIndex(j) + oldSize;

@@ -32,6 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <boost/foreach.hpp>
+
 #include <sore_logger.h>
 #include <sore_topwidget.h>
 
@@ -75,6 +77,13 @@ namespace SORE_GUI
     {
         renderables.clear();
         renderables = GetRenderList();
+
+        sbm.Clear();
+        BOOST_FOREACH(SORE_Graphics::Renderable r, renderables)
+        {
+            sbm.GeometryAdded(r.GetGeometryChunk(), SORE_Graphics::STREAM);
+        }
+        sbm.MakeUpToDate();
     }
 
     std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryBegin()
@@ -85,6 +94,11 @@ namespace SORE_GUI
     std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryEnd()
     {
         return renderables.end();
+    }
+
+    SORE_Graphics::BufferManager* TopWidget::GetBufferManager()
+    {
+        return &sbm;
     }
 
     std::vector<SORE_Graphics::Renderable> TopWidget::GetThisRenderList()

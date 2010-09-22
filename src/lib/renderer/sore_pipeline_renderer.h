@@ -54,14 +54,11 @@ namespace SORE_Graphics
     {
     public:
         PipelineRenderer();
-        PipelineRenderer(BufferManager* bm);
         ~PipelineRenderer();
 
         virtual void ClearGeometryProviders();
         virtual void AddGeometryProvider(GeometryProvider* gp);
         virtual void SetCameraTable(camera_callback_table cameras);
-
-        virtual void SetBufferManager(BufferManager* bm);
 
         virtual void Render();
 
@@ -81,8 +78,6 @@ namespace SORE_Graphics
             boost::shared_ptr<Pipe> pipeline;
         };
         std::stack<renderer_state> states;
-
-        BufferManager* bufferManager;
     };
 }
 

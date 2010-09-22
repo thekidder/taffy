@@ -34,42 +34,31 @@
 
 #include <boost/foreach.hpp>
 
+#include <sore_aggregatebuffermanager.h>
 #include <sore_gl_command_list.h>
 #include <sore_pipeline_renderer.h>
 #include <sore_timing.h>
 
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
-: bufferManager(0)
 {
     glEnable(GL_BLEND);
 }
 
-
-SORE_Graphics::PipelineRenderer::PipelineRenderer(BufferManager* bm)
-: bufferManager(bm)
-{
-}
-
 SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 {
-    delete bufferManager;
-}
-
-void SORE_Graphics::PipelineRenderer::SetBufferManager(BufferManager* bm)
-{
-    bufferManager = bm;
 }
 
 void SORE_Graphics::PipelineRenderer::Render()
 {
-    fps = ms = 0.0f;
-    numPolys = numDrawCalls = 0;
+
+    AggregateBufferManager bufferManager;
 
     //collect geometry
     render_list renderables;
     BOOST_FOREACH(GeometryProvider* gp, states.top().geometry)
     {
         gp->MakeUpToDate();
+        bufferManager.AddBufferManager(gp->GetBufferManager());
         std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
     }
 
@@ -92,7 +81,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     state.pipeline->Setup();
-    state.pipeline->Render(cameras, renderables, renderQueue, bufferManager);
+    state.pipeline->Render(cameras, renderables, renderQueue, &bufferManager);
 
     renderQueue.Render();
 

@@ -57,8 +57,9 @@ namespace SORE_Graphics
         virtual ~BufferManager();
 
         //renderer interface
-        //virtual render_queue GetRenderList() = 0;
+        virtual void MakeUpToDate() = 0;
         virtual geometry_entry LookupGC(GeometryChunkPtr gc) = 0;
+        virtual bool Contains(GeometryChunkPtr gc) = 0;
     };
 }
 

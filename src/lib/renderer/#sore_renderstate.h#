@@ -32,62 +32,51 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SIMPLEBUFFERMANAGER_H
-#define SORE_SIMPLEBUFFERMANAGER_H
+#ifndef SORE_RENDERERSTATE_H
+#define SORE_RENDERERSTATE_H
 
-#include <boost/unordered_set.hpp>
-#include <boost/pool/pool_alloc.hpp>
-
-#include <sore_buffermanager.h>
-#include <sore_util.h>
-
-#ifndef SORE_NO_VBO
-#include <sore_vbo.h>
-#define GraphicsArrayClass VBO
-#else
-#include <sore_vertexarray.h>
-#define GraphicsArrayClass VertexArray
-#endif
+#include <sore_camera.h>
+#include <sore_renderable.h>
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT SimpleBufferManager : public BufferManager, SORE_Utility::Noncopyable
+    class RenderState
     {
     public:
-        SimpleBufferManager();
-        ~SimpleBufferManager();
+        //create an empty RenderState
+        RenderState();
+        //set up state for rendering a single renderable
+        RenderState(const Renderable& r, camera_info cam);
 
-        //renderer interface
-        virtual void MakeUpToDate();
-        virtual geometry_entry LookupGC(GeometryChunkPtr gc);
-        virtual bool Contains(GeometryChunkPtr gc);
-
-        //game interface
-        void Clear();
-        void GeometryAdded(GeometryChunkPtr gc, geometry_type type);
-        void GeometryChanged(GeometryChunkPtr gc);
-        void GeometryRemoved(GeometryChunkPtr gc);
-
+        //create state based upon the differences between a previous state
+        //and a renderable
+        RenderState Difference(const Renderable& r, camera_info cam) const;
+        bool Empty() const;
+        void Apply() const;
     private:
-        struct geometry_buffer
+        enum render_cmd
         {
-            geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
+            RENDER_CMD_NONE              = 0,
+            RENDER_CMD_CHANGE_CAMERA     = 1,
+            RENDER_CMD_CHANGE_BLEND_MODE = 2,
+            RENDER_CMD_BIND_SHADER       = 4,
+            RENDER_CMD_BIND_TEXTURE      = 8,
+            RENDER_CMD_CHANGE_UNIFORMS   = 16
+        }
 
-            GraphicsArrayClass buffer;
-            bool needsRebuild;
-            //generated from renderables
-            typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-            geometry_map geometryMap;
-        };
+        void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera) const;
+        void ChangeProjectionMatrix(const ProjectionInfo& proj) const;
 
-        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
-        void RebuildBuffer(geometry_buffer* buffer);
+        unsigned int commands;
 
-        std::vector<geometry_buffer*> heaps[MAX_GEOMETRY_TYPE];
-        //indexes a GC into one of the buffers above ^
-        boost::unordered_map<GeometryChunkPtr, geometry_buffer*> geometryMapping;
+        UniformState uniforms;
+        TextureState textures;
+        GLSLShaderPtr shader;
 
-        renderable_map renderables;
+        camera_info camera;
+        blend_mode blend;
+
+        GLenum primitiveType;
     };
 }
 

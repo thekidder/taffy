@@ -60,8 +60,6 @@ namespace SORE_Graphics
 
         virtual void SetCameraTable(camera_callback_table cameras) = 0;
 
-        virtual void SetBufferManager(BufferManager* bm) = 0;
-
         //Renderer has a "state": used by Gamestate. Only geometry in the
         //current state should be rendered
         virtual void PushState() = 0;
