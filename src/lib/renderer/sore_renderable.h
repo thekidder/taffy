@@ -36,6 +36,7 @@
 #define SORE_RENDERABLE_H
 
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_set.hpp>
 
 #include <sore_matrix4x4.h>
 #include <sore_geometrychunk.h>
@@ -73,7 +74,7 @@ namespace SORE_Graphics
     {
     public:
         Renderable();
-        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans, 
+        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
             geometry_layer l, blend_mode b);
 
         void SetGeometryChunk(GeometryChunkPtr g);
@@ -101,6 +102,10 @@ namespace SORE_Graphics
         int GetSortKey() const;
 
         void SetProjection(const ProjectionInfo& pi);
+
+        void ClearKeywords();
+        void AddKeyword(const std::string& keyword);
+        bool HasKeyword(const std::string& keyword) const;
     private:
         void CalculateDepth();
         void CalculateSortKey();
@@ -118,6 +123,8 @@ namespace SORE_Graphics
         int sortKey;
 
         ProjectionInfo proj;
+
+        boost::unordered_set<std::string> keywords;
     };
 
     bool operator<(const Renderable& one, const Renderable& two);

@@ -41,7 +41,7 @@ SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
 }
 
 SORE_Graphics::Renderable::Renderable(
-    GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans, 
+    GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
     geometry_layer l, blend_mode b)
     : geometry(g), shader(s), transformation(trans),
       layer(l), blending(b), cachedDepth(0.0f), sortKey(0)
@@ -204,6 +204,22 @@ void SORE_Graphics::Renderable::CalculateSortKey()
     if(shader)
         sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
     sortKey |= ((textures->GetSortKey() % 512)); //9 bits for texture
+}
+
+
+void SORE_Graphics::Renderable::ClearKeywords()
+{
+    keywords.clear();
+}
+
+void SORE_Graphics::Renderable::AddKeyword(const std::string& keyword)
+{
+    keywords.insert(keyword);
+}
+
+bool SORE_Graphics::Renderable::HasKeyword(const std::string& keyword) const
+{
+    return !(keywords.find(keyword) == keywords.end());
 }
 
 bool SORE_Graphics::operator<(const SORE_Graphics::Renderable& one,

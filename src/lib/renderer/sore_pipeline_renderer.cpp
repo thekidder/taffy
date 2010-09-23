@@ -110,7 +110,20 @@ void SORE_Graphics::PipelineRenderer::SetCameraTable(camera_callback_table camer
 void SORE_Graphics::PipelineRenderer::PushState()
 {
     states.push(renderer_state());
-    states.top().pipeline = boost::shared_ptr<Pipe>(new RenderPipe("normal"));
+
+    boost::shared_ptr<Pipe> root(new NullPipe());
+    Pipe* guiPipe = new FilterPipe(KeywordFilter("gui"));
+    guiPipe->AddChildPipe(new RenderPipe("gui"));
+
+    Pipe* gamePipe = new FilterPipe(KeywordFilter("game"));
+    gamePipe->AddChildPipe(new RenderPipe("normal"));
+
+    root->AddChildPipe(guiPipe);
+    root->AddChildPipe(gamePipe);
+    //root->AddChildPipe(new RenderPipe("normal"));
+
+    states.top().pipeline = root;
+    //states.top().pipeline = boost::shared_ptr<Pipe>(new RenderPipe("normal"));
     //states.top().pipeline->AddChildPipe(new RenderPipe());
 }
 

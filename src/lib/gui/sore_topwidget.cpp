@@ -79,8 +79,9 @@ namespace SORE_GUI
         renderables = GetRenderList();
 
         sbm.Clear();
-        BOOST_FOREACH(SORE_Graphics::Renderable r, renderables)
+        BOOST_FOREACH(SORE_Graphics::Renderable& r, renderables)
         {
+            r.AddKeyword("gui");
             sbm.GeometryAdded(r.GetGeometryChunk(), SORE_Graphics::STREAM);
         }
         sbm.MakeUpToDate();

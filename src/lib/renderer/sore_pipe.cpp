@@ -77,7 +77,37 @@ void SORE_Graphics::Pipe::Render
     }
 }
 
-SORE_Graphics::RenderPipe::RenderPipe(std::string cameraName) : camera(cameraName)
+bool SORE_Graphics::NullFilter(const Renderable& r)
+{
+    return true;
+}
+
+SORE_Graphics::KeywordFilter::KeywordFilter(const std::string& keyword) : keyword(keyword)
+{
+}
+
+bool SORE_Graphics::KeywordFilter::operator()(const Renderable& r) const
+{
+    return r.HasKeyword(keyword);
+}
+
+void SORE_Graphics::NullPipe::doSetup()
+{
+}
+
+SORE_Graphics::render_list& SORE_Graphics::NullPipe::doRender
+(
+    const camera_table& cameras,
+    render_list& list,
+    GLCommandList& renderQueue,
+    BufferManager* bm
+)
+{
+    return list;
+}
+
+
+SORE_Graphics::RenderPipe::RenderPipe(const std::string& cameraName) : camera(cameraName)
 {
 }
 
@@ -107,4 +137,31 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::doRender
     }
 
     return list;
+}
+
+SORE_Graphics::FilterPipe::FilterPipe(filter_predicate filterFunction) : filter(filterFunction)
+{
+}
+
+void SORE_Graphics::FilterPipe::doSetup()
+{
+    newList.clear();
+}
+
+SORE_Graphics::render_list& SORE_Graphics::FilterPipe::doRender
+(
+    const camera_table& cameras,
+    render_list& list,
+    GLCommandList& renderQueue,
+    BufferManager* bm
+)
+{
+    BOOST_FOREACH(Renderable r, list)
+    {
+        if(filter(r))
+        {
+            newList.push_back(r);
+        }
+    }
+    return newList;
 }

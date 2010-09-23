@@ -152,7 +152,6 @@ void SORE_Graphics::Renderer::MakeBatches(
     bool isStatic)
 {
     //loop through all renderables, building VBOs and draw call commands
-    unsigned int numIndices = 0, currentOffset = 0;
     std::vector<Renderable>::iterator it, prev = allRenderables.begin();
     RenderState oldState;
     geometry_entry previous;

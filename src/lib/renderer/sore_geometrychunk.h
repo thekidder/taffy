@@ -75,7 +75,6 @@ namespace SORE_Graphics
         unsigned short NumIndices() const;
 
         GeometryChunk& operator=(const GeometryChunk& o);
-
     private:
         void Init(const GeometryChunk& o);
 
@@ -83,7 +82,6 @@ namespace SORE_Graphics
         vertex* data;
         unsigned short* indices;
         GLenum type;
-
     };
 
     typedef boost::shared_ptr<GeometryChunk> GeometryChunkPtr;

@@ -88,13 +88,28 @@ namespace SORE_Graphics
 
     /*
       Collection of basic pipes:
+        NullPipe: does nothing; used for root pipe generally
         RenderPipe: renders geometry with the default shader and given camera name
         SortingPipe: sorts geometry according to a callback
+        FilterPipe: filters out renderables based on a predicate
     */
+
+    class SORE_EXPORT NullPipe: public Pipe
+    {
+    public:
+    protected:
+        virtual void doSetup();
+        virtual render_list& doRender(
+            const camera_table& cameras,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm);
+    };
+
     class SORE_EXPORT RenderPipe: public Pipe
     {
     public:
-        RenderPipe(std::string cameraName);
+        RenderPipe(const std::string& cameraName);
     protected:
         virtual void doSetup();
         virtual render_list& doRender(
@@ -104,6 +119,40 @@ namespace SORE_Graphics
             BufferManager* bm);
     private:
         std::string camera;
+    };
+
+    typedef boost::function<bool (const Renderable&)> filter_predicate;
+
+
+    /*
+      premade filters for the filterpipe
+    */
+    bool NullFilter(const Renderable& r); //accepts all geometry
+
+    class KeywordFilter //accepts all geometry with keyword
+    {
+    public:
+        KeywordFilter(const std::string& keyword);
+
+        bool operator()(const Renderable& r) const;
+    private:
+        std::string keyword;
+    };
+
+    class SORE_EXPORT FilterPipe: public Pipe
+    {
+    public:
+        FilterPipe(filter_predicate filterFunction);
+    protected:
+        virtual void doSetup();
+        virtual render_list& doRender(
+            const camera_table& cameras,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm);
+    private:
+        filter_predicate filter;
+        render_list newList;
     };
 }
 
