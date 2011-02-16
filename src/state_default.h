@@ -1,7 +1,7 @@
 #ifndef STATE_DEFAULT
 #define STATE_DEFAULT
 
-#include <gui/sore_topwidget.h>
+#include <sore_topwidget.h>
 #include <sore_gamestate.h>
 #include <sore_input.h>
 
@@ -20,7 +20,7 @@ private:
     void Init();
     void Quit();
 
-	SORE_GUI::TopWidget* top;
+    SORE_GUI::TopWidget* top;
     DebugGUI* debug;
 };
 

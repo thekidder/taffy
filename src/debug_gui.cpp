@@ -9,13 +9,13 @@
 #include <boost/bind.hpp>
 
 #include <sore_font.h>
-#include <gui/sore_topwidget.h>
-#include <gui/sore_textwidget.h>
+#include <sore_topwidget.h>
+#include <sore_textwidget.h>
 
 namespace gui = SORE_GUI;
 
-DebugGUI::DebugGUI(SORE_Graphics::Renderer* r, SORE_Resource::ResourcePool &pool,
-                   SORE_Kernel::InputTask *input, gui::Widget* top)
+DebugGUI::DebugGUI(SORE_Graphics::Renderer& r, SORE_Resource::ResourcePool &pool,
+                   SORE_Kernel::InputTask& input, gui::Widget* top)
     : renderer(r), renderStats(0), version(0)
 {
     boost::shared_ptr<SORE_Font::Font> guiFont =
