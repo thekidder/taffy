@@ -14,7 +14,7 @@
 
 namespace gui = SORE_GUI;
 
-DebugGUI::DebugGUI(SORE_Graphics::Renderer& r, SORE_Resource::ResourcePool &pool,
+DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool &pool,
                    SORE_Kernel::InputTask& input, gui::Widget* top)
     : renderer(r), renderStats(0), version(0)
 {

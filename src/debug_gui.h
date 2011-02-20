@@ -16,7 +16,7 @@ namespace gui = SORE_GUI;
 class DebugGUI
 {
 public:
-    DebugGUI(SORE_Graphics::Renderer& r, SORE_Resource::ResourcePool& pool,
+    DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool& pool,
              SORE_Kernel::InputTask& input, gui::Widget* top);
     ~DebugGUI();
 
@@ -24,7 +24,7 @@ public:
 
     void Frame(int elapsed);
 private:
-    SORE_Graphics::Renderer& renderer;
+    SORE_Graphics::IRenderer* renderer;
     gui::RenderStats* renderStats;
     gui::TextWidget* version;
 };

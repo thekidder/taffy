@@ -19,8 +19,8 @@ void DefaultState::Init()
     owner->GetInputTask().AddListener(SORE_Kernel::KEYDOWN,
                                        boost::bind(&DefaultState::HandleEscapeKey, this, _1));
 
-    top = new gui::TopWidget(owner->GetRenderer().GetScreenInfo().width,
-                             owner->GetRenderer().GetScreenInfo().height);
+    top = new gui::TopWidget(owner->GetRenderer()->GetScreenInfo().width,
+                             owner->GetRenderer()->GetScreenInfo().height);
 
     SORE_Kernel::InputTask& input = owner->GetInputTask();
     input.AddListener(SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
@@ -30,10 +30,17 @@ void DefaultState::Init()
                        std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
                          owner->GetInputTask(), top);
-    owner->GetRenderer().AddGeometryProvider(top);
-    owner->GetRenderer().SetCamera(
-        SORE_GUI::GUI_LAYER,
-        boost::bind(&SORE_GUI::TopWidget::GetCamera, boost::ref(top)));
+    owner->GetRenderer()->AddGeometryProvider(top);
+
+    SORE_Graphics::camera_callback guiCam = boost::bind(
+        &SORE_GUI::TopWidget::GetCamera,
+        boost::ref(top));
+
+    SORE_Graphics::camera_callback_table cameras;
+    cameras["gui"] = guiCam;
+    cameras["normal"] = guiCam;
+    owner->GetRenderer()->SetCameraTable(cameras);
+
 }
 
 void DefaultState::Frame(int elapsed)
