@@ -63,7 +63,7 @@ namespace SORE_GUI
         void ConnectChange(boost::function<void (std::string)> c);
     private:
         //TODO:fixme
-        //virtual SORE_Graphics::render_list GetThisRenderList();
+        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
         void UpdateText(int dir);
@@ -73,7 +73,7 @@ namespace SORE_GUI
         SORE_Graphics::Text* displayText;
         SORE_Graphics::Texture2DPtr texture;
 
-        SORE_Graphics::GeometryChunk* caret;
+        SORE_Graphics::Renderable caret;
         SORE_Graphics::Texture2DPtr caretTex;
         SORE_Math::Matrix4<float> caretMat;
         unsigned int caretPos;

@@ -40,14 +40,24 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
     state = state.Difference(currentState);
     if(currentGeometry.geometry != geometry.geometry)
     {
+        ENGINE_LOG(
+            SORE_Logging::LVL_INFO,
+            "adding new batch: new vbo");
         commandList.push_back(RenderBatch(geometry, state, true));
-    }
-    else if(currentGeometry.offset != (geometry.offset + geometry.indices))
-    {
-        commandList.push_back(RenderBatch(geometry, state, false));
     }
     else if(!state.Empty())
     {
+        ENGINE_LOG(
+            SORE_Logging::LVL_INFO,
+            "adding new batch: state has changed");
+        commandList.push_back(RenderBatch(geometry, state, false));
+    }
+    else if(currentGeometry.offset != (geometry.offset + geometry.indices))
+    {
+        ENGINE_LOG(
+            SORE_Logging::LVL_INFO,
+            boost::format("adding new batch: (o = %d, i = %d) old offset = %d")
+            % geometry.offset % geometry.indices % currentGeometry.offset);
         commandList.push_back(RenderBatch(geometry, state, false));
     }
     else
@@ -62,6 +72,10 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
 
 void SORE_Graphics::GLCommandList::Render()
 {
+        ENGINE_LOG(
+            SORE_Logging::LVL_INFO,
+            "End frame");
+
     numPolygons = 0;
     numDrawCalls = 0;
 

@@ -32,52 +32,61 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_BUTTON_H
-#define SORE_BUTTON_H
+#ifndef SORE_BATCHINGBUFFERMANAGER_H
+#define SORE_BATCHINGBUFFERMANAGER_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
+#include <map>
+
+#include <sore_buffermanager.h>
+#include <sore_util.h>
+
+#ifndef SORE_NO_VBO
+#include <sore_vbo.h>
+#define GraphicsArrayClass VBO
+#else
+#include <sore_vertexarray.h>
+#define GraphicsArrayClass VertexArray
 #endif
 
-#include <boost/function.hpp>
-#include <boost/signals.hpp>
-
-#include <sore_resource.h>
-#include <sore_font.h>
-#include <sore_text.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+namespace SORE_Graphics
 {
-    class SORE_EXPORT Button : public FrameWidget
+    class SORE_EXPORT BatchingBufferManager : public BufferManager, SORE_Utility::Noncopyable
     {
     public:
-        Button(SVec s, SVec p, const std::string& text,
-                     SORE_Resource::ResourcePool& pool, Widget* par=NULL);
-        ~Button();
+        BatchingBufferManager();
+        ~BatchingBufferManager();
 
-        void ConnectPressed(boost::function<void ()> c);
+        // renderer interface
+        virtual void MakeUpToDate();
+        virtual geometry_entry LookupGC(GeometryChunkPtr gc);
+        virtual bool Contains(GeometryChunkPtr gc);
+
+        // game interface
+        void Clear();
+        void GeometryAdded(const Renderable& gc, geometry_type type);
+        void GeometryChanged(const Renderable& gc);
+        void GeometryRemoved(const Renderable& gc);
     private:
-        //TODO:fixme
-        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList();
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
+         struct geometry_buffer
+         {
+             geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
 
-        SORE_Font::FontPtr font;
-        SORE_Graphics::Text* t;
-        SORE_Graphics::Texture2DPtr normal, active, hover;
+             GraphicsArrayClass buffer;
+             bool needsRebuild;
+             // generated from renderables
+             typedef std::map<Renderable, geometry_entry> geometry_map;
+             geometry_map geometryMap;
+        };
 
-        boost::signal<void ()> onRelease;
+        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
+        void RebuildBuffer(geometry_buffer* buffer);
 
-        bool pressed;
-        bool inArea;
+        std::vector<geometry_buffer*> heaps[MAX_GEOMETRY_TYPE];
+        // indexes a GC into one of the buffers above ^
+        std::map<Renderable, geometry_buffer*> geometryMapping;
+
+        renderable_map renderables;
     };
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

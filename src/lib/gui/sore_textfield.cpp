@@ -34,6 +34,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <sore_geometry.h>
+#include <sore_sprite.h>
 #include <sore_timing.h>
 #include <sore_textfield.h>
 
@@ -42,7 +44,7 @@ namespace SORE_GUI
     TextField::TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool,
                          Widget* par)
         : FrameWidget(s, p, SCALE_CENTER, par), text(""), displayText(0),
-          caret(0), pos(0), textStart(0), textEnd(0)
+          pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
@@ -56,15 +58,19 @@ namespace SORE_GUI
 
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(texture);
+        SetShader(shad);
 
         float height = GetSize(VERTICAL) - 16.0f;
         caretWidth = static_cast<unsigned int>(height/16.0f);
 
-        //TODO:fixme
-        /*caret = new SORE_Graphics::GeometryChunk
-            (caretTex, shad, SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth,
-                                                    8.0f, 8.0f+height));
-        */
+        caret = SORE_Graphics::MakeSprite(
+            SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth, 8.0f, 8.0f+height),
+            SORE_Math::Rect<float>(0.0f, 0.0f, 1.0f, 1.0f),
+            0.0f,
+            caretTex,
+            shad,
+            GUI_LAYER,
+            SORE_Graphics::BLEND_SUBTRACTIVE);
 
         caretEnd = SORE_Timing::GetGlobalTicks();
 
@@ -81,7 +87,6 @@ namespace SORE_GUI
     TextField::~TextField()
     {
         delete displayText;
-        delete caret;
     }
 
     void TextField::ConnectChange(boost::function<void (std::string)> c)
@@ -102,18 +107,25 @@ namespace SORE_GUI
         UpdatePosition();
     }
 
-    /*SORE_Graphics::render_list TextField::GetThisRenderList()
+    std::vector<SORE_Graphics::Renderable> TextField::GetThisRenderList()
     {
-        SORE_Graphics::render_list list;
-
-        std::vector<SORE_Graphics::GeometryChunk*> frame = GetChunks();
-        std::vector<SORE_Graphics::GeometryChunk*>::iterator it;
+        std::vector<SORE_Graphics::Renderable> list;
+/*
+        std::vector<SORE_Graphics::Renderable> frame = GetChunks();
+        std::vector<SORE_Graphics::Renderable>::iterator it;
         for(it = frame.begin();it!=frame.end();++it)
         {
-            list.push_back(std::make_pair(&GetPositionMatrix(), *it));
+            SORE_Graphics::Renderable r(*it);
+            SORE_Graphics::TransformationPtr m(
+                new SORE_Math::Matrix4<float>(
+                    *it->GetTransform() * GetPositionMatrix()));
+            r.SetTransform(m);
+            r.SetLayer(GUI_LAYER);
+            r.AddKeyword("gui");
+            list.push_back(r);
         }
 
-        SORE_Graphics::render_list text = displayText->GetGeometry();
+        std::vector<SORE_Graphics::Renderable> text = displayText->GetGeometry();
         list.insert(list.begin(), text.begin(), text.end());
 
         if(HasFocus())
@@ -121,15 +133,21 @@ namespace SORE_GUI
             unsigned int time = SORE_Timing::GetGlobalTicks();
             if(time - caretEnd < 5000)
             {
-                list.push_back(std::make_pair(&caretMat, caret));
+                SORE_Graphics::Renderable r(caret);
+                SORE_Graphics::TransformationPtr m(
+                    new SORE_Math::Matrix4<float>(
+                        *caret.GetTransform() * GetPositionMatrix()));
+                r.SetTransform(m);
+                r.SetLayer(GUI_LAYER);
+                r.AddKeyword("gui");
+                list.push_back(r);
             }
             else if(time - caretEnd > 10000)
                 caretEnd = time;
         }
-
+*/
         return list;
     }
-    */
 
     bool TextField::ProcessEvents(SORE_Kernel::Event* e)
     {

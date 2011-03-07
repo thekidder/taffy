@@ -81,12 +81,11 @@ namespace SORE_GUI
         SORE_Graphics::Texture2DPtr
             normal, active, hover, arrow, menuBg;
         SORE_Math::Matrix4<float> arrowMat;
-        SORE_Graphics::GeometryChunk* arrowChunk;
+        SORE_Graphics::Renderable arrowChunk;
 
         std::map<unsigned int, SORE_Graphics::Text*> choices;
         SORE_Graphics::Text* curChoice;
-        std::vector<std::pair<SORE_Math::Matrix4<float>,
-            SORE_Graphics::GeometryChunk*> > menu;
+        std::vector<SORE_Graphics::Renderable> menu;
 
         boost::signal<void (unsigned int)> onChange;
 

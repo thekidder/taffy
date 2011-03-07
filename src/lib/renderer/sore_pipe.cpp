@@ -77,6 +77,30 @@ void SORE_Graphics::Pipe::Render
     }
 }
 
+SORE_Graphics::SortingPipe::SortingPipe(sorting_predicate comp) : comparator(comp)
+{
+}
+
+void SORE_Graphics::SortingPipe::doSetup()
+{
+    sortedList.clear();
+}
+
+SORE_Graphics::render_list& SORE_Graphics::SortingPipe::doRender
+(
+    const camera_table& cameras,
+    render_list& list,
+    GLCommandList& renderQueue,
+    BufferManager* bm
+)
+{
+    sortedList = list;
+
+    std::sort(sortedList.begin(), sortedList.end(), comparator);
+
+    return sortedList;
+}
+
 bool SORE_Graphics::NullFilter(const Renderable& r)
 {
     return true;

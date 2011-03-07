@@ -34,11 +34,12 @@
 
 #include <sore_geometry.h>
 #include <sore_dropdown.h>
+#include <sore_sprite.h>
 
 namespace SORE_GUI
 {
     Dropdown::Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par)
-        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s), arrowChunk(0),
+        : FrameWidget(s, p, SCALE_ALL, par), originalSize(s),
           curChoice(0), pressed(false), inArea(false)
     {
         std::string styleDir("data/");
@@ -66,11 +67,18 @@ namespace SORE_GUI
             static_cast<float>(textHeight));
         shad = pool.GetResource<SORE_Graphics::GLSLShader>
             ("data/Shaders/default.shad");
-        //TODO:fixme
-        //arrowChunk = new SORE_Graphics::GeometryChunk(arrow, shad, arrowSize);
+        arrowChunk = SORE_Graphics::MakeSprite(
+            arrowSize,
+            SORE_Math::Rect<float>(0.0f, 1.0f, 0.0f, 1.0f),
+            0.0f,
+            arrow,
+            shad,
+            GUI_LAYER,
+            SORE_Graphics::BLEND_SUBTRACTIVE);
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
+        SetShader(shad);
     }
 
     Dropdown::~Dropdown()
@@ -80,7 +88,6 @@ namespace SORE_GUI
         {
             delete it->second;
         }
-        delete arrowChunk;
         delete curChoice;
     }
 
@@ -109,13 +116,6 @@ namespace SORE_GUI
 
     void Dropdown::BuildGeometry()
     {
-        std::vector<std::pair<SORE_Math::Matrix4<float>,
-            SORE_Graphics::GeometryChunk*> >::iterator it;
-        for(it=menu.begin();it!=menu.end();++it)
-        {
-            SORE_Graphics::GeometryChunk* g = it->second;
-            delete g;
-        }
         menu.clear();
         unsigned int currHeight = GetPixels(VERTICAL, originalSize.GetVertical());
         for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
@@ -130,11 +130,29 @@ namespace SORE_GUI
             /*SORE_Graphics::GeometryChunk* g = new SORE_Graphics::GeometryChunk(
                 menuBg, shad, bounds);
             */
-            SORE_Math::Matrix4<float> m =
-                SORE_Math::Matrix4<float>::GetTranslation(
-                    0.0f, 0.0f,
-                    GetTopLayer() + 0.0009f) *
-                GetPositionMatrix();
+            SORE_Graphics::Renderable g = SORE_Graphics::MakeSprite(
+                bounds,
+                SORE_Math::Rect<float>(0.0f, 1.0f, 0.0f, 1.0f),
+                0.0f,
+                menuBg,
+                shad,
+                GUI_LAYER,
+                SORE_Graphics::BLEND_SUBTRACTIVE);
+            // SORE_Math::Matrix4<float> m =
+            //     SORE_Math::Matrix4<float>::GetTranslation(
+            //         0.0f, 0.0f,
+            //         GetTopLayer() + 0.0009f) *
+            //     GetPositionMatrix();
+            SORE_Graphics::TransformationPtr m(
+                new SORE_Math::Matrix4<float>(
+                    SORE_Math::Matrix4<float>::GetTranslation(
+                        0.0f, 0.0f,
+                        GetTopLayer() + 0.0009f) *
+                    GetPositionMatrix()));
+            g.SetTransform(m);
+            g.SetLayer(GUI_LAYER);
+            g.AddKeyword("gui");
+            menu.push_back(g);
             //menu.push_back(std::make_pair(m, g));
             it->second->SetTransform(
                 GetPositionMatrix() *
@@ -158,22 +176,21 @@ namespace SORE_GUI
 
         std::vector<SORE_Graphics::Renderable> frame = GetChunks();
         std::copy(frame.begin(), frame.end(), std::back_inserter(list));
-        /*list.push_back(std::make_pair(&arrowMat, arrowChunk));
+        list.push_back(arrowChunk);
 
         if(HasFocus())
         {
-            std::vector<std::pair<SORE_Math::Matrix4<float>,
-                SORE_Graphics::GeometryChunk*> >::iterator mit;
+            std::vector<SORE_Graphics::Renderable>::iterator mit;
             for(mit = menu.begin();mit!=menu.end();++mit)
-                list.push_back(std::make_pair(&mit->first, mit->second));
+                list.push_back(*mit);
             std::map<unsigned int, SORE_Graphics::Text*>::iterator it2;
             for(it2 = choices.begin();it2!=choices.end();++it2)
             {
-                SORE_Graphics::render_list text = it2->second->GetGeometry();
+                std::vector<SORE_Graphics::Renderable> text = it2->second->GetGeometry();
                 list.insert(list.begin(), text.begin(), text.end());
             }
         }
-        */
+
         if(curChoice)
         {
             std::vector<SORE_Graphics::Renderable> text = curChoice->GetGeometry();

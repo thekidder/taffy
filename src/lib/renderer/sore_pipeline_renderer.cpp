@@ -113,7 +113,10 @@ void SORE_Graphics::PipelineRenderer::PushState()
 
     boost::shared_ptr<Pipe> root(new NullPipe());
     Pipe* guiPipe = new FilterPipe(KeywordFilter("gui"));
-    guiPipe->AddChildPipe(new RenderPipe("gui"));
+    Pipe* sorter = new SortingPipe();
+
+    guiPipe->AddChildPipe(sorter);
+    sorter->AddChildPipe(new RenderPipe("gui"));
 
     Pipe* gamePipe = new FilterPipe(KeywordFilter("game"));
     gamePipe->AddChildPipe(new RenderPipe("normal"));

@@ -121,8 +121,30 @@ namespace SORE_Graphics
         std::string camera;
     };
 
-    typedef boost::function<bool (const Renderable&)> filter_predicate;
+    typedef boost::function<bool (const Renderable&, const Renderable&)> sorting_predicate;
 
+    inline bool renderableSort(const Renderable& lhs, const Renderable& rhs)
+    {
+        return lhs < rhs;
+    }
+
+    class SORE_EXPORT SortingPipe : public Pipe
+    {
+    public:
+        SortingPipe(sorting_predicate comp = renderableSort);
+    protected:
+        virtual void doSetup();
+        virtual render_list& doRender(
+            const camera_table& cameras,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm);
+    private:
+        sorting_predicate comparator;
+        render_list sortedList;
+    };
+
+    typedef boost::function<bool (const Renderable&)> filter_predicate;
 
     /*
       premade filters for the filterpipe

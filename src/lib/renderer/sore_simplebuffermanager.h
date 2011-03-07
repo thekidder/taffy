@@ -35,8 +35,7 @@
 #ifndef SORE_SIMPLEBUFFERMANAGER_H
 #define SORE_SIMPLEBUFFERMANAGER_H
 
-#include <boost/unordered_set.hpp>
-#include <boost/pool/pool_alloc.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <sore_buffermanager.h>
 #include <sore_util.h>
@@ -69,15 +68,15 @@ namespace SORE_Graphics
         void GeometryRemoved(GeometryChunkPtr gc);
 
     private:
-        struct geometry_buffer
-        {
-            geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
+         struct geometry_buffer
+         {
+             geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
 
-            GraphicsArrayClass buffer;
-            bool needsRebuild;
-            //generated from renderables
-            typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-            geometry_map geometryMap;
+             GraphicsArrayClass buffer;
+             bool needsRebuild;
+             //generated from renderables
+             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
+             geometry_map geometryMap;
         };
 
         geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);

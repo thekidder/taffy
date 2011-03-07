@@ -1,6 +1,8 @@
 set(SORE_RENDERER_SRCS
     renderer/sore_aggregatebuffermanager.cpp
-    renderer/sore_batch.cpp renderer/sore_buffermanager.cpp
+    renderer/sore_batch.cpp
+    renderer/sore_batchingbuffermanager.cpp
+    renderer/sore_buffermanager.cpp
     renderer/sore_fbo.cpp
     renderer/sore_gl_command_list.cpp
     renderer/sore_geometrychunk.cpp renderer/sore_geometryprovider.cpp
@@ -19,6 +21,7 @@ set(SORE_RENDERER_SRCS
 set(SORE_RENDERER_HEADERS
     renderer/sore_aggregatebuffermanager.h
     renderer/sore_allgl.h renderer/sore_batch.h
+    renderer/sore_batchingbuffermanager.h
     renderer/sore_buffermanager.h
     renderer/sore_fbo.h
     renderer/sore_gl_command_list.h

@@ -95,23 +95,35 @@ namespace SORE_GUI
         delete t;
     }
 
-    /*SORE_Graphics::render_list Button::GetThisRenderList()
+    std::vector<SORE_Graphics::Renderable> Button::GetThisRenderList()
     {
-        SORE_Graphics::render_list list;
+        std::vector<SORE_Graphics::Renderable> list;
 
-        std::vector<SORE_Graphics::GeometryChunk*> frame = GetChunks();
-        std::vector<SORE_Graphics::GeometryChunk*>::iterator it;
+        std::vector<SORE_Graphics::Renderable> frame = GetChunks();
+        std::vector<SORE_Graphics::Renderable>::iterator it;
         for(it = frame.begin();it!=frame.end();++it)
         {
-            list.push_back(std::make_pair(&GetPositionMatrix(), *it));
+            SORE_Graphics::Renderable r(*it);
+            SORE_Graphics::TransformationPtr m(
+                new SORE_Math::Matrix4<float>(
+                    GetPositionMatrix()));
+            r.SetTransform(m);
+            r.SetLayer(GUI_LAYER);
+            r.AddKeyword("gui");
+            list.push_back(r);
         }
 
-        SORE_Graphics::render_list text = t->GetGeometry();
-        list.insert(list.begin(), text.begin(), text.end());
+        std::vector<SORE_Graphics::Renderable> text = t->GetGeometry();
+        for(it = text.begin(); it != text.end(); ++it)
+        {
+            SORE_Graphics::Renderable r(*it);
+            r.SetLayer(GUI_LAYER);
+            r.AddKeyword("gui");
+            list.push_back(r);
+        }
 
         return list;
     }
-    */
 
     void Button::ConnectPressed(boost::function<void ()> c)
     {

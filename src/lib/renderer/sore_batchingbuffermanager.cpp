@@ -37,7 +37,7 @@
 
 #include <boost/foreach.hpp>
 
-#include <sore_simplebuffermanager.h>
+#include <sore_batchingbuffermanager.h>
 #include <sore_vbo.h>
 
 #ifndef SORE_NO_VBO
@@ -46,11 +46,11 @@
 #define GraphicsArrayClass VertexArray
 #endif
 
-SORE_Graphics::SimpleBufferManager::SimpleBufferManager()
+SORE_Graphics::BatchingBufferManager::BatchingBufferManager()
 {
 }
 
-SORE_Graphics::SimpleBufferManager::~SimpleBufferManager()
+SORE_Graphics::BatchingBufferManager::~BatchingBufferManager()
 {
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
@@ -61,12 +61,12 @@ SORE_Graphics::SimpleBufferManager::~SimpleBufferManager()
     }
 }
 
-bool SORE_Graphics::SimpleBufferManager::Contains(GeometryChunkPtr gc)
+bool SORE_Graphics::BatchingBufferManager::Contains(GeometryChunkPtr gc)
 {
     return !(geometryMapping.find(gc) == geometryMapping.end());
 }
 
-SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(GeometryChunkPtr gc)
+SORE_Graphics::geometry_entry SORE_Graphics::BatchingBufferManager::LookupGC(GeometryChunkPtr gc)
 {
     if(!Contains(gc))
     {
@@ -83,7 +83,7 @@ SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(Geome
     return gb->geometryMap[gc];
 }
 
-void SORE_Graphics::SimpleBufferManager::MakeUpToDate()
+void SORE_Graphics::BatchingBufferManager::MakeUpToDate()
 {
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
@@ -98,7 +98,7 @@ void SORE_Graphics::SimpleBufferManager::MakeUpToDate()
     }
 }
 
-void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geometry_type type)
+void SORE_Graphics::BatchingBufferManager::GeometryAdded(const Renderable& gc, geometry_type type)
 {
     if(Contains(gc))
     {
@@ -120,7 +120,7 @@ void SORE_Graphics::SimpleBufferManager::GeometryAdded(GeometryChunkPtr gc, geom
     }
 }
 
-void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
+void SORE_Graphics::BatchingBufferManager::GeometryChanged(const Renderable& gc)
 {
     geometry_buffer* buffer = geometryMapping[gc];
     /*if(buffer->geometryMap[gc].indices != gc->NumIndices() ||
@@ -144,14 +144,14 @@ void SORE_Graphics::SimpleBufferManager::GeometryChanged(GeometryChunkPtr gc)
     buffer->needsRebuild = true;
 }
 
-void SORE_Graphics::SimpleBufferManager::GeometryRemoved(GeometryChunkPtr gc)
+void SORE_Graphics::BatchingBufferManager::GeometryRemoved(const Renderable& gc)
 {
     geometry_buffer* buffer = geometryMapping[gc];
     buffer->geometryMap.erase(gc);
     buffer->needsRebuild = true;
 }
 
-void SORE_Graphics::SimpleBufferManager::Clear()
+void SORE_Graphics::BatchingBufferManager::Clear()
 {
     geometryMapping.clear();
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
@@ -164,7 +164,7 @@ void SORE_Graphics::SimpleBufferManager::Clear()
     }
 }
 
-void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
+void SORE_Graphics::BatchingBufferManager::RebuildBuffer(geometry_buffer* buffer)
 {
     //ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("rebuilding geometry buffer %p") % buffer);
     buffer->buffer.Clear();
@@ -177,7 +177,7 @@ void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
     buffer->buffer.Build();
 }
 
-SORE_Graphics::SimpleBufferManager::geometry_buffer* SORE_Graphics::SimpleBufferManager::Insert
+SORE_Graphics::BatchingBufferManager::geometry_buffer* SORE_Graphics::BatchingBufferManager::Insert
 (
     GeometryChunkPtr g,
     geometry_type type
