@@ -60,7 +60,7 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
     }
 
     UniformState copy = r.Uniforms();
-    //copy.SetVariable("transform", *r.GetTransform());
+    copy.SetVariable("transform", *r.GetTransform());
 
     if(!copy.Empty())
     {
