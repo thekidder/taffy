@@ -1,7 +1,7 @@
 set(SORE_RENDERER_SRCS
     renderer/sore_aggregatebuffermanager.cpp
     renderer/sore_batch.cpp
-    renderer/sore_batchingbuffermanager.cpp
+#    renderer/sore_batchingbuffermanager.cpp
     renderer/sore_buffermanager.cpp
     renderer/sore_fbo.cpp
     renderer/sore_gl_command_list.cpp

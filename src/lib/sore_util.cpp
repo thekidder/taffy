@@ -129,7 +129,7 @@ namespace SORE_Utility
                 {
                     setting = TrimString(setting);
                     //this describes a section heading
-                    if(setting[0]=='[' && setting.find(']')!=std::string::npos)
+                    if(setting.length() && setting[0]=='[' && setting.find(']')!=std::string::npos)
                     {
                         currSection = TrimString(
                             setting.substr(1, setting.find(']')-1));

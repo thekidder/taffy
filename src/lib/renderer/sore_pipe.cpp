@@ -36,14 +36,6 @@
 
 #include <sore_pipe.h>
 
-SORE_Graphics::Pipe::Pipe()
-{
-}
-
-SORE_Graphics::Pipe::~Pipe()
-{
-}
-
 void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)
 {
     children.push_back(child);

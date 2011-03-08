@@ -54,8 +54,7 @@ namespace SORE_Graphics
     class SORE_EXPORT Pipe
     {
     public:
-        Pipe();
-        virtual ~Pipe();
+        virtual ~Pipe() {}
 
         /*
           Tree functions: Used to build a tree of pipes for the renderer to
@@ -75,12 +74,12 @@ namespace SORE_Graphics
         /*
           Virtual setup/render functions to be implemented by Pipe implementations
         */
-        virtual void doSetup() = 0;
+        virtual void doSetup() {}
         virtual render_list& doRender(
             const camera_table& cameras,
             render_list& list,
             GLCommandList& renderQueue,
-            BufferManager* bm) = 0;
+            BufferManager* bm) { return list; }
     private:
         typedef boost::ptr_vector<Pipe> pipe_vector;
         pipe_vector children;
