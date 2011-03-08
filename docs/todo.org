@@ -1,0 +1,7 @@
+* SORE todo list
+** TODO Better error handling for some classes
+   use exceptions rather than error flags in some classes so
+   construction of classes either succeeds or throws
+** TODO Fix Batching Geometry Manager
+   need a geometry manager that batches geometry to improve draw call
+   performance
