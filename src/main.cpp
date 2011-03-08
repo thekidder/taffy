@@ -7,10 +7,17 @@
 
 #include "state_default.h"
 
+#include "kissfft.hh"
+
 SORE_Logging::Logger* mainLog;
 
 int main(int argc, char** argv)
 {
+    float src[1024];
+    float dst[1024];
+    kissfft<float> fft(10, false);
+    //fft.transform(src, dst);
+
     srand(static_cast<unsigned int>(time(0)));
     mainLog = new SORE_Logging::Logger(GetVersionDisplayName().c_str());
     std::string logName = "logs/" + GetVersionName() + "_log.xml";
