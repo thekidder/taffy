@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -107,8 +107,8 @@ namespace SORE_Graphics
         void AddKeyword(const std::string& keyword);
         bool HasKeyword(const std::string& keyword) const;
     private:
-        void CalculateDepth();
-        void CalculateSortKey();
+        void CalculateDepth() const;
+        void CalculateSortKey() const;
 
         GeometryChunkPtr geometry;
         GLSLShaderPtr shader;
@@ -118,9 +118,8 @@ namespace SORE_Graphics
         blend_mode blending;
         UniformStatePtr uniforms;
 
-        float cachedDepth;
-
-        int sortKey;
+        mutable float cachedDepth;
+        mutable int sortKey;
 
         ProjectionInfo proj;
 

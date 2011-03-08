@@ -5,3 +5,11 @@
 ** TODO Fix Batching Geometry Manager
    need a geometry manager that batches geometry to improve draw call
    performance
+** TODO Get rid of DLL interface warnings in MSVC
+** TODO Add some basic rendering perf statistics to engine
+   ideas: 
+   - % of state changes due to state changes, vbo switching,
+     not-adjacent indices
+   - already have polygon/draw calls...
+   - pipeline renderer: get information on how much time spent
+     rendering each pipe

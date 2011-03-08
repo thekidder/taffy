@@ -68,7 +68,9 @@ set(SORE_SRCS sore_camera.cpp sore_color.cpp
 	sore_text.cpp sore_timing.cpp sore_util.cpp)
 
 set(SORE_HEADERS sore_camera.h sore_color.h
-	sore_dll.h sore_defines.h sore_fileio.h sore_font.h
+	sore_dll.h sore_defines.h
+	sore_exception.h 
+	sore_fileio.h sore_font.h
 	sore_input.h sore_interpolater.h sore_logger.h
 	sore_logginginit.h sore_noncopyable.h sore_profiler.h 
 	sore_resource.h

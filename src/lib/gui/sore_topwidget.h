@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -38,7 +38,7 @@
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
 #include <sore_input.h>
-#include <sore_simplebuffermanager.h>
+#include <sore_batchingbuffermanager.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
@@ -57,7 +57,7 @@ namespace SORE_GUI
 
         SORE_Graphics::camera_info GetCamera();
     private:
-        SORE_Graphics::SimpleBufferManager sbm;
+        SORE_Graphics::BatchingBufferManager sbm;
 
         std::vector<SORE_Graphics::Renderable> GetThisRenderList();
         bool ProcessEvents(SORE_Kernel::Event* e);

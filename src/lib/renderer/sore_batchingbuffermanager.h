@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -35,7 +35,9 @@
 #ifndef SORE_BATCHINGBUFFERMANAGER_H
 #define SORE_BATCHINGBUFFERMANAGER_H
 
-#include <map>
+#include <set>
+
+#include <boost/unordered_map.hpp>
 
 #include <sore_buffermanager.h>
 #include <sore_util.h>
@@ -73,17 +75,21 @@ namespace SORE_Graphics
 
              GraphicsArrayClass buffer;
              bool needsRebuild;
-             // generated from renderables
-             typedef std::map<Renderable, geometry_entry> geometry_map;
-             geometry_map geometryMap;
+             // master list of renderables (multiset: multiple renderables with same sort key)
+             typedef std::multiset<Renderable> geometry_list;
+             geometry_list allGeometry;
+
+             // used to look up geoemtrychunks: generated from master list
+             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
+             geometry_map geometryChunkLookup;
         };
 
-        geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);
+        geometry_buffer* Insert(const Renderable& r, geometry_type type);
         void RebuildBuffer(geometry_buffer* buffer);
 
         std::vector<geometry_buffer*> heaps[MAX_GEOMETRY_TYPE];
         // indexes a GC into one of the buffers above ^
-        std::map<Renderable, geometry_buffer*> geometryMapping;
+        boost::unordered_map<GeometryChunkPtr, geometry_buffer*> geometryMapping;
 
         renderable_map renderables;
     };

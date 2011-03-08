@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -140,6 +140,9 @@ const SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms() const
 
 int SORE_Graphics::Renderable::GetSortKey() const
 {
+    CalculateDepth();
+    CalculateSortKey();
+
     return sortKey;
 }
 
@@ -149,7 +152,7 @@ void SORE_Graphics::Renderable::SetProjection(const ProjectionInfo& pi)
     CalculateSortKey();
 }
 
-void SORE_Graphics::Renderable::CalculateDepth()
+void SORE_Graphics::Renderable::CalculateDepth() const
 {
     //sort by min-Z
     float minZ = std::numeric_limits<float>::max();
@@ -167,7 +170,7 @@ void SORE_Graphics::Renderable::CalculateDepth()
     cachedDepth = minZ;
 }
 
-void SORE_Graphics::Renderable::CalculateSortKey()
+void SORE_Graphics::Renderable::CalculateSortKey() const
 {
     const unsigned int keyLen = 32;
     const unsigned int depthBits = 11;

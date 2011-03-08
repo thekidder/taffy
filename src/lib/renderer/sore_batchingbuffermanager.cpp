@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -38,6 +38,7 @@
 #include <boost/foreach.hpp>
 
 #include <sore_batchingbuffermanager.h>
+#include <sore_exception.h>
 #include <sore_vbo.h>
 
 #ifndef SORE_NO_VBO
@@ -70,17 +71,14 @@ SORE_Graphics::geometry_entry SORE_Graphics::BatchingBufferManager::LookupGC(Geo
 {
     if(!Contains(gc))
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not find geometry");
-        return geometry_entry();
+        throw SORE_Error::Error("Could not find geometry chunk ");
     }
     geometry_buffer* gb = geometryMapping[gc];
-    if(gb->geometryMap.find(gc) == gb->geometryMap.end())
+    if(gb->geometryChunkLookup.find(gc) == gb->geometryChunkLookup.end())
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not lookup GC in buffer");
-        geometry_entry ge();
-        return geometry_entry();
+        throw SORE_Error::Error("Could not look up geometry chunk ");
     }
-    return gb->geometryMap[gc];
+    return gb->geometryChunkLookup[gc];
 }
 
 void SORE_Graphics::BatchingBufferManager::MakeUpToDate()
@@ -100,29 +98,20 @@ void SORE_Graphics::BatchingBufferManager::MakeUpToDate()
 
 void SORE_Graphics::BatchingBufferManager::GeometryAdded(const Renderable& gc, geometry_type type)
 {
-    if(Contains(gc))
+    if(Contains(gc.GetGeometryChunk()))
     {
         GeometryChanged(gc);
     }
     else
     {
         geometry_buffer* buffer = Insert(gc, type);
-
-        geometry_entry e(
-            &buffer->buffer,
-            buffer->buffer.NumIndices() - gc->NumIndices(),
-            gc->NumIndices(),
-            gc->NumVertices(),
-            gc->Type());
-        buffer->geometryMap[gc] = e;
-
         buffer->needsRebuild = true;
     }
 }
 
 void SORE_Graphics::BatchingBufferManager::GeometryChanged(const Renderable& gc)
 {
-    geometry_buffer* buffer = geometryMapping[gc];
+    geometry_buffer* buffer = geometryMapping[gc.GetGeometryChunk()];
     /*if(buffer->geometryMap[gc].indices != gc->NumIndices() ||
        buffer->geometryMap[gc].vertices != gc->NumVertices())
     {
@@ -133,12 +122,12 @@ void SORE_Graphics::BatchingBufferManager::GeometryChanged(const Renderable& gc)
         //do an in-place upload of the changed data
     }*/
     //too big for current heap?
-    size_t newIndices = gc->NumIndices() - buffer->geometryMap[gc].indices;
-    size_t newVertices = gc->NumVertices() - buffer->geometryMap[gc].vertices;
+    size_t newIndices = gc.GetGeometryChunk()->NumIndices() - buffer->geometryChunkLookup[gc.GetGeometryChunk()].indices;
+    size_t newVertices = gc.GetGeometryChunk()->NumVertices() - buffer->geometryChunkLookup[gc.GetGeometryChunk()].vertices;
     if(!buffer->buffer.HasRoomFor(newIndices, newVertices))
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "readding geometry: not enough room");
-        buffer->geometryMap.erase(gc);
+        buffer->allGeometry.erase(gc);
         GeometryAdded(gc, DYNAMIC); //placeholder
     }
     buffer->needsRebuild = true;
@@ -146,8 +135,8 @@ void SORE_Graphics::BatchingBufferManager::GeometryChanged(const Renderable& gc)
 
 void SORE_Graphics::BatchingBufferManager::GeometryRemoved(const Renderable& gc)
 {
-    geometry_buffer* buffer = geometryMapping[gc];
-    buffer->geometryMap.erase(gc);
+    geometry_buffer* buffer = geometryMapping[gc.GetGeometryChunk()];
+    buffer->allGeometry.erase(gc);
     buffer->needsRebuild = true;
 }
 
@@ -168,31 +157,37 @@ void SORE_Graphics::BatchingBufferManager::RebuildBuffer(geometry_buffer* buffer
 {
     //ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("rebuilding geometry buffer %p") % buffer);
     buffer->buffer.Clear();
-    geometry_buffer::geometry_map::iterator it;
-    for(it = buffer->geometryMap.begin(); it != buffer->geometryMap.end(); ++it)
+    buffer->geometryChunkLookup.clear();
+    geometry_buffer::geometry_list::iterator it;
+    for(it = buffer->allGeometry.begin(); it != buffer->allGeometry.end(); ++it)
     {
-        buffer->buffer.AddObject(it->first);
-        buffer->geometryMap[it->first].offset = buffer->buffer.NumIndices() - it->first->NumIndices();
+        buffer->buffer.AddObject(it->GetGeometryChunk());
+        geometry_entry e(
+            &buffer->buffer,
+            buffer->buffer.NumIndices() - it->GetGeometryChunk()->NumIndices(),
+            it->GetGeometryChunk()->NumIndices(),
+            it->GetGeometryChunk()->NumVertices(),
+            it->GetGeometryChunk()->Type());
+        buffer->geometryChunkLookup[it->GetGeometryChunk()] = e;
     }
     buffer->buffer.Build();
 }
 
 SORE_Graphics::BatchingBufferManager::geometry_buffer* SORE_Graphics::BatchingBufferManager::Insert
 (
-    GeometryChunkPtr g,
+    const Renderable& r,
     geometry_type type
 )
 {
     std::vector<geometry_buffer*>& heap = heaps[type];
     geometry_buffer* current = heap.size() ? heap.back() : 0;
-    if(heap.size() == 0 || !current->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
+    if(heap.size() == 0 || !current->buffer.HasRoomFor(r.GetGeometryChunk()->NumIndices(), r.GetGeometryChunk()->NumVertices()))
     {
         current = new geometry_buffer(type);
         heap.push_back(current);
     }
-
-    current->buffer.AddObject(g);
-    geometryMapping[g] = current;
+    geometryMapping[r.GetGeometryChunk()] = current;
+    current->allGeometry.insert(r);
 
     return current;
 }
