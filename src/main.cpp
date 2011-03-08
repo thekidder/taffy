@@ -22,6 +22,9 @@ int main(int argc, char** argv)
     SORE_Logging::ConsoleLogger consoleLog(SORE_Logging::SHOW_ALL);
     mainLog->AddBackend(&consoleLog);
     APP_LOG(SORE_Logging::LVL_INFO, "DEBUG BUILD");
+    const char* settingsFile = "settings_debug.ini";
+#else
+    const char* settingsFile = "settings.ini";
 #endif
 
     APP_LOG(SORE_Logging::LVL_INFO, GetVersionString());
@@ -30,7 +33,7 @@ int main(int argc, char** argv)
     pc.AddPackage("default_shaders.sdp");
     pc.AddPackage("ix_style.sdp");
 
-    SORE_Game::GamestateManager gsm(&pc, GetVersionDisplayName(), "data/app.bmp", "settings.ini");
+    SORE_Game::GamestateManager gsm(&pc, GetVersionDisplayName(), "data/app.bmp", settingsFile);
 
     gsm.PushState(new DefaultState);
 
