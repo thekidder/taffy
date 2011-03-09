@@ -37,6 +37,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <sore_exception.h>
 #include <sore_simplebuffermanager.h>
 #include <sore_vbo.h>
 
@@ -70,15 +71,12 @@ SORE_Graphics::geometry_entry SORE_Graphics::SimpleBufferManager::LookupGC(Geome
 {
     if(!Contains(gc))
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not find geometry");
-        return geometry_entry();
+        throw SORE_Error::Error("Could not find geometry");
     }
     geometry_buffer* gb = geometryMapping[gc];
     if(gb->geometryMap.find(gc) == gb->geometryMap.end())
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not lookup GC in buffer");
-        geometry_entry ge();
-        return geometry_entry();
+        throw SORE_Error::Error("Could not lookup GC in buffer");
     }
     return gb->geometryMap[gc];
 }
