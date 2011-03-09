@@ -2,9 +2,12 @@
 
 #include <sore_gamestate_manager.h>
 
+#include "app_log.h"
 #include "state_default.h"
 
-DefaultState::DefaultState() : top(0), debug(0)
+const int kFFTSamples = 512;
+
+DefaultState::DefaultState() : top(0), debug(0), sound("music.wav")
 {
 }
 
@@ -12,6 +15,7 @@ DefaultState::~DefaultState()
 {
     delete debug;
     delete top;
+    kiss_fftr_free(kiss_cfg);
 }
 
 void DefaultState::Init()
@@ -41,11 +45,25 @@ void DefaultState::Init()
     cameras["normal"] = guiCam;
     owner->GetRenderer()->SetCameraTable(cameras);
 
+    kiss_cfg = kiss_fftr_alloc(kFFTSamples, 0, 0, 0);
 }
 
 void DefaultState::Frame(int elapsed)
 {
     debug->Frame(elapsed);
+
+    kiss_fft_scalar timedata[kFFTSamples];
+    kiss_fft_cpx    freqdata[kFFTSamples/2 + 1];
+
+    sound.read(timedata, kFFTSamples);
+
+    kiss_fftr(kiss_cfg, timedata, freqdata);
+
+    for(int i = 0; i <= kFFTSamples/2; ++i)
+    {
+        kiss_fft_scalar mag = freqdata[i].r * freqdata[i].r + freqdata[i].i * freqdata[i].i;
+        APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[i].r % freqdata[i].i % mag);
+    }
 }
 
 void DefaultState::Quit()
