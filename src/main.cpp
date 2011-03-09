@@ -7,16 +7,19 @@
 
 #include "state_default.h"
 
-#include "kissfft.hh"
+#include "kiss_fftr.h"
 
 SORE_Logging::Logger* mainLog;
 
 int main(int argc, char** argv)
 {
-    float src[1024];
-    float dst[1024];
-    kissfft<float> fft(10, false);
-    //fft.transform(src, dst);
+    kiss_fftr_cfg cfg = kiss_fftr_alloc( 512, 0, 0, 0);
+    kiss_fft_scalar timedata[512];
+    kiss_fft_cpx    freqdata[257];
+
+    kiss_fftr(cfg, timedata, freqdata);
+
+    kiss_fftr_free(cfg);
 
     srand(static_cast<unsigned int>(time(0)));
     mainLog = new SORE_Logging::Logger(GetVersionDisplayName().c_str());
