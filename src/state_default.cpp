@@ -5,9 +5,11 @@
 #include "app_log.h"
 #include "state_default.h"
 
+#include <fmod.hpp>
+
 const int kFFTSamples = 512;
 
-DefaultState::DefaultState() : top(0), debug(0), sound("music.wav")
+DefaultState::DefaultState() : top(0), debug(0)
 {
 }
 
@@ -16,6 +18,7 @@ DefaultState::~DefaultState()
     delete debug;
     delete top;
     kiss_fftr_free(kiss_cfg);
+    system->release();
 }
 
 void DefaultState::Init()
@@ -45,6 +48,11 @@ void DefaultState::Init()
     cameras["normal"] = guiCam;
     owner->GetRenderer()->SetCameraTable(cameras);
 
+    FMOD::System_Create(&system);
+    system->init(100, FMOD_INIT_NORMAL, 0);
+    system->createStream("music.mp3", FMOD_SOFTWARE, 0, &sound);
+    system->playSound(FMOD_CHANNEL_FREE, sound, false, &channel);
+    
     kiss_cfg = kiss_fftr_alloc(kFFTSamples, 0, 0, 0);
 }
 
@@ -52,7 +60,9 @@ void DefaultState::Frame(int elapsed)
 {
     debug->Frame(elapsed);
 
-    kiss_fft_scalar timedata[kFFTSamples];
+    system->update();
+
+    /*kiss_fft_scalar timedata[kFFTSamples];
     kiss_fft_cpx    freqdata[kFFTSamples/2 + 1];
 
     sound.read(timedata, kFFTSamples);
@@ -63,7 +73,7 @@ void DefaultState::Frame(int elapsed)
     {
         kiss_fft_scalar mag = freqdata[i].r * freqdata[i].r + freqdata[i].i * freqdata[i].i;
         APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[i].r % freqdata[i].i % mag);
-    }
+    }*/
 }
 
 void DefaultState::Quit()

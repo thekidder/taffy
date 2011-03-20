@@ -2,12 +2,19 @@
 #define STATE_DEFAULT
 
 #include <kiss_fftr.h>
-#include <sndfile.hh>
+//#include <sndfile.hh>
 #include <sore_topwidget.h>
 #include <sore_gamestate.h>
 #include <sore_input.h>
 
 #include "debug_gui.h"
+
+namespace FMOD
+{
+    class Channel;
+    class Sound;
+    class System;
+};
 
 class DefaultState : public SORE_Game::Gamestate
 {
@@ -25,8 +32,12 @@ private:
     SORE_GUI::TopWidget* top;
     DebugGUI* debug;
 
+    FMOD::System* system;
+    FMOD::Sound* sound;
+    FMOD::Channel* channel;
+
     kiss_fftr_cfg kiss_cfg;
-    SndfileHandle sound;
+    //SndfileHandle sound;
 };
 
 #endif
