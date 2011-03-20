@@ -10,7 +10,7 @@ set(SORE_RENDERER_SRCS
     renderer/sore_pipe.cpp
     renderer/sore_pipeline_renderer.cpp
     renderer/sore_renderable.cpp renderer/sore_renderer.cpp
-    renderer/sore_renderer_std.cpp renderer/sore_renderstate.cpp 
+    renderer/sore_renderstate.cpp 
     renderer/sore_glslshader.cpp renderer/sore_simplebuffermanager.cpp
     renderer/sore_sprite.cpp
     renderer/sore_texture.cpp renderer/sore_texturestate.cpp
@@ -30,7 +30,7 @@ set(SORE_RENDERER_HEADERS
     renderer/sore_graphicsarray.h
     renderer/sore_pipe.h
     renderer/sore_pipeline_renderer.h renderer/sore_renderable.h
-    renderer/sore_renderer.h renderer/sore_renderer_std.h
+    renderer/sore_renderer.h
     renderer/sore_renderstate.h renderer/sore_glslshader.h
     renderer/sore_simplebuffermanager.h
     renderer/sore_sprite.h renderer/sore_texture.h

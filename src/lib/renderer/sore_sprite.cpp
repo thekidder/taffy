@@ -40,7 +40,6 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
         float z,
         Texture2DPtr texture,
         GLSLShaderPtr shader,
-        geometry_layer l,
         blend_mode b)
 {
     GeometryChunkPtr g(new GeometryChunk(4, 6, GL_TRIANGLES));
@@ -81,7 +80,7 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
     g->SetColor(White);
 
     TransformationPtr transformation(new SORE_Math::Matrix4<float>());
-    Renderable r(g, shader, transformation, l, b);
+    Renderable r(g, shader, transformation, b);
     if(texture)
         r.AddTexture("texture", texture);
     return r;
@@ -92,7 +91,6 @@ SORE_Graphics::Renderable SORE_Graphics::MakePointSprite(
         float size,
         Texture2DPtr texture,
         GLSLShaderPtr shader,
-        geometry_layer l,
         blend_mode b)
 {
     GeometryChunkPtr g(new GeometryChunk(1, 1, GL_POINTS));
@@ -108,7 +106,7 @@ SORE_Graphics::Renderable SORE_Graphics::MakePointSprite(
     g->SetColor(White);
 
     TransformationPtr transformation(new SORE_Math::Matrix4<float>());
-    Renderable r(g, shader, transformation, l, b);
+    Renderable r(g, shader, transformation, b);
     if(texture)
         r.AddTexture("texture", texture);
     r.Uniforms().SetVariable("pointSize", size);

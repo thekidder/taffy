@@ -108,7 +108,6 @@ namespace SORE_GUI
                 new SORE_Math::Matrix4<float>(
                     GetPositionMatrix()));
             r.SetTransform(m);
-            r.SetLayer(GUI_LAYER);
             r.AddKeyword("gui");
             list.push_back(r);
         }
@@ -117,7 +116,6 @@ namespace SORE_GUI
         for(it = text.begin(); it != text.end(); ++it)
         {
             SORE_Graphics::Renderable r(*it);
-            r.SetLayer(GUI_LAYER);
             r.AddKeyword("gui");
             list.push_back(r);
         }

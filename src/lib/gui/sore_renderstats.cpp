@@ -2,7 +2,7 @@
 
 #include <sore_framewindow.h>
 #include <sore_textwidget.h>
-#include <sore_renderer_std.h>
+#include <sore_renderer.h>
 
 #include <sore_renderstats.h>
 

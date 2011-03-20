@@ -42,9 +42,9 @@ SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
 
 SORE_Graphics::Renderable::Renderable(
     GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
-    geometry_layer l, blend_mode b)
+    blend_mode b)
     : geometry(g), shader(s), transformation(trans),
-      layer(l), blending(b), cachedDepth(0.0f), sortKey(0)
+      blending(b), cachedDepth(0.0f), sortKey(0)
 {
     textures = TextureStatePtr(new TextureState());
     uniforms = UniformStatePtr(new UniformState());
@@ -115,17 +115,6 @@ void SORE_Graphics::Renderable::SetBlendMode(blend_mode b)
 SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
 {
     return blending;
-}
-
-void SORE_Graphics::Renderable::SetLayer(geometry_layer l)
-{
-    layer = l;
-    CalculateSortKey();
-}
-
-SORE_Graphics::geometry_layer SORE_Graphics::Renderable::GetLayer() const
-{
-    return layer;
 }
 
 SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms()
@@ -201,7 +190,6 @@ void SORE_Graphics::Renderable::CalculateSortKey() const
         depth = (1<<depthBits) - depth;
 
     sortKey = 0;
-    sortKey |= (layer << (keyLen - 3));
     sortKey |= (blending << (keyLen - 2 - 3));
     sortKey |= (depth & 0xFFF) << (keyLen - 2 - 3 - 12);
     if(shader)

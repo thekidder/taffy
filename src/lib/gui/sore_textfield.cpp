@@ -69,7 +69,6 @@ namespace SORE_GUI
             0.0f,
             caretTex,
             shad,
-            GUI_LAYER,
             SORE_Graphics::BLEND_SUBTRACTIVE);
 
         caretEnd = SORE_Timing::GetGlobalTicks();

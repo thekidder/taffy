@@ -77,7 +77,6 @@ namespace SORE_GUI
                 new SORE_Math::Matrix4<float>(
                     *it->GetTransform() * GetPositionMatrix()));
             r.SetTransform(m);
-            r.SetLayer(GUI_LAYER);
             all.push_back(r);
         }
     }

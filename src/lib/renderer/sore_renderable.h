@@ -47,18 +47,6 @@
 
 namespace SORE_Graphics
 {
-    enum geometry_layer
-    {
-        LAYER0,
-        LAYER1,
-        LAYER2,
-        LAYER3,
-        LAYER4,
-        LAYER5,
-        LAYER6,
-        LAYER7
-    };
-
     enum blend_mode
     {
         BLEND_OPAQUE,
@@ -75,7 +63,7 @@ namespace SORE_Graphics
     public:
         Renderable();
         Renderable(GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
-            geometry_layer l, blend_mode b);
+            blend_mode b);
 
         void SetGeometryChunk(GeometryChunkPtr g);
         GeometryChunkPtr GetGeometryChunk() const;
@@ -92,9 +80,6 @@ namespace SORE_Graphics
 
         void SetBlendMode(blend_mode b);
         blend_mode GetBlendMode() const;
-
-        void SetLayer(geometry_layer l);
-        geometry_layer GetLayer() const;
 
         UniformState& Uniforms();
         const UniformState& Uniforms() const;
@@ -114,7 +99,6 @@ namespace SORE_Graphics
         GLSLShaderPtr shader;
         TextureStatePtr textures;
         TransformationPtr transformation;
-        geometry_layer layer;
         blend_mode blending;
         UniformStatePtr uniforms;
 

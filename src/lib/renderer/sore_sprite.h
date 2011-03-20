@@ -49,7 +49,6 @@ namespace SORE_Graphics
         float z,
         Texture2DPtr texture,
         GLSLShaderPtr shader,
-        geometry_layer l = LAYER3,
         blend_mode b = BLEND_SUBTRACTIVE);
 
     Renderable SORE_EXPORT MakePointSprite(
@@ -57,7 +56,6 @@ namespace SORE_Graphics
         float size,
         Texture2DPtr texture,
         GLSLShaderPtr shader,
-        geometry_layer l = LAYER3,
         blend_mode b = BLEND_SUBTRACTIVE);
 }
 

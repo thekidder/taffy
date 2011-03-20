@@ -240,7 +240,7 @@ void SORE_Font::Font::LoadFace(unsigned int height)
 
             characters[height][i].renderable = SORE_Graphics::MakeSprite(
                 bounds, texCoords, 0.0f, textures[height], shader,
-                SORE_Graphics::LAYER3, SORE_Graphics::BLEND_SUBTRACTIVE);
+                SORE_Graphics::BLEND_SUBTRACTIVE);
             characters[height][i].renderable.SetTransform(buffers[i].transform);
         }
     }

@@ -73,7 +73,6 @@ namespace SORE_GUI
             0.0f,
             arrow,
             shad,
-            GUI_LAYER,
             SORE_Graphics::BLEND_SUBTRACTIVE);
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
@@ -136,7 +135,6 @@ namespace SORE_GUI
                 0.0f,
                 menuBg,
                 shad,
-                GUI_LAYER,
                 SORE_Graphics::BLEND_SUBTRACTIVE);
             // SORE_Math::Matrix4<float> m =
             //     SORE_Math::Matrix4<float>::GetTranslation(
@@ -150,7 +148,6 @@ namespace SORE_GUI
                         GetTopLayer() + 0.0009f) *
                     GetPositionMatrix()));
             g.SetTransform(m);
-            g.SetLayer(GUI_LAYER);
             g.AddKeyword("gui");
             menu.push_back(g);
             //menu.push_back(std::make_pair(m, g));
