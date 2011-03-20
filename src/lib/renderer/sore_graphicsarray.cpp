@@ -52,18 +52,21 @@ void SORE_Graphics::GraphicsArray::Clear()
 
 void SORE_Graphics::GraphicsArray::AddObject(GeometryChunkPtr geometry)
 {
-    size_t oldSize = vertices.size();
-
-    vertices.resize(vertices.size() + geometry->NumVertices());
-    memcpy(&vertices[oldSize], geometry->GetVertices(),
-           geometry->NumVertices()*sizeof(vertex));
-
-    //copy vertices into VBO, taking into account index renumbering
-    indices.resize(indices.size() + geometry->NumIndices());
-    for(unsigned short j=0;j<geometry->NumIndices();++j)
+    if(geometry->NumIndices() && geometry->NumVertices())
     {
-        unsigned short index = geometry->GetIndex(j) + oldSize;
-        indices.push_back(index);
+        size_t oldSize = vertices.size();
+
+        vertices.resize(vertices.size() + geometry->NumVertices());
+        memcpy(&vertices[oldSize], geometry->GetVertices(),
+               geometry->NumVertices()*sizeof(vertex));
+
+        //copy vertices into VBO, taking into account index renumbering
+        indices.resize(indices.size() + geometry->NumIndices());
+        for(unsigned short j=0;j<geometry->NumIndices();++j)
+        {
+            unsigned short index = geometry->GetIndex(j) + oldSize;
+            indices.push_back(index);
+        }
     }
 }
 

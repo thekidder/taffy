@@ -50,12 +50,12 @@ void SORE_Graphics::RenderBatch::AddIndices(unsigned int numIndices)
 unsigned int SORE_Graphics::RenderBatch::Render()
 {
     state.Apply();
-    if(bind)
+    if(geometry && numberIndices)
     {
-        geometry->BeginDraw();
-    }
-    if(geometry)
-    {
+        if(bind)
+        {
+            geometry->BeginDraw();
+        }
         unsigned int trisPerPoly;
         if(type == GL_POINTS)
             trisPerPoly = 1;
