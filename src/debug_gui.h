@@ -2,7 +2,7 @@
 #define DEBUG_GUI
 
 #include <sore_input.h>
-#include <sore_renderer_std.h>
+#include <sore_renderer.h>
 #include <sore_resource.h>
 #include <sore_renderstats.h>
 

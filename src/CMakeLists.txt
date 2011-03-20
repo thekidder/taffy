@@ -31,10 +31,23 @@ SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h.in)
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
 SET(${CMAKE_PROJECT_NAME}_SRCS 
-  debug_gui.cpp main.cpp state_default.cpp version_info.cpp app.rc)
+  debug_gui.cpp
+  fmod_pass_through_adapter.cpp
+  main.cpp
+  particle_system.cpp
+  sound_pass_through_buffer.cpp
+  state_default.cpp
+  version_info.cpp
+  app.rc)
 
 SET(${CMAKE_PROJECT_NAME}_HEADERS 
-  app_log.h debug_gui.h state_default.h ${CMAKE_VERSION_OUT})
+  app_log.h
+  debug_gui.h
+  fmod_pass_through_adapter.h
+  particle_system.h
+  sound_pass_through_buffer.h
+  state_default.h
+  ${CMAKE_VERSION_OUT})
 
 IF(UNIX)
   SET(CMAKE_CXX_FLAGS "-Wall")
