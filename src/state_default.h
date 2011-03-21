@@ -53,7 +53,7 @@ private:
 
     ParticleSystem* particles;
 
-    const static int kNumSpectrumWindows = 20;
+    const static int kNumSpectrumWindows = 16;
     float spectrum[kNumSpectrumWindows];
 };
 

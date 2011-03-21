@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-const int kFFTSamples = 512;
+const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
 DefaultState::DefaultState() 
@@ -146,7 +146,7 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
     //calculate mono fft
     for(int i = 0; i < kFFTSamples; ++i)
     {
-        timedata[i] = (buffer[i*2] + buffer[i*2 + 1]) / 2.0f;
+        timedata[i] = (buffer[i*2] + buffer[i*2]) / 2.0f;
     }
 
     kiss_fftr(kiss_cfg, timedata, freqdata);
@@ -159,16 +159,26 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
     // divide by two: only get resolution out of bottom half of fft
     const int samples = (kFFTSamples / 2);
     const int samples_per_window = samples / kNumSpectrumWindows;
-    // APP_LOG(SORE_Logging::LVL_INFO, boost::format("Need to analyze %d samples of width %d Hz (sample rate = %d)") % samples % (sample_rate / samples) % sample_rate);
-    for(int i = 0; i <= samples; ++i)
+    //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Need to analyze %d samples of width %d Hz (sample rate = %d)") % samples % (sample_rate / samples) % sample_rate);
+    for(int i = 0; i < samples; ++i)
     {
-        kiss_fft_scalar mag  = freqdata[i + 1].r * freqdata[i + 1].r + freqdata[i + 1].i * freqdata[i + 1].i;
-        spectrum[i / samples_per_window] += mag;
-        // APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[i].r % freqdata[i].i % mag);
+        int k = i+1; // first sample is average over all frequencies
+        kiss_fft_scalar mag  = freqdata[k].r * freqdata[k].r + freqdata[k].i * freqdata[k].i;
+        spectrum[i / samples_per_window] += log10(mag);
+        //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[k].r % freqdata[k].i % mag);
     }
 
     for(int i = 0; i < kNumSpectrumWindows; ++i)
     {
         spectrum[i] /= samples_per_window;
+    }
+
+    std::vector<Particle>& p = particles->Particles();
+    p.clear();
+
+    float width = 2.0f / kNumSpectrumWindows;
+    for(int i = 0; i < kNumSpectrumWindows; ++i)
+    {
+        p.push_back(Particle(-1.0f + width*i + width/2.0f, spectrum[i] / 8.0f, 0.0f, 48.0f));
     }
 }
