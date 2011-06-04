@@ -51,7 +51,8 @@ unsigned short int AddFile(boost::filesystem::path p, unsigned short int top, st
         temp.file = false;
     else
         temp.file = true;
-    strcpy(temp.filename, p.filename().c_str());
+
+	strcpy(temp.filename, p.filename().string().c_str());
     strcpy(temp.fullname, p.string().c_str());
 
     std::cout << "Adding " << prefix << temp.fullname << " to archive\n";
