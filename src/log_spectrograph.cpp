@@ -34,15 +34,15 @@ void LogSpectrograph::AddSamples(float* buffer, unsigned int length, int channel
     // divide by two: only get resolution out of bottom half of fft
     const int samples = (kFFTSamples / 2);
     // how much of the FFT data to analyze: only care about bottom 20k Hz
-    float fftFraction = kMaxHz / sampleRate;
-    const int samples_per_window = (int)((samples * fftFraction) / NumBuckets());
+    const double fftFraction = kMaxHz / sampleRate;
+    const double samples_per_window = (samples * fftFraction) / NumBuckets();
     //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Need to analyze %d samples of width %d Hz (sample rate = %d)") % samples % (sample_rate / samples) % sample_rate);
-    for(int i = 0; i < (int)(samples * fftFraction); ++i)
+    for(int i = 0; i < (int)(samples * fftFraction) - 1; ++i)
     {
         int k = i+1; // first sample is average over all frequencies
         kiss_fft_scalar mag  = freqdata[k].r * freqdata[k].r + freqdata[k].i * freqdata[k].i;
         if(mag > 0.0f)
-            Set(i / samples_per_window) += 20.0f * log10(mag);
+            Set(static_cast<int>(i / samples_per_window)) += 20.0f * log10(mag);
         //else
         //    Get(i / samples_per_window) += kDisplayRangeDB.first;
         //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[k].r % freqdata[k].i % mag);

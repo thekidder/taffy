@@ -92,8 +92,6 @@ void DefaultState::Init()
     listener->setBypass(false);
     system->addDSP(listener, 0);
     
-    
-
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
     glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -104,6 +102,15 @@ void DefaultState::Init()
 void DefaultState::Frame(int elapsed)
 {
     debug->Frame(elapsed);
+
+	
+    particles->ClearParticles();
+
+    float width = 2.0f / spectrum.NumBuckets();
+    for(int i = 0; i < spectrum.NumBuckets(); ++i)
+	{
+        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, -spectrum.Get(i), 0.0f, 48.0f));
+    }
 
     system->update();
 }
@@ -142,14 +149,6 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 {
     spectrum.AddSamples(buffer, length, channels);
-
-    particles->ClearParticles();
-
-    float width = 2.0f / spectrum.NumBuckets();
-    for(int i = 0; i < spectrum.NumBuckets(); ++i)
-	{
-        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, -spectrum.Get(i), 0.0f, 48.0f));
-    }
 }
 
 float mapToRange(float value, Float_range_t original, Float_range_t newRange)
