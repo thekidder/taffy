@@ -18,17 +18,21 @@ ParticleSystem::ParticleSystem(SORE_Graphics::Texture2DPtr t, SORE_Graphics::GLS
 
 void ParticleSystem::MakeUpToDate()
 {
-    UpdateGeometry();
-
-    if(particles.size())
     {
-        float size = particles.front().size;
-        geometry.front().Uniforms().SetVariable("pointSize", size);
-    }
+        boost::lock_guard<boost::mutex> lock(particle_mutex);
 
-    vbo.Clear();
-    vbo.AddObject(geometry.front().GetGeometryChunk());
-    vbo.Build();
+        UpdateGeometry();
+
+        if(particles.size())
+        {
+            float size = particles.front().size;
+            geometry.front().Uniforms().SetVariable("pointSize", size);
+        }
+
+        vbo.Clear();
+        vbo.AddObject(geometry.front().GetGeometryChunk());
+        vbo.Build();
+    }
 
     geometry_lookup.geometry = &vbo;
     geometry_lookup.offset = 0;
@@ -55,6 +59,18 @@ SORE_Graphics::geometry_entry ParticleSystem::LookupGC(SORE_Graphics::GeometryCh
 bool ParticleSystem::Contains(SORE_Graphics::GeometryChunkPtr gc)
 {
     return gc == geometry.front().GetGeometryChunk();
+}
+
+void ParticleSystem::ClearParticles()
+{
+    boost::lock_guard<boost::mutex> lock(particle_mutex);
+    particles.clear();
+}
+
+void ParticleSystem::AddParticle(const Particle& p)
+{
+    boost::lock_guard<boost::mutex> lock(particle_mutex);
+    particles.push_back(p);
 }
 
 void ParticleSystem::UpdateGeometry()

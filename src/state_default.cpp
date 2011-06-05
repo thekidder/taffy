@@ -8,11 +8,17 @@
 
 #include <cassert>
 
+typedef std::pair<float,float> Float_range_t;
+float mapToRange(float value, Float_range_t original, Float_range_t newRange);
+
 const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
+const Float_range_t kDisplayRangeDB(-60.0f, 60.0f);
+
 DefaultState::DefaultState() 
-    : top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer)
+    : top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
+    spectrum(44000, kFFTSamples, 20)
 {
 }
 
@@ -23,7 +29,7 @@ DefaultState::~DefaultState()
     delete particles;
     delete debug;
     delete top;
-    kiss_fftr_free(kiss_cfg);
+    
     system->release();
 }
 
@@ -86,7 +92,7 @@ void DefaultState::Init()
     listener->setBypass(false);
     system->addDSP(listener, 0);
     
-    kiss_cfg = kiss_fftr_alloc(kFFTSamples, 0, 0, 0);
+    
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
@@ -121,10 +127,12 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 {
     SORE_Graphics::ProjectionInfo proj;
     proj.type = SORE_Graphics::ORTHO2D;
-    proj.useScreenRatio = true;
+    proj.useScreenRatio = false;
     proj.useScreenCoords = false;
     proj.left = -1.0f;
     proj.right = 1.0f;
+    proj.bottom = -1.0f;
+    proj.top = 1.0f;
     
     SORE_Math::Matrix4<float> identity;
     SORE_Graphics::camera_info cam = {proj, identity};
@@ -133,52 +141,24 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 
 void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 {
-    int sample_rate;
-    system->getSoftwareFormat(&sample_rate, 0, 0, 0, 0, 0);
+    spectrum.AddSamples(buffer, length, channels);
 
-    assert(channels == 2);
-    assert(length == kFFTSamples * channels);
-    // APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got %d samples (%d channels)") % length % channels);
+    particles->ClearParticles();
 
-    kiss_fft_scalar timedata[kFFTSamples];
-    kiss_fft_cpx    freqdata[kFFTSamples/2 + 1];
-
-    //calculate mono fft
-    for(int i = 0; i < kFFTSamples; ++i)
-    {
-        timedata[i] = (buffer[i*2] + buffer[i*2]) / 2.0f;
+    float width = 2.0f / spectrum.NumBuckets();
+    for(int i = 0; i < spectrum.NumBuckets(); ++i)
+	{
+        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, -spectrum.Get(i), 0.0f, 48.0f));
     }
+}
 
-    kiss_fftr(kiss_cfg, timedata, freqdata);
+float mapToRange(float value, Float_range_t original, Float_range_t newRange)
+{
+    // map to a percentage (0,1)
+    float mag = (value - original.first) / (original.second - original.first);
+    // map percentage to new range
+    float transformed = newRange.first + (newRange.second - newRange.first) * mag;
 
-    for(int i = 0; i < kNumSpectrumWindows; ++i)
-    {
-        spectrum[i] = 0.0f;
-    }
-
-    // divide by two: only get resolution out of bottom half of fft
-    const int samples = (kFFTSamples / 2);
-    const int samples_per_window = samples / kNumSpectrumWindows;
-    //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Need to analyze %d samples of width %d Hz (sample rate = %d)") % samples % (sample_rate / samples) % sample_rate);
-    for(int i = 0; i < samples; ++i)
-    {
-        int k = i+1; // first sample is average over all frequencies
-        kiss_fft_scalar mag  = freqdata[k].r * freqdata[k].r + freqdata[k].i * freqdata[k].i;
-        spectrum[i / samples_per_window] += log10(mag);
-        //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[k].r % freqdata[k].i % mag);
-    }
-
-    for(int i = 0; i < kNumSpectrumWindows; ++i)
-    {
-        spectrum[i] /= samples_per_window;
-    }
-
-    std::vector<Particle>& p = particles->Particles();
-    p.clear();
-
-    float width = 2.0f / kNumSpectrumWindows;
-    for(int i = 0; i < kNumSpectrumWindows; ++i)
-    {
-        p.push_back(Particle(-1.0f + width*i + width/2.0f, spectrum[i] / 8.0f, 0.0f, 48.0f));
-    }
+    // clamp
+    return std::min(newRange.second, std::max(transformed, newRange.first));
 }

@@ -2,12 +2,11 @@
 #define STATE_DEFAULT
 
 #include "debug_gui.h"
+#include "log_spectrograph.h"
 #include "fmod_pass_through_adapter.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
 
-#include <kiss_fftr.h>
-//#include <sndfile.hh>
 #include <sore_topwidget.h>
 #include <sore_gamestate.h>
 #include <sore_input.h>
@@ -48,13 +47,9 @@ private:
     FMOD::Channel* channel;
     FMOD::DSP* listener;
 
-    kiss_fftr_cfg kiss_cfg;
-    //SndfileHandle sound;
+    LogSpectrograph spectrum;
 
     ParticleSystem* particles;
-
-    const static int kNumSpectrumWindows = 16;
-    float spectrum[kNumSpectrumWindows];
 };
 
 #endif

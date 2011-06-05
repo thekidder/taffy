@@ -6,6 +6,9 @@
 #include <sore_geometryprovider.h>
 #include <sore_vbo.h>
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <vector>
 
 struct Particle
@@ -30,7 +33,8 @@ public:
 
     SORE_Graphics::BufferManager* GetBufferManager() { return this; }
 
-    std::vector<Particle>& Particles() { return particles; }
+    void ClearParticles();
+    void AddParticle(const Particle& p);
 private:
     void UpdateGeometry();
     std::vector<Particle> particles;
@@ -41,6 +45,8 @@ private:
     std::vector<SORE_Graphics::Renderable> geometry;
     SORE_Graphics::geometry_entry geometry_lookup;
     SORE_Graphics::VBO vbo;
+
+    boost::mutex particle_mutex;
 };
 
 #endif

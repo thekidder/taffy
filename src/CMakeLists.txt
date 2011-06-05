@@ -2,18 +2,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(Boost_USE_STATIC_LIBS ON)
 
-FIND_PACKAGE(Boost COMPONENTS signals REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS signals thread date_time REQUIRED)
 FIND_PACKAGE(FMODEX REQUIRED)
 FIND_PACKAGE(Freetype REQUIRED)
 IF(UNIX)
   FIND_PACKAGE(Fontconfig REQUIRED)  
 ENDIF(UNIX)
 FIND_PACKAGE(GLEW REQUIRED)
-FIND_PACKAGE(OpenAL REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SORE REQUIRED)
-FIND_PACKAGE(LibSndFile REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
@@ -33,9 +31,11 @@ CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 SET(${CMAKE_PROJECT_NAME}_SRCS 
   debug_gui.cpp
   fmod_pass_through_adapter.cpp
+  log_spectrograph.cpp
   main.cpp
   particle_system.cpp
   sound_pass_through_buffer.cpp
+  spectrograph.cpp
   state_default.cpp
   version_info.cpp
   app.rc)
@@ -44,8 +44,10 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
   debug_gui.h
   fmod_pass_through_adapter.h
+  log_spectrograph.h
   particle_system.h
   sound_pass_through_buffer.h
+  spectrograph.h
   state_default.h
   ${CMAKE_VERSION_OUT})
 
@@ -79,8 +81,6 @@ TARGET_LINK_LIBRARIES(
   ${FONTCONFIG_LIBRARIES}
   ${FREETYPE_LIBRARY}
   ${GLEW_LIBRARY}
-  ${LIBSNDFILE_LIBRARY}
-  ${OPENAL_LIBRARY}
   ${OPENGL_gl_LIBRARY}
   ${OPENGL_glu_LIBRARY}
   ${SDL_LIBRARY}
