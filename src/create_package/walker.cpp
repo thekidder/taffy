@@ -40,6 +40,10 @@
 
 #include "walker.h"
 
+// disable warnings about strcpy v strcpy_s
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 unsigned short int AddFile(boost::filesystem::path p, unsigned short int top, std::string prefix, file_list& files)
 {
     file_info temp;
@@ -87,3 +91,5 @@ void Walk(boost::filesystem::path p, unsigned short int top, std::string prefix,
         }
     }
 }
+
+#pragma warning(pop)

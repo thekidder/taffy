@@ -32,6 +32,10 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+// disable warning about std::copy being called unsafely in CompressedPkgFileBuf::read
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -40,6 +44,8 @@
 #include <map>
 #include <string>
 #include <vector>
+
+#pragma warning(pop)
 
 #include <zlib.h>
 
@@ -388,10 +394,10 @@ namespace SORE_FileIO
             unsigned int toRead = (sizeRaw+pos)-currentPos;
             toRead = std::min(toRead, CHUNK);
             package.read(in, toRead);
-            size_t num_in = package.gcount();
+            unsigned int num_in = static_cast<unsigned int>(package.gcount());
             currentPos += num_in;
 
-            strm.avail_in = num_in;
+            strm.avail_in = static_cast<uInt>(num_in);
             strm.next_in = reinterpret_cast<Bytef*>(in);
 
             do
@@ -419,8 +425,9 @@ namespace SORE_FileIO
         unsigned int have = std::min(static_cast<unsigned int>(n), num_out);
         if(have < n)
             eof = true;
+
         std::copy(out.begin(), out.begin() + have, s);
-        std::copy(out.begin() + have, out.end(), out.begin());
+        out.erase(out.begin(), out.begin() + have);
         num_out -= have;
         return have;
     }
@@ -496,7 +503,7 @@ namespace SORE_FileIO
             std::streampos begin = in->tellg();
             in->seekg(0, std::ios::end);
             std::streampos end = in->tellg();
-            size_t size = end - begin;
+            size_t size = static_cast<size_t>(end - begin);
             in->seekg(cur);
             return size;
         }

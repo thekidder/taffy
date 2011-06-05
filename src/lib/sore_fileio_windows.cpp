@@ -125,9 +125,13 @@ static void CALLBACK MonitorCallback(DWORD dwErrorCode,
 
 static bool RefreshMonitoring(HDIR_MONITOR* pMonitor)
 {
-    return ReadDirectoryChangesW(pMonitor->hDir, pMonitor->buffer, 32*1024, FALSE,
+    // disable warning about forcing bool value to true/false
+#pragma warning(push)
+#pragma warning(disable: 4800)
+    return ReadDirectoryChangesW(pMonitor->hDir, pMonitor->buffer, 32*1024, false, 
         FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
-        NULL, &pMonitor->ol, MonitorCallback);
+        0, &pMonitor->ol, MonitorCallback);
+#pragma warning(pop)
 }
 
 void StopMonitoring(HDIR_MONITOR* pMonitor)

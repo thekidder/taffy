@@ -105,7 +105,7 @@ void SORE_Font::Font::Load()
     fontInfo = new FT_Byte[size];
 
     fontObj->strm().read(reinterpret_cast<char*>(fontInfo), size);
-    err = fontObj->strm().gcount();
+    err = static_cast<size_t>(fontObj->strm().gcount());
     delete fontObj;
 
     if(err != size)

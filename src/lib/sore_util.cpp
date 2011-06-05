@@ -105,7 +105,7 @@ namespace SORE_Utility
             const static unsigned int max_len = 128;
             char dataStr[max_len];
             file.strm().getline(dataStr, max_len);
-            len = file.strm().gcount();
+            len = static_cast<size_t>(file.strm().gcount());
 
             std::string currSection;
 
@@ -147,7 +147,7 @@ namespace SORE_Utility
                     }
                 }
                 file.strm().getline(dataStr, max_len);
-                len = file.strm().gcount();
+                len = static_cast<size_t>(file.strm().gcount());
             }
         }
         return list;

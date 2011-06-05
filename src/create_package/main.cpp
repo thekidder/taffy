@@ -52,6 +52,10 @@
 
 using namespace std;
 
+// disable warnings about fopen v fopen_s
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 void showHelp(const char* program_name, boost::program_options::options_description options)
 {
     std::cout << "Usage: " << program_name << " [OPTIONS] output-file input-files\n";
@@ -305,3 +309,5 @@ cout << "Finished writing file table, now copying data...\n";
 
     return 0;
 }
+
+#pragma warning(pop)
