@@ -15,6 +15,7 @@ const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
 const Float_range_t kDisplayRangeDB(-60.0f, 60.0f);
+const Float_range_t kDisplayRangeScreen(-1.0f, 1.0f);
 
 DefaultState::DefaultState() 
     : top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
@@ -103,13 +104,14 @@ void DefaultState::Frame(int elapsed)
 {
     debug->Frame(elapsed);
 
-	
     particles->ClearParticles();
 
     float width = 2.0f / spectrum.NumBuckets();
     for(int i = 0; i < spectrum.NumBuckets(); ++i)
 	{
-        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, -spectrum.Get(i), 0.0f, 48.0f));
+        float z = -spectrum.Get(i);
+        z = mapToRange(z, kDisplayRangeDB, kDisplayRangeScreen);
+        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, z, 0.0f, 48.0f));
     }
 
     system->update();

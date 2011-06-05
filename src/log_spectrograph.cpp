@@ -43,18 +43,13 @@ void LogSpectrograph::AddSamples(float* buffer, unsigned int length, int channel
         kiss_fft_scalar mag  = freqdata[k].r * freqdata[k].r + freqdata[k].i * freqdata[k].i;
         if(mag > 0.0f)
             Set(static_cast<int>(i / samples_per_window)) += 20.0f * log10(mag);
-        //else
-        //    Get(i / samples_per_window) += kDisplayRangeDB.first;
         //APP_LOG(SORE_Logging::LVL_INFO, boost::format("Got sample: (%f, %f) magnitude %f") % freqdata[k].r % freqdata[k].i % mag);
     }
 
     for(int i = 0; i < NumBuckets(); ++i)
     {
+        // average each bucket
         Set(i) /= samples_per_window;
-        // we are on a dB scale: something like -60 - 0 dB on a log scale
-        // let's map (-60,0) to (-1,1)
-        // Get(i) = mapToRange(spectrum[i], kDisplayRangeDB, std::make_pair(-1.0f, 1.0f));
-        // APP_LOG(SORE_Logging::LVL_INFO, boost::format("Final sample for freq %dHz: %f") % ((i + 1) * (fftFraction * sample_rate / kNumSpectrumWindows)) %  spectrum[i]);
     }
 }
 
