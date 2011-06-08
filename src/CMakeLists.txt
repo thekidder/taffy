@@ -29,25 +29,31 @@ SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_version.h.in)
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
 SET(${CMAKE_PROJECT_NAME}_SRCS 
+  app.rc
+  compressed_spectrum.cpp
   debug_gui.cpp
   fmod_pass_through_adapter.cpp
-  log_spectrograph.cpp
+  fmod_spectrum.cpp
+  geometric_spectrum.cpp
+  kiss_spectrum.cpp
   main.cpp
   particle_system.cpp
   sound_pass_through_buffer.cpp
-  spectrograph.cpp
+  spectrum.cpp
   state_default.cpp
-  version_info.cpp
-  app.rc)
+  version_info.cpp)
 
-SET(${CMAKE_PROJECT_NAME}_HEADERS 
+SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
+  compressed_spectrum.h
   debug_gui.h
   fmod_pass_through_adapter.h
-  log_spectrograph.h
+  fmod_spectrum.h
+  geometric_spectrum.h
+  kiss_spectrum.h
   particle_system.h
   sound_pass_through_buffer.h
-  spectrograph.h
+  spectrum.h
   state_default.h
   ${CMAKE_VERSION_OUT})
 

@@ -28,6 +28,7 @@ public:
     std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
     std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
+    void Regenerate();
     SORE_Graphics::geometry_entry LookupGC(SORE_Graphics::GeometryChunkPtr gc);
     bool Contains(SORE_Graphics::GeometryChunkPtr gc);
 

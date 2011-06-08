@@ -2,8 +2,9 @@
 #define STATE_DEFAULT
 
 #include "debug_gui.h"
-#include "log_spectrograph.h"
+#include "kiss_spectrum.h"
 #include "fmod_pass_through_adapter.h"
+#include "geometric_spectrum.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
 
@@ -19,6 +20,8 @@ namespace FMOD
     class System;
 };
 
+class FMOD_Spectrum;
+
 class DefaultState : public SORE_Game::Gamestate
 {
 public:
@@ -28,7 +31,8 @@ public:
     void Frame(int elapsed);
     const char* GetName() const {return "Default state";}
 private:
-    bool HandleEscapeKey(SORE_Kernel::Event* e);
+    bool HandleKeyboard(SORE_Kernel::Event* e);
+    bool HandleResize(SORE_Kernel::Event* e);
     void Init();
     void Quit();
 
@@ -47,7 +51,22 @@ private:
     FMOD::Channel* channel;
     FMOD::DSP* listener;
 
-    LogSpectrograph spectrum;
+    KISS_Spectrum* kiss_spectrum;
+    FMOD_Spectrum* fmod_spectrum;
+
+    GeometricSpectrum* kiss_g_spectrum;
+    GeometricSpectrum* fmod_g_spectrum;
+
+    bool use_kiss;
+
+    enum Channel_e
+    {
+        LEFT,
+        RIGHT,
+        MIX
+    };
+
+    Channel_e display_channel;
 
     ParticleSystem* particles;
 };

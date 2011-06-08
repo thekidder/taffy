@@ -4,7 +4,7 @@
 #include <cstring>
 
 // size of the internal buffer as related to the requested buffer callback length
-const int BUFFER_LEN_MULTIPLIER = 4;
+const int BUFFER_LEN_MULTIPLIER = 4; // up this if we assert in AddSamples
 
 SoundPassThroughBuffer::SoundPassThroughBuffer(int callback_length_, int channels_)
     : callback_length(callback_length_), channels(channels_), buffer_add_pos(0),
@@ -30,7 +30,10 @@ void SoundPassThroughBuffer::AddSamples(float* input, unsigned int length, int c
     memcpy(buffer + buffer_add_pos, input, length * channels * 4);
     buffer_add_pos += length * channels;
 
-    if(buffer_add_pos >= callback_length * channels)
+    // this loop ensures we analyse all data we get. this is probably unnessecary: we can probably
+    // just discard the remaining data and start from scratch once we call the callback, or discard data
+    // so that we run the FFT once every frame
+    while(buffer_add_pos >= callback_length * channels) 
     {
         callback(buffer, callback_length, channels);
         //move unused samples to beginning of buffer
