@@ -12,7 +12,7 @@
 typedef std::pair<float,float> Float_range_t;
 float mapToRange(float value, Float_range_t original, Float_range_t newRange);
 
-const int kFFTSamples = 128;
+const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
 const Float_range_t kDisplayRangeDBFMOD(-60.0f, 0.0f);

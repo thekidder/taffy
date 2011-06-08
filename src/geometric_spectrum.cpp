@@ -33,8 +33,6 @@ GeometricSpectrum::GeometricSpectrum(Spectrum& source_, size_t num_buckets_)
         min_bucket = max_bucket + 1;
         min_rate = max_rate;
     }
-
-    ;
 }
 
 float GeometricSpectrum::Left(size_t bucket) const
