@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_glslshader.h>
+#include <sore_graphics.h>
 #include <sore_util.h>
 
 namespace SORE_Graphics
@@ -91,12 +92,6 @@ namespace SORE_Graphics
         : Resource(SORE_Resource::WatchedFileArrayPtr(
                        new SORE_Resource::WatchedFileArray(pc)))
     {
-        ok = false;
-        linked = false;
-        if(!initCalled)
-            InitShaders();
-        if(!ShadersSupported())
-            return;
         Init();
         AddVertexFile(vertex);
         AddFragmentFile(fragment);
@@ -111,12 +106,6 @@ namespace SORE_Graphics
 
     void GLSLShader::Load()
     {
-        ok = false;
-        linked = false;
-        if(!initCalled)
-            InitShaders();
-        if(!ShadersSupported())
-            return;
         Init();
         SORE_FileIO::InFile* in = File();
         std::map<std::string, std::map<std::string, std::string> > list =
@@ -151,12 +140,7 @@ namespace SORE_Graphics
         ok = true;
         Link();
         Bind();
-        GLenum error;
-        while((error=glGetError())!=GL_NO_ERROR)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
-                       boost::format("Shader: GL Error: %d") % error);
-        }
+        SORE_Graphics::PrintGLErrors(SORE_Logging::LVL_ERROR);
         UnbindShaders();
     }
 
@@ -224,6 +208,8 @@ namespace SORE_Graphics
 
     int GLSLShader::Init()
     {
+        if(!initCalled)
+            InitShaders();
         if(!ShadersSupported())
         {
             program = 0;
@@ -232,8 +218,12 @@ namespace SORE_Graphics
                        "supported on this system)");
             return 1;
         }
-        uniforms.clear();
+        vertexShaders.clear();
+        fragmentShaders.clear();
         program = glCreateProgramObjectARB();
+        ok = linked = false;
+        uniforms.clear();
+        attributes.clear();
         if(program == 0)
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program");

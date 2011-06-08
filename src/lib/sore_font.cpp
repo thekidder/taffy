@@ -124,6 +124,10 @@ void SORE_Font::Font::Load()
                        "Font load failed: Freetype error code %d") % err);
         return;
     }
+
+    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format(
+                       "Loaded face %s") % GetFilename());
+
     return;
 }
 
