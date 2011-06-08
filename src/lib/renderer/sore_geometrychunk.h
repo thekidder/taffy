@@ -48,10 +48,10 @@ namespace SORE_Graphics
 {
     struct vertex
     {
-        float x, y, z;
         float tex0i, tex0j;
-        float normx, normy, normz;
         float r, g, b, a;
+        float normx, normy, normz;
+        float x, y, z;
     };
 
     class SORE_EXPORT GeometryChunk

@@ -35,6 +35,8 @@
 #include <sore_graphicsarray.h>
 #include <sore_logger.h>
 
+#include <cstddef>
+
 SORE_Graphics::GraphicsArray::GraphicsArray(geometry_type type, bool t, bool c, bool n)
   : hasTexCoords(t), hasNormals(n), hasColors(c), type(type)
 {
@@ -78,20 +80,20 @@ void SORE_Graphics::GraphicsArray::BeginDraw()
 {
     BeginDrawHook();
 
-    glVertexPointer(3, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 0));
+    glVertexPointer(3, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), offsetof(vertex, x)));
     if(hasTexCoords)
     {
         glClientActiveTexture(GL_TEXTURE0);
         glTexCoordPointer(2, GL_FLOAT, sizeof(vertex),
-                          GetOffset(&(vertices[0]), 12));
+                          GetOffset(&(vertices[0]), offsetof(vertex, tex0i)));
     }
     if(hasNormals)
     {
-        glNormalPointer(GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 20));
+        glNormalPointer(GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), offsetof(vertex, normx)));
     }
     if(hasColors)
     {
-        glColorPointer(4, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), 32));
+        glColorPointer(4, GL_FLOAT, sizeof(vertex), GetOffset(&(vertices[0]), offsetof(vertex, r)));
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
