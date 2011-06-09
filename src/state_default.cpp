@@ -22,7 +22,7 @@ DefaultState::DefaultState()
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), last_frame(0),
-    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 500),
+    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 2, 500),
     imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
@@ -167,7 +167,8 @@ void DefaultState::Frame(int elapsed)
             flux += diff;
         }
         flux /= spectrum->NumBuckets();
-        beat_visualizer.AddDatum(flux);
+        beat_visualizer.AddDatum(0, flux);
+        beat_visualizer.AddDatum(1, 0.0f);
     }
 
 
