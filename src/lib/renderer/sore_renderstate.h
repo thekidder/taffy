@@ -60,6 +60,7 @@ namespace SORE_Graphics
         const static unsigned int RENDER_CMD_BIND_SHADER       = 4;
         const static unsigned int RENDER_CMD_BIND_TEXTURE      = 8;
         const static unsigned int RENDER_CMD_CHANGE_UNIFORMS   = 16;
+        const static unsigned int RENDER_CMD_CHANGE_PRIMITIVE  = 32;
 
         void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera) const;
         void ChangeProjectionMatrix(const ProjectionInfo& proj) const;
