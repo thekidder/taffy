@@ -16,6 +16,7 @@ public:
     int SampleRate() const { return sample_rate; }
 
     virtual float Value(size_t bucket, Audio_channel channel) const;
+    virtual const SpectrumSnapshot& Snapshot() const;
 protected:
     void Clear();
     void SetSnapshot(const SpectrumSnapshot& new_snapshot);

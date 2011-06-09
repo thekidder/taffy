@@ -17,6 +17,11 @@ float FFTSpectrum::Value(size_t bucket, Audio_channel channel) const
     return current_snapshot.Value(bucket, channel);
 }
 
+const SpectrumSnapshot& FFTSpectrum::Snapshot() const
+{
+    return current_snapshot;
+}
+
 void FFTSpectrum::SetSnapshot(const SpectrumSnapshot& new_snapshot)
 {
     // spectrum can not change sizes
