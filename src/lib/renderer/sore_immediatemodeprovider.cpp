@@ -34,6 +34,10 @@
 
 #include <sore_immediatemodeprovider.h>
 
+#include <set>
+#include <iterator>
+#include <sstream>
+
 SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Graphics::Texture2DPtr default_texture, SORE_Graphics::GLSLShaderPtr default_shader)
     : current_texture(default_texture), current_shader(default_shader), current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
 {
@@ -82,7 +86,6 @@ void SORE_Graphics::ImmediateModeProvider::DrawQuad(
     float x3, float y3, float z3,
     float x4, float y4, float z4)
 {
-    SetKeyword("game");
     unsigned short current_index = SetupDraw(GL_TRIANGLES);
 
     SetTexCoords(0.0f, 0.0f);
@@ -110,7 +113,6 @@ void SORE_Graphics::ImmediateModeProvider::DrawLine(
     float x1, float y1, float z1,
     float x2, float y2, float z2)
 {
-    SetKeyword("game");
     unsigned short current_index = SetupDraw(GL_LINES);
 
     SetTexCoords(0.0f, 0.0f);
@@ -123,9 +125,8 @@ void SORE_Graphics::ImmediateModeProvider::DrawLine(
     indices.push_back(current_index + 1);
 }
 
-void SORE_Graphics::ImmediateModeProvider::DrawString(int x, int y, SORE_Font::Font& face, unsigned int height, const std::string& string)
+void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, SORE_Font::Font& face, unsigned int height, const std::string& string)
 {
-    SetKeyword("gui");
     SetupDraw(GL_TRIANGLES);
 
     float advance = 0.0f;
@@ -192,12 +193,12 @@ void SORE_Graphics::ImmediateModeProvider::SetTexCoords(float i, float j)
     current_texcoords.second = j;
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetKeyword(const std::string& keyword_)
+void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords_)
 {
-    if(keyword != keyword_)
+    if(keywords != keywords_)
         CreateRenderableFromData();
 
-    keyword = keyword_;
+    keywords = keywords_;
 }
 
 void SORE_Graphics::ImmediateModeProvider::AddVertex(float x, float y, float z)
@@ -250,7 +251,16 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
 
     Renderable r(geometry, current_shader, SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float> ()), current_blend_mode);
     r.AddTexture("texture", current_texture);
-    r.AddKeyword(keyword);
+
+    std::set<std::string> keyword_list;
+
+    std::istringstream iss(keywords);
+    std::copy(
+        std::istream_iterator<std::string>(iss),
+        std::istream_iterator<std::string>(),
+        std::insert_iterator<std::set<std::string> >(keyword_list,keyword_list.begin()));
+    for(std::set<std::string>::iterator it = keyword_list.begin(); it != keyword_list.end(); ++it)
+        r.AddKeyword(*it);
 
     renderables.push_back(r);
 

@@ -55,10 +55,10 @@ namespace SORE_Graphics
         void SetColor(SORE_Graphics::Color color);
         void SetBlendMode(SORE_Graphics::blend_mode blend_mode);
         void SetPrimitiveType(GLenum type);
+        void SetKeywords(const std::string& keywords_);
 
         void Start();
 
-        // game coordinates
         void DrawQuad(
             float x1, float y1, float z1,
             float x2, float y2, float z2,
@@ -67,9 +67,7 @@ namespace SORE_Graphics
         void DrawLine(
             float x1, float y1, float z1,
             float x2, float y2, float z2);
-
-        // screen coordinates
-        void DrawString(int x, int y, SORE_Font::Font& face, unsigned int height, const std::string& string);
+        void DrawString(float x, float y, SORE_Font::Font& face, unsigned int height, const std::string& string);
 
         // geometry provider interface
         void MakeUpToDate();
@@ -82,7 +80,6 @@ namespace SORE_Graphics
         SORE_Graphics::BufferManager* GetBufferManager() { return &buffer_manager; }
     private:
         void SetTexCoords(float i, float j);
-        void SetKeyword(const std::string& keyword_);
         void AddVertex(float x, float y, float z);
         void AddVertex(const vertex& v);
 
@@ -97,7 +94,7 @@ namespace SORE_Graphics
         SORE_Graphics::blend_mode current_blend_mode;
         GLenum current_primitive_type;
         std::pair<float, float> current_texcoords;
-        std::string keyword;
+        std::string keywords;
 
         std::vector<SORE_Graphics::vertex> vertices;
         std::vector<unsigned short> indices;
