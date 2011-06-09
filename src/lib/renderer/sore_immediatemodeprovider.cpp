@@ -1,0 +1,259 @@
+/**************************************************************************
+ * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ *                                                                        *
+ * Redistribution and use in source and binary forms, with or without     *
+ * modification, are permitted provided that the following conditions     *
+ * are met:                                                               *
+ *                                                                        *
+ *    1. Redistributions of source code must retain the above             *
+ *       copyright notice, this list of conditions and the following      *
+ *       disclaimer.                                                      *
+ *                                                                        *
+ *    2. Redistributions in binary form must reproduce the above          *
+ *       copyright notice, this list of conditions and the following      *
+ *       disclaimer in the documentation and/or other materials           *
+ *       provided with the distribution.                                  *
+ *                                                                        *
+ * THIS SOFTWARE IS PROVIDED BY ADAM KIDDER ``AS IS'' AND ANY             *
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE      *
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR     *
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ADAM KIDDER OR        *
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,  *
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,    *
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR     *
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY    *
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT           *
+ * (INCLUDING ENGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  *
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   *
+ *                                                                        *
+ * The views and conclusions contained in the software and documentation  *
+ * are those of the authors and should not be interpreted as              *
+ * representing official policies, either expressed or implied, of        *
+ * Adam Kidder.                                                           *
+ **************************************************************************/
+
+#include <sore_immediatemodeprovider.h>
+
+SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Graphics::Texture2DPtr default_texture, SORE_Graphics::GLSLShaderPtr default_shader)
+    : current_texture(default_texture), current_shader(default_shader), current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
+{
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Graphics::Texture2DPtr texture)
+{
+    CreateRenderableFromData();
+    current_texture = texture;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Graphics::GLSLShaderPtr shader)
+{
+    CreateRenderableFromData();
+    current_shader = shader;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
+{
+    current_color = color;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetBlendMode(SORE_Graphics::blend_mode blend_mode)
+{
+    CreateRenderableFromData();
+    current_blend_mode = blend_mode;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
+{
+    CreateRenderableFromData();
+    current_primitive_type = type;
+}
+
+void SORE_Graphics::ImmediateModeProvider::Start()
+{
+    buffer_manager.Clear();
+    renderables.clear();
+    vertices.clear();
+    indices.clear();
+}
+
+void SORE_Graphics::ImmediateModeProvider::DrawQuad(
+    float x1, float y1, float z1,
+    float x2, float y2, float z2,
+    float x3, float y3, float z3,
+    float x4, float y4, float z4)
+{
+    SetKeyword("game");
+    unsigned short current_index = SetupDraw(GL_TRIANGLES);
+
+    SetTexCoords(0.0f, 0.0f);
+    AddVertex(x1, y1, z1);
+
+    SetTexCoords(0.0f, 1.0f);
+    AddVertex(x2, y2, z2);
+
+    SetTexCoords(1.0f, 0.0f);    
+    AddVertex(x3, y3, z3);
+
+    SetTexCoords(1.0f, 1.0f);
+    AddVertex(x4, y4, z4);
+
+    // add two triangles
+    indices.push_back(current_index);
+    indices.push_back(current_index + 1);
+    indices.push_back(current_index + 2);
+    indices.push_back(current_index + 2);
+    indices.push_back(current_index + 1);
+    indices.push_back(current_index + 3);
+}
+
+void SORE_Graphics::ImmediateModeProvider::DrawLine(
+    float x1, float y1, float z1,
+    float x2, float y2, float z2)
+{
+    SetKeyword("game");
+    unsigned short current_index = SetupDraw(GL_LINES);
+
+    SetTexCoords(0.0f, 0.0f);
+    AddVertex(x1, y1, z1);
+
+    SetTexCoords(0.0f, 1.0f);
+    AddVertex(x2, y2, z2);
+
+    indices.push_back(current_index);
+    indices.push_back(current_index + 1);
+}
+
+void SORE_Graphics::ImmediateModeProvider::DrawString(int x, int y, SORE_Font::Font& face, unsigned int height, const std::string& string)
+{
+    SetKeyword("gui");
+    SetupDraw(GL_TRIANGLES);
+
+    float advance = 0.0f;
+    for(std::string::const_iterator it = string.begin(); it != string.end(); ++it)
+    {
+        vertex temp[4];
+        const vertex* src = face.GetCharacter(height, *it).vertices;
+        std::copy(src, src + 4, temp);
+
+        for(int i = 0; i < 4; ++i)
+        {
+            temp[i].r = current_color.GetComponent(RED);
+            temp[i].g = current_color.GetComponent(GREEN);
+            temp[i].b = current_color.GetComponent(BLUE);
+            temp[i].a = current_color.GetComponent(ALPHA);
+
+            temp[i].x += x + advance;
+            temp[i].y += y;
+        }
+
+        SetTexture(face.GetCharacter(height, *it).texture);
+        unsigned short current_index = vertices.size();
+        AddVertex(temp[0]);
+        AddVertex(temp[1]);
+        AddVertex(temp[2]);
+        AddVertex(temp[3]);
+
+        // add two triangles
+        indices.push_back(current_index);
+        indices.push_back(current_index + 1);
+        indices.push_back(current_index + 2);
+        indices.push_back(current_index + 2);
+        indices.push_back(current_index + 1);
+        indices.push_back(current_index + 3);
+
+        advance += face.GetCharacter(height, *it).advance;
+    }
+}
+
+void SORE_Graphics::ImmediateModeProvider::MakeUpToDate()
+{
+    CreateRenderableFromData();
+    buffer_manager.MakeUpToDate();
+}
+
+std::vector<SORE_Graphics::Renderable>::iterator SORE_Graphics::ImmediateModeProvider::GeometryBegin()
+{
+    return renderables.begin();
+}
+
+std::vector<SORE_Graphics::Renderable>::iterator SORE_Graphics::ImmediateModeProvider::GeometryEnd()
+{
+    return renderables.end();
+}
+
+void SORE_Graphics::ImmediateModeProvider::Regenerate()
+{
+    buffer_manager.Regenerate();
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetTexCoords(float i, float j)
+{
+    current_texcoords.first = i;
+    current_texcoords.second = j;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetKeyword(const std::string& keyword_)
+{
+    if(keyword != keyword_)
+        CreateRenderableFromData();
+
+    keyword = keyword_;
+}
+
+void SORE_Graphics::ImmediateModeProvider::AddVertex(float x, float y, float z)
+{
+    vertex temp;
+    temp.r = current_color.GetComponent(RED);
+    temp.g = current_color.GetComponent(GREEN);
+    temp.b = current_color.GetComponent(BLUE);
+    temp.a = current_color.GetComponent(ALPHA);
+
+    temp.tex0i = current_texcoords.first;
+    temp.tex0j = current_texcoords.second;
+
+    temp.x = x;
+    temp.y = y;
+    temp.z = z;
+
+    vertices.push_back(temp);
+}
+
+void SORE_Graphics::ImmediateModeProvider::AddVertex(const vertex& v)
+{
+    vertices.push_back(v);
+}
+
+unsigned short SORE_Graphics::ImmediateModeProvider::SetupDraw(GLenum primitive_type)
+{
+    if(current_primitive_type != primitive_type)
+        SetPrimitiveType(primitive_type);
+
+    if(indices.size() + 6 >= 65535)
+        CreateRenderableFromData();
+
+    if(vertices.size() + 6 >= 65535)
+        CreateRenderableFromData();
+
+    return vertices.size();
+}
+
+void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
+{
+    if(!indices.size())
+        return;
+
+    GeometryChunkPtr geometry(new SORE_Graphics::GeometryChunk(vertices.size(), indices.size(), current_primitive_type));
+    std::copy(vertices.begin(), vertices.end(), geometry->GetVertices());
+    std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
+
+    buffer_manager.GeometryAdded(geometry, SORE_Graphics::STREAM);
+
+    Renderable r(geometry, current_shader, SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float> ()), current_blend_mode);
+    r.AddTexture("texture", current_texture);
+    r.AddKeyword(keyword);
+
+    renderables.push_back(r);
+
+    vertices.clear();
+    indices.clear();
+}

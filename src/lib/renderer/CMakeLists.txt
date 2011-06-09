@@ -7,6 +7,7 @@ set(SORE_RENDERER_SRCS
     renderer/sore_gl_command_list.cpp
     renderer/sore_geometrychunk.cpp renderer/sore_geometryprovider.cpp
     renderer/sore_graphics.cpp renderer/sore_graphicsarray.cpp
+    renderer/sore_immediatemodeprovider.cpp
     renderer/sore_pipe.cpp
     renderer/sore_pipeline_renderer.cpp
     renderer/sore_renderable.cpp renderer/sore_renderer.cpp
@@ -28,6 +29,7 @@ set(SORE_RENDERER_HEADERS
     renderer/sore_geometrychunk.h
     renderer/sore_geometryprovider.h renderer/sore_graphics.h
     renderer/sore_graphicsarray.h
+    renderer/sore_immediatemodeprovider.h
     renderer/sore_pipe.h
     renderer/sore_pipeline_renderer.h renderer/sore_renderable.h
     renderer/sore_renderer.h

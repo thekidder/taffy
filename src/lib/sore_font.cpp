@@ -246,6 +246,32 @@ void SORE_Font::Font::LoadFace(unsigned int height)
                 bounds, texCoords, 0.0f, textures[height], shader,
                 SORE_Graphics::BLEND_SUBTRACTIVE);
             characters[height][i].renderable.SetTransform(buffers[i].transform);
+
+            characters[height][i].texture = textures[height];
+
+            characters[height][i].vertices[0].x     = buffers[i].transform->GetData()[12];
+            characters[height][i].vertices[0].y     = buffers[i].transform->GetData()[13];
+            characters[height][i].vertices[0].z     = 0.0f;
+            characters[height][i].vertices[0].tex0i = xMin;
+            characters[height][i].vertices[0].tex0j = yMin;
+
+            characters[height][i].vertices[1].x     = buffers[i].transform->GetData()[12];
+            characters[height][i].vertices[1].y     = buffers[i].transform->GetData()[13] + buffers[i].height;
+            characters[height][i].vertices[1].z     = 0.0f;
+            characters[height][i].vertices[1].tex0i = xMin;
+            characters[height][i].vertices[1].tex0j = yMax;
+
+            characters[height][i].vertices[2].x     = buffers[i].transform->GetData()[12] + buffers[i].width;
+            characters[height][i].vertices[2].y     = buffers[i].transform->GetData()[13];
+            characters[height][i].vertices[2].z     = 0.0f;
+            characters[height][i].vertices[2].tex0i = xMax;
+            characters[height][i].vertices[2].tex0j = yMin;
+
+            characters[height][i].vertices[3].x     = buffers[i].transform->GetData()[12] + buffers[i].width;
+            characters[height][i].vertices[3].y     = buffers[i].transform->GetData()[13] + buffers[i].height;
+            characters[height][i].vertices[3].z     = 0.0f;
+            characters[height][i].vertices[3].tex0i = xMax;
+            characters[height][i].vertices[3].tex0j = yMax;
         }
     }
 
@@ -327,6 +353,23 @@ const SORE_Font::CharInfo& SORE_Font::Font::GetCharacter(unsigned int height, ch
         }
         return characters[height][static_cast<unsigned int>(c)];
     }
+}
+
+float SORE_Font::Font::Width(unsigned int height, const std::string str)
+{
+    if(characters.find(height)==characters.end())
+    {
+        ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Loading face for height %d") % height);
+        LoadFace(height);
+    }
+
+    float width = 0.0f;
+    for(std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+    {
+        const SORE_Font::CharInfo& c = GetCharacter(height, *it);
+        width += c.advance;
+    }
+    return width;
 }
 
 std::string SORE_Font::FontPaths::GetFontPath(const std::string& name)
