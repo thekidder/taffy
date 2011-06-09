@@ -6,6 +6,7 @@
 #include "fmod_pass_through_adapter.h"
 #include "immediate_mode_provider.h"
 #include "geometric_spectrum.h"
+#include "graph_visualizer.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
 
@@ -59,6 +60,9 @@ private:
     GeometricSpectrum* fmod_g_spectrum;
 
     bool use_kiss;
+    bool use_original;
+
+    GraphVisualizer beat_visualizer;
 
     ParticleSystem* particles;
     ImmediateModeProvider imm_mode;

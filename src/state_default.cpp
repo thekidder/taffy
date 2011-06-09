@@ -1,18 +1,17 @@
 #include "app_log.h"
 #include "fmod_spectrum.h"
 #include "state_default.h"
+#include "utility.h"
 
 #include <sore_gamestate_manager.h>
+#include <sore_util.h>
 
 #include <boost/bind.hpp>
 #include <fmod.hpp>
 
 #include <cassert>
 
-typedef std::pair<float,float> Float_range_t;
-float mapToRange(float value, Float_range_t original, Float_range_t newRange);
-
-const int kFFTSamples = 8192;
+const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
 const Float_range_t kDisplayRangeDBFMOD(-60.0f, 0.0f);
@@ -20,8 +19,10 @@ const Float_range_t kDisplayRangeDBKISS(-60.0f, 0.0f);
 const Float_range_t kDisplayRangeScreen(-1.0f, -0.5f);
 
 DefaultState::DefaultState() 
-    : top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
+    : Gamestate(20), // run every 20 milliseconds
+    top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
+    use_kiss(false), use_original(false), beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), kDisplayRangeDBFMOD, 500),
+    imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
 
@@ -134,36 +135,55 @@ void DefaultState::Frame(int elapsed)
 
     particles->ClearParticles();
 
-    CompressedSpectrum* spectrum;
+    Spectrum* spectrum;
     Float_range_t transform_range;
     if(use_kiss)
     {
-        spectrum = kiss_g_spectrum;
+        if(use_original)
+            spectrum = kiss_spectrum;
+        else
+            spectrum = kiss_g_spectrum;
         transform_range = kDisplayRangeDBKISS;
     }
     else
     {
-        spectrum = fmod_g_spectrum;
+        if(use_original)
+            spectrum = fmod_spectrum;
+        else
+            spectrum = fmod_g_spectrum;
         transform_range = kDisplayRangeDBFMOD;
     }
+
+    double flux = 0.0f;
+    for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
+    {
+        float diff = spectrum->Value(i, STEREO_MIX);
+        flux += diff;
+    }
+    flux /= spectrum->NumBuckets();
+    beat_visualizer.AddDatum(flux);
+
+
     float width = (2.0f / spectrum->NumBuckets()) / 2.0f;
 
     imm_mode.Start();
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
 
+    beat_visualizer.Render(imm_mode);
+
     imm_mode.SetColor(SORE_Graphics::Grey);
     imm_mode.DrawQuad(
-        -1.0f, kDisplayRangeScreen.first,  0.5f,
-        -1.0f, kDisplayRangeScreen.second, 0.5f,
-         1.0f, kDisplayRangeScreen.first,  0.5f,
-         1.0f, kDisplayRangeScreen.second, 0.5f);
+        -1.0f, kDisplayRangeScreen.first,  0.0f,
+        -1.0f, kDisplayRangeScreen.second, 0.0f,
+         1.0f, kDisplayRangeScreen.first,  0.0f,
+         1.0f, kDisplayRangeScreen.second, 0.0f);
 
     for(int i = 0; i < spectrum->NumBuckets(); ++i)
 	{
-        float left  = spectrum->Left(i);
-        float right = spectrum->Right(i);
-        left  = mapToRange(left,  transform_range, kDisplayRangeScreen);
-        right = mapToRange(right, transform_range, kDisplayRangeScreen);
+        float left  = spectrum->Value(i, CHANNEL_LEFT);
+        float right = spectrum->Value(i, CHANNEL_RIGHT);
+        left  = MapToRange(left,  transform_range, kDisplayRangeScreen);
+        right = MapToRange(right, transform_range, kDisplayRangeScreen);
         //particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, z, 0.0f, 48.0f));
 
         imm_mode.SetColor(SORE_Graphics::Green);
@@ -180,19 +200,6 @@ void DefaultState::Frame(int elapsed)
             -1.0f + width * (i * 2.0f + 2), -1.0f,  -0.2f,
             -1.0f + width * (i * 2.0f + 2),  right, -0.2f);
     }
-
-    imm_mode.DrawLine(
-        -1.0f, 0.0f, 0.0f, 
-        -0.9f, 0.1f, 0.0f);
-    imm_mode.DrawLine(
-        -0.9f, 0.1f, 0.0f, 
-        -0.8f, 0.2f, 0.0f);
-    imm_mode.DrawLine(
-        -0.8f, 0.2f, 0.0f, 
-        -0.7f, -0.1f, 0.0f);
-    imm_mode.DrawLine(
-        -0.7f, -0.1f, 0.0f, 
-        -0.6f, 0.0f, 0.0f);
 }
 
 void DefaultState::Quit()
@@ -224,6 +231,9 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
         case SDLK_k:
             use_kiss = !use_kiss;
             return true;
+        case SDLK_o:
+            use_original = !use_original;
+            return true;
         }
     }
     return false;
@@ -254,15 +264,4 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 {
     kiss_spectrum->AddSamples(buffer, length, channels);
-}
-
-float mapToRange(float value, Float_range_t original, Float_range_t newRange)
-{
-    // map to a percentage (0,1)
-    float mag = (value - original.first) / (original.second - original.first);
-    // map percentage to new range
-    float transformed = newRange.first + (newRange.second - newRange.first) * mag;
-
-    // clamp
-    return std::min(newRange.second, std::max(transformed, newRange.first));
 }
