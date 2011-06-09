@@ -1,11 +1,11 @@
 #ifndef FMOD_SPECTRUM_H
 #define FMOD_SPECTRUM_H
 
-#include "spectrum.h"
+#include "fft_spectrum.h"
 
 #include <fmod.hpp>
 
-class FMOD_Spectrum : public Spectrum
+class FMOD_Spectrum : public FFTSpectrum
 {
 public:
     FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* system_);

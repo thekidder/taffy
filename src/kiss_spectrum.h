@@ -1,12 +1,12 @@
 #ifndef KISS_SPECTRUM_H
 #define KISS_SPECTRUM_H
 
-#include "spectrum.h"
+#include "fft_spectrum.h"
 
 #undef FIXED_POINT
 #include <kiss_fftr.h>
 
-class KISS_Spectrum : public Spectrum
+class KISS_Spectrum : public FFTSpectrum
 {
 public:
     KISS_Spectrum(size_t fft_size, int sample_rate);

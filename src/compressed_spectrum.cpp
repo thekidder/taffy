@@ -1,11 +1,11 @@
 #include "compressed_spectrum.h"
 
-CompressedSpectrum::CompressedSpectrum(Spectrum& source_, size_t num_buckets_) 
-    : source(source_), num_buckets(num_buckets_)
+CompressedSpectrum::CompressedSpectrum(FFTSpectrum& source_, size_t num_buckets_) 
+    : Spectrum(num_buckets_), source(source_)
 {
 }
 
-const Spectrum& CompressedSpectrum::Source() const
+const FFTSpectrum& CompressedSpectrum::Source() const
 {
     return source;
 }

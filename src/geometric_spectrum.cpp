@@ -1,6 +1,6 @@
 #include "geometric_spectrum.h"
 
-GeometricSpectrum::GeometricSpectrum(Spectrum& source_, size_t num_buckets_) 
+GeometricSpectrum::GeometricSpectrum(FFTSpectrum& source_, size_t num_buckets_) 
     : CompressedSpectrum(source_, num_buckets_), bucket_src_ranges(NumBuckets())
 {
     //constants for the ends of the first/last bands
@@ -35,7 +35,7 @@ GeometricSpectrum::GeometricSpectrum(Spectrum& source_, size_t num_buckets_)
     }
 }
 
-float GeometricSpectrum::Left(size_t bucket) const
+float GeometricSpectrum::Value(size_t bucket, Audio_channel channel) const
 {
     size_t min_bucket = bucket_src_ranges[bucket].first;
     size_t max_bucket = bucket_src_ranges[bucket].first;
@@ -43,31 +43,11 @@ float GeometricSpectrum::Left(size_t bucket) const
     float avg = 0.0f;
     for(size_t i = min_bucket; i <= max_bucket; ++i)
     {
-        avg += Source().Left(i);
+        avg += Source().Value(i, channel);
     }
     avg /= (max_bucket - min_bucket + 1);
 
     return avg;
-}
-
-float GeometricSpectrum::Right(size_t bucket) const
-{
-    size_t min_bucket = bucket_src_ranges[bucket].first;
-    size_t max_bucket = bucket_src_ranges[bucket].first;
-
-    float avg = 0.0f;
-    for(size_t i = min_bucket; i <= max_bucket; ++i)
-    {
-        avg += Source().Right(i);
-    }
-    avg /= (max_bucket - min_bucket + 1);
-
-    return avg;
-}
-
-float GeometricSpectrum::Mix(size_t bucket) const
-{
-    return ( Left(bucket) + Right(bucket) ) / 2.0f;
 }
 
 std::pair<float, float> GeometricSpectrum::HzRange(size_t bucket)

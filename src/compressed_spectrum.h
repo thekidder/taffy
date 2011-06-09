@@ -1,25 +1,19 @@
 #ifndef COMPRESSED_SPECTRUM_H
 #define COMPRESSED_SPECTRUM_H
 
+#include "fft_spectrum.h"
 #include "spectrum.h"
 
-class CompressedSpectrum
+class CompressedSpectrum : public Spectrum
 {
 public:
-    CompressedSpectrum(Spectrum& source_, size_t num_buckets_);
-
-    size_t NumBuckets() const { return num_buckets; }
-
-    virtual float Left (size_t bucket) const = 0;
-    virtual float Right(size_t bucket) const = 0;
-    virtual float Mix  (size_t bucket) const = 0;
+    CompressedSpectrum(FFTSpectrum& source_, size_t num_buckets_);
 
     virtual std::pair<float, float> HzRange(size_t bucket) = 0;
 protected:
-    const Spectrum& Source() const;
+    const FFTSpectrum& Source() const;
 private:
-    const Spectrum& source;
-    size_t num_buckets;
+    const FFTSpectrum& source;
 };
 
 #endif
