@@ -121,8 +121,8 @@ void SORE_Graphics::PipelineRenderer::PushState()
     Pipe* gamePipe = new FilterPipe(KeywordFilter("game"));
     gamePipe->AddChildPipe(new RenderPipe("normal"));
 
-    root->AddChildPipe(guiPipe);
     root->AddChildPipe(gamePipe);
+    root->AddChildPipe(guiPipe);
     //root->AddChildPipe(new RenderPipe("normal"));
 
     states.top().pipeline = root;
