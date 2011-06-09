@@ -62,6 +62,7 @@ private:
     bool use_kiss;
     bool use_original;
 
+    SpectrumSnapshot last_frame;
     GraphVisualizer beat_visualizer;
 
     ParticleSystem* particles;

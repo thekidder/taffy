@@ -21,7 +21,8 @@ const Float_range_t kDisplayRangeScreen(-1.0f, -0.5f);
 DefaultState::DefaultState() 
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), use_original(false), beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), kDisplayRangeDBFMOD, 500),
+    use_kiss(false), use_original(false), last_frame(0),
+    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 500),
     imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
@@ -154,14 +155,20 @@ void DefaultState::Frame(int elapsed)
         transform_range = kDisplayRangeDBFMOD;
     }
 
-    double flux = 0.0f;
-    for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
+    // only compute flux when this frame and the last frame have the same # of buckets
+    // i.e. don't do this computation when we change spectrums, could result in a crash
+    if(last_frame.NumBuckets() == spectrum->NumBuckets())
     {
-        float diff = spectrum->Value(i, STEREO_MIX);
-        flux += diff;
+        double flux = 0.0f;
+        for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
+        {
+            float diff = spectrum->Value(i, STEREO_MIX) - last_frame.Value(i, STEREO_MIX);
+            diff = diff > 0.0f ? diff : 0.0f;
+            flux += diff;
+        }
+        flux /= spectrum->NumBuckets();
+        beat_visualizer.AddDatum(flux);
     }
-    flux /= spectrum->NumBuckets();
-    beat_visualizer.AddDatum(flux);
 
 
     float width = (2.0f / spectrum->NumBuckets()) / 2.0f;
@@ -200,6 +207,8 @@ void DefaultState::Frame(int elapsed)
             -1.0f + width * (i * 2.0f + 2), -1.0f,  -0.2f,
             -1.0f + width * (i * 2.0f + 2),  right, -0.2f);
     }
+
+    last_frame = spectrum->Snapshot();
 }
 
 void DefaultState::Quit()
