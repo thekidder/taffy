@@ -6,6 +6,7 @@
 class GeometricSpectrum : public CompressedSpectrum
 {
 public:
+    // first bucket is total energy
     GeometricSpectrum(Spectrum& source_, size_t num_buckets_);
 
     virtual float Left (size_t bucket) const;

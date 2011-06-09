@@ -5,7 +5,7 @@ GeometricSpectrum::GeometricSpectrum(Spectrum& source_, size_t num_buckets_)
 {
     //constants for the ends of the first/last bands
     const double max_sample_rate = 20000.0;
-    const double min_sample_rate = 50.0;
+    const double min_sample_rate = 20.0;
 
     double multiplier = exp( log(max_sample_rate / min_sample_rate) / (NumBuckets() - 1));
 
@@ -58,7 +58,7 @@ float GeometricSpectrum::Right(size_t bucket) const
     float avg = 0.0f;
     for(size_t i = min_bucket; i <= max_bucket; ++i)
     {
-        avg += Source().Left(i);
+        avg += Source().Right(i);
     }
     avg /= (max_bucket - min_bucket + 1);
 

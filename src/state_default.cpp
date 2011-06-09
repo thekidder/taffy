@@ -12,16 +12,16 @@
 typedef std::pair<float,float> Float_range_t;
 float mapToRange(float value, Float_range_t original, Float_range_t newRange);
 
-const int kFFTSamples = 1024;
+const int kFFTSamples = 8192;
 const int kNumChannels = 2;
 
 const Float_range_t kDisplayRangeDBFMOD(-60.0f, 0.0f);
 const Float_range_t kDisplayRangeDBKISS(-60.0f, 0.0f);
-const Float_range_t kDisplayRangeScreen(-1.0f, 1.0f);
+const Float_range_t kDisplayRangeScreen(-1.0f, -0.5f);
 
 DefaultState::DefaultState() 
     : top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), display_channel(LEFT)
+    use_kiss(false), imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
 
@@ -44,7 +44,7 @@ void DefaultState::Init()
 {
     owner->GetInputTask().AddListener(SORE_Kernel::KEYDOWN,
                                        boost::bind(&DefaultState::HandleKeyboard, this, _1));
-        owner->GetInputTask().AddListener(SORE_Kernel::RESIZE,
+    owner->GetInputTask().AddListener(SORE_Kernel::RESIZE,
                                        boost::bind(&DefaultState::HandleResize, this, _1));
 
     top = new gui::TopWidget(owner->GetRenderer()->GetScreenInfo().width,
@@ -58,15 +58,21 @@ void DefaultState::Init()
                        std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
                          owner->GetInputTask(), top);
-    owner->GetRenderer()->AddGeometryProvider(top);
 
-    SORE_Graphics::GLSLShaderPtr shader =
+    SORE_Graphics::GLSLShaderPtr point_sprite =
         owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/point_sprite.shad");
+    SORE_Graphics::GLSLShaderPtr default_shader =
+        owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
     SORE_Graphics::Texture2DPtr texture =
         owner->GetPool().GetResource<SORE_Graphics::Texture2D>("data/Textures/particle.tga");
-    particles = new ParticleSystem(texture, shader);
+    particles = new ParticleSystem(texture, point_sprite);
 
-    owner->GetRenderer()->AddGeometryProvider(particles);
+    imm_mode.SetShader(default_shader);
+    imm_mode.SetTexture(texture);
+
+    //owner->GetRenderer()->AddGeometryProvider(particles);
+    owner->GetRenderer()->AddGeometryProvider(&imm_mode);
+    owner->GetRenderer()->AddGeometryProvider(top);
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -107,8 +113,8 @@ void DefaultState::Init()
     fmod_spectrum = new FMOD_Spectrum(kFFTSamples, sample_rate, system);
     kiss_spectrum = new KISS_Spectrum(kFFTSamples, sample_rate);
 
-    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 20);
-    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 20);
+    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 10);
+    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 10);
 }
 
 void DefaultState::Frame(int elapsed)
@@ -118,6 +124,8 @@ void DefaultState::Frame(int elapsed)
     glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_POINT_SPRITE);
+    glEnable(GL_LINE_SMOOTH); 
+    glLineWidth(1);
 
     debug->Frame(elapsed);
 
@@ -138,24 +146,53 @@ void DefaultState::Frame(int elapsed)
         spectrum = fmod_g_spectrum;
         transform_range = kDisplayRangeDBFMOD;
     }
-    float width = 2.0f / (spectrum->NumBuckets() - 1);
-    for(int i = 0; i < spectrum->NumBuckets() - 1; ++i)
+    float width = (2.0f / spectrum->NumBuckets()) / 2.0f;
+
+    imm_mode.Start();
+    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
+
+    imm_mode.SetColor(SORE_Graphics::Grey);
+    imm_mode.DrawQuad(
+        -1.0f, kDisplayRangeScreen.first,  0.5f,
+        -1.0f, kDisplayRangeScreen.second, 0.5f,
+         1.0f, kDisplayRangeScreen.first,  0.5f,
+         1.0f, kDisplayRangeScreen.second, 0.5f);
+
+    for(int i = 0; i < spectrum->NumBuckets(); ++i)
 	{
-        float z;
-        switch(display_channel)
-        {
-        case LEFT:
-            z  = spectrum->Left(i);
-            break;
-        case RIGHT:
-            z  = spectrum->Right(i);
-            break;
-        case MIX:
-            z  = spectrum->Mix(i);
-        }
-        z = mapToRange(z, transform_range, kDisplayRangeScreen);
-        particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, z, 0.0f, 48.0f));
+        float left  = spectrum->Left(i);
+        float right = spectrum->Right(i);
+        left  = mapToRange(left,  transform_range, kDisplayRangeScreen);
+        right = mapToRange(right, transform_range, kDisplayRangeScreen);
+        //particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, z, 0.0f, 48.0f));
+
+        imm_mode.SetColor(SORE_Graphics::Green);
+        imm_mode.DrawQuad(
+            -1.0f + width * i * 2.0f,       -1.0f, -0.2f,
+            -1.0f + width * i * 2.0f,        left, -0.2f,
+            -1.0f + width * (i * 2.0f + 1), -1.0f, -0.2f,
+            -1.0f + width * (i * 2.0f + 1),  left, -0.2f);
+
+        imm_mode.SetColor(SORE_Graphics::Red);
+        imm_mode.DrawQuad(
+            -1.0f + width * (i * 2.0f + 1), -1.0f,  -0.2f,
+            -1.0f + width * (i * 2.0f + 1),  right, -0.2f,
+            -1.0f + width * (i * 2.0f + 2), -1.0f,  -0.2f,
+            -1.0f + width * (i * 2.0f + 2),  right, -0.2f);
     }
+
+    imm_mode.DrawLine(
+        -1.0f, 0.0f, 0.0f, 
+        -0.9f, 0.1f, 0.0f);
+    imm_mode.DrawLine(
+        -0.9f, 0.1f, 0.0f, 
+        -0.8f, 0.2f, 0.0f);
+    imm_mode.DrawLine(
+        -0.8f, 0.2f, 0.0f, 
+        -0.7f, -0.1f, 0.0f);
+    imm_mode.DrawLine(
+        -0.7f, -0.1f, 0.0f, 
+        -0.6f, 0.0f, 0.0f);
 }
 
 void DefaultState::Quit()
@@ -186,19 +223,6 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
             return true;
         case SDLK_k:
             use_kiss = !use_kiss;
-            return true;
-        case SDLK_c:
-            switch(display_channel)
-            {
-            case LEFT:
-                display_channel = RIGHT;
-                break;
-            case RIGHT:
-                display_channel = MIX;
-                break;
-            case MIX:
-                display_channel = LEFT;
-            }
             return true;
         }
     }

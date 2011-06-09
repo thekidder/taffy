@@ -4,6 +4,7 @@
 #include "debug_gui.h"
 #include "kiss_spectrum.h"
 #include "fmod_pass_through_adapter.h"
+#include "immediate_mode_provider.h"
 #include "geometric_spectrum.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
@@ -59,16 +60,8 @@ private:
 
     bool use_kiss;
 
-    enum Channel_e
-    {
-        LEFT,
-        RIGHT,
-        MIX
-    };
-
-    Channel_e display_channel;
-
     ParticleSystem* particles;
+    ImmediateModeProvider imm_mode;
 };
 
 #endif

@@ -35,6 +35,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   fmod_pass_through_adapter.cpp
   fmod_spectrum.cpp
   geometric_spectrum.cpp
+  immediate_mode_provider.cpp
   kiss_spectrum.cpp
   main.cpp
   particle_system.cpp
@@ -50,6 +51,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   fmod_pass_through_adapter.h
   fmod_spectrum.h
   geometric_spectrum.h
+  immediate_mode_provider.h
   kiss_spectrum.h
   particle_system.h
   sound_pass_through_buffer.h

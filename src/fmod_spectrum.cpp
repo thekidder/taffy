@@ -3,7 +3,7 @@
 #include <fmod.hpp>
 
 FMOD_Spectrum::FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* system_) 
-    : Spectrum(fft_size, sample_rate), system(system_), window_type(FMOD_DSP_FFT_WINDOW_RECT)
+    : Spectrum(fft_size, sample_rate), system(system_), window_type(FMOD_DSP_FFT_WINDOW_HANNING)
 {
 }
 
