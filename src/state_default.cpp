@@ -22,7 +22,7 @@ DefaultState::DefaultState()
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), last_frame(0),
-    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 2, 500),
+    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 3, 500),
     imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
@@ -167,8 +167,22 @@ void DefaultState::Frame(int elapsed)
             flux += diff;
         }
         flux /= spectrum->NumBuckets();
+
+        if(flux_history.size() == 11)
+            flux_history.pop_front();
+        flux_history.push_back(flux);
+
+        float flux_moving_average = 0;
+        for(std::list<float>::reverse_iterator it = flux_history.rbegin(); it != flux_history.rend(); ++it)
+        {
+            flux_moving_average += *it;
+        }
+        if(flux_history.size())
+            flux_moving_average /= flux_history.size();
+
         beat_visualizer.AddDatum(0, flux);
-        beat_visualizer.AddDatum(1, 0.0f);
+        beat_visualizer.AddDatum(1, 1.5f * flux_moving_average);
+        beat_visualizer.AddDatum(2, flux - 1.5f * flux_moving_average < 0 ? 0.0f : flux - 1.5f * flux_moving_average);
     }
 
 

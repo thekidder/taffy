@@ -64,6 +64,7 @@ private:
 
     SpectrumSnapshot last_frame;
     GraphVisualizer beat_visualizer;
+    std::list<float> flux_history;
 
     ParticleSystem* particles;
     ImmediateModeProvider imm_mode;
