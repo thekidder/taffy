@@ -54,7 +54,7 @@ namespace SORE_GUI
         font = pool.GetResource<SORE_Font::Font>(
             styleDir + "LiberationSans-Regular.ttf");
         titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)),
-                                   *font, 24, title,
+                                   *font, 24, title, pool,
                                    SORE_Graphics::White, this);
 
         UpdatePosition();
@@ -118,13 +118,8 @@ namespace SORE_GUI
         return false;
     }
 
-    std::vector<SORE_Graphics::Renderable> FrameWindow::GetThisRenderList()
+    void FrameWindow::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> list;
-
-        std::vector<SORE_Graphics::Renderable> frame = GetChunks();
-        std::copy(frame.begin(), frame.end(), std::back_inserter(list));
-
-        return list;
+        RenderFrame(imm_mode);
     }
 }

@@ -49,20 +49,20 @@ namespace SORE_GUI
         switch(mode)
         {
         case SCALE_CENTER:
-            leftBorder = static_cast<unsigned int>(l);
-            rightBorder = static_cast<unsigned int>(r);
-            topBorder = static_cast<unsigned int>(t);
-            bottomBorder = static_cast<unsigned int>(b);
+            leftBorder = l;
+            rightBorder = r;
+            topBorder = t;
+            bottomBorder = b;
             break;
         case SCALE_ALL:
         {
             float h = static_cast<float>(GetSize(HORIZONTAL));
             float v = static_cast<float>(GetSize(VERTICAL));
             float f = h < v ? h : v;
-            leftBorder = static_cast<unsigned int>(l/64.0f * f);
-            rightBorder = static_cast<unsigned int>(r/64.0f * f);
-            topBorder = static_cast<unsigned int>(t/64.0f * f);
-            bottomBorder = static_cast<unsigned int>(b/64.0f * f);
+            leftBorder = l/64.0f * f;
+            rightBorder = r/64.0f * f;
+            topBorder = t/64.0f * f;
+            bottomBorder = b/64.0f * f;
             break;
         }
         default:
@@ -70,46 +70,32 @@ namespace SORE_GUI
                        "Unknown sizing mode selected for FrameWidget");
             break;
         };
-
-        BuildGeometry();
     }
 
     void FrameWidget::SetTexture(SORE_Graphics::Texture2DPtr tex)
     {
         texture = tex;
-        for(unsigned int i=0;i<9;++i)
-        {
-            chunk[i].AddTexture("texture", tex);
-        }
     }
 
     void FrameWidget::SetShader(SORE_Graphics::GLSLShaderPtr shad)
     {
         shader = shad;
-        for(unsigned int i=0;i<9;++i)
-        {
-            chunk[i].SetShader(shad);
-        }
     }
 
 
-    std::vector<SORE_Graphics::Renderable> FrameWidget::GetChunks() const
+    void FrameWidget::RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> all;
-        for(unsigned int i=0;i<9;++i)
-        {
-            if(chunk[i].GetTransform())
-                *chunk[i].GetTransform() = GetPositionMatrix();
-            if(chunk[i].GetGeometryChunk())
-                all.push_back(chunk[i]);
-        }
-        return all;
-    }
+        imm_mode.SetShader(shader);
+        imm_mode.SetTexture(texture);
+        imm_mode.SetColor(SORE_Graphics::White);
+        imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
+        imm_mode.SetTransform(
+            SORE_Graphics::TransformationPtr(
+                    new SORE_Math::Matrix4<float>(
+                        GetPositionMatrix())));
 
-    void FrameWidget::BuildGeometry()
-    {
-        unsigned int width = GetSize(HORIZONTAL);
-        unsigned int height = GetSize(VERTICAL);
+        float width  = static_cast<float>(GetSize(HORIZONTAL));
+        float height = static_cast<float>(GetSize(VERTICAL));
 
         SORE_Math::Rect<float> bounds;
         SORE_Math::Rect<float> texCoords;
@@ -117,142 +103,109 @@ namespace SORE_GUI
         if(leftBorder + rightBorder < width && bottomBorder + topBorder < height)
         {
             //center
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(leftBorder),
-                static_cast<float>(width - leftBorder),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.25f, 0.75f);
-
-            chunk[0] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                leftBorder,         topBorder,             0.0f,
+                leftBorder,         height - bottomBorder, 0.0f,
+                width - leftBorder, topBorder,             0.0f,
+                width - leftBorder, height - bottomBorder, 0.0f,
+                texCoords);
         }
 
         if(leftBorder && bottomBorder + topBorder < height)
         {
             //left border
-            bounds = SORE_Math::Rect<float>(
-                0.0f,
-                static_cast<float>(leftBorder),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.25f, 0.75f);
-
-            chunk[1] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                0.0f,       topBorder,             0.0f,
+                0.0f,       height - bottomBorder, 0.0f,
+                leftBorder, topBorder,             0.0f,
+                leftBorder, height - bottomBorder, 0.0f,
+                texCoords);
         }
 
         if(leftBorder && topBorder)
         {
             //top left corner
-            bounds = SORE_Math::Rect<float>(
-                0.0f,
-                static_cast<float>(leftBorder),
-                0.0f,
-                static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.0f, 0.25f);
-
-            chunk[2] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                0.0f,       0.0f,      0.0f,
+                0.0f,       topBorder, 0.0f,
+                leftBorder, 0.0f,      0.0f,
+                leftBorder, topBorder, 0.0f,
+                texCoords);
         }
 
         if(leftBorder + rightBorder < width && topBorder)
         {
             //top border
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(leftBorder),
-                static_cast<float>(width - rightBorder),
-                0.0f,
-                static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.0f, 0.25f);
-
-            chunk[3] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                leftBorder,          0.0f,      0.0f,
+                leftBorder,          topBorder, 0.0f,
+                width - rightBorder, 0.0f,      0.0f,
+                width - rightBorder, topBorder, 0.0f,
+                texCoords);
         }
 
         if(rightBorder && topBorder)
         {
             //top right corner
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(width - rightBorder),
-                static_cast<float>(width),
-                0.0f,
-                static_cast<float>(topBorder));
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.0f, 0.25f);
-
-            chunk[4] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                width - rightBorder, 0.0f,      0.0f,
+                width - rightBorder, topBorder, 0.0f,
+                width,               0.0f,      0.0f,
+                width,               topBorder, 0.0f,
+                texCoords);
         }
 
         if(rightBorder && topBorder + bottomBorder < height)
         {
             //right border
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(width - rightBorder),
-                static_cast<float>(width),
-                static_cast<float>(topBorder),
-                static_cast<float>(height - bottomBorder));
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.25f, 0.75f);
-
-            chunk[5] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                width - rightBorder, topBorder,             0.0f,
+                width - rightBorder, height - bottomBorder, 0.0f,
+                width,               topBorder,             0.0f,
+                width,               height - bottomBorder, 0.0f,
+                texCoords);
         }
 
         if(rightBorder && bottomBorder)
         {
             //bottom right corner
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(width - rightBorder),
-                static_cast<float>(width),
-                static_cast<float>(height - bottomBorder),
-                static_cast<float>(height));
             texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.75f, 1.0f);
-
-            chunk[6] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                width - rightBorder, height - bottomBorder, 0.0f,
+                width - rightBorder, height,                0.0f,
+                width,               height - bottomBorder, 0.0f,
+                width,               height,                0.0f,
+                texCoords);
         }
 
         if(bottomBorder && rightBorder + leftBorder < width)
         {
             //bottom border
-            bounds = SORE_Math::Rect<float>(
-                static_cast<float>(leftBorder),
-                static_cast<float>(width - rightBorder),
-                static_cast<float>(height - bottomBorder),
-                static_cast<float>(height));
             texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.75f, 1.0f);
-
-            chunk[7] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                leftBorder,          height - bottomBorder, 0.0f,
+                leftBorder,          height,                0.0f,
+                width - rightBorder, height - bottomBorder, 0.0f,
+                width - rightBorder, height,                0.0f,
+                texCoords);
         }
 
         if(leftBorder && bottomBorder)
         {
             //bottom left corner
-            bounds = SORE_Math::Rect<float>(
-                0.0f,
-                static_cast<float>(leftBorder),
-                static_cast<float>(height - bottomBorder),
-                static_cast<float>(height));
             texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.75f, 1.0f);
-
-            chunk[8] = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, texture, shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
+            imm_mode.DrawQuad(
+                0.0f,       height - bottomBorder, 0.0f,
+                0.0f,       height,                0.0f,
+                leftBorder, height - bottomBorder, 0.0f,
+                leftBorder, height,                0.0f,
+                texCoords);
         }
-        for(unsigned int i = 0; i < 9; ++i)
-            chunk[i].SetTransform(
-                SORE_Graphics::TransformationPtr(
-                    new SORE_Math::Matrix4<float>(
-                        GetPositionMatrix())));
-
     }
 }

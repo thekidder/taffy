@@ -62,7 +62,7 @@ namespace SORE_GUI
         void SetValue(int value);
     private:
         //TODO:fixme
-        //SORE_Graphics::render_list GetThisRenderList();
+        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
         void UpdateSlider();

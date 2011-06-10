@@ -167,9 +167,10 @@ namespace SORE_GUI
         onChange.connect(c);
     }
 
-    std::vector<SORE_Graphics::Renderable> Dropdown::GetThisRenderList()
+    void Dropdown::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> list;
+        // TODO: fixme
+        /*std::vector<SORE_Graphics::Renderable> list;
 
         std::vector<SORE_Graphics::Renderable> frame = GetChunks();
         std::copy(frame.begin(), frame.end(), std::back_inserter(list));
@@ -194,7 +195,7 @@ namespace SORE_GUI
             std::copy(text.begin(), text.end(), std::back_inserter(list));
         }
 
-        return list;
+        return list;*/
     }
 
     bool Dropdown::ProcessEvents(SORE_Kernel::Event* e)

@@ -106,10 +106,10 @@ namespace SORE_GUI
         UpdatePosition();
     }
 
-    std::vector<SORE_Graphics::Renderable> TextField::GetThisRenderList()
+    void TextField::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> list;
-/*
+/*        std::vector<SORE_Graphics::Renderable> list;
+
         std::vector<SORE_Graphics::Renderable> frame = GetChunks();
         std::vector<SORE_Graphics::Renderable>::iterator it;
         for(it = frame.begin();it!=frame.end();++it)
@@ -144,8 +144,8 @@ namespace SORE_GUI
             else if(time - caretEnd > 10000)
                 caretEnd = time;
         }
-*/
-        return list;
+
+        return list;*/
     }
 
     bool TextField::ProcessEvents(SORE_Kernel::Event* e)

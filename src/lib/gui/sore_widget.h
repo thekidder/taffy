@@ -45,9 +45,8 @@
 
 #include <sore_matrix4x4.h>
 #include <sore_dll.h>
-#include <sore_geometrychunk.h>
+#include <sore_immediatemodeprovider.h>
 #include <sore_input.h>
-#include <sore_renderable.h>
 
 #include <sore_units.h>
 
@@ -78,6 +77,9 @@ namespace SORE_GUI
 
         void SetVisible(bool visible = true);
     protected:
+        // perform all logic updates and render
+        void Frame(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode); 
+
         //returns true if inside widget area
         bool InBounds(unsigned int x, unsigned int y);
         //returns total size of area for child widgets
@@ -103,7 +105,7 @@ namespace SORE_GUI
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
         //child widgets ARE responsible to transforming their geometry
         //via GetPositionMatrix()
-        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList() = 0;
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) = 0;
         //gets called when the parent's position is updated; overload if we need to do
         //processing on a position change
         virtual void UpdatePosition() {}

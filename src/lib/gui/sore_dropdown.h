@@ -64,7 +64,7 @@ namespace SORE_GUI
         void ConnectChange(boost::function<void (unsigned int)> c);
     private:
         void OnGLReload();
-        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList();
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
         void FocusLost();

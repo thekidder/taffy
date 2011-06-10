@@ -3,6 +3,7 @@
 
 #include <sore_dll.h>
 #include <sore_resource.h>
+#include <sore_framewindow.h>
 
 namespace SORE_Graphics
 {
@@ -11,24 +12,18 @@ namespace SORE_Graphics
 
 namespace SORE_GUI
 {
-    class Widget;
-    class FrameWindow;
     class TextWidget;
 
-    class SORE_EXPORT RenderStats
+    class SORE_EXPORT RenderStats : public FrameWindow
     {
     public:
         RenderStats(SORE_Resource::ResourcePool& pool, SORE_Graphics::IRenderer* r,
-                       SORE_GUI::Widget* parent = 0);
-        ~RenderStats();
-
-        void SetVisible(bool visible = true);
-
-        void Frame(int elapsed);
+                    SORE_GUI::Widget* parent = 0);
     private:
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
+
         SORE_Graphics::IRenderer* renderer;
 
-        SORE_GUI::FrameWindow* frame;
         SORE_GUI::TextWidget* draws, *drawsLabel;
         SORE_GUI::TextWidget* fps, *fpsLabel;
         SORE_GUI::TextWidget* polys, *polysLabel;

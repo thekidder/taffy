@@ -41,7 +41,8 @@ namespace SORE_GUI
 {
     TopWidget::TopWidget(unsigned int width, unsigned int height)
         : Widget(SVec(SUnit(0.0, width), SUnit(0.0, height)),
-                                SVec(SUnit(0.0, 0), SUnit(0.0, 0)))
+                 SVec(SUnit(0.0, 0), SUnit(0.0, 0))),
+                 imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())  
     {
     }
 
@@ -49,7 +50,7 @@ namespace SORE_GUI
     {
         if(e->type == SORE_Kernel::RESIZE)
         {
-            sbm.Regenerate();
+            imm_mode.Regenerate();
             UpdateResolution(e->resize.w, e->resize.h);
             return true;
         }
@@ -74,39 +75,15 @@ namespace SORE_GUI
         return cam;
     }
 
-    void TopWidget::MakeUpToDate()
+    void TopWidget::Frame(int elapsed)
     {
-        renderables.clear();
-        renderables = GetRenderList();
-
-        sbm.Clear();
-        BOOST_FOREACH(SORE_Graphics::Renderable& r, renderables)
-        {
-            r.AddKeyword("gui");
-            sbm.GeometryAdded(r, SORE_Graphics::STREAM);
-        }
-        sbm.MakeUpToDate();
+        imm_mode.Start();
+        imm_mode.SetKeywords("gui");
+        Widget::Frame(elapsed, imm_mode);
     }
 
-    std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryBegin()
+    void TopWidget::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        return renderables.begin();
-    }
-
-    std::vector<SORE_Graphics::Renderable>::iterator TopWidget::GeometryEnd()
-    {
-        return renderables.end();
-    }
-
-    SORE_Graphics::BufferManager* TopWidget::GetBufferManager()
-    {
-        return &sbm;
-    }
-
-    std::vector<SORE_Graphics::Renderable> TopWidget::GetThisRenderList()
-    {
-        std::vector<SORE_Graphics::Renderable> list;
-        return list;
     }
 
     bool TopWidget::ProcessEvents(SORE_Kernel::Event* e)
