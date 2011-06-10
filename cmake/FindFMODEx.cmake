@@ -1,4 +1,4 @@
-# - Locate FMOD library
+# - Locate FMOD library
 # This module defines
 #  FMODEX_LIBRARY, the library to link against
 #  FMODEX_FOUND, if false, do not try to link to FMOD
@@ -119,8 +119,3 @@ ELSE(FMODEX_LIBRARY AND FMODEX_INCLUDE_DIR)
     MESSAGE(STATUS "Warning: Unable to find FMOD EX!")
   ENDIF(NOT FMODEX_FIND_QUIETLY)
 ENDIF(FMODEX_LIBRARY AND FMODEX_INCLUDE_DIR)
-
-
-
-
-
