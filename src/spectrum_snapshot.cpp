@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <limits>
+#include <stdexcept>
 
 SpectrumSnapshot::SpectrumSnapshot(std::vector<float> left_data, std::vector<float> right_data)
     : left(left_data), right(right_data), num_buckets(left.size())
