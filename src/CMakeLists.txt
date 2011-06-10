@@ -30,6 +30,7 @@ CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
 SET(${CMAKE_PROJECT_NAME}_SRCS
   app.rc
+  beat_detector.cpp
   compressed_spectrum.cpp
   debug_gui.cpp
   fft_spectrum.cpp
@@ -50,6 +51,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
 
 SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
+  beat_detector.h
   compressed_spectrum.h
   debug_gui.h
   fft_spectrum.h

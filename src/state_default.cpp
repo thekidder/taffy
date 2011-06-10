@@ -20,8 +20,8 @@ const int kNumChannels = 2;
 DefaultState::DefaultState() 
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), use_original(false), last_frame(0),
-    last_beat(0.0f), imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
+    use_kiss(false), use_original(false), beat_detector(0),
+    imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
 
@@ -34,7 +34,6 @@ DefaultState::~DefaultState()
     delete kiss_g_spectrum;
     delete fmod_spectrum;
     delete kiss_spectrum;
-    delete debug;
     delete top;
     
     system->release();
@@ -57,8 +56,11 @@ void DefaultState::Init()
     input.AddListener(SORE_Kernel::RESIZE ,
                        std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
 
-    beat_visualizer = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.25, 0)), SVec(SUnit(0.0, 0), SUnit(0.25, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
-    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.25, 0)), SVec(SUnit(0.0, 0), SUnit(0.75, 0)), top, owner->GetPool(), 0);
+    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
+
+    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), top, owner->GetPool(), 0);
 
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
                          owner->GetInputTask(), top);
@@ -119,26 +121,19 @@ void DefaultState::Init()
     fmod_spectrum = new FMOD_Spectrum(kFFTSamples, sample_rate, system);
     kiss_spectrum = new KISS_Spectrum(kFFTSamples, sample_rate);
 
-    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 10);
-    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 10);
+    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 12);
+    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 12);
 
     spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
+    beat_detector.SetSpectrum(fmod_g_spectrum);
 }
 
 void DefaultState::Frame(int elapsed)
 {
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
-    glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_POINT_SPRITE);
-    glEnable(GL_LINE_SMOOTH); 
-    glLineWidth(1);
-
-    fmod_spectrum->Update();
     system->update();
 
-    particles->ClearParticles();
+    fmod_spectrum->Update();
+    beat_detector.Update();
 
     Spectrum* spectrum;
     if(use_kiss)
@@ -156,47 +151,13 @@ void DefaultState::Frame(int elapsed)
             spectrum = fmod_g_spectrum;
     }
     spectrum_visualizer->SetSpectrum(spectrum);
+    beat_detector.SetSpectrum(spectrum);
 
-    // only compute flux when this frame and the last frame have the same # of buckets
-    // i.e. don't do this computation when we change spectrums, could result in a crash
-    if(last_frame.NumBuckets() == spectrum->NumBuckets())
-    {
-        double flux = 0.0f;
-        for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
-        {
-            float diff = spectrum->Value(i, STEREO_MIX) - last_frame.Value(i, STEREO_MIX);
-            diff = diff > 0.0f ? diff : 0.0f;
-            flux += diff;
-        }
-        flux /= spectrum->NumBuckets();
-
-        if(flux_history.size() == 11)
-            flux_history.pop_front();
-        flux_history.push_back(flux);
-
-        float flux_moving_average = 0;
-        for(std::list<float>::reverse_iterator it = flux_history.rbegin(); it != flux_history.rend(); ++it)
-        {
-            flux_moving_average += *it;
-        }
-        if(flux_history.size())
-            flux_moving_average /= flux_history.size();
-
-        float threshold = 1.5f * flux_moving_average;
-        float beat = flux - threshold < 0 ? 0.0f : flux - threshold;
-        float detected = 0.0f;
-        if(beat > last_beat)
-            detected = beat;
-        
-        beat_visualizer->AddDatum(0, flux);
-        beat_visualizer->AddDatum(1, threshold);
-        beat_visualizer->AddDatum(2, beat);
-        beat_visualizer->AddDatum(3, 30.0f - detected);
-
-        last_beat = beat;
-    }
-
-    last_frame = spectrum->Snapshot();
+            
+    beat_visualizer_mid->AddDatum(0, beat_detector.Flux());
+    beat_visualizer_mid->AddDatum(1, beat_detector.Threshold());
+    beat_visualizer_mid->AddDatum(2, beat_detector.ThresholdedFlux());
+    beat_visualizer_mid->AddDatum(3, 30.0f - beat_detector.Beat());
 
     // draw gui
     top->Frame(elapsed);

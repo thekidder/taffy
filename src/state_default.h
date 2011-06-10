@@ -1,6 +1,7 @@
 #ifndef STATE_DEFAULT
 #define STATE_DEFAULT
 
+#include "beat_detector.h"
 #include "debug_gui.h"
 #include "kiss_spectrum.h"
 #include "fmod_pass_through_adapter.h"
@@ -48,7 +49,9 @@ private:
     SORE_Graphics::Texture2DPtr particle_texture;
 
     SORE_GUI::TopWidget* top;
-    GraphVisualizer* beat_visualizer;
+    GraphVisualizer* beat_visualizer_low;
+    GraphVisualizer* beat_visualizer_mid;
+    GraphVisualizer* beat_visualizer_high;
     SpectrumVisualizer* spectrum_visualizer;
     DebugGUI* debug;
 
@@ -69,10 +72,7 @@ private:
     bool use_kiss;
     bool use_original;
 
-    SpectrumSnapshot last_frame;
-
-    std::list<float> flux_history;
-    float last_beat;
+    BeatDetector beat_detector;
 
     ParticleSystem* particles;
     SORE_Graphics::ImmediateModeProvider imm_mode;
