@@ -7,6 +7,7 @@
 #include "fmod_pass_through_adapter.h"
 #include "geometric_spectrum.h"
 #include "graph_visualizer.h"
+#include "partial_spectrum.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
 #include "spectrum_visualizer.h"
@@ -69,10 +70,14 @@ private:
     GeometricSpectrum* kiss_g_spectrum;
     GeometricSpectrum* fmod_g_spectrum;
 
+    PartialSpectrum* low, *mid, *high;
+
     bool use_kiss;
     bool use_original;
 
-    BeatDetector beat_detector;
+    BeatDetector beat_detector_low;
+    BeatDetector beat_detector_mid;
+    BeatDetector beat_detector_high;
 
     ParticleSystem* particles;
     SORE_Graphics::ImmediateModeProvider imm_mode;

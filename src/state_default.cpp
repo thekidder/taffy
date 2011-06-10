@@ -20,7 +20,7 @@ const int kNumChannels = 2;
 DefaultState::DefaultState() 
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), use_original(false), beat_detector(0),
+    use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
     imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
@@ -124,8 +124,14 @@ void DefaultState::Init()
     fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 12);
     kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 12);
 
+    low  = new PartialSpectrum(*fmod_g_spectrum, 0, 4);
+    mid  = new PartialSpectrum(*fmod_g_spectrum, 4, 8);
+    high = new PartialSpectrum(*fmod_g_spectrum, 8, 12);
+
     spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
-    beat_detector.SetSpectrum(fmod_g_spectrum);
+    beat_detector_low.SetSpectrum(low);
+    beat_detector_mid.SetSpectrum(mid);
+    beat_detector_high.SetSpectrum(high);
 }
 
 void DefaultState::Frame(int elapsed)
@@ -133,7 +139,9 @@ void DefaultState::Frame(int elapsed)
     system->update();
 
     fmod_spectrum->Update();
-    beat_detector.Update();
+    beat_detector_low.Update();
+    beat_detector_mid.Update();
+    beat_detector_high.Update();
 
     Spectrum* spectrum;
     if(use_kiss)
@@ -151,13 +159,22 @@ void DefaultState::Frame(int elapsed)
             spectrum = fmod_g_spectrum;
     }
     spectrum_visualizer->SetSpectrum(spectrum);
-    beat_detector.SetSpectrum(spectrum);
+    //beat_detector.SetSpectrum(spectrum);
 
+    beat_visualizer_low->AddDatum(0, beat_detector_low.Flux());
+    beat_visualizer_low->AddDatum(1, beat_detector_low.Threshold());
+    beat_visualizer_low->AddDatum(2, beat_detector_low.ThresholdedFlux());
+    beat_visualizer_low->AddDatum(3, 30.0f - beat_detector_low.Beat());
             
-    beat_visualizer_mid->AddDatum(0, beat_detector.Flux());
-    beat_visualizer_mid->AddDatum(1, beat_detector.Threshold());
-    beat_visualizer_mid->AddDatum(2, beat_detector.ThresholdedFlux());
-    beat_visualizer_mid->AddDatum(3, 30.0f - beat_detector.Beat());
+    beat_visualizer_mid->AddDatum(0, beat_detector_mid.Flux());
+    beat_visualizer_mid->AddDatum(1, beat_detector_mid.Threshold());
+    beat_visualizer_mid->AddDatum(2, beat_detector_mid.ThresholdedFlux());
+    beat_visualizer_mid->AddDatum(3, 30.0f - beat_detector_mid.Beat());
+
+    beat_visualizer_high->AddDatum(0, beat_detector_high.Flux());
+    beat_visualizer_high->AddDatum(1, beat_detector_high.Threshold());
+    beat_visualizer_high->AddDatum(2, beat_detector_high.ThresholdedFlux());
+    beat_visualizer_high->AddDatum(3, 30.0f - beat_detector_high.Beat());
 
     // draw gui
     top->Frame(elapsed);
