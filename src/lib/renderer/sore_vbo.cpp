@@ -41,18 +41,12 @@ namespace SORE_Graphics
     VBO::VBO(geometry_type type, bool t, bool c, bool n) :
         GraphicsArray(type, t, c, n), vbo(0), vboIndices(0)
     {
-        glGenBuffersARB(1, &vbo);
-        if(!vbo)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
-        glGenBuffersARB(1, &vboIndices);
-        if(!vboIndices)
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create index buffer");
+        Create();
     }
 
     VBO::~VBO()
     {
-        glDeleteBuffersARB(1, &vbo);
-        glDeleteBuffersARB(1, &vboIndices);
+        Destroy();
     }
 
     void VBO::BeginDrawHook()
@@ -64,6 +58,11 @@ namespace SORE_Graphics
     void* VBO::GetOffset(void* pointer, unsigned int offset)
     {
         return ((char*)NULL + (offset));
+    }
+
+    void VBO::Regenerate()
+    {
+        Create();
     }
 
     void VBO::Build()
@@ -105,5 +104,22 @@ namespace SORE_Graphics
         size_t indexOffset,
         size_t numIndices)
     {
+    }
+
+    void VBO::Create()
+    {
+        glGenBuffersARB(1, &vbo);
+        if(!vbo)
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create vertex buffer");
+        glGenBuffersARB(1, &vboIndices);
+        if(!vboIndices)
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not create index buffer");
+    }
+
+    void VBO::Destroy()
+    {
+        glDeleteBuffersARB(1, &vbo);
+        glDeleteBuffersARB(1, &vboIndices);
+        vbo = vboIndices = 0;
     }
 }

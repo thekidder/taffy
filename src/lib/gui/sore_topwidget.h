@@ -38,32 +38,28 @@
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
 #include <sore_input.h>
-#include <sore_batchingbuffermanager.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
 {
-    class SORE_EXPORT TopWidget : public Widget, public SORE_Graphics::GeometryProvider
+    class SORE_EXPORT TopWidget : public Widget
     {
     public:
         TopWidget(unsigned int width, unsigned int height);
 
         bool OnResize(SORE_Kernel::Event* e);
 
-        virtual void MakeUpToDate();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
-        virtual std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
-        virtual SORE_Graphics::BufferManager* GetBufferManager();
+        virtual SORE_Graphics::GeometryProvider* GetGeometryProvider() { return &imm_mode; }
 
         SORE_Graphics::camera_info GetCamera();
-    private:
-        SORE_Graphics::BatchingBufferManager sbm;
 
-        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
+        void Frame(int elapsed); // perform all logic and render
+    private:
+        void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdateResolution(unsigned int w, unsigned int h);
 
-        std::vector<SORE_Graphics::Renderable> renderables;
+        SORE_Graphics::ImmediateModeProvider imm_mode;
     };
 }
 

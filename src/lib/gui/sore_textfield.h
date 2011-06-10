@@ -63,7 +63,7 @@ namespace SORE_GUI
         void ConnectChange(boost::function<void (std::string)> c);
     private:
         //TODO:fixme
-        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList();
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
         void UpdateText(int dir);

@@ -56,10 +56,13 @@ namespace SORE_Graphics
     public:
         virtual ~BufferManager();
 
-        //renderer interface
+        // renderer interface
         virtual void MakeUpToDate() = 0;
         virtual geometry_entry LookupGC(GeometryChunkPtr gc) = 0;
         virtual bool Contains(GeometryChunkPtr gc) = 0;
+
+        // game interface
+        virtual void Regenerate() = 0; // regenerate all VBOs
     };
 }
 

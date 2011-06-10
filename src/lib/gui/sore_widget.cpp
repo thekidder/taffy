@@ -110,21 +110,18 @@ namespace SORE_GUI
         return mat;
     }
 
-    std::vector<SORE_Graphics::Renderable> Widget::GetRenderList()
+    void Widget::Frame(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> all;
         if(isVisible)
         {
-            all = GetThisRenderList();
+            UpdateAndRender(elapsed, imm_mode);
 
             std::vector<Widget*>::iterator it;
             for(it = children.begin(); it != children.end(); ++it)
             {
-                std::vector<SORE_Graphics::Renderable> child = (*it)->GetRenderList();
-                std::copy(child.begin(), child.end(), std::back_inserter(all));
+                (*it)->Frame(elapsed, imm_mode);
             }
         }
-        return all;
     }
 
     bool Widget::PropagateEvents(SORE_Kernel::Event* e)

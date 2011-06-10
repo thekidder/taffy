@@ -65,6 +65,7 @@ namespace SORE_Graphics
     Color operator-(const Color& lhs, const Color& rhs);
 
     static const Color White (1.0f, 1.0f, 1.0f, 1.0f);
+    static const Color Grey  (0.5f, 0.5f, 0.5f, 1.0f);
     static const Color Black (0.0f, 0.0f, 0.0f, 1.0f);
 
     static const Color Red   (1.0f, 0.0f, 0.0f, 1.0f);

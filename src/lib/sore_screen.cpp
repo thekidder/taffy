@@ -139,11 +139,11 @@ namespace SORE_Kernel
     {
         SDLScreenChange(_screen);
 
-        glViewport( 0, 0, ( GLsizei )_screen.width, ( GLsizei )_screen.height );
         if(renderer)
             renderer->SetScreenInfo(_screen);
 
         screen = _screen;
+        InitializeGL();
 
         glGetIntegerv(GL_VIEWPORT, viewport);
         Event e;

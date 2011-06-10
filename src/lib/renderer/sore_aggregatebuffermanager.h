@@ -47,6 +47,8 @@ namespace SORE_Graphics
         virtual void MakeUpToDate() {}
         virtual geometry_entry LookupGC(GeometryChunkPtr gc);
         virtual bool Contains(GeometryChunkPtr gc);
+
+        virtual void Regenerate();
     private:
         std::vector<BufferManager*> bufferManagers;
     };

@@ -95,9 +95,10 @@ namespace SORE_GUI
         delete t;
     }
 
-    std::vector<SORE_Graphics::Renderable> Button::GetThisRenderList()
+    void Button::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        std::vector<SORE_Graphics::Renderable> list;
+        // TODO: fixme
+        /*std::vector<SORE_Graphics::Renderable> list;
 
         std::vector<SORE_Graphics::Renderable> frame = GetChunks();
         std::vector<SORE_Graphics::Renderable>::iterator it;
@@ -120,7 +121,7 @@ namespace SORE_GUI
             list.push_back(r);
         }
 
-        return list;
+        return list;*/
     }
 
     void Button::ConnectPressed(boost::function<void ()> c)

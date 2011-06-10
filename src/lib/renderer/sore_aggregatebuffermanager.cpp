@@ -64,3 +64,11 @@ bool SORE_Graphics::AggregateBufferManager::Contains(GeometryChunkPtr gc)
     }
     return true;
 }
+
+void SORE_Graphics::AggregateBufferManager::Regenerate()
+{
+    BOOST_FOREACH(BufferManager* bm, bufferManagers)
+    {
+        bm->Regenerate();
+    }
+}

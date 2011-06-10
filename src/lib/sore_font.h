@@ -77,7 +77,10 @@ namespace SORE_Font
 
     struct CharInfo
     {
+        // two ways to draw: draw the given Renderable, or construct one using vertices and texture
         SORE_Graphics::Renderable renderable;
+        SORE_Graphics::vertex vertices[4];
+        SORE_Graphics::Texture2DPtr texture;
         float advance;
     };
 
@@ -100,6 +103,7 @@ namespace SORE_Font
 
         void LoadFace(unsigned int height);
         const CharInfo& GetCharacter(unsigned int height, char c);
+        float Width(unsigned int height, const std::string str);
 
         static std::string ProcessFilename(const std::string& filename);
     protected:

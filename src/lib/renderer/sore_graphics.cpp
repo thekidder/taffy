@@ -59,33 +59,7 @@ namespace SORE_Graphics
         GLenum error;
         while((error=glGetError())!=GL_NO_ERROR)
         {
-            switch(error)
-            {
-            case GL_INVALID_ENUM:
-                ENGINE_LOG(logLevel, "GL Error: invalid enum");
-                break;
-            case GL_INVALID_VALUE:
-                ENGINE_LOG(logLevel, "GL Error: invalid value");
-                break;
-            case GL_INVALID_OPERATION:
-                ENGINE_LOG(logLevel, "GL Error: invalid operation");
-                break;
-            case GL_STACK_OVERFLOW:
-                ENGINE_LOG(logLevel, "GL Error: stack overflow");
-                break;
-            case GL_STACK_UNDERFLOW:
-                ENGINE_LOG(logLevel, "GL Error: stack underflow");
-                break;
-            case GL_OUT_OF_MEMORY:
-                ENGINE_LOG(logLevel, "GL Error: out of memory");
-                break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
-                ENGINE_LOG(logLevel, "GL Error: invalid framebuffer operation");
-                break;
-            default:
-                ENGINE_LOG(logLevel, "GL Error: unknown error");
-                break;
-            }
+            ENGINE_LOG(logLevel, boost::format("GL Error: %s") % gluErrorString(error));
         }
 	}
 }

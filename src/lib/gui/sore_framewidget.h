@@ -52,20 +52,17 @@ namespace SORE_GUI
         void SetTexture(SORE_Graphics::Texture2DPtr tex);
         void SetShader(SORE_Graphics::GLSLShaderPtr shad);
 
-        std::vector<SORE_Graphics::Renderable> GetChunks() const;
+        void RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode);
     private:
         virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
-        virtual std::vector<SORE_Graphics::Renderable> GetThisRenderList() = 0;
-
-        void BuildGeometry();
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) = 0;
 
         size_mode mode;
 
         SORE_Graphics::Texture2DPtr texture;
         SORE_Graphics::GLSLShaderPtr shader;
 
-        SORE_Graphics::Renderable chunk[9];
-        unsigned int leftBorder, rightBorder, topBorder, bottomBorder;
+        float leftBorder, rightBorder, topBorder, bottomBorder;
     };
 }
 

@@ -35,6 +35,8 @@
 #include <sore_gamestate_manager.h>
 #include <sore_timing.h>
 
+#include <boost/bind.hpp>
+
 namespace SORE_Game
 {
     static SORE_Graphics::ScreenInfo screenInfo =

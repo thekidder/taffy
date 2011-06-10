@@ -10,65 +10,44 @@ namespace SORE_GUI
 {
     RenderStats::RenderStats(SORE_Resource::ResourcePool& pool,
                              SORE_Graphics::IRenderer* r,
-                             SORE_GUI::Widget *parent) :
-        renderer(r), frame(0), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
-        polys(0), polysLabel(0), ms(0), msLabel(0)
+                             SORE_GUI::Widget *parent)
+    : FrameWindow(SVec(SUnit(0.0, 200), SUnit(0.0, 180)),
+                  SVec(SUnit(0.0, 10), SUnit(0.0, 10)),
+                  "Renderer Stats", pool, parent),
+    renderer(r), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
+    polys(0), polysLabel(0), ms(0), msLabel(0)
     {
         SORE_Font::FontPtr font = pool.GetResource<SORE_Font::Font>(
             "data/ix_style/LiberationSans-Regular.ttf");
 
-        frame = new SORE_GUI::FrameWindow(SVec(SUnit(0.0, 200), SUnit(0.0, 180)),
-                                          SVec(SUnit(0.0, 10), SUnit(0.0, 10)),
-                                          "Renderer Stats", pool, parent);
-
         fpsLabel   = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 0)),
-                                              *font, 16, "FPS:",
-                                              SORE_Graphics::White, frame);
+                                              *font, 16, "FPS:", pool,
+                                              SORE_Graphics::White, this);
         drawsLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 16)),
-                                              *font, 16, "Draw Calls:",
-                                              SORE_Graphics::White, frame);
+                                              *font, 16, "Draw Calls:", pool,
+                                              SORE_Graphics::White, this);
         polysLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 32)),
-                                              *font, 16, "Polygons:",
-                                              SORE_Graphics::White, frame);
+                                              *font, 16, "Polygons:", pool,
+                                              SORE_Graphics::White, this);
         msLabel    = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 48)),
-                                              *font, 16, "Milliseconds:",
-                                              SORE_Graphics::White, frame);
+                                              *font, 16, "Milliseconds:", pool,
+                                              SORE_Graphics::White, this);
 
         fps        = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 0)),
-                                              *font, 16, "0", SORE_Graphics::White,
-                                              frame);
+                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              this);
         draws      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 16)),
-                                              *font, 16, "0", SORE_Graphics::White,
-                                              frame);
+                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              this);
         polys      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 32)),
-                                              *font, 16, "0", SORE_Graphics::White,
-                                              frame);
+                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              this);
         ms         = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 48)),
-                                              *font, 16, "0", SORE_Graphics::White,
-                                              frame);
+                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              this);
     }
 
-    RenderStats::~RenderStats()
-    {
-        delete drawsLabel;
-        delete fpsLabel;
-        delete polysLabel;
-        delete msLabel;
-
-        delete draws;
-        delete fps;
-        delete polys;
-        delete ms;
-
-        delete frame;
-    }
-
-    void RenderStats::SetVisible(bool visible)
-    {
-        frame->SetVisible(visible);
-    }
-
-    void RenderStats::Frame(int elapsed)
+    void RenderStats::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
         int rendererFPS = static_cast<int>(renderer->GetFPS());
 
@@ -95,5 +74,7 @@ namespace SORE_GUI
                                 SUnit(0.0, 32)));
         ms->SetPosition(SVec(SUnit(1.0, -10 - ms->GetSize(HORIZONTAL)),
                              SUnit(0.0, 48)));
+
+        RenderFrame(imm_mode);
     }
 }

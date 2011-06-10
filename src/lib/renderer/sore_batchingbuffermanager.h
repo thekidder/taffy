@@ -64,6 +64,7 @@ namespace SORE_Graphics
         virtual bool Contains(GeometryChunkPtr gc);
 
         // game interface
+        virtual void Regenerate();
         void Clear();
         void GeometryAdded(const Renderable& gc, geometry_type type);
         void GeometryChanged(const Renderable& gc);

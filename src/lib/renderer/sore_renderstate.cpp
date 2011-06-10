@@ -67,6 +67,9 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
         commands |= RENDER_CMD_CHANGE_UNIFORMS;
         uniforms = copy;
     }
+
+    primitiveType = r.GetGeometryChunk()->Type();
+    commands |= RENDER_CMD_CHANGE_PRIMITIVE;
 }
 
 SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderState& old) const
@@ -111,6 +114,11 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
     else
     {
         newState.uniforms = uniforms;
+    }
+
+    if(old.primitiveType != primitiveType)
+    {
+        newState.commands |= RENDER_CMD_CHANGE_PRIMITIVE;
     }
 
     return newState;

@@ -41,7 +41,6 @@
 
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
 {
-    glEnable(GL_BLEND);
 }
 
 SORE_Graphics::PipelineRenderer::~PipelineRenderer()
@@ -75,6 +74,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     GLCommandList renderQueue;
 
     //render using current pipeline
+    glEnable(GL_BLEND);
 
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -121,8 +121,8 @@ void SORE_Graphics::PipelineRenderer::PushState()
     Pipe* gamePipe = new FilterPipe(KeywordFilter("game"));
     gamePipe->AddChildPipe(new RenderPipe("normal"));
 
-    root->AddChildPipe(guiPipe);
     root->AddChildPipe(gamePipe);
+    root->AddChildPipe(guiPipe);
     //root->AddChildPipe(new RenderPipe("normal"));
 
     states.top().pipeline = root;

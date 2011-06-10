@@ -38,62 +38,37 @@ namespace SORE_GUI
 {
     TextWidget::TextWidget(
         SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
+        SORE_Resource::ResourcePool& pool,
         const SORE_Graphics::Color& c, Widget* parent)
         : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h),
-          text(f, h, t, c), color(c)
+          color(c)
     {
+        shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         UpdateText(t);
     }
 
     void TextWidget::UpdateText(const std::string& t)
     {
-        text.UpdateText(t, color);
-        SetSize(SVec(SUnit(0.0, text.GetWidth()), SUnit(0.0, text.GetHeight())));
-        UpdateCache();
+        text = t;
+        SetSize(SVec(SUnit(0.0, face.Width(height, text)), SUnit(0.0, height)));
     }
 
     void TextWidget::SetColor(const SORE_Graphics::Color& c)
     {
         color = c;
-        text.UpdateText(text.GetText(), color);
-        UpdateCache();
     }
 
-    void TextWidget::UpdatePosition()
+    void TextWidget::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        UpdateCache();
-    }
-
-    void TextWidget::UpdateCache()
-    {
-        all.clear();
-        std::vector<SORE_Graphics::Renderable> raw = text.GetGeometry();
-
-        std::vector<SORE_Graphics::Renderable>::iterator it;
-        for(it = raw.begin(); it != raw.end(); ++it)
-        {
-            SORE_Graphics::Renderable r(*it);
-            SORE_Graphics::TransformationPtr m(
-                new SORE_Math::Matrix4<float>(
-                    *it->GetTransform() * GetPositionMatrix()));
-            r.SetTransform(m);
-            all.push_back(r);
-        }
-    }
-
-    std::vector<SORE_Graphics::Renderable> TextWidget::GetThisRenderList()
-    {
-        return all;
+        imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
+        imm_mode.SetColor(color);
+        imm_mode.SetShader(shader);
+        imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
+        imm_mode.DrawString(0.0f, 0.0f, face, height, text);
     }
 
     bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
     {
         return false;
-    }
-
-    void TextWidget::OnGLReload()
-    {
-        text.UpdateText(text.GetText(), color);
-        UpdateCache();
     }
 }

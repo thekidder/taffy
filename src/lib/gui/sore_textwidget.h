@@ -36,7 +36,9 @@
 #define SORE_TEXTWIDGET_H
 
 #include <sore_font.h>
+#include <sore_glslshader.h>
 #include <sore_text.h>
+#include <sore_resource.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
@@ -45,22 +47,22 @@ namespace SORE_GUI
     {
     public:
         TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
+                   SORE_Resource::ResourcePool& pool,
                    const SORE_Graphics::Color& c = SORE_Graphics::White,
                    Widget* parent=NULL);
 
         void UpdateText(const std::string& t);
         void SetColor(const SORE_Graphics::Color& c);
     private:
-        void UpdatePosition();
-        void OnGLReload();
-        std::vector<SORE_Graphics::Renderable> GetThisRenderList();
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdateCache();
 
+        SORE_Graphics::GLSLShaderPtr shader;
         SORE_Font::Font& face;
         unsigned int height;
-        SORE_Graphics::Text text;
         SORE_Graphics::Color color;
+
+        std::string text;
 
         std::vector<SORE_Graphics::Renderable> all;
     };
