@@ -37,7 +37,6 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   fmod_spectrum.cpp
   geometric_spectrum.cpp
   graph_visualizer.cpp
-  immediate_mode_provider.cpp
   kiss_spectrum.cpp
   main.cpp
   particle_system.cpp
@@ -58,7 +57,6 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   fmod_spectrum.h
   geometric_spectrum.h
   graph_visualizer.h
-  immediate_mode_provider.h
   kiss_spectrum.h
   particle_system.h
   sound_pass_through_buffer.h
