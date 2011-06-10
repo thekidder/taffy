@@ -60,13 +60,13 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
         float x_decrement = static_cast<float>(GetSize(SORE_GUI::HORIZONTAL)) / history_size;
 
         float x_last = x_start;
-        float y_last = MapToRange(data[i].back(), k_std_range, render_range);
+        float y_last = GetSize(SORE_GUI::VERTICAL) - MapToRange(data[i].back(), k_std_range, render_range);
 
         float x = x_last;
         for(data_container::reverse_iterator it = ++data[i].rbegin(); it != data[i].rend(); ++it)
         {
             x -= x_decrement;
-            float y = MapToRange(*it, k_std_range, render_range);
+            float y = GetSize(SORE_GUI::VERTICAL) - MapToRange(*it, k_std_range, render_range);
 
             imm_mode.DrawLine(x_last, y_last, 0.2f, x, y, 0.2f);
 
