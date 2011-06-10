@@ -29,7 +29,7 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
         GetSize(SORE_GUI::HORIZONTAL), GetSize(SORE_GUI::VERTICAL), 0.0f);
 
     Float_range_t display_range(0.0f, GetSize(SORE_GUI::VERTICAL));
-    float width = (GetSize(SORE_GUI::HORIZONTAL) / spectrum->NumBuckets()) / 2.0f;
+    double width = (static_cast<double>(GetSize(SORE_GUI::HORIZONTAL)) / spectrum->NumBuckets()) / 2.0;
     float height = GetSize(SORE_GUI::VERTICAL);
     for(int i = 0; i < spectrum->NumBuckets(); ++i)
     {
@@ -40,16 +40,16 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
 
         imm_mode.SetColor(SORE_Graphics::Green);
         imm_mode.DrawQuad(
-            width * i * 2.0f,       height,        0.0f,
-            width * i * 2.0f,       height - left, 0.0f,
-            width * (i * 2.0f + 1), height,        0.0f,
-            width * (i * 2.0f + 1), height - left, 0.0f);
+            width * i * 2.0,       height,        0.0f,
+            width * i * 2.0,       height - left, 0.0f,
+            width * (i * 2.0 + 1), height,        0.0f,
+            width * (i * 2.0 + 1), height - left, 0.0f);
 
         imm_mode.SetColor(SORE_Graphics::Red);
         imm_mode.DrawQuad(
-            width * (i * 2.0f + 1), height,         0.0f,
-            width * (i * 2.0f + 1), height - right, 0.0f,
-            width * (i * 2.0f + 2), height,         0.0f,
-            width * (i * 2.0f + 2), height - right, 0.0f);
+            width * (i * 2.0 + 1), height,         0.0f,
+            width * (i * 2.0 + 1), height - right, 0.0f,
+            width * (i * 2.0 + 2), height,         0.0f,
+            width * (i * 2.0 + 2), height - right, 0.0f);
     }
 }
