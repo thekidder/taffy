@@ -9,10 +9,13 @@
 #include "graph_visualizer.h"
 #include "particle_system.h"
 #include "sound_pass_through_buffer.h"
+#include "spectrum_visualizer.h"
 
-#include <sore_topwidget.h>
+#include <sore_font.h>
 #include <sore_gamestate.h>
+#include <sore_immediatemodeprovider.h>
 #include <sore_input.h>
+#include <sore_topwidget.h>
 
 namespace FMOD
 {
@@ -42,7 +45,12 @@ private:
 
     void GotSamples(float* buffer, unsigned int length, int channels);
 
+    SORE_Font::FontPtr face;
+    SORE_Graphics::Texture2DPtr particle_texture;
+
     SORE_GUI::TopWidget* top;
+    GraphVisualizer* beat_visualizer;
+    SpectrumVisualizer* spectrum_visualizer;
     DebugGUI* debug;
 
     SoundPassThroughBuffer buffer;
@@ -63,11 +71,12 @@ private:
     bool use_original;
 
     SpectrumSnapshot last_frame;
-    GraphVisualizer beat_visualizer;
+
     std::list<float> flux_history;
+    float last_beat;
 
     ParticleSystem* particles;
-    ImmediateModeProvider imm_mode;
+    SORE_Graphics::ImmediateModeProvider imm_mode;
 };
 
 #endif

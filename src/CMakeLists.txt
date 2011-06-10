@@ -44,6 +44,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   sound_pass_through_buffer.cpp
   spectrum.cpp
   spectrum_snapshot.cpp
+  spectrum_visualizer.cpp
   state_default.cpp
   utility.cpp
   version_info.cpp)
@@ -63,6 +64,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   sound_pass_through_buffer.h
   spectrum.h
   spectrum_snapshot.h
+  spectrum_visualizer.h
   state_default.h
   utility.h
   ${CMAKE_VERSION_OUT})

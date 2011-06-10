@@ -2,11 +2,13 @@
 #include "utility.h"
 
 GraphVisualizer::GraphVisualizer(
-        std::pair<float, float> position_, std::pair<float, float> size_, 
+        SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
+        SORE_Resource::ResourcePool& pool,
         std::pair<float, float> input_range_, int num_series, int history_size_)
-        : position(position_), size(size_), input_range(input_range_), 
+        : Widget(size, position, parent), input_range(input_range_), 
         data(num_series), history_size(history_size_)
 {
+    shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
 }
 
 void GraphVisualizer::AddDatum(int series, float datum)
@@ -17,17 +19,20 @@ void GraphVisualizer::AddDatum(int series, float datum)
     data[series].push_back(MapToRange(datum, input_range, k_std_range));
 }
 
-void GraphVisualizer::Render(ImmediateModeProvider& imm_mode)
+void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
 {
-    Float_range_t render_range(position.second, position.second + size.second);
+    Float_range_t render_range(0.0f, GetSize(SORE_GUI::VERTICAL));
 
     // draw background
+    imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
+    imm_mode.SetShader(shader);
     imm_mode.SetColor(SORE_Graphics::Grey);
+    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
-        position.first,              position.second,               0.0f,
-        position.first,              position.second + size.second, 0.0f,
-        position.first + size.first, position.second,               0.0f,
-        position.first + size.first, position.second + size.second, 0.0f);
+        0.0f,                          0.0f,                        0.0f,
+        0.0f,                          GetSize(SORE_GUI::VERTICAL), 0.0f,
+        GetSize(SORE_GUI::HORIZONTAL), 0.0f,                        0.0f,
+        GetSize(SORE_GUI::HORIZONTAL), GetSize(SORE_GUI::VERTICAL), 0.0f);
 
     for(size_t i = 0; i < data.size(); ++i)
     {
@@ -51,8 +56,8 @@ void GraphVisualizer::Render(ImmediateModeProvider& imm_mode)
             break;
         }
 
-        float x_start = position.first + size.first;
-        float x_decrement = size.first / history_size;
+        float x_start = GetSize(SORE_GUI::HORIZONTAL);
+        float x_decrement = static_cast<float>(GetSize(SORE_GUI::HORIZONTAL)) / history_size;
 
         float x_last = x_start;
         float y_last = MapToRange(data[i].back(), k_std_range, render_range);

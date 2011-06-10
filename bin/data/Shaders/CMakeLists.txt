@@ -6,5 +6,8 @@ INSTALL(FILES particles.shad
   point_sprite.shad
   point_v.glsl
   point_f.glsl
+  untextured.shad
+  untextured_fragment.glsl
+  untextured_vertex.glsl
   DESTINATION data/Shaders
 )

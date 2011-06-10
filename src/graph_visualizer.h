@@ -1,28 +1,31 @@
 #ifndef GRAPH_VISUALIZER_H
 #define GRAPH_VISUALIZER_H
 
-#include "immediate_mode_provider.h"
+#include <sore_widget.h>
 
 #include <list>
 #include <vector>
 
-class GraphVisualizer
+class GraphVisualizer : public SORE_GUI::Widget
 {
 public:
     GraphVisualizer(
-        std::pair<float, float> position_, std::pair<float, float> size_, 
+        SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
+        SORE_Resource::ResourcePool& pool,
         std::pair<float, float> input_range_, int num_series, int history_size_);
 
     void AddDatum(int series, float datum);
-    void Render(ImmediateModeProvider& imm_mode);
 private:
-    std::pair<float, float> position;
-    std::pair<float, float> size;
+    virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
+    virtual bool ProcessEvents(SORE_Kernel::Event*) { return false; }
+
     std::pair<float, float> input_range;
 
     typedef std::list<float> data_container;
     std::vector<data_container> data;
     int history_size;
+
+    SORE_Graphics::GLSLShaderPtr shader;
 };
 
 #endif

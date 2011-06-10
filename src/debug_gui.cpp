@@ -24,7 +24,7 @@ DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool &poo
     renderStats = new gui::RenderStats(pool, renderer, top);
 
     version = new gui::TextWidget(gui::SVec(gui::SUnit(0.0, 0), gui::SUnit(1.0, -26)),
-                                  *guiFont, 24, GetVersionString(),
+                                  *guiFont, 24, GetVersionString(), pool,
                                   SORE_Graphics::White, top);
 }
 
@@ -42,7 +42,6 @@ void DebugGUI::SetVisible(bool visible)
 
 void DebugGUI::Frame(int elapsed)
 {
-    renderStats->Frame(elapsed);
 }
 
 #ifdef _MSC_VER //boost warnings in MSVC++

@@ -11,19 +11,17 @@
 
 #include <cassert>
 
+using SORE_GUI::SVec;
+using SORE_GUI::SUnit;
+
 const int kFFTSamples = 1024;
 const int kNumChannels = 2;
-
-const Float_range_t kDisplayRangeDBFMOD(-60.0f, 0.0f);
-const Float_range_t kDisplayRangeDBKISS(-60.0f, 0.0f);
-const Float_range_t kDisplayRangeScreen(-1.0f, -0.5f);
 
 DefaultState::DefaultState() 
     : Gamestate(20), // run every 20 milliseconds
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), last_frame(0),
-    beat_visualizer(std::make_pair(-1.0f, -0.4f), std::make_pair(2.0f, 0.5f), std::make_pair(0.0f, 30.0f), 3, 500),
-    imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
+    last_beat(0.0f), imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())
 {
 }
 
@@ -58,23 +56,29 @@ void DefaultState::Init()
                                         &SORE_GUI::TopWidget::PropagateEvents), top));
     input.AddListener(SORE_Kernel::RESIZE ,
                        std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
+
+    beat_visualizer = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.25, 0)), SVec(SUnit(0.0, 0), SUnit(0.25, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
+    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.25, 0)), SVec(SUnit(0.0, 0), SUnit(0.75, 0)), top, owner->GetPool(), 0);
+
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
                          owner->GetInputTask(), top);
+
+    face = owner->GetPool().GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
 
     SORE_Graphics::GLSLShaderPtr point_sprite =
         owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/point_sprite.shad");
     SORE_Graphics::GLSLShaderPtr default_shader =
         owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    SORE_Graphics::Texture2DPtr texture =
+    particle_texture =
         owner->GetPool().GetResource<SORE_Graphics::Texture2D>("data/Textures/particle.tga");
-    particles = new ParticleSystem(texture, point_sprite);
+    particles = new ParticleSystem(particle_texture, point_sprite);
 
     imm_mode.SetShader(default_shader);
-    imm_mode.SetTexture(texture);
+    imm_mode.SetTexture(particle_texture);
 
     //owner->GetRenderer()->AddGeometryProvider(particles);
     owner->GetRenderer()->AddGeometryProvider(&imm_mode);
-    owner->GetRenderer()->AddGeometryProvider(top);
+    owner->GetRenderer()->AddGeometryProvider(top->GetGeometryProvider());
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -117,6 +121,8 @@ void DefaultState::Init()
 
     fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 10);
     kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 10);
+
+    spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
 }
 
 void DefaultState::Frame(int elapsed)
@@ -129,22 +135,18 @@ void DefaultState::Frame(int elapsed)
     glEnable(GL_LINE_SMOOTH); 
     glLineWidth(1);
 
-    debug->Frame(elapsed);
-
     fmod_spectrum->Update();
     system->update();
 
     particles->ClearParticles();
 
     Spectrum* spectrum;
-    Float_range_t transform_range;
     if(use_kiss)
     {
         if(use_original)
             spectrum = kiss_spectrum;
         else
             spectrum = kiss_g_spectrum;
-        transform_range = kDisplayRangeDBKISS;
     }
     else
     {
@@ -152,8 +154,8 @@ void DefaultState::Frame(int elapsed)
             spectrum = fmod_spectrum;
         else
             spectrum = fmod_g_spectrum;
-        transform_range = kDisplayRangeDBFMOD;
     }
+    spectrum_visualizer->SetSpectrum(spectrum);
 
     // only compute flux when this frame and the last frame have the same # of buckets
     // i.e. don't do this computation when we change spectrums, could result in a crash
@@ -180,50 +182,24 @@ void DefaultState::Frame(int elapsed)
         if(flux_history.size())
             flux_moving_average /= flux_history.size();
 
-        beat_visualizer.AddDatum(0, flux);
-        beat_visualizer.AddDatum(1, 1.5f * flux_moving_average);
-        beat_visualizer.AddDatum(2, flux - 1.5f * flux_moving_average < 0 ? 0.0f : flux - 1.5f * flux_moving_average);
-    }
+        float threshold = 1.5f * flux_moving_average;
+        float beat = flux - threshold < 0 ? 0.0f : flux - threshold;
+        float detected = 0.0f;
+        if(beat > last_beat)
+            detected = beat;
+        
+        beat_visualizer->AddDatum(0, flux);
+        beat_visualizer->AddDatum(1, threshold);
+        beat_visualizer->AddDatum(2, beat);
+        beat_visualizer->AddDatum(3, 30.0f - detected);
 
-
-    float width = (2.0f / spectrum->NumBuckets()) / 2.0f;
-
-    imm_mode.Start();
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
-
-    beat_visualizer.Render(imm_mode);
-
-    imm_mode.SetColor(SORE_Graphics::Grey);
-    imm_mode.DrawQuad(
-        -1.0f, kDisplayRangeScreen.first,  0.0f,
-        -1.0f, kDisplayRangeScreen.second, 0.0f,
-         1.0f, kDisplayRangeScreen.first,  0.0f,
-         1.0f, kDisplayRangeScreen.second, 0.0f);
-
-    for(int i = 0; i < spectrum->NumBuckets(); ++i)
-	{
-        float left  = spectrum->Value(i, CHANNEL_LEFT);
-        float right = spectrum->Value(i, CHANNEL_RIGHT);
-        left  = MapToRange(left,  transform_range, kDisplayRangeScreen);
-        right = MapToRange(right, transform_range, kDisplayRangeScreen);
-        //particles->AddParticle(Particle(-1.0f + width*i + width/2.0f, z, 0.0f, 48.0f));
-
-        imm_mode.SetColor(SORE_Graphics::Green);
-        imm_mode.DrawQuad(
-            -1.0f + width * i * 2.0f,       -1.0f, -0.2f,
-            -1.0f + width * i * 2.0f,        left, -0.2f,
-            -1.0f + width * (i * 2.0f + 1), -1.0f, -0.2f,
-            -1.0f + width * (i * 2.0f + 1),  left, -0.2f);
-
-        imm_mode.SetColor(SORE_Graphics::Red);
-        imm_mode.DrawQuad(
-            -1.0f + width * (i * 2.0f + 1), -1.0f,  -0.2f,
-            -1.0f + width * (i * 2.0f + 1),  right, -0.2f,
-            -1.0f + width * (i * 2.0f + 2), -1.0f,  -0.2f,
-            -1.0f + width * (i * 2.0f + 2),  right, -0.2f);
+        last_beat = beat;
     }
 
     last_frame = spectrum->Snapshot();
+
+    // draw gui
+    top->Frame(elapsed);
 }
 
 void DefaultState::Quit()
