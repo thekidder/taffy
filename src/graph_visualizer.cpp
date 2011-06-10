@@ -26,6 +26,7 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     // draw background
     imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
     imm_mode.SetShader(shader);
+    imm_mode.SetTexture(SORE_Graphics::Texture2DPtr());
     imm_mode.SetColor(SORE_Graphics::Grey);
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
