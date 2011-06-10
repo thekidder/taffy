@@ -39,7 +39,8 @@
 #include <sstream>
 
 SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Graphics::Texture2DPtr default_texture, SORE_Graphics::GLSLShaderPtr default_shader)
-    : current_texture(default_texture), current_shader(default_shader), current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
+    : current_texture(default_texture), current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
+    current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
 {
 }
 
@@ -58,6 +59,12 @@ void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Graphics::GLSLShaderPt
 void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
 {
     current_color = color;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::TransformationPtr transform)
+{
+    CreateRenderableFromData();
+    current_transform = transform;
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetBlendMode(SORE_Graphics::blend_mode blend_mode)
@@ -84,20 +91,21 @@ void SORE_Graphics::ImmediateModeProvider::DrawQuad(
     float x1, float y1, float z1,
     float x2, float y2, float z2,
     float x3, float y3, float z3,
-    float x4, float y4, float z4)
+    float x4, float y4, float z4,
+    SORE_Math::Rect<float> texCoords)
 {
     unsigned short current_index = SetupDraw(GL_TRIANGLES);
 
-    SetTexCoords(0.0f, 0.0f);
+    SetTexCoords(texCoords.topLeft.GetValue()[0], texCoords.topLeft.GetValue()[1]);
     AddVertex(x1, y1, z1);
 
-    SetTexCoords(0.0f, 1.0f);
+    SetTexCoords(texCoords.topLeft.GetValue()[0], texCoords.bottomRight.GetValue()[1]);
     AddVertex(x2, y2, z2);
 
-    SetTexCoords(1.0f, 0.0f);    
+    SetTexCoords(texCoords.bottomRight.GetValue()[0], texCoords.topLeft.GetValue()[1]);    
     AddVertex(x3, y3, z3);
 
-    SetTexCoords(1.0f, 1.0f);
+    SetTexCoords(texCoords.bottomRight.GetValue()[0], texCoords.bottomRight.GetValue()[1]);
     AddVertex(x4, y4, z4);
 
     // add two triangles
@@ -132,37 +140,41 @@ void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, SORE_Fon
     float advance = 0.0f;
     for(std::string::const_iterator it = string.begin(); it != string.end(); ++it)
     {
-        vertex temp[4];
-        const vertex* src = face.GetCharacter(height, *it).vertices;
-        std::copy(src, src + 4, temp);
+        const SORE_Font::CharInfo& char_info = face.GetCharacter(height, *it);
 
-        for(int i = 0; i < 4; ++i)
+        if(char_info.texture)
         {
-            temp[i].r = current_color.GetComponent(RED);
-            temp[i].g = current_color.GetComponent(GREEN);
-            temp[i].b = current_color.GetComponent(BLUE);
-            temp[i].a = current_color.GetComponent(ALPHA);
+            vertex temp[4];
+            const vertex* src = char_info.vertices;
+            std::copy(src, src + 4, temp);
 
-            temp[i].x += x + advance;
-            temp[i].y += y;
+            for(int i = 0; i < 4; ++i)
+            {
+                temp[i].r = current_color.GetComponent(RED);
+                temp[i].g = current_color.GetComponent(GREEN);
+                temp[i].b = current_color.GetComponent(BLUE);
+                temp[i].a = current_color.GetComponent(ALPHA);
+
+                temp[i].x += x + advance;
+                temp[i].y += y;
+            }
+
+            SetTexture(char_info.texture);
+            unsigned short current_index = vertices.size();
+            AddVertex(temp[0]);
+            AddVertex(temp[1]);
+            AddVertex(temp[2]);
+            AddVertex(temp[3]);
+
+            // add two triangles
+            indices.push_back(current_index);
+            indices.push_back(current_index + 1);
+            indices.push_back(current_index + 2);
+            indices.push_back(current_index + 2);
+            indices.push_back(current_index + 1);
+            indices.push_back(current_index + 3);
         }
-
-        SetTexture(face.GetCharacter(height, *it).texture);
-        unsigned short current_index = vertices.size();
-        AddVertex(temp[0]);
-        AddVertex(temp[1]);
-        AddVertex(temp[2]);
-        AddVertex(temp[3]);
-
-        // add two triangles
-        indices.push_back(current_index);
-        indices.push_back(current_index + 1);
-        indices.push_back(current_index + 2);
-        indices.push_back(current_index + 2);
-        indices.push_back(current_index + 1);
-        indices.push_back(current_index + 3);
-
-        advance += face.GetCharacter(height, *it).advance;
+        advance += char_info.advance;
     }
 }
 
@@ -249,7 +261,7 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
 
     buffer_manager.GeometryAdded(geometry, SORE_Graphics::STREAM);
 
-    Renderable r(geometry, current_shader, SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float> ()), current_blend_mode);
+    Renderable r(geometry, current_shader, current_transform, current_blend_mode);
     r.AddTexture("texture", current_texture);
 
     std::set<std::string> keyword_list;

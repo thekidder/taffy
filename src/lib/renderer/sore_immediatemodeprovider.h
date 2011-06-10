@@ -36,6 +36,7 @@
 #define SORE_IMMEDIATE_MODE_PROVIDER_H
 
 #include <sore_font.h>
+#include <sore_geometry.h>
 #include <sore_geometryprovider.h>
 #include <sore_glslshader.h>
 #include <sore_simplebuffermanager.h>
@@ -53,6 +54,7 @@ namespace SORE_Graphics
         void SetTexture(SORE_Graphics::Texture2DPtr texture);
         void SetShader(SORE_Graphics::GLSLShaderPtr shader);
         void SetColor(SORE_Graphics::Color color);
+        void SetTransform(SORE_Graphics::TransformationPtr transform);
         void SetBlendMode(SORE_Graphics::blend_mode blend_mode);
         void SetPrimitiveType(GLenum type);
         void SetKeywords(const std::string& keywords_);
@@ -63,7 +65,8 @@ namespace SORE_Graphics
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             float x3, float y3, float z3,
-            float x4, float y4, float z4);
+            float x4, float y4, float z4,
+            SORE_Math::Rect<float> texCoords = SORE_Math::Rect<float>(0.0f, 1.0f, 0.0f, 1.0f));
         void DrawLine(
             float x1, float y1, float z1,
             float x2, float y2, float z2);
@@ -91,6 +94,7 @@ namespace SORE_Graphics
         SORE_Graphics::Texture2DPtr current_texture;
         SORE_Graphics::GLSLShaderPtr current_shader;
         SORE_Graphics::Color current_color;
+        SORE_Graphics::TransformationPtr current_transform;
         SORE_Graphics::blend_mode current_blend_mode;
         GLenum current_primitive_type;
         std::pair<float, float> current_texcoords;
