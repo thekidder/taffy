@@ -262,7 +262,8 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     buffer_manager.GeometryAdded(geometry, SORE_Graphics::STREAM);
 
     Renderable r(geometry, current_shader, current_transform, current_blend_mode);
-    r.AddTexture("texture", current_texture);
+    if(current_texture)
+        r.AddTexture("texture", current_texture);
 
     std::set<std::string> keyword_list;
 
