@@ -12,6 +12,8 @@ public:
     size_t NumBuckets() const { return num_buckets; }
     virtual float Value(size_t bucket, Audio_channel channel) const = 0; // return the value of the i'th bucket
     virtual const SpectrumSnapshot& Snapshot() const = 0; // retrieve a snapshot of the spectrum in this moment of time;
+
+    virtual std::pair<float, float> HzRange(size_t bucket) const = 0;
 private:
     size_t num_buckets;
 };

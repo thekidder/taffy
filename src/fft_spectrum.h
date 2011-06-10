@@ -17,6 +17,8 @@ public:
 
     virtual float Value(size_t bucket, Audio_channel channel) const;
     virtual const SpectrumSnapshot& Snapshot() const;
+
+    virtual std::pair<float, float> HzRange(size_t bucket) const;
 protected:
     void Clear();
     void SetSnapshot(const SpectrumSnapshot& new_snapshot);

@@ -22,6 +22,12 @@ const SpectrumSnapshot& FFTSpectrum::Snapshot() const
     return current_snapshot;
 }
 
+std::pair<float, float> FFTSpectrum::HzRange(size_t bucket) const
+{
+    double hz_per_bucket = SampleRate() / 2.0 / NumBuckets();
+    return std::make_pair(bucket * hz_per_bucket, (bucket + 1) * hz_per_bucket);
+}
+
 void FFTSpectrum::SetSnapshot(const SpectrumSnapshot& new_snapshot)
 {
     // spectrum can not change sizes

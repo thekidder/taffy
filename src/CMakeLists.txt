@@ -30,8 +30,8 @@ CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
 SET(${CMAKE_PROJECT_NAME}_SRCS
   app.rc
+  averaging_spectrum.cpp
   beat_detector.cpp
-  compressed_spectrum.cpp
   debug_gui.cpp
   fft_spectrum.cpp
   fmod_pass_through_adapter.cpp
@@ -40,6 +40,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   graph_visualizer.cpp
   kiss_spectrum.cpp
   main.cpp
+  partial_spectrum.cpp
   particle_system.cpp
   sound_pass_through_buffer.cpp
   spectrum.cpp
@@ -51,8 +52,8 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
 
 SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
+  averaging_spectrum.h
   beat_detector.h
-  compressed_spectrum.h
   debug_gui.h
   fft_spectrum.h
   fmod_pass_through_adapter.h
@@ -60,6 +61,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   geometric_spectrum.h
   graph_visualizer.h
   kiss_spectrum.h
+  partial_spectrum.h
   particle_system.h
   sound_pass_through_buffer.h
   spectrum.h
