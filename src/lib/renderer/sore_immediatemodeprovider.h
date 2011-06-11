@@ -70,7 +70,7 @@ namespace SORE_Graphics
         void DrawLine(
             float x1, float y1, float z1,
             float x2, float y2, float z2);
-        void DrawString(float x, float y, SORE_Font::Font& face, unsigned int height, const std::string& string);
+        void DrawString(float x, float y, float z, SORE_Font::Font& face, unsigned int height, const std::string& string);
 
         // geometry provider interface
         void MakeUpToDate();

@@ -46,12 +46,16 @@ SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Graphics::Textu
 
 void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Graphics::Texture2DPtr texture)
 {
+    if(texture == current_texture)
+        return;
     CreateRenderableFromData();
     current_texture = texture;
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Graphics::GLSLShaderPtr shader)
 {
+    if(shader == current_shader)
+        return;
     CreateRenderableFromData();
     current_shader = shader;
 }
@@ -63,18 +67,24 @@ void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
 
 void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::TransformationPtr transform)
 {
+    if(transform == current_transform)
+        return;
     CreateRenderableFromData();
     current_transform = transform;
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetBlendMode(SORE_Graphics::blend_mode blend_mode)
 {
+    if(blend_mode == current_blend_mode)
+        return;
     CreateRenderableFromData();
     current_blend_mode = blend_mode;
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
 {
+    if(type == current_primitive_type)
+        return;
     CreateRenderableFromData();
     current_primitive_type = type;
 }
@@ -133,7 +143,7 @@ void SORE_Graphics::ImmediateModeProvider::DrawLine(
     indices.push_back(current_index + 1);
 }
 
-void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, SORE_Font::Font& face, unsigned int height, const std::string& string)
+void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z, SORE_Font::Font& face, unsigned int height, const std::string& string)
 {
     SetupDraw(GL_TRIANGLES);
 
@@ -157,6 +167,7 @@ void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, SORE_Fon
 
                 temp[i].x += x + advance;
                 temp[i].y += y;
+                temp[i].z = z;
             }
 
             SetTexture(char_info.texture);
