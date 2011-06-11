@@ -20,6 +20,8 @@ private:
     Spectrum* spectrum;
 
     SORE_Graphics::GLSLShaderPtr shader;
+    SORE_Graphics::GLSLShaderPtr font_shader;
+    SORE_Font::FontPtr face;
 };
 
 #endif
