@@ -14,6 +14,7 @@ public:
     virtual const SpectrumSnapshot& Snapshot() const = 0; // retrieve a snapshot of the spectrum in this moment of time;
 
     virtual std::pair<float, float> HzRange(size_t bucket) const = 0;
+    std::pair<float, float> TotalHz() const; 
 private:
     size_t num_buckets;
 };
