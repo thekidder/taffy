@@ -57,11 +57,12 @@
 
 namespace SORE_Kernel
 {
+    // Responsible for opening/displaying a window and keeping the OpenGL context up-to-date
     class SORE_EXPORT Screen : public Task, SORE_Utility::Noncopyable
     {
     public:
         Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-               const std::string& windowTitle="SORE App",
+               const std::string& windowTitle_="SORE App",
                const std::string& iconFilename="",
                SORE_Utility::SettingsManager* _sm=NULL);
         ~Screen();
@@ -77,29 +78,22 @@ namespace SORE_Kernel
 
         bool OnResize(Event* event=NULL);
 
-        const GLint* GetViewport() const;
         SORE_Graphics::ScreenInfo GetScreen() const;
     private:
+        void CreateSFMLWindow(); // create window based on current screeninfo
         void SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen);
         int  InitializeGL();
         void PrintGLDiagnostics();
         void InitExtensions();
         void ChangeScreenOnSettingsChange();
 
-        void Resize(int width, int height); //does the actual resizing
-
         InputTask& input; //for injecting resize events
 
+        sf::Window window;
+        std::string windowTitle;
         SORE_Graphics::IRenderer* renderer;
-        SORE_Graphics::ProjectionInfo proj;
         SORE_Graphics::ScreenInfo screen;
         SORE_Utility::SettingsManager* sm;
-
-        GLint viewport[4];
-
-        std::string uiDataPath;
-
-        int best_w, best_h;
     };
 }
 

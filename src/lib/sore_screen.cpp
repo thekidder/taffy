@@ -46,19 +46,14 @@
 namespace SORE_Kernel
 {
     Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
-        const std::string& windowTitle, const std::string& iconFilename,
+        const std::string& windowTitle_, const std::string& iconFilename,
         SORE_Utility::SettingsManager* _sm)
-        : input(i), screen(_screen), sm(_sm)
+        : input(i), windowTitle(windowTitle_), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
         renderer = NULL;
-        proj.type = SORE_Graphics::PERSPECTIVE;
-        proj.fov = 45.0f;
-        proj.znear = 0.1f;
-        proj.zfar  = 200.0f;
-        proj.useScreenRatio = true;
-        screen.ratio = static_cast<GLfloat>(_screen.width) /
-            static_cast<GLfloat>(_screen.height);
+
+        CreateSFMLWindow();
         
         if(sm!=NULL)
         {
@@ -107,14 +102,7 @@ namespace SORE_Kernel
             renderer->SetScreenInfo(_screen);
 
         screen = _screen;
-        InitializeGL();
-
-        glGetIntegerv(GL_VIEWPORT, viewport);
-        Event e;
-        e.type = RESIZE;
-        e.resize.w = _screen.width;
-        e.resize.h = _screen.height;
-        input.InjectEvent(e);
+        CreateSFMLWindow();
     }
 
     std::vector<SORE_Math::Vector2<unsigned int> > Screen::ListModes()
@@ -134,6 +122,8 @@ namespace SORE_Kernel
         SORE_Profiler::Sample graphics("graphics");
         if(renderer)
             renderer->Render();
+
+        window.Display();
     }
 
     void Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
@@ -144,40 +134,43 @@ namespace SORE_Kernel
 
     bool Screen::OnResize(Event* event)
     {
-        GLint width, height;
         if(event==NULL)
         {
-            width = screen.width;
-            height = screen.height;
+            return false;
         }
-        else
-        {
-            width  = event->resize.w;
-            height = event->resize.h;
-        }
-        SORE_Graphics::ScreenInfo tempScreen = screen;
-        tempScreen.width = width;
-        tempScreen.height = height;
-        ChangeScreen(tempScreen);
+
+        int width, height;
+        width  = event->resize.w;
+        height = event->resize.h;
+        // make sure viewport is correct
+        glViewport(0, 0, width, height);
+
         return true;
+    }
+
+    void Screen::CreateSFMLWindow()
+    {
+        SetupScreenInfo(screen);
+
+        unsigned long style = sf::Style::Close;
+        if(screen.fullscreen)
+            style |= sf::Style::Fullscreen;
+        if(screen.resizable)
+            style |= sf::Style::Resize;
+        sf::VideoMode videoMode(screen.width, screen.height);
+
+        window.Create(videoMode, windowTitle, style);
     }
 
     void Screen::SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen)
     {
         if(_screen.useNativeResolution)
         {
-            _screen.width = best_w;
-            _screen.height = best_h;
+            //_screen.width = best_w;
+            //_screen.height = best_h;
         }
         _screen.ratio = static_cast<GLfloat>(_screen.width) /
             static_cast<GLfloat>(_screen.height);
-    }
-
-    void Screen::Resize(int width, int height)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
-                   boost::format("resizing from (%d, %d) to (%d, %d)")
-                   % screen.width % screen.height % width % height);
     }
 
     int Screen::InitializeGL()
@@ -298,11 +291,6 @@ namespace SORE_Kernel
                                      "GLEW Error: %s")
                        % glewGetErrorString(glewError));
         }
-    }
-
-    const GLint* Screen::GetViewport() const
-    {
-        return viewport;
     }
 
     SORE_Graphics::ScreenInfo Screen::GetScreen() const
