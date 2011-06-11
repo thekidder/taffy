@@ -3,7 +3,9 @@
 # SFML_FOUND, if false, do not try to link to SFML 
 # SFML_LIBRARY, the name of the librarys to link against 
 # SFML_INCLUDE_DIR, where to find SFML headers 
-# SFML_DLLS, where to find the SFML DLLS (if using shared SFML on windows)
+# SFML_DLL_DEBUG
+# SFML_DLL_NONDEBUG
+# - where to find the SFML DLLS (if using shared SFML on windows)
 # 
 # By default this script will link to the shared version of SFML 
 # You can change this by defining this variable before calling FIND_PACKAGE 
@@ -178,8 +180,6 @@ ELSE(${SFML_STATIC})
   SET(SHARED_MODE "_SHARED")
 ENDIF(${SFML_STATIC})
 
-LIST(APPEND SFML_LIBRARY ${SFML_MAIN_LIBRARY${MODE_LABEL}}) 
-
 LIST(APPEND SFML_FIND_COMPONENTS "System") #We allays need at last the System component 
 LIST(REMOVE_DUPLICATES SFML_FIND_COMPONENTS) 
 
@@ -203,10 +203,10 @@ FOREACH(DEBUG_MODE ${DEBUG_MODES})
   ENDFOREACH(COMPONENT)
 
   LIST(REMOVE_DUPLICATES SFML_LIBRARY_${DEBUG_MODE})  
+  LIST(APPEND SFML_LIBRARY_${DEBUG_MODE} ${SFML_MAIN_LIBRARY${SHARED_MODE}_${DEBUG_MODE}}) 
 ENDFOREACH(DEBUG_MODE)
 
 SET(SFML_LIBRARY optimized ${SFML_LIBRARY_NONDEBUG} debug ${SFML_LIBRARY_DEBUG})
-SET(SFML_DLL optimized ${SFML_DLL_NONDEBUG} debug ${SFML_DLL_DEBUG})
 
 IF(NOT SFML_INCLUDE_DIR) 
   SET(SFML_FOUND "NO") 
