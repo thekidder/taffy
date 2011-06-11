@@ -3,17 +3,18 @@
 GeometricSpectrum::GeometricSpectrum(Spectrum& source_, size_t num_buckets_) 
     :  AveragingSpectrum(source_, num_buckets_)
 {
+    double max_hz = Source().TotalHz().second;
+    double src_bucket_hz_size = max_hz / Source().NumBuckets();
+
     //constants for the ends of the first/last bands
-    const double max_sample_rate = 20000.0;
-    const double min_sample_rate = 20.0;
+    const double max_sample_rate = max_hz;
+    const double min_sample_rate = src_bucket_hz_size;
 
     double multiplier = exp( log(max_sample_rate / min_sample_rate) / (NumBuckets() - 1));
 
-    double max_hz = Source().HzRange(Source().NumBuckets() - 1).second;
-    double src_bucket_hz_size = max_hz / Source().NumBuckets();
 
     double min_rate = 0.0;
-    size_t min_bucket = 1;
+    size_t min_bucket = 0;
     for(size_t i = 0; i < NumBuckets(); ++i)
     {
         double max_rate;
