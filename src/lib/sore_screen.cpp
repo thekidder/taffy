@@ -48,7 +48,7 @@ namespace SORE_Kernel
     Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
         const std::string& windowTitle, const std::string& iconFilename,
         SORE_Utility::SettingsManager* _sm)
-        : input(i), drawContext(0), screen(_screen), sm(_sm)
+        : input(i), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
         renderer = NULL;
@@ -59,15 +59,7 @@ namespace SORE_Kernel
         proj.useScreenRatio = true;
         screen.ratio = static_cast<GLfloat>(_screen.width) /
             static_cast<GLfloat>(_screen.height);
-        if(InitializeSDL(windowTitle)!=0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_CRITICAL,
-                       boost::format("Could not initialize SDL (SDL error %s)")
-                       % SDL_GetError());
-            quitFlag = true;
-        }
-        SDL_EnableUNICODE(1);
-        SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+        
         if(sm!=NULL)
         {
             screen.width =
@@ -101,15 +93,7 @@ namespace SORE_Kernel
                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
                              this));
         }
-        best_w = SDL_GetVideoInfo()->current_w;
-        best_h = SDL_GetVideoInfo()->current_h;
-
-        if(iconFilename.size())
-        {
-            SDL_WM_SetIcon(SDL_LoadBMP(iconFilename.c_str()), NULL);
-        }
-
-        SDLScreenChange(screen);
+        
         if(InitializeGL()!=0)
         {
             ENGINE_LOG(SORE_Logging::LVL_CRITICAL, "Could not initialize GL");
@@ -117,28 +101,8 @@ namespace SORE_Kernel
         }
     }
 
-    void Screen::SDLScreenChange(SORE_Graphics::ScreenInfo& _screen)
-    {
-        SetupScreenInfo(_screen);
-        if(_screen.fullscreen)
-            videoFlags |= SDL_FULLSCREEN;
-        else
-            if(videoFlags & SDL_FULLSCREEN) videoFlags ^= SDL_FULLSCREEN;
-        if(_screen.showCursor)
-            SDL_ShowCursor(SDL_ENABLE);
-        else
-            SDL_ShowCursor(SDL_DISABLE);
-        if(_screen.resizable)
-            videoFlags |= SDL_RESIZABLE;
-        else
-            if(videoFlags & SDL_RESIZABLE) videoFlags ^= SDL_RESIZABLE;
-        Resize(_screen.width, _screen.height);
-    }
-
     void Screen::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
     {
-        SDLScreenChange(_screen);
-
         if(renderer)
             renderer->SetScreenInfo(_screen);
 
@@ -156,33 +120,13 @@ namespace SORE_Kernel
     std::vector<SORE_Math::Vector2<unsigned int> > Screen::ListModes()
     {
         std::vector<SORE_Math::Vector2<unsigned int> > allModes;
-        SDL_Rect** modes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-        if(!modes)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "No modes detected by SDL");
-            return allModes;
-        }
-        for(unsigned int i=0;modes[i];++i)
-        {
-            if(modes[i]->x || modes[i]->y)
-                ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                           boost::format("ListModes returned invalid Rect: x: "
-                                         "%d, y: %d")
-                           % modes[i]->x % modes[i]->y);
-            if(modes[i]->w >= 640 && modes[i]->h >= 480)
-            {
-                SORE_Math::Vector2<unsigned int> m(modes[i]->w, modes[i]->h);
-                allModes.push_back(m);
-            }
-        }
+        
         return allModes;
     }
 
     Screen::~Screen()
     {
-        SDL_ShowCursor(SDL_ENABLE);
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        SDL_Quit();
+        
     }
 
     void Screen::Frame(int elapsedTime)
@@ -190,7 +134,6 @@ namespace SORE_Kernel
         SORE_Profiler::Sample graphics("graphics");
         if(renderer)
             renderer->Render();
-        SDL_GL_SwapBuffers();
     }
 
     void Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
@@ -235,49 +178,10 @@ namespace SORE_Kernel
         ENGINE_LOG(SORE_Logging::LVL_DEBUG1,
                    boost::format("resizing from (%d, %d) to (%d, %d)")
                    % screen.width % screen.height % width % height);
-        drawContext = SDL_SetVideoMode(width, height, 0, videoFlags);
-    }
-
-    int Screen::InitializeSDL(std::string windowTitle)
-    {
-        if(SDL_Init(SDL_INIT_VIDEO)!=0)
-        {
-            return 1;
-        }
-
-        const SDL_VideoInfo *videoInfo;
-        /* Fetch the video info */
-        videoInfo = SDL_GetVideoInfo( );
-
-        if ( !videoInfo )
-        {
-            ENGINE_LOG(SORE_Logging::SHOW_CRITICAL,
-                       boost::format("Video query failed: %s")
-                       % SDL_GetError());
-            return 1;
-        }
-
-        videoFlags = SDL_OPENGL;
-        videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering */
-        videoFlags |= SDL_HWPALETTE;
-        /* This checks to see if surfaces can be stored in memory */
-        if ( videoInfo->hw_available )
-            videoFlags |= SDL_HWSURFACE;
-        else
-            videoFlags |= SDL_SWSURFACE;
-        if(videoInfo->blit_hw)
-            videoFlags |= SDL_HWACCEL;
-
-        SDL_WM_SetCaption(windowTitle.c_str(), windowTitle.c_str());
-
-        return 0;
     }
 
     int Screen::InitializeGL()
     {
-        //OpenGL setup
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
         /* Enable smooth shading */
         glShadeModel( GL_SMOOTH );
         /* Set the background black */

@@ -154,7 +154,7 @@ namespace SORE_GUI
         int dir = 0;
         if(e->type == SORE_Kernel::KEYDOWN)
         {
-            if(e->key.keySym == SDLK_LEFT)
+            if(e->key.keySym == SORE_Input::SSYM_LEFT)
             {
                 if(text.length() && pos)
                 {
@@ -162,7 +162,7 @@ namespace SORE_GUI
                     dir = -1;
                 }
             }
-            else if(e->key.keySym == SDLK_RIGHT)
+            else if(e->key.keySym == SORE_Input::SSYM_RIGHT)
             {
                 if(text.length() > pos)
                 {
@@ -170,7 +170,7 @@ namespace SORE_GUI
                     dir = 1;
                 }
             }
-            else if(e->key.keySym == SDLK_BACKSPACE)
+            else if(e->key.keySym == SORE_Input::SSYM_BACKSPACE)
             {
                 if(pos)
                 {

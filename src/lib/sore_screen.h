@@ -43,7 +43,7 @@
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
-#include <SDL/SDL.h>
+#include <SFML/Window.hpp>
 
 #include <sore_renderer.h>
 #include <sore_gamekernel.h>
@@ -80,22 +80,15 @@ namespace SORE_Kernel
         const GLint* GetViewport() const;
         SORE_Graphics::ScreenInfo GetScreen() const;
     private:
-        int  InitializeSDL(std::string windowTitle);
+        void SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen);
         int  InitializeGL();
         void PrintGLDiagnostics();
         void InitExtensions();
-
-        void SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen);
-
-        void SDLScreenChange(SORE_Graphics::ScreenInfo& _screen);
         void ChangeScreenOnSettingsChange();
 
         void Resize(int width, int height); //does the actual resizing
 
         InputTask& input; //for injecting resize events
-
-        SDL_Surface* drawContext;
-        Uint32 videoFlags;
 
         SORE_Graphics::IRenderer* renderer;
         SORE_Graphics::ProjectionInfo proj;

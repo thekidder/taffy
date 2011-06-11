@@ -147,8 +147,6 @@ namespace SORE_Kernel
         void PushState();
         void PopState();
     private:
-        //translate the given event and place it into event
-        void TranslateEvent(SDL_Event& sdl_event);
         //processes the member variable event
         void HandleEvent(Event& event);
 
