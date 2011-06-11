@@ -18,6 +18,7 @@ ENDIF()
 FIND_PACKAGE(GLEW REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(SDL REQUIRED)
+FIND_PACKAGE(SFML REQUIRED COMPONENTS System Window)
 FIND_PACKAGE(ZLIB REQUIRED)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
@@ -25,6 +26,7 @@ INCLUDE_DIRECTORIES(${ENET_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${SFML_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
 
 IF(NOT SORE_WITH_VBO)
@@ -83,7 +85,9 @@ set(SORE_HEADERS sore_camera.h sore_color.h
   sore_dll.h sore_defines.h
   sore_exception.h 
   sore_fileio.h sore_font.h
-  sore_input.h sore_interpolater.h sore_logger.h
+  sore_input.h 
+  sore_input_keysym.h
+  sore_interpolater.h sore_logger.h
   sore_logginginit.h sore_noncopyable.h sore_profiler.h 
   sore_resource.h
   sore_scenegraph.h sore_scenenode.h sore_screen.h sore_screeninfo.h
@@ -149,6 +153,7 @@ TARGET_LINK_LIBRARIES(
   ${OPENGL_gl_LIBRARY} 
   ${OPENGL_glu_LIBRARY}
   ${SDL_LIBRARY}
+  ${SFML_LIBRARY}
   )
 
 IF(ENET_FOUND)

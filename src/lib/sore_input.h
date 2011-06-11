@@ -41,15 +41,14 @@
 #pragma warning( disable : 4251 )
 #endif
 
+#include <sore_input_keysym.h>
+#include <sore_task.h>
+
+#include <boost/function.hpp>
+
 #include <map>
 #include <vector>
 #include <queue>
-
-#include <boost/function.hpp>
-#include <SDL/SDL_keysym.h>
-#include <SDL/SDL_events.h>
-
-#include <sore_task.h>
 
 namespace SORE_Kernel
 {
@@ -95,8 +94,8 @@ namespace SORE_Kernel
     
     struct KeyInfo
     {
-        unsigned int keySym;
-        unsigned int modState;
+        SORE_Input::Keysym_code_t keySym;
+        SORE_Input::Keysym_modifier_t modifiers;
         unsigned int unicode;
     };
     

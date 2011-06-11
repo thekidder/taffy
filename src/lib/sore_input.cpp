@@ -110,16 +110,17 @@ namespace SORE_Kernel
 			}
 			break;
 		case SDL_KEYDOWN:
+            // keysyms are designed to map directly to SDL keysyms
 			event.type = KEYDOWN;
-			event.key.keySym = sdl_event.key.keysym.sym;
-			event.key.modState = sdl_event.key.keysym.mod;
+			event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sdl_event.key.keysym.sym);
+			event.key.modifiers = static_cast<SORE_Input::Keysym_modifier_t>(sdl_event.key.keysym.mod);
 			event.key.unicode = sdl_event.key.keysym.unicode;
 			break;
 		case SDL_KEYUP:
 			event.type = KEYUP;
-			event.key.keySym = sdl_event.key.keysym.sym;
-			event.key.modState = sdl_event.key.keysym.mod;
-			event.key.unicode = sdl_event.key.keysym.unicode;
+			event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sdl_event.key.keysym.sym);
+			event.key.modifiers = static_cast<SORE_Input::Keysym_modifier_t>(sdl_event.key.keysym.mod);
+			event.key.unicode = 0u;
 			break;
 		case SDL_VIDEORESIZE:
 			event.type = WINDOWRESIZE;
