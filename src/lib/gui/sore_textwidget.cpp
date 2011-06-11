@@ -50,7 +50,7 @@ namespace SORE_GUI
     void TextWidget::UpdateText(const std::string& t)
     {
         text = t;
-        SetSize(SVec(SUnit(0.0, face.Width(height, text)), SUnit(0.0, height)));
+        SetSize(SVec(SUnit(0.0, static_cast<int>(face.Width(height, text))), SUnit(0.0, height)));
     }
 
     void TextWidget::SetColor(const SORE_Graphics::Color& c)
@@ -64,7 +64,7 @@ namespace SORE_GUI
         imm_mode.SetColor(color);
         imm_mode.SetShader(shader);
         imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
-        imm_mode.DrawString(0.0f, 0.0f, face, height, text);
+        imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, height, text);
     }
 
     bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)

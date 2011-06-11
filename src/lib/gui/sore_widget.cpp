@@ -116,7 +116,7 @@ namespace SORE_GUI
         {
             UpdateAndRender(elapsed, imm_mode);
 
-            std::vector<Widget*>::iterator it;
+            Widget_container_t::iterator it;
             for(it = children.begin(); it != children.end(); ++it)
             {
                 (*it)->Frame(elapsed, imm_mode);
@@ -141,7 +141,7 @@ namespace SORE_GUI
 
     void Widget::PropagateGLReload()
     {
-        for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+        for(Widget_container_t::iterator it=children.begin();it!=children.end();++it)
         {
             (*it)->PropagateGLReload();
         }
@@ -179,7 +179,7 @@ namespace SORE_GUI
             OldFocus() = Focus();
             Focus() = 0;
         }
-        for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+        for(Widget_container_t::iterator it=children.begin();it!=children.end();++it)
         {
             SORE_Kernel::Event relative;
             relative = *e;
@@ -338,7 +338,7 @@ namespace SORE_GUI
     {
         if(c)
         {
-            std::vector<Widget*>::iterator it;
+            Widget_container_t::iterator it;
             if((it = find(children.begin(), children.end(), c)) != children.end())
             {
                 children.erase(it);

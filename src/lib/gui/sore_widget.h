@@ -43,6 +43,8 @@
 
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include <sore_matrix4x4.h>
 #include <sore_dll.h>
 #include <sore_immediatemodeprovider.h>
@@ -52,9 +54,14 @@
 
 namespace SORE_GUI
 {
-    const static float LAYER_SEPARATION = 0.0005f;
+    const static float LAYER_SEPARATION = 0.05f;
 
     enum unit_type {HORIZONTAL, VERTICAL};
+
+    class Widget;
+
+    typedef boost::shared_ptr<Widget> WidgetPtr;
+    typedef boost::weak_ptr<Widget> WeakWidgetPtr;
 
     class SORE_EXPORT Widget
     {
@@ -102,10 +109,10 @@ namespace SORE_GUI
     private:
         //these events are preprocessed: mouse coordinates are relative to the widget,
         //not absolute
-        virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
+        virtual bool ProcessEvents(SORE_Kernel::Event* e) { return false; };
         //child widgets ARE responsible to transforming their geometry
         //via GetPositionMatrix()
-        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) = 0;
+        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) {};
         //gets called when the parent's position is updated; overload if we need to do
         //processing on a position change
         virtual void UpdatePosition() {}
@@ -124,7 +131,8 @@ namespace SORE_GUI
         //position matrix
         SORE_Math::Matrix4<float> mat;
         float layer;
-        std::vector<Widget*> children;
+        typedef std::vector<Widget*> Widget_container_t;
+        Widget_container_t children;
         Widget* parent;
         SVec position;
         SVec size;
