@@ -165,26 +165,8 @@ void SORE_Graphics::Renderable::CalculateSortKey() const
     const unsigned int depthBits = 11;
     unsigned int depth;
 
-    float z = 0.0f;
+    float z = (1<<depthBits) * cachedDepth;
 
-    switch(proj.type)
-    {
-    case ORTHO:
-    case ORTHO2D:
-        z = (1<<depthBits) *
-            (cachedDepth - proj.znear) / (proj.zfar - proj.znear);
-        break;
-    case PERSPECTIVE:
-        z = 1.0f / cachedDepth;
-        z = (proj.znear + proj.zfar) / (proj.zfar - proj.znear) +
-            cachedDepth * (-2.0f * proj.zfar * proj.znear) /
-            (proj.zfar - proj.znear);
-        z *= (1<<depthBits);
-        break;
-    case NONE:
-    default:
-        break;
-    }
     depth = static_cast<int>(z);
     if(blending == BLEND_OPAQUE)
         depth = (1<<depthBits) - depth;
