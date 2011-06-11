@@ -15,6 +15,9 @@ public:
         std::pair<float, float> input_range_, int num_series, int history_size_);
 
     void AddDatum(int series, float datum);
+
+    // set a comment to be rendered
+    void SetComment(const std::string& comment_);
 private:
     virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
     virtual bool ProcessEvents(SORE_Kernel::Event*) { return false; }
@@ -26,6 +29,10 @@ private:
     int history_size;
 
     SORE_Graphics::GLSLShaderPtr shader;
+    SORE_Graphics::GLSLShaderPtr font_shader;
+    SORE_Font::FontPtr face;
+
+    std::string comment;
 };
 
 #endif

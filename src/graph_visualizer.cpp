@@ -9,6 +9,8 @@ GraphVisualizer::GraphVisualizer(
         data(num_series), history_size(history_size_)
 {
     shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
+    font_shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
+    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
 }
 
 void GraphVisualizer::AddDatum(int series, float datum)
@@ -17,6 +19,11 @@ void GraphVisualizer::AddDatum(int series, float datum)
         data[series].pop_front();
 
     data[series].push_back(MapToRange(datum, input_range, k_std_range));
+}
+
+void GraphVisualizer::SetComment(const std::string& comment_)
+{
+    comment = comment_;
 }
 
 void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
@@ -69,10 +76,14 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
             x -= x_decrement;
             float y = GetSize(SORE_GUI::VERTICAL) - MapToRange(*it, k_std_range, render_range);
 
-            imm_mode.DrawLine(x_last, y_last, 0.2f, x, y, 0.2f);
+            imm_mode.DrawLine(x_last, y_last, SORE_GUI::LAYER_SEPARATION / 3.0, x, y, SORE_GUI::LAYER_SEPARATION / 3.0);
 
             x_last = x;
             y_last = y;
         }
     }
+    
+    imm_mode.SetColor(SORE_Graphics::White);
+    imm_mode.SetShader(font_shader);
+    imm_mode.DrawString(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment), GetSize(SORE_GUI::VERTICAL) - 24, 2.0 * SORE_GUI::LAYER_SEPARATION / 3.0, *face, 24, comment);
 }
