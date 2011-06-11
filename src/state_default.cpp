@@ -4,6 +4,7 @@
 #include "utility.h"
 
 #include <sore_gamestate_manager.h>
+#include <sore_input.h>
 #include <sore_util.h>
 
 #include <boost/bind.hpp>
@@ -56,6 +57,8 @@ void DefaultState::Init()
     input.AddListener(SORE_Kernel::RESIZE ,
                        std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
 
+    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), top);
+
     beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
     beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
     beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), top, owner->GetPool(), std::make_pair(0.0f, 30.0f), 4, 500);
@@ -63,7 +66,7 @@ void DefaultState::Init()
     spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), top, owner->GetPool(), 0);
 
     debug = new DebugGUI(owner->GetRenderer(), owner->GetPool(),
-                         owner->GetInputTask(), top);
+                         owner->GetInputTask(), container);
 
     face = owner->GetPool().GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
 
@@ -121,17 +124,21 @@ void DefaultState::Init()
     fmod_spectrum = new FMOD_Spectrum(kFFTSamples, sample_rate, system);
     kiss_spectrum = new KISS_Spectrum(kFFTSamples, sample_rate);
 
-    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 12);
-    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 12);
+    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 24);
+    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 24);
 
-    low  = new PartialSpectrum(*fmod_g_spectrum, 0, 4);
-    mid  = new PartialSpectrum(*fmod_g_spectrum, 4, 8);
-    high = new PartialSpectrum(*fmod_g_spectrum, 8, 12);
+    low  = new PartialSpectrum(*fmod_g_spectrum, 0, 8);
+    mid  = new PartialSpectrum(*fmod_g_spectrum, 8, 16);
+    high = new PartialSpectrum(*fmod_g_spectrum, 16, 24);
 
     spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
     beat_detector_low.SetSpectrum(low);
     beat_detector_mid.SetSpectrum(mid);
     beat_detector_high.SetSpectrum(high);
+
+    beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low->TotalHz().first % low->TotalHz().second).str());
+    beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid->TotalHz().first % mid->TotalHz().second).str());
+    beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high->TotalHz().first % high->TotalHz().second).str());
 }
 
 void DefaultState::Frame(int elapsed)
@@ -191,25 +198,25 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
     {
         switch(e->key.keySym)
         {
-        case SDLK_ESCAPE:
+        case SORE_Input::SSYM_ESCAPE:
             Quit();
             return true;
-        case SDLK_r:
+        case SORE_Input::SSYM_r:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_RECT);
             return true;
-        case SDLK_t:
+        case SORE_Input::SSYM_t:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_TRIANGLE);
             return true;
-        case SDLK_m:
+        case SORE_Input::SSYM_m:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HAMMING);
             return true;
-        case SDLK_n:
+        case SORE_Input::SSYM_n:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HANNING);
             return true;
-        case SDLK_k:
+        case SORE_Input::SSYM_k:
             use_kiss = !use_kiss;
             return true;
-        case SDLK_o:
+        case SORE_Input::SSYM_o:
             use_original = !use_original;
             return true;
         }
