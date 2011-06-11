@@ -23,7 +23,7 @@ DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool &poo
 
     renderStats = new gui::RenderStats(pool, renderer, top);
 
-    version = new gui::TextWidget(gui::SVec(gui::SUnit(0.0, 0), gui::SUnit(1.0, -26)),
+    version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
                                   *guiFont, 24, GetVersionString(), pool,
                                   SORE_Graphics::White, top);
 }
