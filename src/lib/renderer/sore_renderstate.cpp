@@ -186,11 +186,12 @@ void SORE_Graphics::RenderState::ChangeProjectionMatrix(
                    "No projection type set, could not initialize projection");
         break;
     case ORTHO2D:
-        gluOrtho2D(projection.left, projection.right,
-                   projection.top, projection.bottom);
+        glOrtho(projection.left, projection.right,
+                projection.top, projection.bottom, -1.0f, 1.0f);
         break;
     case ORTHO:
-        //TODO: finish ortho projection
+        glOrtho(projection.left, projection.right,
+                projection.top, projection.bottom, projection.znear, projection.zfar);
         break;
     case PERSPECTIVE:
         {
