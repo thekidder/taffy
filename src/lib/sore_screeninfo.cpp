@@ -45,7 +45,8 @@ namespace SORE_Graphics
             break;
         case ORTHO2D:
             returnProj.znear = -1.0f;
-            returnProj.zfar  =  1.0f;
+            returnProj.zfar  = 1.0f;
+        case ORTHO:
             if(pi.useScreenCoords)
             {
                 returnProj.top = static_cast<float>(si.height);
@@ -64,9 +65,6 @@ namespace SORE_Graphics
             {
                 returnProj.ratio = (pi.right - pi.left) / (pi.top - pi.bottom);
             }
-            break;
-        case ORTHO:
-            //TODO: finish ortho projection
             break;
         case PERSPECTIVE:
             if(pi.useScreenRatio)
