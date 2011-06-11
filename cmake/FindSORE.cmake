@@ -49,11 +49,13 @@ FIND_LIBRARY(SORE_LIBRARY_STATIC_DEBUG
 
 IF(WIN32)
   FIND_FILE(SORE_DLL_RELEASE
-    NAMES bin/sore.dll
+    sore.dll
+    PATH_SUFFIXES bin lib
     )
 
   FIND_FILE(SORE_DLL_DEBUG
-    NAMES bin/sore_debug.dll
+    sore_debug.dll
+    PATH_SUFFIXES bin lib
     )
 ENDIF()
 
