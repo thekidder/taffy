@@ -38,7 +38,8 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
 {
     RenderState state(r, cam);
     state = state.Difference(currentState);
-    if(currentGeometry.geometry != geometry.geometry)
+
+    if(currentGeometry.geometry != geometry.geometry || commandList.back().type == COMMAND)
     {
         //ENGINE_LOG(
         //    SORE_Logging::LVL_INFO,
@@ -62,12 +63,17 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
     }
     else
     {
-        commandList.back().AddIndices(geometry.indices);
+        commandList.back().batch.AddIndices(geometry.indices);
     }
 
     currentState = state;
     currentGeometry = geometry;
     currentTransform = *r.GetTransform();
+}
+
+void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command)
+{
+    commandList.push_back(command);
 }
 
 void SORE_Graphics::GLCommandList::Render()
@@ -79,15 +85,24 @@ void SORE_Graphics::GLCommandList::Render()
     numPolygons = 0;
     numDrawCalls = 0;
 
-    std::vector<RenderBatch>::iterator it;
+    std::vector<Command>::iterator it;
+    RenderBatch* lastRendered = 0;
     for(it = commandList.begin(); it != commandList.end(); ++it)
     {
-        numPolygons += it->Render();
-        numDrawCalls++;
+        if(it->type == RENDER)
+        {
+            numPolygons += it->batch.Render();
+            numDrawCalls++;
+            lastRendered = &it->batch;
+        }
+        else
+        {
+            ApplyRenderCommand(it->command);
+        }
     }
-    if(numDrawCalls > 0)
+    if(lastRendered)
     {
-        commandList.back().EndDraw();
+        lastRendered->EndDraw();
     }
 }
 
@@ -99,4 +114,16 @@ unsigned int SORE_Graphics::GLCommandList::NumPolygons() const
 unsigned int SORE_Graphics::GLCommandList::NumDrawCalls() const
 {
     return numDrawCalls;
+}
+
+void SORE_Graphics::GLCommandList::ApplyRenderCommand(Render_command_t command)
+{
+    switch(command)
+    {
+    case CLEAR_DEPTH_BUFFER:
+        glClear(GL_DEPTH_BUFFER_BIT);
+        break;
+    default:
+        break;
+    }
 }

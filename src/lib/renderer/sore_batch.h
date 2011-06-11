@@ -65,6 +65,8 @@ namespace SORE_Graphics
     class RenderBatch
     {
     public:
+        // creates a no-op batch
+        RenderBatch();
         //sets command to either NONE or BIND_VBO
         RenderBatch(const geometry_entry& geometry,
                     const RenderState& state, bool bindVBO = false);

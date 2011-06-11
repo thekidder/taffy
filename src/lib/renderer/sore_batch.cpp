@@ -34,6 +34,11 @@
 
 #include <sore_batch.h>
 
+SORE_Graphics::RenderBatch::RenderBatch()
+    : geometry(0), numberIndices(0)
+{
+}
+
 SORE_Graphics::RenderBatch::RenderBatch(
     const geometry_entry& geometry,
     const RenderState& state, bool bindVBO)

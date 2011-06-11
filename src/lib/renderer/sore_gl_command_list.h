@@ -44,6 +44,13 @@
 
 namespace SORE_Graphics
 {
+    enum Render_command_t
+    {
+        CLEAR_COLOR_BUFFER,
+        CLEAR_DEPTH_BUFFER,
+        CLEAR_COLOR_AND_DEPTH_BUFFERS
+    };
+
     /*
       Generates a list of GL commands to send to the GPU from an ordered list
       of renderables. Handles state changes, draw calls, and some rudimentary
@@ -56,19 +63,44 @@ namespace SORE_Graphics
             const Renderable& r,
             const geometry_entry& geometry,
             const camera_info& cam);
+        void AddCommand(Render_command_t command);
 
         void Render();
 
         unsigned int NumPolygons() const;
         unsigned int NumDrawCalls() const;
     private:
+        void ApplyRenderCommand(Render_command_t command);
+
+        enum Render_command_type_t
+        {
+            RENDER,
+            COMMAND
+        };
+        struct Command
+        {
+            Command(const RenderBatch& b)
+            {
+                type = RENDER;
+                batch = b;
+            }
+            Command(Render_command_t c)
+            {
+                type = COMMAND;
+                command = c;
+            }
+            Render_command_type_t type;
+            RenderBatch batch;
+            Render_command_t command;
+        };
+
         //current state
         RenderState currentState;
         geometry_entry currentGeometry;
         SORE_Math::Matrix4<float> currentTransform;
 
         //command list
-        std::vector<RenderBatch> commandList;
+        std::vector<Command> commandList;
 
         //stats
         unsigned int numPolygons;
