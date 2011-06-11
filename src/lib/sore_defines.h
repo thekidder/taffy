@@ -36,16 +36,15 @@
 #define  SORE_DEFINES_H
 
 #ifdef NDEBUG
-#undef DEBUG
+    #undef DEBUG
 #else
-#define DEBUG 1
+    #define DEBUG 1
 #endif
 
 #ifdef _WIN32
-//We need M_PI
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+    #define NOMINMAX
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
 #endif
 
 #endif /*SORE_DEFINES_H*/

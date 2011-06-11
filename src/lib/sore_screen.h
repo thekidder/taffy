@@ -43,6 +43,7 @@
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <SDL/SDL.h>
 
 #include <sore_renderer.h>
 #include <sore_gamekernel.h>
