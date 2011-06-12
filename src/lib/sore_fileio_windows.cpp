@@ -32,9 +32,10 @@
 * Adam Kidder.                                                           *
 **************************************************************************/
 
-
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4995 )
+#endif
 
 #define _WIN32_WINNT 0x0400
 #include <sore_defines.h> //for windows.h
@@ -126,12 +127,16 @@ static void CALLBACK MonitorCallback(DWORD dwErrorCode,
 static bool RefreshMonitoring(HDIR_MONITOR* pMonitor)
 {
     // disable warning about forcing bool value to true/false
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4800)
+#endif
     return ReadDirectoryChangesW(pMonitor->hDir, pMonitor->buffer, 32*1024, false, 
         FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
         0, &pMonitor->ol, MonitorCallback);
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 }
 
 void StopMonitoring(HDIR_MONITOR* pMonitor)
@@ -261,4 +266,6 @@ void SORE_FileIO::WindowsFileWatcher::Remove(notify_handle handle)
         watchedFiles.erase(watchedFiles.find(filename));*/
 }
 
-#pragma warning( pop)
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

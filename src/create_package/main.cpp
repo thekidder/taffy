@@ -53,8 +53,10 @@
 using namespace std;
 
 // disable warnings about fopen v fopen_s
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#endif
 
 void showHelp(const char* program_name, boost::program_options::options_description options)
 {
@@ -136,17 +138,6 @@ int main(int argc, char** argv)
         else
             AddFile(p, top, prefix, files);
     }
-    /*for(int i=0;i<files.size();i++)
-      {
-      if(files[i].file)
-      cout << "File Entry\n";
-      else
-      cout << "Directory Entry\n";
-      cout << "ID:\t\t" << files[i].fileID << "\n";
-      cout << "Parent:\t\t" << files[i].parentID << "\n";
-      cout << "Name: \t\t" << files[i].filename <<"\n";
-      cout << "Full name:\t" << files[i].fullname << "\n\n";
-      }*/
     if(files.size()>65534)
     {
         cerr << "Too many files in selected directory." << endl;
@@ -230,8 +221,6 @@ cout << "Finished writing file table, now copying data...\n";
                 it->size+=c;
                 fwrite(in_buf, sizeof(char), c, out);
             }
-            //cout << it->filename << "\n";
-            //cout << "size: " << it->size << "\n\n";
             fclose(in);
         }
         else
@@ -310,4 +299,6 @@ cout << "Finished writing file table, now copying data...\n";
     return 0;
 }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif

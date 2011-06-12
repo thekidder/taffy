@@ -32,8 +32,12 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+// std::copy warning in MSVC++
+#define _SCL_SECURE_NO_WARNINGS
+
 #include <sore_immediatemodeprovider.h>
 
+#include <algorithm>
 #include <set>
 #include <iterator>
 #include <sstream>
@@ -262,6 +266,7 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
         return;
 
     GeometryChunkPtr geometry(new SORE_Graphics::GeometryChunk(vertices.size(), indices.size(), current_primitive_type));
+
     std::copy(vertices.begin(), vertices.end(), geometry->GetVertices());
     std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
 

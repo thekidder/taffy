@@ -33,8 +33,10 @@
  **************************************************************************/
 
 // disable warning about std::copy being called unsafely in CompressedPkgFileBuf::read
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#endif
 
 #include <algorithm>
 #include <cassert>
@@ -45,7 +47,9 @@
 #include <string>
 #include <vector>
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 #include <zlib.h>
 
