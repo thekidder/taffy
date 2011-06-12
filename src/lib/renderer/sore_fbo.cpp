@@ -35,6 +35,8 @@
 #include <sore_fbo.h>
 #include <sore_logger.h>
 
+#include <cstring> // memset
+
 namespace SORE_Graphics
 {
     FBO::FBO(unsigned int w, unsigned int h, bool depthBuffer, unsigned int colorBuffers)

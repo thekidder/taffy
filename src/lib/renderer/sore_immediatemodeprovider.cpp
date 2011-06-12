@@ -205,11 +205,6 @@ std::vector<SORE_Graphics::Renderable>::iterator SORE_Graphics::ImmediateModePro
     return renderables.end();
 }
 
-void SORE_Graphics::ImmediateModeProvider::Regenerate()
-{
-    buffer_manager.Regenerate();
-}
-
 void SORE_Graphics::ImmediateModeProvider::SetTexCoords(float i, float j)
 {
     current_texcoords.first = i;

@@ -118,10 +118,7 @@ namespace SORE_GUI
         virtual void UpdatePosition() {}
         //gets called when the widget loses focus
         virtual void FocusLost() {}
-        //overload to perform any processing on GL context reload (reload textures etc)
-        virtual void OnGLReload() {}
         bool PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p);
-        void PropagateGLReload();
         void AddChild(Widget* c);
         void RemoveChild(Widget* c);
         void UpdatePositionMatrix();

@@ -105,7 +105,7 @@ namespace SORE_Kernel
     std::vector<SORE_Math::Vector2<unsigned int> > Screen::ListModes()
     {
         std::vector<SORE_Math::Vector2<unsigned int> > allModes;
-        
+        // TODO: FIXME
         return allModes;
     }
 
@@ -124,6 +124,7 @@ namespace SORE_Kernel
         }
 
         SORE_Profiler::Sample graphics("graphics");
+        window.SetActive();
         if(renderer)
             renderer->Render();
 
@@ -182,6 +183,7 @@ namespace SORE_Kernel
     {
         if(_screen.useNativeResolution)
         {
+            // TODO: FIXME
             //_screen.width = best_w;
             //_screen.height = best_h;
         }

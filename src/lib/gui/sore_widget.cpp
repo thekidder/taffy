@@ -128,24 +128,8 @@ namespace SORE_GUI
     {
         SORE_Kernel::Event previous = prev;
         prev = *e;
-        if(e->type == SORE_Kernel::RESIZE)
-        {
-            PropagateGLReload();
-            return true;
-        }
-        else
-        {
-            return PropagateEventHelper(e, &previous);
-        }
-    }
-
-    void Widget::PropagateGLReload()
-    {
-        for(Widget_container_t::iterator it=children.begin();it!=children.end();++it)
-        {
-            (*it)->PropagateGLReload();
-        }
-        OnGLReload();
+        
+        return PropagateEventHelper(e, &previous);
     }
 
     bool Widget::InBounds(unsigned int x, unsigned int y)

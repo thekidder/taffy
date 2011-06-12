@@ -35,14 +35,14 @@
 #ifndef SORE_GAMESTATE_MANAGER_H
 #define SORE_GAMESTATE_MANAGER_H
 
-#include <vector>
-
 #include <sore_pipeline_renderer.h>
 #include <sore_input.h>
 #include <sore_resource.h>
 #include <sore_screen.h>
 #include <sore_gamestate.h>
 #include <sore_gamekernel.h>
+
+#include <vector>
 
 namespace SORE_Game
 {

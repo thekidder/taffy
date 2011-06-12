@@ -149,29 +149,18 @@ void SORE_Graphics::SimpleBufferManager::GeometryRemoved(GeometryChunkPtr gc)
     buffer->needsRebuild = true;
 }
 
-void SORE_Graphics::SimpleBufferManager::Regenerate()
-{
-#ifndef SORE_NO_VBO
-    for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
-    {
-        BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
-        {
-            buffer->buffer.Regenerate();
-        }
-    }
-#endif
-}
-
 void SORE_Graphics::SimpleBufferManager::Clear()
 {
     geometryMapping.clear();
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
+        // TODO: FIXME
         BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
         {
-            delete buffer;
+            buffer->geometryMap.clear();
+            buffer->needsRebuild = true;
         }
-        heaps[i].clear();
+        //heaps[i].clear();
     }
 }
 

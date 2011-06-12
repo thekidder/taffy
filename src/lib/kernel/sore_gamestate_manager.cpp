@@ -117,10 +117,6 @@ namespace SORE_Game
         input.AddListener(
             SORE_Kernel::RESIZE,
             std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-        /*input.AddListener(
-            SORE_Kernel::RESIZE,
-            std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
-                          &pool));*/
     }
 
     SORE_Graphics::IRenderer* GamestateManager::GetRenderer()

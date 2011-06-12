@@ -93,8 +93,10 @@ namespace SORE_Graphics
                 && one.left == two.left && one.right == two.right
                 && one.top == two.top && one.bottom == two.bottom;
         case ORTHO:
-            //TODO: finish ortho projection
-            return two.type == ORTHO;
+            return two.type == ORTHO
+                && one.left == two.left && one.right == two.right
+                && one.top == two.top && one.bottom == two.bottom
+                && one.znear == two.znear && one.zfar == two.zfar;
         case PERSPECTIVE:
             return two.type == PERSPECTIVE
                 && one.fov == two.fov && one.ratio == two.ratio

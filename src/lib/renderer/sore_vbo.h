@@ -55,7 +55,6 @@ namespace SORE_Graphics
         VBO(geometry_type type, bool t = false, bool c = false, bool n = false);
         ~VBO();
 
-        void Regenerate(); //regenerates opengl VBO; call if context changes. VBO will be empty after this call
         virtual void Build();
     private:
         virtual void BeginDrawHook();

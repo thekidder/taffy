@@ -75,6 +75,9 @@ namespace SORE_Kernel
             case sf::Mouse::Right:
                 event.mouse.buttonState = MOUSE_BUTTON2;
                 break;
+            default:
+                event.mouse.buttonState = MOUSE_BUTTON3;
+                break;
             }
             break;
         case sf::Event::MouseButtonReleased:
@@ -89,6 +92,9 @@ namespace SORE_Kernel
                 break;
             case sf::Mouse::Right:
                 event.mouse.buttonState = MOUSE_BUTTON2;
+                break;
+            default:
+                event.mouse.buttonState = MOUSE_BUTTON3;
                 break;
             }
             break;
@@ -183,20 +189,12 @@ namespace SORE_Kernel
 
     void InputTask::Frame(int elapsedTime)
     {
-        //handle injected events first
         while(injectedEvents.size())
         {
             Event& e = injectedEvents.front();
             HandleEvent(e);
             injectedEvents.pop();
         }
-
-        /*SDL_Event sdl_event;
-        while(SDL_PollEvent(&sdl_event))
-        {
-            TranslateEvent(sdl_event);
-            HandleEvent(event);
-        }*/
     }
 
     event_listener_ref InputTask::AddListener(unsigned int eventType, boost::function<bool (Event*)> functor)

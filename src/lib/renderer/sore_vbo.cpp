@@ -60,11 +60,6 @@ namespace SORE_Graphics
         return ((char*)NULL + (offset));
     }
 
-    void VBO::Regenerate()
-    {
-        Create();
-    }
-
     void VBO::Build()
     {
         if(!indices.size()) return;
@@ -84,6 +79,8 @@ namespace SORE_Graphics
         case MAX_GEOMETRY_TYPE:
         default:
             ENGINE_LOG(SORE_Logging::LVL_ERROR, "Unrecognized switch case");
+            usage = GL_STREAM_DRAW_ARB;
+            break;
         }
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);

@@ -123,11 +123,8 @@ void SORE_Graphics::PipelineRenderer::PushState()
     root->AddChildPipe(sorter);
     sorter->AddChildPipe(gamePipe);
     sorter->AddChildPipe(guiPipe);
-    //root->AddChildPipe(new RenderPipe("normal"));
 
     states.top().pipeline = root;
-    //states.top().pipeline = boost::shared_ptr<Pipe>(new RenderPipe("normal"));
-    //states.top().pipeline->AddChildPipe(new RenderPipe());
 }
 
 void SORE_Graphics::PipelineRenderer::PopState()

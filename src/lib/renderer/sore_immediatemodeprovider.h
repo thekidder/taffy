@@ -77,9 +77,6 @@ namespace SORE_Graphics
         std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
         std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
-        // buffer manager interface
-        void Regenerate();
-
         SORE_Graphics::BufferManager* GetBufferManager() { return &buffer_manager; }
     private:
         void SetTexCoords(float i, float j);
