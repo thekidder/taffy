@@ -41,11 +41,11 @@
 #pragma warning( disable : 4251 )
 #endif
 
+#include <sore_allgl.h>
 #include <sore_input_keysym.h>
 #include <sore_task.h>
 
 #include <boost/function.hpp>
-#include <SFML/Window/Event.hpp>
 
 #include <map>
 #include <vector>
@@ -73,40 +73,40 @@ namespace SORE_Kernel
         RESIZE          = 0x400,
         QUIT            = 0x800,
 
-        INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP 
+        INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP
         | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK | MOUSEENTER | MOUSELEAVE,
 
         INPUT_ALLMOUSE  = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | MOUSEENTER | MOUSELEAVE
     };
 
     enum Mouse_button_t
-    {    
+    {
         MOUSE_BUTTON1   = 0x01,
         MOUSE_BUTTON2   = 0x02,
         MOUSE_BUTTON3   = 0x04,
         MOUSE_WHEELDOWN = 0x08,
         MOUSE_WHEELUP   = 0x10,
     };
-    
+
     struct MouseInfo
     {
         unsigned int x,y;
         int          xmove,ymove;
         unsigned int buttonState;
     };
-    
+
     struct KeyInfo
     {
         SORE_Input::Keysym_code_t keySym;
         unsigned int modifiers; // bitwise combination of Keysym_modifier_t
         unsigned int unicode; // used on TEXTENTERED event
     };
-    
+
     struct ResizeInfo
     {
         int w,h;
     };
-    
+
     struct Event
     {
         Event_type_t type;
@@ -114,7 +114,7 @@ namespace SORE_Kernel
         MouseInfo mouse;
         ResizeInfo resize;
     };
-    
+
     typedef std::vector<std::pair<unsigned int, boost::function<bool (Event*)> > > event_map;
 
     class SORE_EXPORT InputTask;
@@ -129,26 +129,26 @@ namespace SORE_Kernel
 
     // translate an SFML event to a SORE event
     Event TranslateEvent(const sf::Event& sfmlEvent);
-    
+
     class SORE_EXPORT InputTask : public Task
     {
     public:
         InputTask();
         ~InputTask();
-            
+
         void Frame(int elapsedTime);
         void Pause();
         void Resume();
-            
+
         const char* GetName() const {return "Input task";}
-            
+
         event_listener_ref AddListener(unsigned int eventType, boost::function<bool (Event*)> functor);
         void RemoveListener(event_listener_ref listener);
         void InjectEvent(SORE_Kernel::Event e);
 
         bool QuitEventReceived() const;
 
-        //This "state" is used by Gamestate. Only input handlers in the current state are respected 
+        //This "state" is used by Gamestate. Only input handlers in the current state are respected
         //(with Resize events as an exception)
         void PushState();
         void PopState();

@@ -230,7 +230,7 @@ namespace SORE_Graphics
         glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
         GLenum type = GL_UNSIGNED_BYTE;
         //interpret data as unsigned bytes unless a float format is specified
-        const unsigned int NUM_FLOAT_FORMATS = 12;
+        const int NUM_FLOAT_FORMATS = 12;
         GLint floatFormats[NUM_FLOAT_FORMATS] = {
             GL_RGBA32F_ARB,
             GL_RGB32F_ARB,

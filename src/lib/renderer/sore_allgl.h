@@ -39,6 +39,12 @@
 #include <sore_defines.h> //for windows.h
 
 #include <GL/glew.h>
+
+// can not include xlib before SFML
+// (http://www.sfml-dev.org/forum/viewtopic.php?p=18200&sid=754023e6f7b761837c33a5b21a29287c)
+// to fix this we put Window first, before the offending allgl
+#include <SFML/Window.hpp>
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 

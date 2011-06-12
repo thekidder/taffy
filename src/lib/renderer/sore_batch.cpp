@@ -61,7 +61,7 @@ unsigned int SORE_Graphics::RenderBatch::Render()
         {
             geometry->BeginDraw();
         }
-        unsigned int trisPerPoly;
+        unsigned int trisPerPoly = 1;
         if(type == GL_POINTS)
             trisPerPoly = 1;
         else if(type == GL_LINES)

@@ -36,6 +36,7 @@
 #include <sore_logger.h>
 
 #include <cstddef>
+#include <cstring> // memcpy
 
 SORE_Graphics::GraphicsArray::GraphicsArray(geometry_type type, bool t, bool c, bool n)
   : hasTexCoords(t), hasNormals(n), hasColors(c), type(type)
