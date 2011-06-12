@@ -71,5 +71,7 @@ namespace SORE_FileIO
         bool finished; //true when watcher is done
     };
 
+// currently this is very, very broken.
+// ReadDirectoryChangesW article: http://qualapps.blogspot.com/2010/05/understanding-readdirectorychangesw.html
 //#define FilesystemWatcherTask WindowsFileWatcher
 }

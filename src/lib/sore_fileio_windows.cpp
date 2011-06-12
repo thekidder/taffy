@@ -232,7 +232,7 @@ void SORE_FileIO::WindowsFileWatcher::Frame(int elapsedTime)
 SORE_FileIO::notify_handle SORE_FileIO::WindowsFileWatcher::Notify(
     const std::string& filename, file_callback callback)
 {
-    /*if(watches.find(GetParent(filename)) == watches.end())
+    if(watches.find(GetParent(filename)) == watches.end())
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, std::string("watching ") + GetParent(filename));
         HANDLE hDir = CreateFile(
@@ -254,16 +254,16 @@ SORE_FileIO::notify_handle SORE_FileIO::WindowsFileWatcher::Notify(
     else
     {
         return notify_handle();
-    }*/
+    }
     return notify_handle();
 }
 
 void SORE_FileIO::WindowsFileWatcher::Remove(notify_handle handle)
 {
-    /*std::string filename = GetParent(handle.filename);
+    std::string filename = GetParent(handle.filename);
     watchedFiles[filename].callbacks.erase(handle.it);
     if(watchedFiles[filename].callbacks.empty())
-        watchedFiles.erase(watchedFiles.find(filename));*/
+        watchedFiles.erase(watchedFiles.find(filename));
 }
 
 #ifdef _MSC_VER
