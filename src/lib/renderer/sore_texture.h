@@ -63,7 +63,6 @@ namespace SORE_Graphics
         const char* Type() const {return "2D texture";}
 
         void SaveTGA(const char* filename);
-        bool GLContextDependent() const {return true;}
         unsigned int GetHandle() const;
 
         bool operator<(const Texture2D& o) const;

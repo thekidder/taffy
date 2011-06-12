@@ -99,7 +99,6 @@ namespace SORE_Font
         ~Font();
 
         const char* Type() {return "Font";}
-        bool GLContextDependent() const {return true;}
 
         void LoadFace(unsigned int height);
         const CharInfo& GetCharacter(unsigned int height, char c);

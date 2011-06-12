@@ -178,18 +178,3 @@ void SORE_Resource::ResourcePool::for_each(boost::function<void (ResourcePtr)> f
     }
 }
 
-bool SORE_Resource::ResourcePool::OnResize(SORE_Kernel::Event* e)
-{
-    ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Reloading all GL dependent resources");
-    std::map<std::size_t, boost::weak_ptr<Resource> >::iterator it;
-    for(it=resources.begin();it!=resources.end();it++)
-    {
-        if(ResourcePtr r = it->second.lock())
-        {
-            if(r->GLContextDependent())
-                r->Reload();
-        }
-    }
-    return true;
-}
-

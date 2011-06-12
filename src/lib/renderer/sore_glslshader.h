@@ -76,7 +76,6 @@ namespace SORE_Graphics
         unsigned int GetHandle() const;
 
         const char* Type() const {return "GLSL shader";}
-        bool GLContextDependent() const {return true;}
 
         //Uniform operators
         void SetUniform1i(std::string name, GLuint i0);

@@ -111,7 +111,6 @@ public:
     std::string GetFilename() const;
 
     virtual void Reload() {Load();}
-    virtual bool GLContextDependent() const {return false;}
 
     void SetResourcePool(ResourcePool* rp);
 protected:
@@ -126,12 +125,6 @@ private:
     WatchedFileArrayPtr watchedFiles;
 };
 
-/*
-  As a little bit of a hack, we will put the logic for reloading textures
-  into ResourcePool.
-  To do this, we add a new field to Resource: GLContextDependent, which
-  returns true if we need to reload on GL context change
-*/
 class SORE_EXPORT SORE_Resource::ResourcePool
 {
 public:
@@ -142,7 +135,6 @@ public:
         boost::shared_ptr<T> GetResource(const std::string& filename);
 
     void for_each(boost::function<void (ResourcePtr)> func);
-    bool OnResize(SORE_Kernel::Event* e);
 private:
     template<typename T>
         boost::shared_ptr<T> InsertResource(
