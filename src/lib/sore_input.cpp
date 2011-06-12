@@ -54,190 +54,190 @@ namespace SORE_Kernel
     {
         Event event;
         switch(sfmlEvent.Type)
-		{
+        {
         case sf::Event::MouseMoved:
-			event.type = MOUSEMOVE;
-			event.mouse.xmove = sfmlEvent.MouseMove.X;
-			event.mouse.ymove = sfmlEvent.MouseMove.Y;
+            event.type = MOUSEMOVE;
+            event.mouse.xmove = sfmlEvent.MouseMove.X;
+            event.mouse.ymove = sfmlEvent.MouseMove.Y;
             event.mouse.x = sfmlEvent.MouseMove.X;
-			event.mouse.y = sfmlEvent.MouseMove.Y;
-			break;
-		case sf::Event::MouseButtonPressed:
-			event.type = MOUSEBUTTONDOWN;
-			switch(sfmlEvent.MouseButton.Button)
-			{
+            event.mouse.y = sfmlEvent.MouseMove.Y;
+            break;
+        case sf::Event::MouseButtonPressed:
+            event.type = MOUSEBUTTONDOWN;
+            switch(sfmlEvent.MouseButton.Button)
+            {
             case sf::Mouse::Left:
-				event.mouse.buttonState = MOUSE_BUTTON1;
-				break;
-			case sf::Mouse::Middle:
-				event.mouse.buttonState = MOUSE_BUTTON3;
-				break;
-			case sf::Mouse::Right:
-				event.mouse.buttonState = MOUSE_BUTTON2;
-				break;
-			}
-			break;
-		case sf::Event::MouseButtonReleased:
-			event.type = MOUSEBUTTONUP;
-			switch(sfmlEvent.MouseButton.Button)
-			{
+                event.mouse.buttonState = MOUSE_BUTTON1;
+                break;
+            case sf::Mouse::Middle:
+                event.mouse.buttonState = MOUSE_BUTTON3;
+                break;
+            case sf::Mouse::Right:
+                event.mouse.buttonState = MOUSE_BUTTON2;
+                break;
+            }
+            break;
+        case sf::Event::MouseButtonReleased:
+            event.type = MOUSEBUTTONUP;
+            switch(sfmlEvent.MouseButton.Button)
+            {
             case sf::Mouse::Left:
-				event.mouse.buttonState = MOUSE_BUTTON1;
-				break;
-			case sf::Mouse::Middle:
-				event.mouse.buttonState = MOUSE_BUTTON3;
-				break;
-			case sf::Mouse::Right:
-				event.mouse.buttonState = MOUSE_BUTTON2;
-				break;
-			}
-			break;
+                event.mouse.buttonState = MOUSE_BUTTON1;
+                break;
+            case sf::Mouse::Middle:
+                event.mouse.buttonState = MOUSE_BUTTON3;
+                break;
+            case sf::Mouse::Right:
+                event.mouse.buttonState = MOUSE_BUTTON2;
+                break;
+            }
+            break;
         case sf::Event::MouseWheelMoved:
             event.type = MOUSEBUTTONDOWN;
             if(sfmlEvent.MouseWheel.Delta > 0)
                 event.mouse.buttonState = MOUSE_WHEELUP;
             else
-				event.mouse.buttonState = MOUSE_WHEELDOWN;
+                event.mouse.buttonState = MOUSE_WHEELDOWN;
             break;
-		case sf::Event::KeyPressed:
+        case sf::Event::KeyPressed:
             // keysyms are designed to map directly to SDL keysyms
-			event.type = KEYDOWN;
+            event.type = KEYDOWN;
             event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sfmlEvent.Key.Code);
-			event.key.modifiers = GetModifiers(sfmlEvent);
-			break;
-		case sf::Event::KeyReleased:
-			event.type = KEYUP;
-			event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sfmlEvent.Key.Code);
-			event.key.modifiers = GetModifiers(sfmlEvent);
-			break;
+            event.key.modifiers = GetModifiers(sfmlEvent);
+            break;
+        case sf::Event::KeyReleased:
+            event.type = KEYUP;
+            event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sfmlEvent.Key.Code);
+            event.key.modifiers = GetModifiers(sfmlEvent);
+            break;
         case sf::Event::TextEntered:
             event.type = TEXTENTERED;
             event.key.unicode = sfmlEvent.Text.Unicode;
             break;
-		case sf::Event::Resized:
-			event.type = RESIZE;
-			event.resize.w = sfmlEvent.Size.Width;
-			event.resize.h = sfmlEvent.Size.Height;
-			break;
+        case sf::Event::Resized:
+            event.type = RESIZE;
+            event.resize.w = sfmlEvent.Size.Width;
+            event.resize.h = sfmlEvent.Size.Height;
+            break;
         case sf::Event::Closed:
             event.type = QUIT;
             break;
-		default: //invalid event type
-			event.type = NOEVENT;
-			break;
-		}
+        default: //invalid event type
+            event.type = NOEVENT;
+            break;
+        }
 
         return event;
     }
 
-	InputTask::InputTask() : quitEvent(false)
-	{
-		event.mouse.buttonState = 0x00;
-		PushState();
-	}
+    InputTask::InputTask() : quitEvent(false)
+    {
+        event.mouse.buttonState = 0x00;
+        PushState();
+    }
 
-	InputTask::~InputTask()
-	{
-	}
+    InputTask::~InputTask()
+    {
+    }
 
-	bool InputTask::QuitEventReceived() const
-	{
-		return quitEvent;
-	}
+    bool InputTask::QuitEventReceived() const
+    {
+        return quitEvent;
+    }
 
-	void InputTask::HandleEvent(Event& event)
-	{
-		if(event.type == NOEVENT) return;
+    void InputTask::HandleEvent(Event& event)
+    {
+        if(event.type == NOEVENT) return;
         if(event.type == QUIT)
         {
             quitEvent = true;
             return;
         }
-		for(event_map::iterator it=currentListeners->begin();it!=currentListeners->end();it++)
-		{
-			if(it->first & event.type && event.type != RESIZE)
-			{
-				bool result = (it->second)(&event); 
-				if(result) //ALWAYS propagate resize events...can be used by more than one function
-						return;
-			}
-		}
-		if(event.type == RESIZE)
-		{
-			//separate iteration for resize events in previous stack locations
-			std::vector<event_map>::iterator stackIter;
-			std::vector<event_map>::iterator stackEnd = allListeners.end();
-			for(stackIter=allListeners.begin();stackIter!=stackEnd;++stackIter)
-			{
-				event_map::iterator it;
-				for(it=stackIter->begin();it!=stackIter->end();it++)
-				{
-					if(it->first & event.type)
-					{
-						(it->second)(&event);
-					}
-				}
-			}
-		}
-	}
+        for(event_map::iterator it=currentListeners->begin();it!=currentListeners->end();it++)
+        {
+            if(it->first & event.type && event.type != RESIZE)
+            {
+                bool result = (it->second)(&event);
+                if(result)
+                    return;
+            }
+        }
+        if(event.type == RESIZE)
+        {
+            //separate iteration for resize events in previous stack locations
+            std::vector<event_map>::iterator stackIter;
+            std::vector<event_map>::iterator stackEnd = allListeners.end();
+            for(stackIter=allListeners.begin();stackIter!=stackEnd;++stackIter)
+            {
+                event_map::iterator it;
+                for(it=stackIter->begin();it!=stackIter->end();it++)
+                {
+                    if(it->first & event.type)
+                    {
+                        (it->second)(&event);
+                    }
+                }
+            }
+        }
+    }
 
-	void InputTask::Frame(int elapsedTime)
-	{
-		//handle injected events first
-		while(injectedEvents.size())
-		{
-			Event& e = injectedEvents.front();
-			HandleEvent(e);
-			injectedEvents.pop();
-		}
+    void InputTask::Frame(int elapsedTime)
+    {
+        //handle injected events first
+        while(injectedEvents.size())
+        {
+            Event& e = injectedEvents.front();
+            HandleEvent(e);
+            injectedEvents.pop();
+        }
 
-		/*SDL_Event sdl_event;
-		while(SDL_PollEvent(&sdl_event))
-		{
-			TranslateEvent(sdl_event);
-			HandleEvent(event);
-		}*/
-	}
+        /*SDL_Event sdl_event;
+        while(SDL_PollEvent(&sdl_event))
+        {
+            TranslateEvent(sdl_event);
+            HandleEvent(event);
+        }*/
+    }
 
-	event_listener_ref InputTask::AddListener(unsigned int eventType, boost::function<bool (Event*)> functor)
-	{
-		event_listener_ref curr;
-		curr.stackPos = currentListeners;
+    event_listener_ref InputTask::AddListener(unsigned int eventType, boost::function<bool (Event*)> functor)
+    {
+        event_listener_ref curr;
+        curr.stackPos = currentListeners;
 
-		currentListeners->push_back(std::make_pair(eventType, functor));
+        currentListeners->push_back(std::make_pair(eventType, functor));
 
-		curr.event = currentListeners->end() - 1;
-		return curr;
-	}
+        curr.event = currentListeners->end() - 1;
+        return curr;
+    }
 
-	void InputTask::RemoveListener(event_listener_ref ref)
-	{
-		ref.stackPos->erase(ref.event);
-	}
+    void InputTask::RemoveListener(event_listener_ref ref)
+    {
+        ref.stackPos->erase(ref.event);
+    }
 
-	void InputTask::InjectEvent(SORE_Kernel::Event e)
-	{
-		injectedEvents.push(e);
-	}
+    void InputTask::InjectEvent(SORE_Kernel::Event e)
+    {
+        injectedEvents.push(e);
+    }
 
-	void InputTask::PushState()
-	{
-		event_map temp;
-		allListeners.push_back(temp);
-		currentListeners = allListeners.end() - 1;
-	}
+    void InputTask::PushState()
+    {
+        event_map temp;
+        allListeners.push_back(temp);
+        currentListeners = allListeners.end() - 1;
+    }
 
-	void InputTask::PopState()
-	{
-		allListeners.pop_back();
-		currentListeners = allListeners.end() - 1;
-	}
+    void InputTask::PopState()
+    {
+        allListeners.pop_back();
+        currentListeners = allListeners.end() - 1;
+    }
 
-	void InputTask::Pause()
-	{
-	}
+    void InputTask::Pause()
+    {
+    }
 
-	void InputTask::Resume()
-	{
-	}
+    void InputTask::Resume()
+    {
+    }
 }
