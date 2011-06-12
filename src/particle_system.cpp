@@ -51,11 +51,6 @@ std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryEnd()
     return geometry.end();
 }
 
-void ParticleSystem::Regenerate()
-{
-    vbo.Regenerate();
-}
-
 SORE_Graphics::geometry_entry ParticleSystem::LookupGC(SORE_Graphics::GeometryChunkPtr gc)
 {
     return geometry_lookup;

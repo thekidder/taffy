@@ -198,10 +198,10 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
     {
         switch(e->key.keySym)
         {
-        /*case SORE_Input::SSYM_ESCAPE:
+        case SORE_Input::SSYM_ESCAPE:
             Quit();
-            return true;*/
-        /*case SORE_Input::SSYM_r:
+            return true;
+        case SORE_Input::SSYM_r:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_RECT);
             return true;
         case SORE_Input::SSYM_t:
@@ -218,7 +218,7 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
             return true;
         case SORE_Input::SSYM_o:
             use_original = !use_original;
-            return true;*/
+            return true;
         }
     }
     return false;
@@ -226,8 +226,7 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
 
 bool DefaultState::HandleResize(SORE_Kernel::Event* e)
 {
-    particles->Regenerate();
-    return true;
+    return false;
 }
 
 SORE_Graphics::camera_info DefaultState::GetCamera()
