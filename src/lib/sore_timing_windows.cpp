@@ -54,7 +54,6 @@ namespace SORE_Timing
 		QueryPerformanceCounter((LARGE_INTEGER*)&ticks);
 		double secs = (double)(ticks - start_count) / (double)freq;
 		return (unsigned int)(secs*10000.0);
-		//return 10*SDL_GetTicks();
 	}
 	
 	void Sleep(unsigned int ms)

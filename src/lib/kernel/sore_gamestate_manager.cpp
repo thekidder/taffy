@@ -115,12 +115,12 @@ namespace SORE_Game
 
         //ugly hack! get proper resize in every state
         input.AddListener(
-            SORE_Kernel::WINDOWRESIZE,
+            SORE_Kernel::RESIZE,
             std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
-        input.AddListener(
+        /*input.AddListener(
             SORE_Kernel::RESIZE,
             std::bind1st(std::mem_fun(&SORE_Resource::ResourcePool::OnResize),
-                          &pool));
+                          &pool));*/
     }
 
     SORE_Graphics::IRenderer* GamestateManager::GetRenderer()

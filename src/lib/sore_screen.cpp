@@ -53,8 +53,6 @@ namespace SORE_Kernel
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
         renderer = NULL;
 
-        CreateSFMLWindow();
-        
         if(sm!=NULL)
         {
             screen.width =
@@ -88,6 +86,8 @@ namespace SORE_Kernel
                  boost::bind(std::mem_fun(&Screen::ChangeScreenOnSettingsChange),
                              this));
         }
+
+        CreateSFMLWindow();
         
         if(InitializeGL()!=0)
         {
@@ -98,9 +98,6 @@ namespace SORE_Kernel
 
     void Screen::ChangeScreen(SORE_Graphics::ScreenInfo& _screen)
     {
-        if(renderer)
-            renderer->SetScreenInfo(_screen);
-
         screen = _screen;
         CreateSFMLWindow();
     }
@@ -119,6 +116,13 @@ namespace SORE_Kernel
 
     void Screen::Frame(int elapsedTime)
     {
+        sf::Event sfmlEvent;
+        while(window.GetEvent(sfmlEvent))
+        {
+            SORE_Kernel::Event event = SORE_Kernel::TranslateEvent(sfmlEvent);
+            input.InjectEvent(event);
+        }
+
         SORE_Profiler::Sample graphics("graphics");
         if(renderer)
             renderer->Render();
@@ -139,11 +143,17 @@ namespace SORE_Kernel
             return false;
         }
 
-        int width, height;
-        width  = event->resize.w;
-        height = event->resize.h;
+        screen.useNativeResolution = false;
+        screen.width  = event->resize.w;
+        screen.height = event->resize.h;
+        SetupScreenInfo(screen);
+
         // make sure viewport is correct
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, screen.width, screen.height);
+
+        // tell the renderer what our screen is
+        if(renderer)
+            renderer->SetScreenInfo(screen);
 
         return true;
     }
@@ -160,6 +170,12 @@ namespace SORE_Kernel
         sf::VideoMode videoMode(screen.width, screen.height);
 
         window.Create(videoMode, windowTitle, style);
+
+        SORE_Kernel::Event e;
+        e.type = SORE_Kernel::RESIZE;
+        e.resize.w = screen.width;
+        e.resize.h = screen.height;
+        input.InjectEvent(e);
     }
 
     void Screen::SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen)

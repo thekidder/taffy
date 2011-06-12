@@ -45,6 +45,7 @@
 #include <sore_task.h>
 
 #include <boost/function.hpp>
+#include <SFML/Window/Event.hpp>
 
 #include <map>
 #include <vector>
@@ -62,27 +63,29 @@ namespace SORE_Kernel
         KEYDOWN         = 0x010,
         KEYUP           = 0x020,
         KEYCLICK        = 0x040,
+        TEXTENTERED     = 0x080,
 
         //used for SORE_GUI
-        MOUSEENTER      = 0x080,
-        MOUSELEAVE      = 0x100,
-    
-        //window resize is called when the user physically resizes the window
-        //this really should not be called by any external functions
-        WINDOWRESIZE    = 0x200,
+        MOUSEENTER      = 0x100,
+        MOUSELEAVE      = 0x200,
+
         //resize is called when the actual screen is resized by *any* method
         RESIZE          = 0x400,
-    
-        MOUSE_BUTTON1   = 0x01,
-        MOUSE_BUTTON2   = 0x02,
-        MOUSE_BUTTON3   = 0x04,
-        MOUSE_WHEELDOWN = 0x08,
-        MOUSE_WHEELUP   = 0x10,
+        QUIT            = 0x800,
 
         INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP 
         | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK | MOUSEENTER | MOUSELEAVE,
 
         INPUT_ALLMOUSE  = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | MOUSEENTER | MOUSELEAVE
+    };
+
+    enum Mouse_button_t
+    {    
+        MOUSE_BUTTON1   = 0x01,
+        MOUSE_BUTTON2   = 0x02,
+        MOUSE_BUTTON3   = 0x04,
+        MOUSE_WHEELDOWN = 0x08,
+        MOUSE_WHEELUP   = 0x10,
     };
     
     struct MouseInfo
@@ -95,8 +98,8 @@ namespace SORE_Kernel
     struct KeyInfo
     {
         SORE_Input::Keysym_code_t keySym;
-        SORE_Input::Keysym_modifier_t modifiers;
-        unsigned int unicode;
+        unsigned int modifiers; // bitwise combination of Keysym_modifier_t
+        unsigned int unicode; // used on TEXTENTERED event
     };
     
     struct ResizeInfo
@@ -123,6 +126,9 @@ namespace SORE_Kernel
         event_map::iterator event;
         friend class SORE_EXPORT InputTask;
     };
+
+    // translate an SFML event to a SORE event
+    Event TranslateEvent(const sf::Event& sfmlEvent);
     
     class SORE_EXPORT InputTask : public Task
     {

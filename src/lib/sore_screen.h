@@ -41,10 +41,6 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-#include <SFML/Window.hpp>
-
 #include <sore_renderer.h>
 #include <sore_gamekernel.h>
 #include <sore_font.h>
@@ -54,6 +50,10 @@
 #include <sore_noncopyable.h>
 #include <sore_settings.h>
 #include <sore_screeninfo.h>
+
+#include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
+#include <SFML/Window.hpp>
 
 namespace SORE_Kernel
 {

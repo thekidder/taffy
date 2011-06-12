@@ -34,8 +34,102 @@
 
 #include <sore_input.h>
 #include <sore_logger.h>
+
 namespace SORE_Kernel
 {
+    unsigned int GetModifiers(const sf::Event& sfmlEvent)
+    {
+        unsigned int mod = SORE_Input::SMOD_NONE;
+        if(sfmlEvent.Key.Alt)
+            mod |= SORE_Input::SMOD_ALT;
+        if(sfmlEvent.Key.Control)
+            mod |= SORE_Input::SMOD_CTRL;
+        if(sfmlEvent.Key.Shift)
+            mod |= SORE_Input::SMOD_SHIFT;
+
+        return mod;
+    }
+
+    Event TranslateEvent(const sf::Event& sfmlEvent)
+    {
+        Event event;
+        switch(sfmlEvent.Type)
+		{
+        case sf::Event::MouseMoved:
+			event.type = MOUSEMOVE;
+			event.mouse.xmove = sfmlEvent.MouseMove.X;
+			event.mouse.ymove = sfmlEvent.MouseMove.Y;
+            event.mouse.x = sfmlEvent.MouseMove.X;
+			event.mouse.y = sfmlEvent.MouseMove.Y;
+			break;
+		case sf::Event::MouseButtonPressed:
+			event.type = MOUSEBUTTONDOWN;
+			switch(sfmlEvent.MouseButton.Button)
+			{
+            case sf::Mouse::Left:
+				event.mouse.buttonState = MOUSE_BUTTON1;
+				break;
+			case sf::Mouse::Middle:
+				event.mouse.buttonState = MOUSE_BUTTON3;
+				break;
+			case sf::Mouse::Right:
+				event.mouse.buttonState = MOUSE_BUTTON2;
+				break;
+			}
+			break;
+		case sf::Event::MouseButtonReleased:
+			event.type = MOUSEBUTTONUP;
+			switch(sfmlEvent.MouseButton.Button)
+			{
+            case sf::Mouse::Left:
+				event.mouse.buttonState = MOUSE_BUTTON1;
+				break;
+			case sf::Mouse::Middle:
+				event.mouse.buttonState = MOUSE_BUTTON3;
+				break;
+			case sf::Mouse::Right:
+				event.mouse.buttonState = MOUSE_BUTTON2;
+				break;
+			}
+			break;
+        case sf::Event::MouseWheelMoved:
+            event.type = MOUSEBUTTONDOWN;
+            if(sfmlEvent.MouseWheel.Delta > 0)
+                event.mouse.buttonState = MOUSE_WHEELUP;
+            else
+				event.mouse.buttonState = MOUSE_WHEELDOWN;
+            break;
+		case sf::Event::KeyPressed:
+            // keysyms are designed to map directly to SDL keysyms
+			event.type = KEYDOWN;
+            event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sfmlEvent.Key.Code);
+			event.key.modifiers = GetModifiers(sfmlEvent);
+			break;
+		case sf::Event::KeyReleased:
+			event.type = KEYUP;
+			event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sfmlEvent.Key.Code);
+			event.key.modifiers = GetModifiers(sfmlEvent);
+			break;
+        case sf::Event::TextEntered:
+            event.type = TEXTENTERED;
+            event.key.unicode = sfmlEvent.Text.Unicode;
+            break;
+		case sf::Event::Resized:
+			event.type = RESIZE;
+			event.resize.w = sfmlEvent.Size.Width;
+			event.resize.h = sfmlEvent.Size.Height;
+			break;
+        case sf::Event::Closed:
+            event.type = QUIT;
+            break;
+		default: //invalid event type
+			event.type = NOEVENT;
+			break;
+		}
+
+        return event;
+    }
+
 	InputTask::InputTask() : quitEvent(false)
 	{
 		event.mouse.buttonState = 0x00;
@@ -51,91 +145,14 @@ namespace SORE_Kernel
 		return quitEvent;
 	}
 
-	//void InputTask::TranslateEvent(SDL_Event& sdl_event)
-	//{
-	//	switch(sdl_event.type)
-	//	{
-	//	case SDL_QUIT:
-	//	{
-	//		quitEvent = true;
-	//		break;
-	//	}
-	//	case SDL_MOUSEMOTION:
-	//		event.type = MOUSEMOVE;
-	//		event.mouse.x = sdl_event.motion.x;
-	//		event.mouse.y = sdl_event.motion.y;
-	//		event.mouse.xmove = sdl_event.motion.xrel;
-	//		event.mouse.ymove = sdl_event.motion.yrel;
-	//		break;
-	//	case SDL_MOUSEBUTTONDOWN:
-	//		event.type = MOUSEBUTTONDOWN;
-	//		switch(sdl_event.button.button)
-	//		{
-	//		case SDL_BUTTON_LEFT:
-	//			event.mouse.buttonState = MOUSE_BUTTON1;
-	//			break;
-	//		case SDL_BUTTON_MIDDLE:
-	//			event.mouse.buttonState = MOUSE_BUTTON3;
-	//			break;
-	//		case SDL_BUTTON_RIGHT:
-	//			event.mouse.buttonState = MOUSE_BUTTON2;
-	//			break;
-	//		case SDL_BUTTON_WHEELDOWN:
-	//			event.mouse.buttonState = MOUSE_WHEELDOWN;
-	//			break;
-	//		case SDL_BUTTON_WHEELUP:
-	//			event.mouse.buttonState = MOUSE_WHEELUP;
-	//			break;
-	//		}
-	//		break;
-	//	case SDL_MOUSEBUTTONUP:
-	//		event.type = MOUSEBUTTONUP;
-	//		switch(sdl_event.button.button)
-	//		{
-	//		case SDL_BUTTON_LEFT:
-	//			event.mouse.buttonState = MOUSE_BUTTON1;
-	//			break;
-	//		case SDL_BUTTON_MIDDLE:
-	//			event.mouse.buttonState = MOUSE_BUTTON3;
-	//			break;
-	//		case SDL_BUTTON_RIGHT:
-	//			event.mouse.buttonState = MOUSE_BUTTON2;
-	//			break;
-	//		case SDL_BUTTON_WHEELDOWN:
-	//			event.mouse.buttonState = MOUSE_WHEELDOWN;
-	//			break;
-	//		case SDL_BUTTON_WHEELUP:
-	//			event.mouse.buttonState = MOUSE_WHEELUP;
-	//			break;
-	//		}
-	//		break;
-	//	case SDL_KEYDOWN:
- //           // keysyms are designed to map directly to SDL keysyms
-	//		event.type = KEYDOWN;
-	//		event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sdl_event.key.keysym.sym);
-	//		event.key.modifiers = static_cast<SORE_Input::Keysym_modifier_t>(sdl_event.key.keysym.mod);
-	//		event.key.unicode = sdl_event.key.keysym.unicode;
-	//		break;
-	//	case SDL_KEYUP:
-	//		event.type = KEYUP;
-	//		event.key.keySym = static_cast<SORE_Input::Keysym_code_t>(sdl_event.key.keysym.sym);
-	//		event.key.modifiers = static_cast<SORE_Input::Keysym_modifier_t>(sdl_event.key.keysym.mod);
-	//		event.key.unicode = 0u;
-	//		break;
-	//	case SDL_VIDEORESIZE:
-	//		event.type = WINDOWRESIZE;
-	//		event.resize.w = sdl_event.resize.w;
-	//		event.resize.h = sdl_event.resize.h;
-	//		break;
-	//	default: //invalid event type
-	//		event.type = NOEVENT;
-	//		return;
-	//	}
-	//}
-
 	void InputTask::HandleEvent(Event& event)
 	{
 		if(event.type == NOEVENT) return;
+        if(event.type == QUIT)
+        {
+            quitEvent = true;
+            return;
+        }
 		for(event_map::iterator it=currentListeners->begin();it!=currentListeners->end();it++)
 		{
 			if(it->first & event.type && event.type != RESIZE)
