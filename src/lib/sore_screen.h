@@ -59,22 +59,19 @@ namespace SORE_Kernel
     class SORE_EXPORT Screen : public Task, SORE_Utility::Noncopyable
     {
     public:
-        Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
+        Screen(SORE_Graphics::ScreenInfo& _screen,
                const std::string& windowTitle_="SORE App",
                const std::string& iconFilename="",
                SORE_Utility::SettingsManager* _sm=NULL);
-        ~Screen();
 
         void Frame(int elapsedTime);
 
         const char* GetName() const {return "Screen";}
 
-        void SetRenderer(SORE_Graphics::IRenderer* _renderer);
-
         void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
         std::vector<SORE_Math::Vector2<unsigned int> > ListModes();
 
-        bool OnResize(Event* event=NULL);
+        bool OnResize(Event* event = NULL);
 
         SORE_Graphics::ScreenInfo GetScreen() const;
     private:
@@ -85,11 +82,8 @@ namespace SORE_Kernel
         void InitExtensions();
         void ChangeScreenOnSettingsChange();
 
-        InputTask& input; //for injecting resize events
-
         sf::Window window;
         std::string windowTitle;
-        SORE_Graphics::IRenderer* renderer;
         SORE_Graphics::ScreenInfo screen;
         SORE_Utility::SettingsManager* sm;
     };

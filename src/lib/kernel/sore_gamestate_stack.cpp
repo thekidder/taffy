@@ -32,14 +32,12 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_gamestate_manager.h>
+#include <sore_gamestate_stack.h>
 #include <sore_timing.h>
-
-#include <boost/bind.hpp>
 
 namespace SORE_Game
 {
-    static SORE_Graphics::ScreenInfo screenInfo =
+    static SORE_Graphics::ScreenInfo defaultScreenInfo =
     {
         1024,
         768,
@@ -49,33 +47,28 @@ namespace SORE_Game
         false
     };
 
-    GamestateManager::GamestateManager(SORE_FileIO::PackageCache* pc,
-                                       const std::string& windowTitle,
-                                       const std::string& iconFilename,
-                                       const std::string& settingsFile)
+    GamestateStack::GamestateStack(
+        const std::string& windowTitle,
+        const std::string& iconFilename,
+        const std::string& settingsFile)
         : ini(settingsFile), sm(&ini),
-        screen(screenInfo, input, windowTitle, iconFilename, &sm),
+        screen(defaultScreenInfo, windowTitle, iconFilename, &sm), 
+        fontCache(SORE_Resource::FontLoader(packageCache)),
+        textureCache(SORE_Resource::Texture2DLoader(packageCache)),
+        shaderCache(SORE_Resource::GLSLShaderLoader(packageCache)),
         popFlag(false)
     {
         curr = kernel.end();
 
-        kernel.AddTask(0, &input);
         kernel.AddTask(10, &screen);
-#ifdef FilesystemWatcherTask
-        kernel.AddTask(20, &watcher);
-#endif
-
-        screen.SetRenderer(&renderer);
     }
 
-    GamestateManager::~GamestateManager()
+    GamestateStack::~GamestateStack()
     {
     }
 
-    void GamestateManager::Pop()
+    void GamestateStack::Pop()
     {
-        input.PopState();
-        renderer.PopState();
         kernel.RemoveTask(states.back().first);
         delete states.back().second;
         states.pop_back();
@@ -90,17 +83,13 @@ namespace SORE_Game
         popFlag = false;
     }
 
-    void GamestateManager::PopState()
+    void GamestateStack::PopState()
     {
         popFlag = true;
     }
 
-    void GamestateManager::PushState(Gamestate* newState)
+    void GamestateStack::PushState(Gamestate* newState)
     {
-        input.PushState();
-        renderer.PushState();
-        newState->Initialize(this);
-
         kernel.PauseTask(curr);
 
         if(newState->GetInterval() == -1)
@@ -108,29 +97,9 @@ namespace SORE_Game
         else
             curr = kernel.AddConstTask(50, newState->GetInterval(), newState);
         states.push_back(std::make_pair(curr, newState));
-
-        //ugly hack! get proper resize in every state
-        input.AddListener(
-            SORE_Kernel::RESIZE,
-            std::bind1st(std::mem_fun(&SORE_Kernel::Screen::OnResize), &screen));
     }
 
-    SORE_Graphics::IRenderer* GamestateManager::GetRenderer()
-    {
-        return &renderer;
-    }
-
-    SORE_Kernel::InputTask& GamestateManager::GetInputTask()
-    {
-        return input;
-    }
-
-    SORE_Kernel::Screen& GamestateManager::GetScreen()
-    {
-        return screen;
-    }
-
-    int GamestateManager::Run()
+    int GamestateStack::Run()
     {
         if(kernel.ShouldQuit())
         {
@@ -141,7 +110,7 @@ namespace SORE_Game
 
         unsigned int maxfps = 1000;
         unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
-        while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
+        while(!kernel.ShouldQuit() && states.size())
         {
             unsigned int ticks = SORE_Timing::GetGlobalTicks();
             unsigned int time = ticks - lastTicks;
@@ -164,14 +133,5 @@ namespace SORE_Game
         while(states.size()) Pop();
 
         return 0;
-    }
-
-    bool GamestateManager::FileNotifySupported() const
-    {
-#ifdef FilesystemWatcherTask
-        return true;
-#else
-        return false;
-#endif
     }
 }

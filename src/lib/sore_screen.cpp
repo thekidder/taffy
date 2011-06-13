@@ -45,13 +45,12 @@
 
 namespace SORE_Kernel
 {
-    Screen::Screen(SORE_Graphics::ScreenInfo& _screen, InputTask& i,
+    Screen::Screen(SORE_Graphics::ScreenInfo& _screen,
         const std::string& windowTitle_, const std::string& iconFilename,
         SORE_Utility::SettingsManager* _sm)
-        : input(i), windowTitle(windowTitle_), screen(_screen), sm(_sm)
+        : windowTitle(windowTitle_), screen(_screen), sm(_sm)
     {
         ENGINE_LOG(SORE_Logging::LVL_INFO, "Creating screen");
-        renderer = NULL;
 
         if(sm!=NULL)
         {
@@ -109,32 +108,17 @@ namespace SORE_Kernel
         return allModes;
     }
 
-    Screen::~Screen()
-    {
-        
-    }
-
     void Screen::Frame(int elapsedTime)
     {
         sf::Event sfmlEvent;
         while(window.GetEvent(sfmlEvent))
         {
             SORE_Kernel::Event event = SORE_Kernel::TranslateEvent(sfmlEvent);
-            input.InjectEvent(event);
+            //input.InjectEvent(event);
         }
 
-        SORE_Profiler::Sample graphics("graphics");
         window.SetActive();
-        if(renderer)
-            renderer->Render();
-
         window.Display();
-    }
-
-    void Screen::SetRenderer(SORE_Graphics::IRenderer* _renderer)
-    {
-        renderer = _renderer;
-        renderer->SetScreenInfo(screen);
     }
 
     bool Screen::OnResize(Event* event)
@@ -151,10 +135,6 @@ namespace SORE_Kernel
 
         // make sure viewport is correct
         glViewport(0, 0, screen.width, screen.height);
-
-        // tell the renderer what our screen is
-        if(renderer)
-            renderer->SetScreenInfo(screen);
 
         return true;
     }
@@ -176,7 +156,7 @@ namespace SORE_Kernel
         e.type = SORE_Kernel::RESIZE;
         e.resize.w = screen.width;
         e.resize.h = screen.height;
-        input.InjectEvent(e);
+        //input.InjectEvent(e);
     }
 
     void Screen::SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen)

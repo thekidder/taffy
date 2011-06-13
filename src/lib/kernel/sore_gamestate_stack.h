@@ -32,39 +32,50 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_GAMESTATE_MANAGER_H
-#define SORE_GAMESTATE_MANAGER_H
+#ifndef SORE_GAMESTATE_STACK_H
+#define SORE_GAMESTATE_STACK_H
 
-#include <sore_pipeline_renderer.h>
-#include <sore_input.h>
-#include <sore_screen.h>
+#include <sore_fileio.h>
+#include <sore_font_loader.h>
 #include <sore_gamestate.h>
-#include <sore_gamekernel.h>
+#include <sore_glslshader_loader.h>
+#include <sore_resourcecache.h>
+#include <sore_screen.h>
+#include <sore_settings.h>
+#include <sore_texture2d_loader.h>
+#include <sore_util.h>
 
-#include <vector>
+#include <string>
 
 namespace SORE_Game
 {
-    class SORE_EXPORT GamestateManager
+    class SORE_EXPORT GamestateStack
     {
     public:
-        GamestateManager(SORE_FileIO::PackageCache* pc = NULL,
-                         const std::string& windowTitle = "SORE Framework Application",
-                         const std::string& iconFilename = "",
-                         const std::string& settingsFile = "");
-        ~GamestateManager();
+        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Font,       SORE_Resource::FontLoader>       Font_cache_t;
+        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> Shader_cache_t;
+        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D,  SORE_Resource::Texture2DLoader>  Texture_cache_t;
+        
+        GamestateStack(
+            const std::string& windowTitle = "SORE Framework Application",
+            const std::string& iconFilename = "",
+            const std::string& settingsFile = "");
+        ~GamestateStack();
 
-        //use new to instantiate newState; the Manager will handle its deallocation
+        //use new to instantiate newState; the stack will handle its deallocation
         void PushState(Gamestate* newState);
         void PopState();
         //run until a task requests exit or until there are no states left
         int Run();
 
-        SORE_Graphics::IRenderer* GetRenderer();
-        SORE_Kernel::InputTask& GetInputTask();
-        SORE_Kernel::Screen& GetScreen();
+        // Accessors
+        SORE_Kernel::Screen& Screen() { return screen; }
+        SORE_FileIO::PackageCache& PackageCache() { return packageCache; }
 
-        bool FileNotifySupported() const;
+        // global resource caches
+        Font_cache_t& FontCache() { return fontCache; }
+        Shader_cache_t& ShaderCache() { return shaderCache; }
+        Texture_cache_t& TextureCache() { return textureCache; }
     private:
         void Pop();
 
@@ -73,14 +84,14 @@ namespace SORE_Game
         SORE_Utility::IniSettingsBackend ini;
         SORE_Utility::SettingsManager sm;
 
-        SORE_Kernel::InputTask input;
+        // globals accessible from gamestates
+        SORE_Kernel::Screen screen;
+        SORE_FileIO::PackageCache packageCache;
 
-        SORE_Kernel::Screen screen; //depends on input, sm
-        SORE_Graphics::PipelineRenderer renderer; //must be init after screen
-
-#ifdef FilesystemWatcherTask
-        SORE_FileIO::FilesystemWatcherTask watcher;
-#endif
+        // resource caches accessible from gamestates
+        Font_cache_t fontCache;
+        Shader_cache_t shaderCache;
+        Texture_cache_t textureCache;
 
         SORE_Kernel::task_ref curr;
         std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
@@ -89,5 +100,4 @@ namespace SORE_Game
         bool popFlag;
     };
 }
-
 #endif
