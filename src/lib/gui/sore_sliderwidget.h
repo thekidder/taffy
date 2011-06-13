@@ -41,11 +41,11 @@
 #pragma warning( disable : 4251 )
 #endif
 
+#include <sore_assettypes.h>
+#include <sore_framewidget.h>
+
 #include <boost/signals.hpp>
 #include <boost/function.hpp>
-
-#include <sore_resource.h>
-#include <sore_framewidget.h>
 
 namespace SORE_GUI
 {
@@ -70,8 +70,8 @@ namespace SORE_GUI
         float ValueToX(int value) const;
         int XToValue(float x) const;
 
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
+        SORE_Resource::Texture2DPtr bg, slider;
+        SORE_Resource::GLSLShaderPtr shader;
         SORE_Graphics::GeometryChunk* sliderChunk;
         SORE_Math::Matrix4<float> sliderMat;
 
