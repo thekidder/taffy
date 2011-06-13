@@ -54,6 +54,9 @@ namespace SORE_Resource
         // defined in place so we can use the Resource_t typedef
         Resource_t ResourceCache<Key,Asset,ResourceLoader>::Get(const Key& key)
         {
+            // make sure proxy is loaded
+            proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
+
             Asset_container_t::iterator it = map.find(key);
             if(it == map.end())
             {
@@ -94,7 +97,6 @@ namespace SORE_Resource
     ResourceCache<Key,Asset,ResourceLoader>::ResourceCache(const ResourceLoader& loader_)
         : loader(loader_)
     {
-        proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
     }
 
     template<typename Key, typename Asset, typename ResourceLoader>
