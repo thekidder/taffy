@@ -16,9 +16,10 @@
 #include <sore_glslshader_loader.h>
 #include <sore_font_loader.h>
 #include <sore_font.h>
-#include <sore_gamestate.h>
+#include <sore_gamestate_stack.h>
 #include <sore_immediatemodeprovider.h>
-#include <sore_input.h>
+#include <sore_inputdistributor.h>
+#include <sore_pipeline_renderer.h>
 #include <sore_resourcecache.h>
 #include <sore_topwidget.h>
 
@@ -35,16 +36,20 @@ class FMOD_Spectrum;
 class DefaultState : public SORE_Game::Gamestate
 {
 public:
-    DefaultState();
+    DefaultState(SORE_Game::GamestateStack& stack);
     ~DefaultState();
 
     void Frame(int elapsed);
     const char* GetName() const {return "Default state";}
+
+    virtual bool OnEvent(const SORE_Kernel::Event& e); 
 private:
-    bool HandleKeyboard(SORE_Kernel::Event* e);
-    bool HandleResize(SORE_Kernel::Event* e);
-    void Init();
+    bool HandleKeyboard(const SORE_Kernel::Event& e);
+    bool HandleResize(const SORE_Kernel::Event& e);
     void Quit();
+
+    SORE_Graphics::PipelineRenderer renderer;
+    SORE_Kernel::InputDistributor distributor;
 
     SORE_FileIO::PackageCache package_cache;
     SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D, SORE_Resource::Texture2DLoader> texture_cache;

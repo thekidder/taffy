@@ -1,9 +1,8 @@
 #include <sore_logger.h>
 #include "app_log.h"
 
-#include <sore_gamekernel.h>
 #include <sore_gamestate.h>
-#include <sore_gamestate_manager.h>
+#include <sore_gamestate_stack.h>
 
 #include "state_default.h"
 
@@ -29,15 +28,10 @@ int main(int argc, char** argv)
 
     APP_LOG(SORE_Logging::LVL_INFO, GetVersionString());
 
-    SORE_FileIO::PackageCache pc;
-    pc.AddPackage("default_shaders.sdp");
-    pc.AddPackage("ix_style.sdp");
+    SORE_Game::GamestateStack stack(GetVersionDisplayName(), "data/app.bmp", settingsFile);
+    stack.PushState(new DefaultState(stack));
+    int toReturn = stack.Run();
 
-    SORE_Game::GamestateManager gsm(&pc, GetVersionDisplayName(), "data/app.bmp", settingsFile);
-
-    gsm.PushState(new DefaultState);
-
-    int toReturn = gsm.Run();
     delete mainLog;
     return toReturn;
 }

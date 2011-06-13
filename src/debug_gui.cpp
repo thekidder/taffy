@@ -14,12 +14,13 @@
 
 namespace gui = SORE_GUI;
 
-DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r,
-                   SORE_Kernel::InputTask& input, gui::Widget* top)
-    : renderer(r), renderStats(0), version(0)
+DebugGUI::DebugGUI(
+    SORE_Graphics::Renderer& r,
+    gui::Widget* top)
+    : renderStats(0), version(0)
 {
 
-    renderStats = new gui::RenderStats(renderer, top);
+    renderStats = new gui::RenderStats(r, top);
 
     //version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
     //                              *guiFont, 24, GetVersionString(), 

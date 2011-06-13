@@ -6,8 +6,6 @@
 #include "state_default.h"
 #include "utility.h"
 
-#include <sore_gamestate_manager.h>
-#include <sore_input.h>
 #include <sore_util.h>
 
 #include <boost/bind.hpp>
@@ -21,8 +19,8 @@ using SORE_GUI::SUnit;
 const int kFFTSamples = 1024;
 const int kNumChannels = 2;
 
-DefaultState::DefaultState() 
-    : Gamestate(20), // run every 20 milliseconds
+DefaultState::DefaultState(SORE_Game::GamestateStack& stack) 
+    : Gamestate(stack, 20), // run every 20 milliseconds
     texture_cache(SORE_Resource::Texture2DLoader(package_cache)),
     shader_cache(SORE_Resource::GLSLShaderLoader(package_cache)),
     font_cache(SORE_Resource::FontLoader(package_cache, "")),
@@ -30,28 +28,15 @@ DefaultState::DefaultState()
     use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
     imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
-}
-
-DefaultState::~DefaultState()
-{
-    SetAdapter(0);
-
-    //delete particles;
-    delete fmod_g_spectrum;
-    delete kiss_g_spectrum;
-    delete fmod_spectrum;
-    delete kiss_spectrum;
-    //delete top;
-    
-    system->release();
-}
-
-void DefaultState::Init()
-{
-    owner->GetInputTask().AddListener(SORE_Kernel::KEYDOWN,
-                                       boost::bind(&DefaultState::HandleKeyboard, this, _1));
-    owner->GetInputTask().AddListener(SORE_Kernel::RESIZE,
-                                       boost::bind(&DefaultState::HandleResize, this, _1));
+    distributor.AddListener(
+        SORE_Kernel::KEYDOWN,
+         boost::bind(&DefaultState::HandleKeyboard, this, _1));
+    distributor.AddListener(
+        SORE_Kernel::RESIZE,
+        boost::bind(&DefaultState::HandleResize, this, _1));
+    distributor.AddListener(
+        SORE_Kernel::RESIZE,
+        boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
 
     //top = new gui::TopWidget(owner->GetRenderer()->GetScreenInfo().width,
     //                         owner->GetRenderer()->GetScreenInfo().height);
@@ -97,7 +82,7 @@ void DefaultState::Init()
     imm_mode.SetTexture(particle_texture);
 
     //owner->GetRenderer()->AddGeometryProvider(particles);
-    owner->GetRenderer()->AddGeometryProvider(&imm_mode);
+    renderer.AddGeometryProvider(&imm_mode);
     //owner->GetRenderer()->AddGeometryProvider(top->GetGeometryProvider());
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
@@ -111,7 +96,7 @@ void DefaultState::Init()
     SORE_Graphics::camera_callback_table cameras;
     cameras["gui"] = guiCam;
     cameras["normal"] = normalCam;
-    owner->GetRenderer()->SetCameraTable(cameras);
+    renderer.SetCameraTable(cameras);
 
     FMOD::System_Create(&system);
     system->init(100, FMOD_INIT_NORMAL, 0);
@@ -154,6 +139,25 @@ void DefaultState::Init()
     //beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low->TotalHz().first % low->TotalHz().second).str());
     //beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid->TotalHz().first % mid->TotalHz().second).str());
     //beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high->TotalHz().first % high->TotalHz().second).str());
+}
+
+DefaultState::~DefaultState()
+{
+    SetAdapter(0);
+
+    //delete particles;
+    delete fmod_g_spectrum;
+    delete kiss_g_spectrum;
+    delete fmod_spectrum;
+    delete kiss_spectrum;
+    //delete top;
+    
+    system->release();
+}
+
+bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
+{
+    return distributor.DistributeEvent(e);
 }
 
 void DefaultState::Frame(int elapsed)
@@ -204,41 +208,43 @@ void DefaultState::Frame(int elapsed)
 
     // draw gui
     //top->Frame(elapsed);
+
+    renderer.Render();
 }
 
 void DefaultState::Quit()
 {
-    owner->PopState();
+    gamestateStack.PopState();
 }
 
-bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
+bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
 {
-    if(e->type == SORE_Kernel::KEYDOWN)
+    if(e.type == SORE_Kernel::KEYDOWN)
     {
-        switch(e->key.keySym)
+        switch(e.key.keySym)
         {
-        case SORE_Input::SSYM_ESCAPE:
+        case SORE_Kernel::Key::SSYM_ESCAPE:
             Quit();
             return true;
-        case SORE_Input::SSYM_r:
+        case SORE_Kernel::Key::SSYM_r:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_RECT);
             return true;
-        case SORE_Input::SSYM_t:
+        case SORE_Kernel::Key::SSYM_t:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_TRIANGLE);
             return true;
-        case SORE_Input::SSYM_m:
+        case SORE_Kernel::Key::SSYM_m:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HAMMING);
             return true;
-        case SORE_Input::SSYM_n:
+        case SORE_Kernel::Key::SSYM_n:
             fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HANNING);
             return true;
-        case SORE_Input::SSYM_k:
+        case SORE_Kernel::Key::SSYM_k:
             use_kiss = !use_kiss;
             return true;
-        case SORE_Input::SSYM_o:
+        case SORE_Kernel::Key::SSYM_o:
             use_original = !use_original;
             return true;
-        case SORE_Input::SSYM_l:
+        case SORE_Kernel::Key::SSYM_l:
             if(particle_texture.Loaded())
                 texture_cache.Unload("particle.tga");
             else
@@ -249,7 +255,7 @@ bool DefaultState::HandleKeyboard(SORE_Kernel::Event* e)
     return false;
 }
 
-bool DefaultState::HandleResize(SORE_Kernel::Event* e)
+bool DefaultState::HandleResize(const SORE_Kernel::Event& e)
 {
     return false;
 }
