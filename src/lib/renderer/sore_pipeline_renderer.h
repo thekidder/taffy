@@ -50,7 +50,7 @@
 
 namespace SORE_Graphics
 {
-    class SORE_EXPORT PipelineRenderer : public IRenderer, SORE_Utility::Noncopyable
+    class SORE_EXPORT PipelineRenderer : public Renderer, SORE_Utility::Noncopyable
     {
     public:
         PipelineRenderer();
@@ -58,26 +58,20 @@ namespace SORE_Graphics
 
         virtual void ClearGeometryProviders();
         virtual void AddGeometryProvider(GeometryProvider* gp);
-        virtual void SetCameraTable(camera_callback_table cameras);
+        virtual void SetCameraTable(const camera_callback_table& cameras_);
+
+        virtual bool OnResize(const SORE_Kernel::Event& e);
 
         virtual void Render();
-
-        virtual void PushState();
-        virtual void PopState();
-
     private:
         //call once per frame to keep fps numbers up to date
         void CalculateFPS();
 
-        //state management
-        struct renderer_state
-        {
-            renderer_state() {}
-            camera_callback_table cameras;
-            std::vector<GeometryProvider*> geometry;
-            boost::shared_ptr<Pipe> pipeline;
-        };
-        std::stack<renderer_state> states;
+        camera_callback_table cameras;
+        std::vector<GeometryProvider*> geometry;
+        boost::shared_ptr<Pipe> pipeline;
+
+        int width, height;
     };
 }
 

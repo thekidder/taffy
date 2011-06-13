@@ -269,7 +269,7 @@ void SORE_Logging::XMLLogger::Write(log_message* log)
 	const char end[]   = "\t</message>\n";
 	buffer += begin;
 	buffer += "\t\t<time>";
-	buffer += boost::str(boost::format("+%.1f ms") % double(SORE_Timing::GetGlobalTicks()/10.0));
+	buffer += boost::str(boost::format("+%.1f ms") % double(SORE_Kernel::GetGlobalTicks()/10.0));
 	buffer += "</time>\n\t\t<level>";
 	buffer += levelint;
 	buffer += "</level>\n\t\t<levelstr>";

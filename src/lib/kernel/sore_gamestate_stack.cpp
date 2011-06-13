@@ -52,15 +52,16 @@ namespace SORE_Game
         const std::string& iconFilename,
         const std::string& settingsFile)
         : ini(settingsFile), sm(&ini),
-        screen(defaultScreenInfo, windowTitle, iconFilename, &sm), 
+        screen(defaultScreenInfo, windowTitle, iconFilename, &sm),
+        input(screen),
         fontCache(SORE_Resource::FontLoader(packageCache)),
         textureCache(SORE_Resource::Texture2DLoader(packageCache)),
         shaderCache(SORE_Resource::GLSLShaderLoader(packageCache)),
         popFlag(false)
     {
-        curr = kernel.end();
-
-        kernel.AddTask(10, &screen);
+        kernel.AddTask(10, &input);
+        // sf::window.Display() should be last call
+        kernel.AddTask(1000, &screen);
     }
 
     GamestateStack::~GamestateStack()
@@ -74,11 +75,7 @@ namespace SORE_Game
         states.pop_back();
 
         if(states.size())
-            curr = states.back().first;
-        else
-            curr = kernel.end();
-
-        kernel.ResumeTask(curr);
+            kernel.ResumeTask(states.back().first);
 
         popFlag = false;
     }
@@ -90,13 +87,22 @@ namespace SORE_Game
 
     void GamestateStack::PushState(Gamestate* newState)
     {
-        kernel.PauseTask(curr);
+        if(states.size())
+            kernel.PauseTask(states.back().first);
 
+        SORE_Kernel::task_ref curr;
         if(newState->GetInterval() == -1)
             curr = kernel.AddTask(50, newState);
         else
             curr = kernel.AddConstTask(50, newState->GetInterval(), newState);
         states.push_back(std::make_pair(curr, newState));
+
+        // put in a resize event so the state knows the window size
+        SORE_Kernel::Event e;
+        e.type = SORE_Kernel::RESIZE;
+        e.resize.w = screen.GetScreen().width;
+        e.resize.h = screen.GetScreen().height;
+        newState->OnEvent(e);
     }
 
     int GamestateStack::Run()
@@ -109,18 +115,31 @@ namespace SORE_Game
         }
 
         unsigned int maxfps = 1000;
-        unsigned int lastTicks = SORE_Timing::GetGlobalTicks();
-        while(!kernel.ShouldQuit() && states.size())
+        unsigned int lastTicks = SORE_Kernel::GetGlobalTicks();
+        while(!kernel.ShouldQuit() && states.size() && !input.QuitEventReceived())
         {
-            unsigned int ticks = SORE_Timing::GetGlobalTicks();
+            unsigned int ticks = SORE_Kernel::GetGlobalTicks();
             unsigned int time = ticks - lastTicks;
             double fps = 10000.0/double(time);
             if(fps>static_cast<double>(maxfps))
             {
-                SORE_Timing::Sleep(0);
+                SORE_Kernel::Sleep(0);
                 continue;
             }
             lastTicks = ticks;
+
+            // distribute events to the gamestates
+            while(input.size())
+            {
+                const SORE_Kernel::Event& e = input.top();
+                for(State_stack_t::reverse_iterator it = states.rbegin(); it != states.rend(); ++it)
+                {
+                    if(it->second->OnEvent(e))
+                        break;
+
+                }
+                input.pop();
+            }
 
             kernel.Frame();
 

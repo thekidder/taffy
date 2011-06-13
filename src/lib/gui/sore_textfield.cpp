@@ -63,7 +63,7 @@ namespace SORE_GUI
             shad,
             SORE_Graphics::BLEND_SUBTRACTIVE);*/
 
-        caretEnd = SORE_Timing::GetGlobalTicks();
+        caretEnd = SORE_Kernel::GetGlobalTicks();
 
         unsigned int textHeight = GetSize(VERTICAL) - 16;
 
@@ -116,7 +116,7 @@ namespace SORE_GUI
 
         if(HasFocus())
         {
-            unsigned int time = SORE_Timing::GetGlobalTicks();
+            unsigned int time = SORE_Kernel::GetGlobalTicks();
             if(time - caretEnd < 5000)
             {
                 SORE_Graphics::Renderable r(caret);
@@ -135,13 +135,13 @@ namespace SORE_GUI
         return list;*/
     }
 
-    bool TextField::ProcessEvents(SORE_Kernel::Event* e)
+    bool TextField::ProcessEvents(const SORE_Kernel::Event& e)
     {
         if(!HasFocus()) return false;
         int dir = 0;
-        if(e->type == SORE_Kernel::KEYDOWN)
+        if(e.type == SORE_Kernel::KEYDOWN)
         {
-            if(e->key.keySym == SORE_Input::SSYM_LEFT)
+            if(e.key.keySym == SORE_Kernel::Key::SSYM_LEFT)
             {
                 if(text.length() && pos)
                 {
@@ -149,7 +149,7 @@ namespace SORE_GUI
                     dir = -1;
                 }
             }
-            else if(e->key.keySym == SORE_Input::SSYM_RIGHT)
+            else if(e.key.keySym == SORE_Kernel::Key::SSYM_RIGHT)
             {
                 if(text.length() > pos)
                 {
@@ -157,7 +157,7 @@ namespace SORE_GUI
                     dir = 1;
                 }
             }
-            else if(e->key.keySym == SORE_Input::SSYM_BACKSPACE)
+            else if(e.key.keySym == SORE_Kernel::Key::SSYM_BACKSPACE)
             {
                 if(pos)
                 {
@@ -167,9 +167,9 @@ namespace SORE_GUI
                     dir = -1;
                 }
             }
-            else if(e->key.unicode < 128 && e->key.unicode > 31)
+            else if(e.key.unicode < 128 && e.key.unicode > 31)
             {
-                char insert = static_cast<char>(e->key.unicode);
+                char insert = static_cast<char>(e.key.unicode);
                 text.insert(pos, 1, insert);
                 pos++;
                 onChange(text);
@@ -179,9 +179,9 @@ namespace SORE_GUI
             UpdatePosition();
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
-            float x = static_cast<float>(e->mouse.x - 8);
+            float x = static_cast<float>(e.mouse.x - 8);
             size_t index;// = displayText->GetIndex(x);
             unsigned int oldPos = pos;
             pos = index + textStart;

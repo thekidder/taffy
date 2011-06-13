@@ -47,7 +47,7 @@ namespace SORE_Kernel
 	GameKernel::GameKernel()
 	{
 		ENGINE_LOG(SORE_Logging::LVL_INFO, "Kernel initialized");
-		lastTicks = SORE_Timing::GetGlobalTicks();
+		lastTicks = SORE_Kernel::GetGlobalTicks();
 		lastTicks = 0;
 		paused = false;
 	}
@@ -62,7 +62,7 @@ namespace SORE_Kernel
 		if(paused) return;
 		const int maxDeltaT = 20000; //if frame time is over 2 seconds don't run frame
 		task_ref it;
-		int ticks = SORE_Timing::GetGlobalTicks();
+		int ticks = SORE_Kernel::GetGlobalTicks();
 		int deltaT = ticks - lastTicks;
 		if(deltaT<maxDeltaT)
 		{

@@ -32,10 +32,12 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <boost/foreach.hpp>
-
 #include <sore_logger.h>
 #include <sore_pipe.h>
+
+#include <boost/foreach.hpp>
+
+#include <stdexcept>
 
 void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)
 {
@@ -142,8 +144,8 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::doRender
 {
     if(cameras.find(camera) == cameras.end())
     {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   boost::format("Could not find named camera %s") % camera);
+        // TODO: FIXME: sore exceptions
+        throw std::runtime_error("Could not find named camera " + camera);
     }
 
     const camera_info& cam = cameras.find(camera)->second;

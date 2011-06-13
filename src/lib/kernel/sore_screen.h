@@ -44,7 +44,7 @@
 #include <sore_allgl.h>
 #include <sore_font.h>
 #include <sore_gamekernel.h>
-#include <sore_input.h>
+#include <sore_event.h>
 #include <sore_logger.h>
 #include <sore_noncopyable.h>
 #include <sore_renderer.h>
@@ -55,6 +55,8 @@
 
 namespace SORE_Kernel
 {
+    class InputTask;
+
     // Responsible for opening/displaying a window and keeping the OpenGL context up-to-date
     class SORE_EXPORT Screen : public Task, SORE_Utility::Noncopyable
     {
@@ -71,10 +73,12 @@ namespace SORE_Kernel
         void ChangeScreen(SORE_Graphics::ScreenInfo& _screen);
         std::vector<SORE_Math::Vector2<unsigned int> > ListModes();
 
-        bool OnResize(Event* event = NULL);
+        bool OnResize(const Event& event);
 
         SORE_Graphics::ScreenInfo GetScreen() const;
     private:
+        friend class InputTask;
+
         void CreateSFMLWindow(); // create window based on current screeninfo
         void SetupScreenInfo(SORE_Graphics::ScreenInfo& _screen);
         int  InitializeGL();

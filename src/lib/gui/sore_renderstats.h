@@ -16,12 +16,12 @@ namespace SORE_GUI
     class SORE_EXPORT RenderStats : public FrameWindow
     {
     public:
-        RenderStats(SORE_Graphics::IRenderer* r,
+        RenderStats(SORE_Graphics::Renderer& r,
                     SORE_GUI::Widget* parent = 0);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
 
-        SORE_Graphics::IRenderer* renderer;
+        SORE_Graphics::Renderer& renderer;
 
         SORE_GUI::TextWidget* draws, *drawsLabel;
         SORE_GUI::TextWidget* fps, *fpsLabel;

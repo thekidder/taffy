@@ -39,7 +39,7 @@
 #include <sore_timing.h>
 #include <sore_logger.h>
 
-namespace SORE_Timing
+namespace SORE_Kernel
 {
     unsigned int GetGlobalTicks() //in 1/10000 second increments
     {

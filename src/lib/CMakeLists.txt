@@ -78,17 +78,14 @@ set(SORE_SRCS
   sore_camera.cpp 
   sore_color.cpp
   sore_fileio.cpp
-  sore_input.cpp
   sore_interpolater.cpp
   sore_logger.cpp
   sore_logginginit.cpp
   sore_profiler.cpp
   sore_scenegraph.cpp
   sore_scenenode.cpp
-  sore_screen.cpp
   sore_screeninfo.cpp
   sore_settings.cpp
-  sore_timing.cpp
   sore_util.cpp)
 
 set(SORE_HEADERS
@@ -98,8 +95,6 @@ set(SORE_HEADERS
   sore_dll.h
   sore_exception.h 
   sore_fileio.h
-  sore_input.h 
-  sore_input_keysym.h
   sore_interpolater.h
   sore_logger.h
   sore_logginginit.h
@@ -107,10 +102,8 @@ set(SORE_HEADERS
   sore_profiler.h 
   sore_scenegraph.h
   sore_scenenode.h
-  sore_screen.h
   sore_screeninfo.h
   sore_settings.h
-  sore_timing.h
   sore_util.h) 
 
 #set up source groups to create VS folders

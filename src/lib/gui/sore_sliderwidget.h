@@ -63,7 +63,7 @@ namespace SORE_GUI
     private:
         //TODO:fixme
         //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
+        bool ProcessEvents(const SORE_Kernel::Event& e);
         void UpdatePosition();
         void UpdateSlider();
 

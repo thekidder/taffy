@@ -32,15 +32,30 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_gamestate_stack.h>
-#include <sore_logger.h>
-#include <sore_gamestate.h>
+#ifndef  SORE_TIMING_H
+#define  SORE_TIMING_H
 
-namespace SORE_Game
+#include <sore_dll.h>
+
+namespace SORE_Kernel
 {
-    Gamestate::Gamestate(GamestateStack& gamestateStack_, int ms) 
-        : gamestateStack(gamestateStack_), interval(ms)
-    {
-    }
+	unsigned int SORE_EXPORT GetGlobalTicks(); // in 1/10000 sec
+	unsigned int SORE_EXPORT GetGlobalMS(); //provided for convenience 
+	
+	void SORE_EXPORT Sleep(unsigned int ms);
 
+	//implements a timer that starts when it comes in scope
+	class SORE_EXPORT Timer
+	{
+	public:
+		Timer();
+
+		void Reset();
+		float GetSeconds() const;
+		unsigned int GetMS() const;
+	private:
+		unsigned int startTicks;
+	};
 }
+
+#endif

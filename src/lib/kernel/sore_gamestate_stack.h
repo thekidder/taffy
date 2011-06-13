@@ -39,6 +39,7 @@
 #include <sore_font_loader.h>
 #include <sore_gamestate.h>
 #include <sore_glslshader_loader.h>
+#include <sore_inputtask.h>
 #include <sore_resourcecache.h>
 #include <sore_screen.h>
 #include <sore_settings.h>
@@ -86,6 +87,7 @@ namespace SORE_Game
 
         // globals accessible from gamestates
         SORE_Kernel::Screen screen;
+        SORE_Kernel::InputTask input;
         SORE_FileIO::PackageCache packageCache;
 
         // resource caches accessible from gamestates
@@ -93,8 +95,8 @@ namespace SORE_Game
         Shader_cache_t shaderCache;
         Texture_cache_t textureCache;
 
-        SORE_Kernel::task_ref curr;
-        std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;
+        typedef std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > State_stack_t;
+        State_stack_t states;
 
         //should we pop the state on frame end?
         bool popFlag;

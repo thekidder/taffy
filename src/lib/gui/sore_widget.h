@@ -48,7 +48,7 @@
 #include <sore_matrix4x4.h>
 #include <sore_dll.h>
 #include <sore_immediatemodeprovider.h>
-#include <sore_input.h>
+#include <sore_event.h>
 
 #include <sore_units.h>
 
@@ -70,7 +70,7 @@ namespace SORE_GUI
         ~Widget();
 
         std::vector<SORE_Graphics::Renderable> GetRenderList();
-        bool PropagateEvents(SORE_Kernel::Event* e);
+        bool PropagateEvents(const SORE_Kernel::Event& e);
 
         int GetSize(unit_type type) const;
         int GetPosition(unit_type type) const;
@@ -109,7 +109,7 @@ namespace SORE_GUI
     private:
         //these events are preprocessed: mouse coordinates are relative to the widget,
         //not absolute
-        virtual bool ProcessEvents(SORE_Kernel::Event* e) { return false; };
+        virtual bool ProcessEvents(const SORE_Kernel::Event& e) { return false; };
         //child widgets ARE responsible to transforming their geometry
         //via GetPositionMatrix()
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) {};
@@ -118,7 +118,7 @@ namespace SORE_GUI
         virtual void UpdatePosition() {}
         //gets called when the widget loses focus
         virtual void FocusLost() {}
-        bool PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p);
+        bool PropagateEventHelper(const SORE_Kernel::Event& e, const SORE_Kernel::Event& p);
         void AddChild(Widget* c);
         void RemoveChild(Widget* c);
         void UpdatePositionMatrix();

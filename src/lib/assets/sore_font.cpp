@@ -32,6 +32,9 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+// suppress warnings in visual studio with std::copy
+#define _SCL_SECURE_NO_WARNINGS
+
 #include <sore_fileio.h>
 #include <sore_font.h>
 #include <sore_geometry.h>

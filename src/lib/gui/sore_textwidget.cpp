@@ -65,7 +65,7 @@ namespace SORE_GUI
         imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, height, text);
     }
 
-    bool TextWidget::ProcessEvents(SORE_Kernel::Event* e)
+    bool TextWidget::ProcessEvents(const SORE_Kernel::Event& e)
     {
         return false;
     }

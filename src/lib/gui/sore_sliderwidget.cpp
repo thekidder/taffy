@@ -92,15 +92,15 @@ namespace SORE_GUI
     }
     */
 
-    bool SliderWidget::ProcessEvents(SORE_Kernel::Event* e)
+    bool SliderWidget::ProcessEvents(const SORE_Kernel::Event& e)
     {
         float pos = ValueToX(current);
-        switch(e->type)
+        switch(e.type)
         {
         case SORE_Kernel::MOUSEBUTTONDOWN:
-            if(e->mouse.x < pos || e->mouse.x > pos+GetSize(VERTICAL)/8.0f)
+            if(e.mouse.x < pos || e.mouse.x > pos+GetSize(VERTICAL)/8.0f)
             {
-                SetValue(XToValue(static_cast<float>(e->mouse.x)));
+                SetValue(XToValue(static_cast<float>(e.mouse.x)));
             }
             dragged = true;
             return true;
@@ -112,7 +112,7 @@ namespace SORE_GUI
         case SORE_Kernel::MOUSEMOVE:
             if(dragged)
             {
-                SetValue(XToValue(static_cast<float>(e->mouse.x)));
+                SetValue(XToValue(static_cast<float>(e.mouse.x)));
                 return true;
             }
             break;

@@ -110,33 +110,28 @@ namespace SORE_Kernel
 
     void Screen::Frame(int elapsedTime)
     {
-        sf::Event sfmlEvent;
-        while(window.GetEvent(sfmlEvent))
-        {
-            SORE_Kernel::Event event = SORE_Kernel::TranslateEvent(sfmlEvent);
-            //input.InjectEvent(event);
-        }
-
         window.SetActive();
         window.Display();
     }
 
-    bool Screen::OnResize(Event* event)
+    bool Screen::OnResize(const Event& event)
     {
-        if(event==NULL)
+        if(event.type == RESIZE)
+        {
+            screen.useNativeResolution = false;
+            screen.width  = event.resize.w;
+            screen.height = event.resize.h;
+            SetupScreenInfo(screen);
+
+            // make sure viewport is correct
+            glViewport(0, 0, screen.width, screen.height);
+
+            return true;
+        }
+        else
         {
             return false;
         }
-
-        screen.useNativeResolution = false;
-        screen.width  = event->resize.w;
-        screen.height = event->resize.h;
-        SetupScreenInfo(screen);
-
-        // make sure viewport is correct
-        glViewport(0, 0, screen.width, screen.height);
-
-        return true;
     }
 
     void Screen::CreateSFMLWindow()

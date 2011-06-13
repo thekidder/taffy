@@ -32,32 +32,38 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_timing.h>
+#include <sore_inputtask.h>
+#include <sore_screen.h>
 
-namespace SORE_Timing
+namespace SORE_Kernel
 {
-	unsigned int GetGlobalMS()
-	{
-		return GetGlobalTicks()/10;
-	}
+    InputTask::InputTask(SORE_Kernel::Screen& screen_) 
+        : screen(screen_), quitEvent(false)
+    {
+    }
 
-	Timer::Timer()
-	{
-		Reset();
-	}
+    void InputTask::HandleEvent(const Event& event)
+    {
+        if(event.type == NOEVENT) return;
+        if(event.type == QUIT)
+        {
+            quitEvent = true;
+        }
+        allEvents.push(event);
+    }
 
-	void Timer::Reset()
-	{
-		startTicks = GetGlobalMS();
-	}
+    void InputTask::Frame(int elapsedTime)
+    {
+        sf::Event sfmlEvent;
+        while(screen.window.GetEvent(sfmlEvent))
+        {
+            SORE_Kernel::Event event = SORE_Kernel::TranslateEvent(sfmlEvent);
+            HandleEvent(event);
+        }
+    }
 
-	unsigned int Timer::GetMS() const
-	{
-		return GetGlobalMS() - startTicks;
-	}
-
-	float Timer::GetSeconds() const
-	{
-		return (GetGlobalMS() - startTicks)/1000.0f;
-	}
+    void InputTask::InjectEvent(const SORE_Kernel::Event& e)
+    {
+        HandleEvent(e);
+    }
 }

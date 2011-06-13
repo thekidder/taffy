@@ -37,7 +37,7 @@
 
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
-#include <sore_input.h>
+#include <sore_event.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
@@ -47,7 +47,7 @@ namespace SORE_GUI
     public:
         TopWidget(unsigned int width, unsigned int height);
 
-        bool OnResize(SORE_Kernel::Event* e);
+        bool OnResize(const SORE_Kernel::Event& e);
 
         virtual SORE_Graphics::GeometryProvider* GetGeometryProvider() { return &imm_mode; }
 
@@ -56,7 +56,7 @@ namespace SORE_GUI
         void Frame(int elapsed); // perform all logic and render
     private:
         void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
+        bool ProcessEvents(const SORE_Kernel::Event& e);
         void UpdateResolution(unsigned int w, unsigned int h);
 
         SORE_Graphics::ImmediateModeProvider imm_mode;

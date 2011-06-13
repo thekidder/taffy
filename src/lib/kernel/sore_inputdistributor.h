@@ -32,20 +32,35 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_renderer.h>
+#ifndef SORE_INPUTDISTRIBUTOR_H
+#define SORE_INPUTDISTRIBUTOR_H
 
-#include <boost/format.hpp>
+#include <sore_event.h>
 
-namespace SORE_Graphics
+#include <boost/function.hpp>
+
+#include <list>
+
+namespace SORE_Kernel
 {
-    void IRenderer::SetScreenInfo(ScreenInfo _screen)
+    // can attach/detach listeners, will broadcast all inserted events
+    class InputDistributor
     {
-        screen = _screen;
-        OnScreenChange();
-    }
+    public:
+        typedef boost::function<bool (const Event&)> Event_listener_func_t;
+        typedef std::list<std::pair<unsigned int, Event_listener_func_t> > Event_listeners_t;
+        typedef Event_listeners_t::iterator Event_listener_ref_t;
 
-    ScreenInfo IRenderer::GetScreenInfo() const
-    {
-        return screen;
-    }
+        InputDistributor();
+
+        // returns whether or not the event was successfully handled
+        bool DistributeEvent(const Event& e);
+
+        Event_listener_ref_t AddListener(unsigned int eventTypes, Event_listener_func_t listener);
+        void RemoveListener(Event_listener_ref_t listener);
+    private:
+        Event_listeners_t allListeners;
+    };
 }
+
+#endif

@@ -32,30 +32,29 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_TIMING_H
-#define  SORE_TIMING_H
+#include <sore_timing.h>
 
-#include <sore_dll.h>
-
-namespace SORE_Timing
+unsigned int SORE_Kernel::GetGlobalMS()
 {
-	unsigned int SORE_EXPORT GetGlobalTicks(); // in 1/10000 sec
-	unsigned int SORE_EXPORT GetGlobalMS(); //provided for convenience 
-	
-	void SORE_EXPORT Sleep(unsigned int ms);
-
-	//implements a timer that starts when it comes in scope
-	class SORE_EXPORT Timer
-	{
-	public:
-		Timer();
-
-		void Reset();
-		float GetSeconds() const;
-		unsigned int GetMS() const;
-	private:
-		unsigned int startTicks;
-	};
+	return GetGlobalTicks()/10;
 }
 
-#endif
+SORE_Kernel::Timer::Timer()
+{
+	Reset();
+}
+
+void SORE_Kernel::Timer::Reset()
+{
+	startTicks = GetGlobalMS();
+}
+
+unsigned int SORE_Kernel::Timer::GetMS() const
+{
+	return GetGlobalMS() - startTicks;
+}
+
+float SORE_Kernel::Timer::GetSeconds() const
+{
+	return (GetGlobalMS() - startTicks)/1000.0f;
+}

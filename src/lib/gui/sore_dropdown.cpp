@@ -178,21 +178,21 @@ namespace SORE_GUI
         return list;*/
     }
 
-    bool Dropdown::ProcessEvents(SORE_Kernel::Event* e)
+    bool Dropdown::ProcessEvents(const SORE_Kernel::Event& e)
     {
-        if(e->type == SORE_Kernel::MOUSEENTER)
+        if(e.type == SORE_Kernel::MOUSEENTER)
         {
             inArea = true;
             ChangeTexture();
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSELEAVE)
+        else if(e.type == SORE_Kernel::MOUSELEAVE)
         {
             inArea = false;
             ChangeTexture();
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             pressed = true;
             ChangeTexture();/*
@@ -200,14 +200,14 @@ namespace SORE_GUI
                                      SUnit(0.0, choices.size()*textHeight*2)));*/
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONUP)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONUP)
         {
             pressed = false;
             unsigned int origY = GetPixels(VERTICAL, originalSize.GetVertical());
 
-            if(e->mouse.y > origY)
+            if(e.mouse.y > origY)
             {
-                unsigned int choice = e->mouse.y - origY;
+                unsigned int choice = e.mouse.y - origY;
                 choice /= (textHeight*2);
                 ClearFocus();
                 SetSize(originalSize);

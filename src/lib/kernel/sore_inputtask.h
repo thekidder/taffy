@@ -32,15 +32,47 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_gamestate_stack.h>
-#include <sore_logger.h>
-#include <sore_gamestate.h>
+#ifndef SORE_INPUTTASK_H
+#define SORE_INPUTTASK_H
 
-namespace SORE_Game
+#include <sore_event.h>
+#include <sore_task.h>
+
+#include <queue>
+
+namespace SORE_Kernel
 {
-    Gamestate::Gamestate(GamestateStack& gamestateStack_, int ms) 
-        : gamestateStack(gamestateStack_), interval(ms)
-    {
-    }
+    class Screen;
 
+    // Polls for all SFML inputs and allows users to inject events
+    // Interface for collected events is via a queue
+    class SORE_EXPORT InputTask : public Task
+    {
+    public:
+        InputTask(SORE_Kernel::Screen& screen_);
+
+        void Frame(int elapsedTime);
+
+        const char* GetName() const {return "Input task";}
+
+        //add an event
+        void InjectEvent(const SORE_Kernel::Event& e);
+
+        // access the event queue
+        size_t size() { return allEvents.size(); }
+        Event& top() { return allEvents.front(); }
+        void pop() { allEvents.pop(); }
+
+        bool QuitEventReceived() const { return quitEvent; }
+    private:
+        //processes the event, either a user-injected event or one from SFML
+        void HandleEvent(const Event& event);
+
+        SORE_Kernel::Screen& screen;
+
+        std::queue<Event> allEvents;
+        bool quitEvent;
+    };
 }
+
+#endif

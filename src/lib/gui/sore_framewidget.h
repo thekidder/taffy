@@ -54,7 +54,7 @@ namespace SORE_GUI
 
         void RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode);
     private:
-        virtual bool ProcessEvents(SORE_Kernel::Event* e) = 0;
+        virtual bool ProcessEvents(const SORE_Kernel::Event& e) = 0;
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) = 0;
 
         size_mode mode;

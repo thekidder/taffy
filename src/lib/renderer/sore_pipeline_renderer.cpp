@@ -41,76 +41,6 @@
 
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
 {
-}
-
-SORE_Graphics::PipelineRenderer::~PipelineRenderer()
-{
-}
-
-void SORE_Graphics::PipelineRenderer::Render()
-{
-
-    AggregateBufferManager bufferManager;
-
-    //collect geometry
-    render_list renderables;
-    BOOST_FOREACH(GeometryProvider* gp, states.top().geometry)
-    {
-        gp->MakeUpToDate();
-        bufferManager.AddBufferManager(gp->GetBufferManager());
-        std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
-    }
-
-    renderer_state& state = states.top();
-    //get current cameras
-    camera_table cameras;
-    typedef std::pair<std::string, camera_callback> cam;
-    BOOST_FOREACH(cam c, state.cameras)
-    {
-        cameras[c.first] = c.second();
-        cameras[c.first].projection = SetupProjection(cameras[c.first].projection, screen);
-    }
-
-    GLCommandList renderQueue;
-
-    //render using current pipeline
-    glEnable(GL_BLEND);
-
-    glClearColor(0.0,0.0,0.0,1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    state.pipeline->Setup();
-    state.pipeline->Render(cameras, renderables, renderQueue, &bufferManager);
-
-    renderQueue.Render();
-
-    //collect rendering stats
-    numPolys = renderQueue.NumPolygons();
-    numDrawCalls = renderQueue.NumDrawCalls();
-
-    CalculateFPS();
-}
-
-void SORE_Graphics::PipelineRenderer::ClearGeometryProviders()
-{
-    states.top().geometry.clear();
-}
-
-void SORE_Graphics::PipelineRenderer::AddGeometryProvider(GeometryProvider* gp)
-{
-    states.top().geometry.push_back(gp);
-}
-
-void SORE_Graphics::PipelineRenderer::SetCameraTable(camera_callback_table cameras)
-{
-    states.top().cameras = cameras;
-}
-
-void SORE_Graphics::PipelineRenderer::PushState()
-{
-    states.push(renderer_state());
-
     boost::shared_ptr<Pipe> root(new NullPipe());
     Pipe* sorter = new SortingPipe();
 
@@ -124,22 +54,95 @@ void SORE_Graphics::PipelineRenderer::PushState()
     sorter->AddChildPipe(gamePipe);
     sorter->AddChildPipe(guiPipe);
 
-    states.top().pipeline = root;
+    pipeline = root;
 }
 
-void SORE_Graphics::PipelineRenderer::PopState()
+SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 {
-    states.pop();
+}
+
+void SORE_Graphics::PipelineRenderer::Render()
+{
+
+    AggregateBufferManager bufferManager;
+
+    //collect geometry
+    render_list renderables;
+    BOOST_FOREACH(GeometryProvider* gp, geometry)
+    {
+        gp->MakeUpToDate();
+        bufferManager.AddBufferManager(gp->GetBufferManager());
+        std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
+    }
+
+    ScreenInfo screenInfo;
+    screenInfo.width = width;
+    screenInfo.height = height;
+
+    //get current cameras
+    camera_table cameraTable;
+    typedef std::pair<std::string, camera_callback> cam;
+    BOOST_FOREACH(cam c, cameras)
+    {
+        cameraTable[c.first] = c.second();
+        cameraTable[c.first].projection = SetupProjection(cameraTable[c.first].projection, screenInfo);
+    }
+
+    GLCommandList renderQueue;
+
+    //render using current pipeline
+    glEnable(GL_BLEND);
+
+    glClearColor(0.0,0.0,0.0,1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    pipeline->Setup();
+    pipeline->Render(cameraTable, renderables, renderQueue, &bufferManager);
+
+    renderQueue.Render();
+
+    //collect rendering stats
+    numPolys = renderQueue.NumPolygons();
+    numDrawCalls = renderQueue.NumDrawCalls();
+
+    CalculateFPS();
+}
+
+void SORE_Graphics::PipelineRenderer::ClearGeometryProviders()
+{
+    geometry.clear();
+}
+
+void SORE_Graphics::PipelineRenderer::AddGeometryProvider(GeometryProvider* gp)
+{
+    geometry.push_back(gp);
+}
+
+void SORE_Graphics::PipelineRenderer::SetCameraTable(const camera_callback_table& cameras_)
+{
+    cameras = cameras_;
+}
+
+bool SORE_Graphics::PipelineRenderer::OnResize(const SORE_Kernel::Event& e)
+{
+    if(e.type == SORE_Kernel::RESIZE)
+    {
+        width = e.resize.w;
+        height = e.resize.h;
+        return true;
+    }
+    return false;
 }
 
 void SORE_Graphics::PipelineRenderer::CalculateFPS()
 {
     static int frames = 0;
-    static int T0 = SORE_Timing::GetGlobalTicks();
+    static int T0 = SORE_Kernel::GetGlobalTicks();
     static int last;
     frames++;
 
-    GLint t = SORE_Timing::GetGlobalTicks();
+    GLint t = SORE_Kernel::GetGlobalTicks();
 
     ms = (static_cast<float>(t) - static_cast<float>(last)) / 10.0f;
 

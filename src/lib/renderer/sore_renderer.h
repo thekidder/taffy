@@ -36,34 +36,29 @@
 #define  SORE_RENDERER_H
 
 #include <sore_buffermanager.h>
+#include <sore_camera.h>
+#include <sore_event.h>
 #include <sore_geometryprovider.h>
 #include <sore_screeninfo.h>
-#include <sore_camera.h>
 
 namespace SORE_Graphics
 {
     typedef unsigned int gc_id;
 
-    class SORE_EXPORT IRenderer
+    class SORE_EXPORT Renderer
     {
     public:
-        IRenderer() {}
-        virtual ~IRenderer() {}
+        virtual ~Renderer() {}
 
         virtual void Render() = 0;
-        void SetScreenInfo(ScreenInfo _screen);
-        ScreenInfo GetScreenInfo() const;
 
         //interface between game logic and rendering
         virtual void AddGeometryProvider(GeometryProvider* gp) = 0;
         virtual void ClearGeometryProviders() = 0;
 
-        virtual void SetCameraTable(camera_callback_table cameras) = 0;
+        virtual void SetCameraTable(const camera_callback_table& cameras) = 0;
 
-        //Renderer has a "state": used by Gamestate. Only geometry in the
-        //current state should be rendered
-        virtual void PushState() = 0;
-        virtual void PopState() = 0;
+        virtual bool OnResize(const SORE_Kernel::Event& e) { return false; }
 
         //Rendering Statistics
         float GetFPS() const { return fps; }
@@ -71,9 +66,6 @@ namespace SORE_Graphics
         unsigned int GetDrawCalls() const { return numDrawCalls; }
         unsigned int GetNumPolys() const { return numPolys; }
     protected:
-        virtual void OnScreenChange() {}
-        ScreenInfo screen;
-
         float fps, ms;
         unsigned int numDrawCalls, numPolys;
     };

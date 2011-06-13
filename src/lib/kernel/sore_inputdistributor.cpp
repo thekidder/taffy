@@ -32,15 +32,32 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_gamestate_stack.h>
-#include <sore_logger.h>
-#include <sore_gamestate.h>
+#include <sore_inputdistributor.h>
 
-namespace SORE_Game
+SORE_Kernel::InputDistributor::InputDistributor()
 {
-    Gamestate::Gamestate(GamestateStack& gamestateStack_, int ms) 
-        : gamestateStack(gamestateStack_), interval(ms)
-    {
-    }
+}
 
+bool SORE_Kernel::InputDistributor::DistributeEvent(const Event& e)
+{
+    for(Event_listener_ref_t it = allListeners.begin(); it != allListeners.end(); ++it)
+    {
+        if(it->first & e.type)
+        {
+            bool result = (it->second)(e);
+            if(result && e.type != RESIZE)
+                return true;
+        }
+    }
+    return false;
+}
+
+SORE_Kernel::InputDistributor::Event_listener_ref_t SORE_Kernel::InputDistributor::AddListener(unsigned int eventTypes, Event_listener_func_t listener)
+{
+    return allListeners.insert(allListeners.end(), std::make_pair(eventTypes, listener));
+}
+
+void SORE_Kernel::InputDistributor::RemoveListener(Event_listener_ref_t listener)
+{
+    allListeners.erase(listener);
 }

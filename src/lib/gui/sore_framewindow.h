@@ -50,7 +50,7 @@ namespace SORE_GUI
         unsigned int GetClientSize(unit_type type) const;
         unsigned int GetClientPosition(unit_type type) const;
     private:
-        bool ProcessEvents(SORE_Kernel::Event* e);
+        bool ProcessEvents(const SORE_Kernel::Event& e);
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         void UpdatePosition();
 

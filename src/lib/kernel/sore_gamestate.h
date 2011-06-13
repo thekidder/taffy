@@ -36,29 +36,25 @@
 #ifndef SORE_GAMESTATE_H
 #define SORE_GAMESTATE_H
 
+#include <sore_event.h>
 #include <sore_task.h>
 
 namespace SORE_Game
 {
-	class SORE_EXPORT GamestateManager;
+	class SORE_EXPORT GamestateStack;
 
 	class SORE_EXPORT Gamestate : public SORE_Kernel::Task
 	{
 	public:
-		Gamestate(int ms = -1); //ms is the time interval for const tasks: -1 if a regular task
+        // ms is the time interval for const tasks: -1 if a regular task
+		Gamestate(GamestateStack& gamestateStack_, int ms = -1); 
 
-		void Initialize(GamestateManager* o);
-		int GetInterval() const;
-	protected:
-		void PushState(Gamestate* newState);
-		//make sure to return directly after calling PopState
-		void PopState();
+        int GetInterval() const { return interval; }
 
-		GamestateManager* owner;
+        virtual bool OnEvent(const SORE_Kernel::Event& e) { return false; }
+    protected:
+        GamestateStack& gamestateStack;
 	private:
-		//called when we receive our GamestateManager pointer
-		virtual void Init() = 0;
-
 		int interval;
 	};
 }

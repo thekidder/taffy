@@ -116,23 +116,23 @@ namespace SORE_GUI
         onRelease.connect(c);
     }
 
-    bool Button::ProcessEvents(SORE_Kernel::Event* e)
+    bool Button::ProcessEvents(const SORE_Kernel::Event& e)
     {
-        if(e->type == SORE_Kernel::MOUSEENTER)
+        if(e.type == SORE_Kernel::MOUSEENTER)
         {
             inArea = true;
             if(!pressed)
                 SetTexture(hover);
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSELEAVE)
+        else if(e.type == SORE_Kernel::MOUSELEAVE)
         {
             inArea = false;
             if(!pressed)
                 SetTexture(normal);
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             pressed = true;
             /*t->SetTransform(t->GetTransform() *
@@ -140,7 +140,7 @@ namespace SORE_GUI
             SetTexture(active);
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONUP)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONUP)
         {
             pressed = false;
             //t->SetTransform(t->GetTransform() *

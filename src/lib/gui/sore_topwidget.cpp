@@ -46,11 +46,11 @@ namespace SORE_GUI
     {
     }
 
-    bool TopWidget::OnResize(SORE_Kernel::Event* e)
+    bool TopWidget::OnResize(const SORE_Kernel::Event& e)
     {
-        if(e->type == SORE_Kernel::RESIZE)
+        if(e.type == SORE_Kernel::RESIZE)
         {
-            UpdateResolution(e->resize.w, e->resize.h);
+            UpdateResolution(e.resize.w, e.resize.h);
             return true;
         }
         return false;
@@ -85,7 +85,7 @@ namespace SORE_GUI
     {
     }
 
-    bool TopWidget::ProcessEvents(SORE_Kernel::Event* e)
+    bool TopWidget::ProcessEvents(const SORE_Kernel::Event& e)
     {
         return false;
     }

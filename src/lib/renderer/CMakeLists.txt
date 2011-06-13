@@ -13,7 +13,6 @@ set(SORE_RENDERER_SRCS
     renderer/sore_pipe.cpp
     renderer/sore_pipeline_renderer.cpp
     renderer/sore_renderable.cpp 
-    renderer/sore_renderer.cpp
     renderer/sore_renderstate.cpp 
     renderer/sore_simplebuffermanager.cpp
     renderer/sore_sprite.cpp

@@ -61,12 +61,12 @@ namespace SORE_Profiler
             //samples[index].timesRun++;
             samples[index].intervalCount++;
         }
-        samples[index].startTime = SORE_Timing::GetGlobalTicks();
+        samples[index].startTime = SORE_Kernel::GetGlobalTicks();
     }
 
     Sample::~Sample()
     {
-        samples[index].endTime = SORE_Timing::GetGlobalTicks();
+        samples[index].endTime = SORE_Kernel::GetGlobalTicks();
         samples[index].lastTime = samples[index].endTime - samples[index].startTime;
         // gcc warning...commenting for now
         //samples[index].avgTime = (samples[index].avgTime*samples[index].timesRun+(samples[index].lastTime))/(++samples[index].timesRun);

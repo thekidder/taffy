@@ -32,24 +32,10 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_INPUT_H
-#define  SORE_INPUT_H
+#ifndef SORE_EVENT_H
+#define SORE_EVENT_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
-
-#include <sore_allgl.h>
-#include <sore_input_keysym.h>
-#include <sore_task.h>
-
-#include <boost/function.hpp>
-
-#include <map>
-#include <vector>
-#include <queue>
+#include <sore_event_keysym.h>
 
 namespace SORE_Kernel
 {
@@ -97,7 +83,7 @@ namespace SORE_Kernel
 
     struct KeyInfo
     {
-        SORE_Input::Keysym_code_t keySym;
+        Key::Keysym_code_t keySym;
         unsigned int modifiers; // bitwise combination of Keysym_modifier_t
         unsigned int unicode; // used on TEXTENTERED event
     };
@@ -115,62 +101,8 @@ namespace SORE_Kernel
         ResizeInfo resize;
     };
 
-    typedef std::vector<std::pair<unsigned int, boost::function<bool (Event*)> > > event_map;
-
-    class SORE_EXPORT InputTask;
-
-    struct event_listener_ref
-    {
-    private:
-        std::vector<event_map>::iterator stackPos;
-        event_map::iterator event;
-        friend class SORE_EXPORT InputTask;
-    };
-
     // translate an SFML event to a SORE event
     Event TranslateEvent(const sf::Event& sfmlEvent);
-
-    class SORE_EXPORT InputTask : public Task
-    {
-    public:
-        InputTask();
-        ~InputTask();
-
-        void Frame(int elapsedTime);
-        void Pause();
-        void Resume();
-
-        const char* GetName() const {return "Input task";}
-
-        event_listener_ref AddListener(unsigned int eventType, boost::function<bool (Event*)> functor);
-        void RemoveListener(event_listener_ref listener);
-        void InjectEvent(SORE_Kernel::Event e);
-
-        bool QuitEventReceived() const;
-
-        //This "state" is used by Gamestate. Only input handlers in the current state are respected
-        //(with Resize events as an exception)
-        void PushState();
-        void PopState();
-    private:
-        //processes the member variable event
-        void HandleEvent(Event& event);
-
-        std::vector<
-            event_map
-            > allListeners;
-        //reference to the current listener list
-        std::vector<event_map>::iterator currentListeners;
-
-        Event event;
-        std::queue<Event> injectedEvents;
-
-        bool quitEvent;
-    };
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

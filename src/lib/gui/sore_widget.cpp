@@ -124,12 +124,12 @@ namespace SORE_GUI
         }
     }
 
-    bool Widget::PropagateEvents(SORE_Kernel::Event* e)
+    bool Widget::PropagateEvents(const SORE_Kernel::Event& e)
     {
         SORE_Kernel::Event previous = prev;
-        prev = *e;
+        prev = e;
         
-        return PropagateEventHelper(e, &previous);
+        return PropagateEventHelper(e, previous);
     }
 
     bool Widget::InBounds(unsigned int x, unsigned int y)
@@ -145,20 +145,20 @@ namespace SORE_GUI
         return false;
     }
 
-    bool Widget::PropagateEventHelper(SORE_Kernel::Event* e, SORE_Kernel::Event* p)
+    bool Widget::PropagateEventHelper(const SORE_Kernel::Event& e, const SORE_Kernel::Event& p)
     {
         if(!isVisible)
             return false;
-        if(Focus() && Focus()->InBounds(e->mouse.x, e->mouse.y))
+        if(Focus() && Focus()->InBounds(e.mouse.x, e.mouse.y))
         {
-            SORE_Kernel::Event relative = *e;
+            SORE_Kernel::Event relative = e;
             relative.mouse.x -= Focus()->GetPosition(HORIZONTAL);
             relative.mouse.y -= Focus()->GetPosition(VERTICAL);
-            if(Focus()->ProcessEvents(&relative))
+            if(Focus()->ProcessEvents(relative))
                 return true;
         }
         //if there is a mousedown, set focus accordingly
-        if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+        if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             OldFocus() = Focus();
             Focus() = 0;
@@ -166,10 +166,10 @@ namespace SORE_GUI
         for(Widget_container_t::iterator it=children.begin();it!=children.end();++it)
         {
             SORE_Kernel::Event relative;
-            relative = *e;
+            relative = e;
 
-            bool inWidget = (*it)->InBounds(e->mouse.x, e->mouse.y);
-            bool inPrevWidget = (*it)->InBounds(p->mouse.x, p->mouse.y);
+            bool inWidget = (*it)->InBounds(e.mouse.x, e.mouse.y);
+            bool inPrevWidget = (*it)->InBounds(p.mouse.x, p.mouse.y);
 
             if(inWidget && !inPrevWidget)
                 relative.type = SORE_Kernel::MOUSEENTER;
@@ -182,7 +182,7 @@ namespace SORE_GUI
                 relative.mouse.x -= (*it)->GetPosition(HORIZONTAL);
                 relative.mouse.y -= (*it)->GetPosition(VERTICAL);
 
-                bool accepted = (*it)->PropagateEventHelper(&relative, p);
+                bool accepted = (*it)->PropagateEventHelper(relative, p);
 
                 if(accepted)
                 {

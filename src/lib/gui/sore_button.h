@@ -59,7 +59,7 @@ namespace SORE_GUI
         void ConnectPressed(boost::function<void ()> c);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
+        bool ProcessEvents(const SORE_Kernel::Event& e);
         void UpdatePosition();
 
         SORE_Resource::FontPtr font;

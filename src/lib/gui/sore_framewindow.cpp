@@ -82,28 +82,28 @@ namespace SORE_GUI
         delete titleText;
     }
 
-    bool FrameWindow::ProcessEvents(SORE_Kernel::Event* e)
+    bool FrameWindow::ProcessEvents(const SORE_Kernel::Event& e)
     {
-        if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
+        if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             dragged = true;
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEBUTTONUP)
+        else if(e.type == SORE_Kernel::MOUSEBUTTONUP)
         {
             dragged = false;
             return true;
         }
-        else if(e->type == SORE_Kernel::MOUSEMOVE)
+        else if(e.type == SORE_Kernel::MOUSEMOVE)
         {
             if(dragged)
             {
                 SetPosition(SVec(SUnit(GetPosition().GetHorizontal().GetRelative(),
                                        GetPosition().GetHorizontal().GetAbsolute() +
-                                       e->mouse.xmove),
+                                       e.mouse.xmove),
                                  SUnit(GetPosition().GetVertical().GetRelative(),
                                        GetPosition().GetVertical().GetAbsolute() +
-                                       e->mouse.ymove)));
+                                       e.mouse.ymove)));
                 return true;
             }
         }
