@@ -2,7 +2,7 @@
 
 #include <sore_sprite.h>
 
-ParticleSystem::ParticleSystem(SORE_Graphics::Texture2DPtr t, SORE_Graphics::GLSLShaderPtr s)
+ParticleSystem::ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLSLShaderPtr s)
     : vbo(SORE_Graphics::STREAM, true, false, false), texture(t), shader(s)
 {
     SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(0, 0, GL_POINTS));

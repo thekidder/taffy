@@ -14,18 +14,16 @@
 
 namespace gui = SORE_GUI;
 
-DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool &pool,
+DebugGUI::DebugGUI(SORE_Graphics::IRenderer* r,
                    SORE_Kernel::InputTask& input, gui::Widget* top)
     : renderer(r), renderStats(0), version(0)
 {
-    boost::shared_ptr<SORE_Font::Font> guiFont =
-        pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
 
-    renderStats = new gui::RenderStats(pool, renderer, top);
+    renderStats = new gui::RenderStats(renderer, top);
 
-    version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
-                                  *guiFont, 24, GetVersionString(), pool,
-                                  SORE_Graphics::White, top);
+    //version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
+    //                              *guiFont, 24, GetVersionString(), 
+    //                              SORE_Graphics::White, top);
 }
 
 DebugGUI::~DebugGUI()

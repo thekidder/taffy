@@ -10,7 +10,7 @@ class SpectrumVisualizer : public SORE_GUI::Widget
 public:
     SpectrumVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        SORE_Resource::ResourcePool& pool, Spectrum* spectrum_);
+        Spectrum* spectrum_);
 
     void SetSpectrum(Spectrum* spectrum_);
 private:
@@ -19,9 +19,9 @@ private:
 
     Spectrum* spectrum;
 
-    SORE_Graphics::GLSLShaderPtr shader;
-    SORE_Graphics::GLSLShaderPtr font_shader;
-    SORE_Font::FontPtr face;
+    SORE_Resource::GLSLShaderPtr shader;
+    SORE_Resource::GLSLShaderPtr font_shader;
+    SORE_Resource::FontPtr face;
 };
 
 #endif

@@ -12,10 +12,14 @@
 #include "sound_pass_through_buffer.h"
 #include "spectrum_visualizer.h"
 
+#include <sore_texture2d_loader.h>
+#include <sore_glslshader_loader.h>
+#include <sore_font_loader.h>
 #include <sore_font.h>
 #include <sore_gamestate.h>
 #include <sore_immediatemodeprovider.h>
 #include <sore_input.h>
+#include <sore_resourcecache.h>
 #include <sore_topwidget.h>
 
 namespace FMOD
@@ -42,12 +46,17 @@ private:
     void Init();
     void Quit();
 
+    SORE_FileIO::PackageCache package_cache;
+    SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D, SORE_Resource::Texture2DLoader> texture_cache;
+    SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> shader_cache;
+    SORE_Resource::ResourceCache<std::string, SORE_Resource::Font, SORE_Resource::FontLoader> font_cache;
+
     SORE_Graphics::camera_info GetCamera();
 
     void GotSamples(float* buffer, unsigned int length, int channels);
 
-    SORE_Font::FontPtr face;
-    SORE_Graphics::Texture2DPtr particle_texture;
+    SORE_Resource::FontPtr face;
+    SORE_Resource::Texture2DPtr particle_texture;
 
     SORE_GUI::TopWidget* top;
     GraphVisualizer* beat_visualizer_low;

@@ -3,14 +3,13 @@
 
 GraphVisualizer::GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        SORE_Resource::ResourcePool& pool,
         std::pair<float, float> input_range_, int num_series, int history_size_)
         : Widget(size, position, parent), input_range(input_range_), 
         data(num_series), history_size(history_size_)
 {
-    shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
+    /*shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
     font_shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
+    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");*/
 }
 
 void GraphVisualizer::AddDatum(int series, float datum)
@@ -33,7 +32,7 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     // draw background
     imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
     imm_mode.SetShader(shader);
-    imm_mode.SetTexture(SORE_Graphics::Texture2DPtr());
+    imm_mode.SetTexture(SORE_Resource::Texture2DPtr());
     imm_mode.SetColor(SORE_Graphics::Grey);
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
@@ -85,5 +84,9 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     
     imm_mode.SetColor(SORE_Graphics::White);
     imm_mode.SetShader(font_shader);
-    imm_mode.DrawString(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment), GetSize(SORE_GUI::VERTICAL) - 24, 2.0 * SORE_GUI::LAYER_SEPARATION / 3.0, *face, 24, comment);
+    imm_mode.DrawString(
+        GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment), 
+        GetSize(SORE_GUI::VERTICAL) - 24, 
+        2.0 * SORE_GUI::LAYER_SEPARATION / 3.0, 
+        face, 24, comment);
 }

@@ -11,7 +11,6 @@ class GraphVisualizer : public SORE_GUI::Widget
 public:
     GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        SORE_Resource::ResourcePool& pool,
         std::pair<float, float> input_range_, int num_series, int history_size_);
 
     void AddDatum(int series, float datum);
@@ -28,9 +27,9 @@ private:
     std::vector<data_container> data;
     int history_size;
 
-    SORE_Graphics::GLSLShaderPtr shader;
-    SORE_Graphics::GLSLShaderPtr font_shader;
-    SORE_Font::FontPtr face;
+    SORE_Resource::GLSLShaderPtr shader;
+    SORE_Resource::GLSLShaderPtr font_shader;
+    SORE_Resource::FontPtr face;
 
     std::string comment;
 };

@@ -22,7 +22,7 @@ struct Particle
 class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
 {
 public:
-    ParticleSystem(SORE_Graphics::Texture2DPtr t, SORE_Graphics::GLSLShaderPtr s);
+    ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLSLShaderPtr s);
 
     void MakeUpToDate();
     std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
@@ -39,8 +39,8 @@ private:
     void UpdateGeometry();
     std::vector<Particle> particles;
 
-    SORE_Graphics::Texture2DPtr texture;
-    SORE_Graphics::GLSLShaderPtr shader;
+    SORE_Resource::Texture2DPtr texture;
+    SORE_Resource::GLSLShaderPtr shader;
 
     std::vector<SORE_Graphics::Renderable> geometry;
     SORE_Graphics::geometry_entry geometry_lookup;

@@ -3,7 +3,6 @@
 
 #include <sore_input.h>
 #include <sore_renderer.h>
-#include <sore_resource.h>
 #include <sore_renderstats.h>
 
 namespace SORE_GUI
@@ -16,7 +15,7 @@ namespace gui = SORE_GUI;
 class DebugGUI
 {
 public:
-    DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool& pool,
+    DebugGUI(SORE_Graphics::IRenderer* r,
              SORE_Kernel::InputTask& input, gui::Widget* top);
     ~DebugGUI();
 

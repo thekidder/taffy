@@ -5,12 +5,12 @@
 
 SpectrumVisualizer::SpectrumVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        SORE_Resource::ResourcePool& pool, Spectrum* spectrum_)
+        Spectrum* spectrum_)
         : Widget(size, position, parent), spectrum(spectrum_)
 {
-    shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
+    /*shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
     font_shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");
+    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");*/
 }
 
 void SpectrumVisualizer::SetSpectrum(Spectrum* spectrum_)
@@ -24,7 +24,7 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
 {
     imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
     imm_mode.SetShader(shader);
-    imm_mode.SetTexture(SORE_Graphics::Texture2DPtr());
+    imm_mode.SetTexture(SORE_Resource::Texture2DPtr());
     imm_mode.SetColor(SORE_Graphics::Grey);
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
@@ -70,7 +70,7 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
                 (width * 2.0 - str_width) / 2.0 + width * i * 2.0, 
                 GetSize(SORE_GUI::VERTICAL) - 24, 
                 2.0 * SORE_GUI::LAYER_SEPARATION / 3.0, 
-                *face, 16, str);
+                face, 16, str);
         }
     }
 }
