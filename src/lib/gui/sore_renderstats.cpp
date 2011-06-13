@@ -8,42 +8,40 @@
 
 namespace SORE_GUI
 {
-    RenderStats::RenderStats(SORE_Resource::ResourcePool& pool,
-                             SORE_Graphics::IRenderer* r,
+    RenderStats::RenderStats(SORE_Graphics::IRenderer* r,
                              SORE_GUI::Widget *parent)
     : FrameWindow(SVec(SUnit(0.0, 200), SUnit(0.0, 180)),
                   SVec(SUnit(0.0, 10), SUnit(0.0, 10)),
-                  "Renderer Stats", pool, parent),
+                  "Renderer Stats", parent),
     renderer(r), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
     polys(0), polysLabel(0), ms(0), msLabel(0)
     {
-        SORE_Font::FontPtr font = pool.GetResource<SORE_Font::Font>(
-            "data/ix_style/LiberationSans-Regular.ttf");
+        SORE_Resource::FontPtr font;
 
         fpsLabel   = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 0)),
-                                              *font, 16, "FPS:", pool,
+                                              font, 16, "FPS:",
                                               SORE_Graphics::White, this);
         drawsLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 16)),
-                                              *font, 16, "Draw Calls:", pool,
+                                              font, 16, "Draw Calls:",
                                               SORE_Graphics::White, this);
         polysLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 32)),
-                                              *font, 16, "Polygons:", pool,
+                                              font, 16, "Polygons:",
                                               SORE_Graphics::White, this);
         msLabel    = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 48)),
-                                              *font, 16, "Milliseconds:", pool,
+                                              font, 16, "Milliseconds:",
                                               SORE_Graphics::White, this);
 
         fps        = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 0)),
-                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              font, 16, "0", SORE_Graphics::White,
                                               this);
         draws      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 16)),
-                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              font, 16, "0", SORE_Graphics::White,
                                               this);
         polys      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 32)),
-                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              font, 16, "0", SORE_Graphics::White,
                                               this);
         ms         = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 48)),
-                                              *font, 16, "0",  pool, SORE_Graphics::White,
+                                              font, 16, "0", SORE_Graphics::White,
                                               this);
     }
 

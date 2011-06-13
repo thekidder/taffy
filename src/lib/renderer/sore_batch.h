@@ -37,7 +37,7 @@
 
 #include <sore_graphicsarray.h>
 #include <sore_renderable.h>
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 #include <sore_renderstate.h>
 #include <sore_screeninfo.h>
 #include <sore_glslshader.h>

@@ -34,12 +34,38 @@
 
 #include <sore_glslshader.h>
 #include <sore_graphics.h>
-#include <sore_util.h>
+#include <sore_logger.h>
 
-namespace SORE_Graphics
+#include <fstream>
+#include <stdexcept>
+
+namespace SORE_Resource
 {
     bool GLSLShader::initCalled = false;
     bool GLSLShader::supported  = false;
+
+    GLSLShader::GLSLShader()
+        : linked(false), program(0)
+    {
+        Init();
+    }
+
+    GLSLShader::GLSLShader(const char* vertex, const char* fragment)
+        : linked(false), program(0)
+    {
+        Init();
+
+        AddVertexString(vertex);
+        AddFragmentString(fragment);
+
+        Link();
+    }
+
+    GLSLShader::~GLSLShader()
+    {
+        Unload();
+    }
+
 
     int GLSLShader::InitShaders()
     {
@@ -87,87 +113,9 @@ namespace SORE_Graphics
         glUseProgramObjectARB(0);
     }
 
-    GLSLShader::GLSLShader(const char* vertex, const char* fragment,
-                           SORE_FileIO::PackageCache* pc)
-        : Resource(SORE_Resource::WatchedFileArrayPtr(
-                       new SORE_Resource::WatchedFileArray(pc)))
+    bool GLSLShader::Loaded() const
     {
-        Init();
-        AddVertexFile(vertex);
-        AddFragmentFile(fragment);
-        ok = true;
-    }
-
-    GLSLShader::GLSLShader(SORE_Resource::WatchedFileArrayPtr wfa) :
-        Resource(wfa)
-    {
-        Load();
-    }
-
-    void GLSLShader::Load()
-    {
-        Init();
-        SORE_FileIO::InFile* in = File();
-        std::map<std::string, std::map<std::string, std::string> > list =
-            SORE_Utility::ParseIniFile(*in);
-        delete in;
-
-        std::map<std::string, std::map<std::string, std::string> >::iterator i;
-        std::map<std::string, std::string>::iterator i2;
-
-        for(i=list.begin();i!=list.end();i++)
-        {
-            std::string section = i->first;
-
-            for(i2=i->second.begin();i2!=i->second.end();i2++)
-            {
-                std::string name = i2->first;
-                if(section=="Vertex")
-                {
-                    AddVertexFile(name.c_str());
-                }
-                else if(section=="Fragment")
-                {
-                    AddFragmentFile(name.c_str());
-                }
-                else
-                {
-                    ENGINE_LOG(SORE_Logging::LVL_WARNING,
-                               boost::format("Invalid material heading: %s") % section);
-                }
-            }
-        }
-        ok = true;
-        Link();
-        Bind();
-        SORE_Graphics::PrintGLErrors(SORE_Logging::LVL_ERROR);
-        UnbindShaders();
-    }
-
-    GLSLShader::~GLSLShader()
-    {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        std::vector<GLuint>::iterator it;
-        for(it=vertexShaders.begin();it!=vertexShaders.end();it++)
-        {
-            glDetachObjectARB(program, *it);
-            glDeleteObjectARB(*it);
-        }
-        for(it=fragmentShaders.begin();it!=fragmentShaders.end();it++)
-        {
-            glDetachObjectARB(program, *it);
-            glDeleteObjectARB(*it);
-        }
-        glDeleteObjectARB(program);
-    }
-
-    bool GLSLShader::Ready() const
-    {
-        return ok && linked && ShadersSupported() && program!=0;
+        return linked && program!=0;
     }
 
     void GLSLShader::Link()
@@ -206,31 +154,49 @@ namespace SORE_Graphics
         }
     }
 
-    int GLSLShader::Init()
+    void GLSLShader::Init()
     {
+        // TODO: FIXME: SORE exception support
         if(!initCalled)
             InitShaders();
         if(!ShadersSupported())
         {
-            program = 0;
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Error creating shader program (shaders are not "
-                       "supported on this system)");
-            return 1;
+            throw std::runtime_error(
+                "Error creating shader program (shaders are not "
+                "supported on this system)");
         }
-        vertexShaders.clear();
-        fragmentShaders.clear();
-        program = glCreateProgramObjectARB();
-        ok = linked = false;
-        uniforms.clear();
-        attributes.clear();
+
+        program = glCreateProgramObjectARB(); 
         if(program == 0)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Error creating shader program");
-            ok = false;
-            return 1; //error
+            throw std::runtime_error("Error creating shader program");
         }
-        return 0;
+    }
+
+    void GLSLShader::Unload()
+    {
+        vertexShaders.clear();
+        fragmentShaders.clear();
+        uniforms.clear();
+        attributes.clear();
+
+        if(program == 0)
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
+            return;
+        }
+        std::vector<GLuint>::iterator it;
+        for(it=vertexShaders.begin();it!=vertexShaders.end();it++)
+        {
+            glDetachObjectARB(program, *it);
+            glDeleteObjectARB(*it);
+        }
+        for(it=fragmentShaders.begin();it!=fragmentShaders.end();it++)
+        {
+            glDetachObjectARB(program, *it);
+            glDeleteObjectARB(*it);
+        }
+        glDeleteObjectARB(program);
     }
 
     int GLSLShader::AddShader(GLuint type, const char* src)
@@ -302,56 +268,9 @@ namespace SORE_Graphics
         return 0;
     }
 
-    char* GLSLShader::LoadFile(const char* filename)
-    {
-        SORE_FileIO::InFile* file = File(filename);
-        if(!file->strm().good())
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Could not load shader filename: %s") % filename);
-            return NULL;
-        }
-        size_t size = file->size();
-        char* src = new char[size+1];
-        file->strm().read(src, size);
-        delete file;
-        src[size] = '\0';
-        return src;
-    }
-
-    int GLSLShader::AddVertexFile(const char* vertex)
-    {
-        char* src = LoadFile(vertex);
-        if(!src)
-            return -1;
-        int status = AddShader(GL_VERTEX_SHADER, src);
-        delete[] src;
-        if(status == 0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
-                       boost::format("Loaded vertex shader file %s") % vertex);
-        }
-        return status;
-    }
-
     int GLSLShader::AddVertexString(const char* vertex)
     {
         return AddShader(GL_VERTEX_SHADER, vertex);
-    }
-
-    int GLSLShader::AddFragmentFile(const char* fragment)
-    {
-        char* src = LoadFile(fragment);
-        if(!src)
-            return -1;
-        int status = AddShader(GL_FRAGMENT_SHADER, src);
-        delete[] src;
-        if(status == 0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_DEBUG2,
-                       boost::format("Loaded fragment shader file %s") % fragment);
-        }
-        return status;
     }
 
     int GLSLShader::AddFragmentString(const char* fragment)
@@ -361,7 +280,7 @@ namespace SORE_Graphics
 
     void GLSLShader::Bind() const
     {
-        if(!ShadersSupported() || program==0)
+        if(!Loaded())
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
             return;

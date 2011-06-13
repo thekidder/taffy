@@ -39,60 +39,47 @@
 namespace SORE_GUI
 {
     Button::Button(SVec s, SVec p, const std::string& text,
-                   SORE_Resource::ResourcePool& pool, Widget* par)
+                   Widget* par)
         : FrameWidget(s, p, SCALE_ALL, par), pressed(false), inArea(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        normal = pool.GetResource<SORE_Graphics::Texture2D>(
-            styleDir + "button_sheet_normal.tga");
-        active = pool.GetResource<SORE_Graphics::Texture2D>(
-            styleDir + "button_sheet_active.tga");
-        hover = pool.GetResource<SORE_Graphics::Texture2D>(
-            styleDir + "button_sheet_hover.tga");
-        SORE_Graphics::GLSLShaderPtr shad =
-            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         unsigned int height = GetSize(VERTICAL);
         unsigned int width = GetSize(HORIZONTAL);
 
         unsigned int textHeight = height / 2;
         if(textHeight < 16) textHeight = 16;
 
-        font = pool.GetResource<SORE_Font::Font>(styleDir +
-                                                 "LiberationSans-Regular.ttf");
-        t = new SORE_Graphics::Text(*font, textHeight, text);
-        if(t->GetWidth() >= (width-16))
-        {
-            float factor = static_cast<float>(t->GetWidth()) / (width - 16);
-            unsigned int newHeight = static_cast<unsigned int>(
-                static_cast<float>(textHeight) / factor);
-            font = pool.GetResource<SORE_Font::Font>(styleDir +
-                                                     "LiberationSans-Regular.ttf");
-            delete t;
-            t = new SORE_Graphics::Text(*font, newHeight, text);
-        }
+        //t = new SORE_Graphics::Text(*font, textHeight, text);
+        //if(t->GetWidth() >= (width-16))
+        //{
+        //    float factor = static_cast<float>(t->GetWidth()) / (width - 16);
+        //    unsigned int newHeight = static_cast<unsigned int>(
+        //        static_cast<float>(textHeight) / factor);
+        //    delete t;
+        //    t = new SORE_Graphics::Text(*font, newHeight, text);
+        //}
 
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
-        SetShader(shad);
+        //SetShader(shad);
     }
 
     void Button::UpdatePosition()
     {
-        unsigned int textStartV = (GetSize(VERTICAL) - t->GetHeight())/2;
+        /*unsigned int textStartV = (GetSize(VERTICAL) - t->GetHeight())/2;
         unsigned int textStartH = (GetSize(HORIZONTAL) - t->GetWidth())/2;
         t->SetTransform(GetPositionMatrix() *
                         SORE_Math::Matrix4<float>::GetTranslation(
                             static_cast<float>(textStartH),
             static_cast<float>(textStartV),
-            0.0f));
+            0.0f));*/
     }
 
     Button::~Button()
     {
-        delete t;
     }
 
     void Button::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
@@ -148,17 +135,17 @@ namespace SORE_GUI
         else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             pressed = true;
-            t->SetTransform(t->GetTransform() *
-                            SORE_Math::Matrix4<float>::GetTranslation(2.0, 2.0, 0.0f));
+            /*t->SetTransform(t->GetTransform() *
+                            SORE_Math::Matrix4<float>::GetTranslation(2.0, 2.0, 0.0f));*/
             SetTexture(active);
             return true;
         }
         else if(e->type == SORE_Kernel::MOUSEBUTTONUP)
         {
             pressed = false;
-            t->SetTransform(t->GetTransform() *
-                            SORE_Math::Matrix4<float>::GetTranslation(-2.0f,
-                                                                      -2.0f, 0.0f));
+            //t->SetTransform(t->GetTransform() *
+            //                SORE_Math::Matrix4<float>::GetTranslation(-2.0f,
+            //                                                          -2.0f, 0.0f));
             if(inArea)
                 SetTexture(hover);
             else

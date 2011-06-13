@@ -34,9 +34,9 @@
 
 #include <sore_texturestate.h>
 
-void SORE_Graphics::TextureState::Bind(GLSLShaderPtr s) const
+void SORE_Graphics::TextureState::Bind(SORE_Resource::GLSLShaderPtr s) const
 {
-    std::map<std::string, Texture2DPtr>::const_iterator it;
+    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
     int i;
     for(i = 0,it = textures.begin(); it!= textures.end(); ++it,++i)
     {
@@ -45,11 +45,11 @@ void SORE_Graphics::TextureState::Bind(GLSLShaderPtr s) const
 }
 
 void SORE_Graphics::TextureState::AddTexture(
-    const std::string& samplerName, Texture2DPtr tex)
+    const std::string& samplerName, SORE_Resource::Texture2DPtr tex)
 {
     textures[samplerName] = tex;
     cachedHash = 0;
-    std::map<std::string, Texture2DPtr>::const_iterator it;
+    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
     for(it = textures.begin(); it != textures.end(); ++it)
     {
         if(it->second)
@@ -73,7 +73,7 @@ SORE_Graphics::TextureState SORE_Graphics::TextureState::GetDiff(
     const TextureState& o) const
 {
     TextureState r;
-    std::map<std::string, Texture2DPtr>::const_iterator it;
+    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
     for(it = textures.begin(); it != textures.end(); ++it)
     {
         if(o.textures.find(it->first) == o.textures.end())
@@ -81,8 +81,8 @@ SORE_Graphics::TextureState SORE_Graphics::TextureState::GetDiff(
             r.AddTexture(it->first, it->second);
             continue;
         }
-        const Texture2DPtr& t = o.textures.find(it->first)->second;
-        const Texture2DPtr& t2 = it->second;
+        const SORE_Resource::Texture2DPtr& t = o.textures.find(it->first)->second;
+        const SORE_Resource::Texture2DPtr& t2 = it->second;
         if(t != t2)
             r.AddTexture(it->first, it->second);
     }

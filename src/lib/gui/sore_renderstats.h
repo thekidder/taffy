@@ -2,7 +2,6 @@
 #define RENDERSTATS_H
 
 #include <sore_dll.h>
-#include <sore_resource.h>
 #include <sore_framewindow.h>
 
 namespace SORE_Graphics
@@ -17,7 +16,7 @@ namespace SORE_GUI
     class SORE_EXPORT RenderStats : public FrameWindow
     {
     public:
-        RenderStats(SORE_Resource::ResourcePool& pool, SORE_Graphics::IRenderer* r,
+        RenderStats(SORE_Graphics::IRenderer* r,
                     SORE_GUI::Widget* parent = 0);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);

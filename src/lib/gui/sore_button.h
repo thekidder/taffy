@@ -44,9 +44,7 @@
 #include <boost/function.hpp>
 #include <boost/signals.hpp>
 
-#include <sore_resource.h>
 #include <sore_font.h>
-#include <sore_text.h>
 #include <sore_framewidget.h>
 
 namespace SORE_GUI
@@ -55,7 +53,7 @@ namespace SORE_GUI
     {
     public:
         Button(SVec s, SVec p, const std::string& text,
-                     SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+               Widget* par=NULL);
         ~Button();
 
         void ConnectPressed(boost::function<void ()> c);
@@ -64,9 +62,8 @@ namespace SORE_GUI
         bool ProcessEvents(SORE_Kernel::Event* e);
         void UpdatePosition();
 
-        SORE_Font::FontPtr font;
-        SORE_Graphics::Text* t;
-        SORE_Graphics::Texture2DPtr normal, active, hover;
+        SORE_Resource::FontPtr font;
+        SORE_Resource::Texture2DPtr normal, active, hover;
 
         boost::signal<void ()> onRelease;
 

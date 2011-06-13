@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_geometry.h>
+#include <sore_logger.h>
 #include <sore_sprite.h>
 #include <sore_framewidget.h>
 
@@ -72,12 +73,12 @@ namespace SORE_GUI
         };
     }
 
-    void FrameWidget::SetTexture(SORE_Graphics::Texture2DPtr tex)
+    void FrameWidget::SetTexture(SORE_Resource::Texture2DPtr tex)
     {
         texture = tex;
     }
 
-    void FrameWidget::SetShader(SORE_Graphics::GLSLShaderPtr shad)
+    void FrameWidget::SetShader(SORE_Resource::GLSLShaderPtr shad)
     {
         shader = shad;
     }

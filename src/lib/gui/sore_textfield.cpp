@@ -41,43 +41,31 @@
 
 namespace SORE_GUI
 {
-    TextField::TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool,
-                         Widget* par)
-        : FrameWidget(s, p, SCALE_CENTER, par), text(""), displayText(0),
+    TextField::TextField(SVec s, SVec p, Widget* par)
+        : FrameWidget(s, p, SCALE_CENTER, par), text(""), 
           pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        SORE_Graphics::GLSLShaderPtr shad =
-            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-        texture = pool.GetResource<SORE_Graphics::Texture2D>(
-            styleDir+"textfield.tga");
-        caretTex = pool.GetResource<SORE_Graphics::Texture2D>(
-            styleDir + "caret.tga");
-
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(texture);
-        SetShader(shad);
+        //SetShader(shad);
 
         float height = GetSize(VERTICAL) - 16.0f;
         caretWidth = static_cast<unsigned int>(height/16.0f);
 
-        caret = SORE_Graphics::MakeSprite(
+        /*caret = SORE_Graphics::MakeSprite(
             SORE_Math::Rect<float>(8.0f, 8.0f+caretWidth, 8.0f, 8.0f+height),
             SORE_Math::Rect<float>(0.0f, 0.0f, 1.0f, 1.0f),
             0.0f,
             caretTex,
             shad,
-            SORE_Graphics::BLEND_SUBTRACTIVE);
+            SORE_Graphics::BLEND_SUBTRACTIVE);*/
 
         caretEnd = SORE_Timing::GetGlobalTicks();
 
         unsigned int textHeight = GetSize(VERTICAL) - 16;
-
-        font = pool.GetResource<SORE_Font::Font>(styleDir +
-                                                 "LiberationSans-Regular.ttf");
-        displayText = new SORE_Graphics::Text(*font, textHeight, text);
 
         UpdateText(0);
         UpdatePosition();
@@ -85,7 +73,6 @@ namespace SORE_GUI
 
     TextField::~TextField()
     {
-        delete displayText;
     }
 
     void TextField::ConnectChange(boost::function<void (std::string)> c)
@@ -195,7 +182,7 @@ namespace SORE_GUI
         else if(e->type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
             float x = static_cast<float>(e->mouse.x - 8);
-            size_t index = displayText->GetIndex(x);
+            size_t index;// = displayText->GetIndex(x);
             unsigned int oldPos = pos;
             pos = index + textStart;
             dir = pos > oldPos ? 1 :
@@ -208,8 +195,8 @@ namespace SORE_GUI
 
     void TextField::UpdateText(int dir)
     {
-        displayText->UpdateText(text);
-        unsigned int contentsWidth = displayText->GetWidth() + caretWidth;
+        //displayText->UpdateText(text);
+        unsigned int contentsWidth;// = displayText->GetWidth() + caretWidth;
         if(pos < textStart && dir < 0)
             textStart = pos;
         unsigned int numChars = text.length();
@@ -229,20 +216,20 @@ namespace SORE_GUI
                 textStart = pos - numChars;
                 textEnd = numChars + textStart;
             }
-            displayText->UpdateText(text.substr(textStart, numChars));
-            contentsWidth = displayText->GetWidth() + caretWidth;
+            //displayText->UpdateText(text.substr(textStart, numChars));
+            //contentsWidth = displayText->GetWidth() + caretWidth;
         }
-        displayText->UpdateText(text.substr(textStart, pos - textStart));
-        caretPos = displayText->GetWidth();
-        displayText->UpdateText(text.substr(textStart, numChars));
+        //displayText->UpdateText(text.substr(textStart, pos - textStart));
+        //caretPos = displayText->GetWidth();
+        //displayText->UpdateText(text.substr(textStart, numChars));
     }
 
     void TextField::UpdatePosition()
     {
-        displayText->SetTransform
+        /*displayText->SetTransform
             (GetPositionMatrix() *
              SORE_Math::Matrix4<float>::GetTranslation(8.0f, 8.0f, GetLayer() +
-                                                       LAYER_SEPARATION/2.0f));
+                                                       LAYER_SEPARATION/2.0f));*/
         caretMat = GetPositionMatrix() *
             SORE_Math::Matrix4<float>::GetTranslation
             (static_cast<float>(caretPos), 0.0f, GetLayer() + LAYER_SEPARATION/2.0f);

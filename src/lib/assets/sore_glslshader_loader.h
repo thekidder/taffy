@@ -32,59 +32,24 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_TEXT_H
-#define SORE_TEXT_H
+#ifndef SORE_GLSLSHADER_LOADER_H
+#define SORE_GLSLSHADER_LOADER_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <sore_fileloader.h>
+#include <sore_glslshader.h>
 
-#include <sore_color.h>
-#include <sore_font.h>
-#include <sore_geometrychunk.h>
-#include <sore_matrix4x4.h>
-
-namespace SORE_Graphics
+namespace SORE_Resource
 {
-    class SORE_EXPORT Text
+    class GLSLShaderLoader : public FileResourceLoader<GLSLShader>
     {
     public:
-        Text(SORE_Font::Font& f, unsigned int h, const std::string& initalText,
-             const Color& c = White);
-        virtual ~Text();
+        GLSLShaderLoader(
+            SORE_FileIO::PackageCache& packageCache_, 
+            const std::string& basePath_ = "data/Shaders/",
+            const std::string& proxyName_ = "default.shad");
 
-        void UpdateText(const std::string& newText, const Color& c = White);
-        void SetTransform(const SORE_Math::Matrix4<float>& transform);
-        void TrimToWidth(unsigned int width, size_t start);
-
-        const SORE_Math::Matrix4<float>& GetTransform();
-        std::vector<Renderable> GetGeometry() const;
-        //following two functions are only valid if text is not scaled or rotated
-        unsigned int GetWidth() const;
-        unsigned int GetHeight() const;
-
-        //returns number of characters in text
-        size_t GetLength() const;
-        size_t GetIndex(float xpos) const;
-        const std::string& GetText() const;
-    private:
-        void Update();
-
-        unsigned int height;
-        unsigned int width;
-        std::string text;
-        Color color;
-        SORE_Font::Font& face;
-
-        SORE_Math::Matrix4<float> overallTransform;
-        std::vector<Renderable> geometry;
+        virtual GLSLShader* Load(const std::string& path);
     };
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

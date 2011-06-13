@@ -37,20 +37,18 @@
 namespace SORE_GUI
 {
     TextWidget::TextWidget(
-        SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
-        SORE_Resource::ResourcePool& pool,
+        SVec p, SORE_Resource::FontPtr f, unsigned int h, const std::string& t,
         const SORE_Graphics::Color& c, Widget* parent)
         : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h),
           color(c)
     {
-        shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
         UpdateText(t);
     }
 
     void TextWidget::UpdateText(const std::string& t)
     {
         text = t;
-        SetSize(SVec(SUnit(0.0, static_cast<int>(face.Width(height, text))), SUnit(0.0, height)));
+        SetSize(SVec(SUnit(0.0, static_cast<int>(face->Width(height, text))), SUnit(0.0, height)));
     }
 
     void TextWidget::SetColor(const SORE_Graphics::Color& c)

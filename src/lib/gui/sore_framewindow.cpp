@@ -37,25 +37,17 @@
 namespace SORE_GUI
 {
     FrameWindow::FrameWindow(SVec s, SVec p, const std::string& t,
-                             SORE_Resource::ResourcePool& pool, Widget* par)
+                             Widget* par)
         : FrameWidget(s, p, SCALE_CENTER, par), title(t), titleText(0), dragged(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        SORE_Graphics::Texture2DPtr tex =
-            pool.GetResource<SORE_Graphics::Texture2D>(styleDir + "frame.tga");
-        SORE_Graphics::GLSLShaderPtr shad =
-            pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
+        SORE_Resource::Texture2DPtr tex;
+        SORE_Resource::GLSLShaderPtr shad;
         SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
         SetTexture(tex);
         SetShader(shad);
-
-        font = pool.GetResource<SORE_Font::Font>(
-            styleDir + "LiberationSans-Regular.ttf");
-        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)),
-                                   *font, 24, title, pool,
-                                   SORE_Graphics::White, this);
 
         UpdatePosition();
     }

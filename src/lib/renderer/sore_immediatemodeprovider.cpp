@@ -42,13 +42,13 @@
 #include <iterator>
 #include <sstream>
 
-SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Graphics::Texture2DPtr default_texture, SORE_Graphics::GLSLShaderPtr default_shader)
+SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader)
     : current_texture(default_texture), current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
     current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
 {
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Graphics::Texture2DPtr texture)
+void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Resource::Texture2DPtr texture)
 {
     if(texture == current_texture)
         return;
@@ -56,7 +56,7 @@ void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Graphics::Texture2DPt
     current_texture = texture;
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Graphics::GLSLShaderPtr shader)
+void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Resource::GLSLShaderPtr shader)
 {
     if(shader == current_shader)
         return;
@@ -147,14 +147,14 @@ void SORE_Graphics::ImmediateModeProvider::DrawLine(
     indices.push_back(current_index + 1);
 }
 
-void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z, SORE_Font::Font& face, unsigned int height, const std::string& string)
+void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z, SORE_Resource::FontPtr face, unsigned int height, const std::string& string)
 {
     SetupDraw(GL_TRIANGLES);
 
     float advance = 0.0f;
     for(std::string::const_iterator it = string.begin(); it != string.end(); ++it)
     {
-        const SORE_Font::CharInfo& char_info = face.GetCharacter(height, *it);
+        const SORE_Resource::CharInfo& char_info = face->GetCharacter(height, *it);
 
         if(char_info.texture)
         {

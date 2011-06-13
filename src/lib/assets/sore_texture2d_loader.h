@@ -32,58 +32,26 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SLIDERWIDGET_H
-#define SORE_SLIDERWIDGET_H
+#ifndef SORE_TEXTURE2D_LOADER_H
+#define SORE_TEXTURE2D_LOADER_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <sore_fileloader.h>
+#include <sore_texture2d.h>
 
-#include <boost/signals.hpp>
-#include <boost/function.hpp>
+#include <string>
 
-#include <sore_resource.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+namespace SORE_Resource
 {
-    class SORE_EXPORT SliderWidget : public FrameWidget
+    class Texture2DLoader : public FileResourceLoader<Texture2D>
     {
     public:
-        SliderWidget(SVec s, SVec p, int min, int max,
-                     Widget* par=NULL);
-        ~SliderWidget();
+        Texture2DLoader(
+            SORE_FileIO::PackageCache& packageCache_, 
+            const std::string& basePath_ = "data/Textures/",
+            const std::string& proxyName_ = "proxy.tga");
 
-        void ConnectChange(boost::function<void (int)> c);
-
-        int GetValue() const;
-        void SetValue(int value);
-    private:
-        //TODO:fixme
-        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
-        void UpdateSlider();
-
-        float ValueToX(int value) const;
-        int XToValue(float x) const;
-
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Graphics::GeometryChunk* sliderChunk;
-        SORE_Math::Matrix4<float> sliderMat;
-
-        boost::signal<void (int)> onChange;
-        bool dragged;
-
-        int minimum, maximum, current;
+        virtual Texture2D* Load(const std::string& path);
     };
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

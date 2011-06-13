@@ -32,58 +32,28 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SLIDERWIDGET_H
-#define SORE_SLIDERWIDGET_H
+#include <sore_font_loader.h>
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
-
-#include <boost/signals.hpp>
-#include <boost/function.hpp>
-
-#include <sore_resource.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+SORE_Resource::FontLoader::FontLoader(
+    SORE_FileIO::PackageCache& packageCache_, 
+    const std::string& basePath_,
+    const std::string& proxyName_)
+    : FileResourceLoader<Font>(packageCache_, basePath_, proxyName_)
 {
-    class SORE_EXPORT SliderWidget : public FrameWidget
-    {
-    public:
-        SliderWidget(SVec s, SVec p, int min, int max,
-                     Widget* par=NULL);
-        ~SliderWidget();
-
-        void ConnectChange(boost::function<void (int)> c);
-
-        int GetValue() const;
-        void SetValue(int value);
-    private:
-        //TODO:fixme
-        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
-        void UpdateSlider();
-
-        float ValueToX(int value) const;
-        int XToValue(float x) const;
-
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Graphics::GeometryChunk* sliderChunk;
-        SORE_Math::Matrix4<float> sliderMat;
-
-        boost::signal<void (int)> onChange;
-        bool dragged;
-
-        int minimum, maximum, current;
-    };
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+SORE_Resource::Font* SORE_Resource::FontLoader::Load(const std::string& path)
+{
+    SORE_FileIO::InFile* in = LoadFile(SORE_Resource::FontPaths::GetFontPath(path));
 
-#endif
+    size_t size = in->size();
+    FT_Byte* faceData = new FT_Byte[size];
+
+    in->strm().read(reinterpret_cast<char*>(faceData), size);
+    delete in;
+
+    Font* font = new Font(faceData, size);
+    delete faceData;
+
+    return font;
+}

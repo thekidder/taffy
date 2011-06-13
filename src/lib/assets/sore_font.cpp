@@ -35,25 +35,27 @@
 #include <sore_fileio.h>
 #include <sore_font.h>
 #include <sore_geometry.h>
-#include <sore_geometrychunk.h>
 #include <sore_logger.h>
 #include <sore_glslshader.h>
 #include <sore_sprite.h>
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 
-#include <vector>
+#include <cstdlib>
+#include <stdexcept>
 #include <string>
 #include <string.h>
-#include <cstdlib>
-#include <fstream>
+#include <vector>
 
 #include <boost/lexical_cast.hpp>
 
 //number of characters to load for each face
 //we'll load the full ASCII set
-const static unsigned int NUM_CHARACTERS = 128;
+const static unsigned int CHARACTER_OFFSET = 32;
+const static unsigned int NUM_CHARACTERS   = 95;
 
-std::vector<std::string> SORE_Font::FontPaths::fontPaths;
+std::vector<std::string> SORE_Resource::FontPaths::fontPaths;
+int SORE_Resource::Font::numFonts = 0;
+FT_Library SORE_Resource::Font::library;
 
 inline static int next_p2 (int a )
 {
@@ -62,86 +64,49 @@ inline static int next_p2 (int a )
     return rval;
 }
 
-SORE_Font::Font::Font(SORE_Resource::WatchedFileArrayPtr wfa)
-    : Resource(wfa), libraryInit(false)
+SORE_Resource::Font::Font(FT_Byte* faceData_, size_t length)
 {
-    Load();
-}
-
-SORE_Font::Font::~Font()
-{
-    delete[] fontInfo;
-    std::map<unsigned int, CharInfo*>::iterator it;
-    for(it = characters.begin();it!=characters.end();++it)
+    if(numFonts == 0)
     {
-        CharInfo* c = it->second;
-        delete[] c;
+        // TODO: sore exception handling
+        if (FT_Init_FreeType( &library ))
+            throw std::runtime_error("Could not initialize Freetype");
     }
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
+
+    faceData.resize(length);
+    std::copy(faceData_, faceData_ + length, &faceData[0]);
+
+    FT_Error error;
+    error = FT_New_Memory_Face(
+        library, &faceData[0], static_cast<FT_Long>(length),
+        0, &face);
+
+    if (error)
+    {
+        throw std::runtime_error(
+            (boost::format("Font load failed: Freetype error code %d") % error).str());
+    }
+    ++numFonts;
 }
 
-void DeleteCharacters(std::pair<unsigned int, SORE_Font::CharInfo*> chars)
+void DeleteCharacters(std::pair<unsigned int, SORE_Resource::CharInfo*> chars)
 {
     delete[] chars.second;
 }
 
-void SORE_Font::Font::Load()
+SORE_Resource::Font::~Font()
 {
+    --numFonts;
     for_each(characters.begin(), characters.end(), &DeleteCharacters);
-    characters.clear();
-    if(!libraryInit)
+    FT_Done_Face(face);
+    if(numFonts == 0)
     {
-        if (FT_Init_FreeType( &library ))
-            return;
-        libraryInit = true;
-    }
-
-    SORE_FileIO::InFile* fontObj = File();
-
-    size_t size = fontObj->size();
-    size_t err;
-
-    fontInfo = new FT_Byte[size];
-
-    fontObj->strm().read(reinterpret_cast<char*>(fontInfo), size);
-    err = static_cast<size_t>(fontObj->strm().gcount());
-    delete fontObj;
-
-    if(err != size)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
-                       "Font load failed: Could not read font from disk "
-                       "(expected %d bytes, read %d bytes)") % size % err);
-        return;
-    }
-
-    if ((err=FT_New_Memory_Face( library, fontInfo, static_cast<FT_Long>(size),
-                                 0, &face ))!=0)
-    {
+        ENGINE_LOG(SORE_Logging::LVL_INFO, "Destroyed freetype library");
         FT_Done_FreeType(library);
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format(
-                       "Font load failed: Freetype error code %d") % err);
-        return;
     }
-
-    ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format(
-                       "Loaded face %s") % GetFilename());
-
-    return;
 }
-
-std::string SORE_Font::Font::ProcessFilename(const std::string& filename)
+void SORE_Resource::Font::LoadFace(unsigned int height)
 {
-    return FontPaths::GetFontPath(filename);
-}
-
-void SORE_Font::Font::LoadFace(unsigned int height)
-{
-    ENGINE_LOG(SORE_Logging::LVL_DEBUG3,
-               boost::format("Loading face for %d px %s") %
-               height % GetFilename());
-
     FT_Set_Pixel_Sizes( face, 0, height);
     characters[height] = new CharInfo[NUM_CHARACTERS];
 
@@ -153,17 +118,17 @@ void SORE_Font::Font::LoadFace(unsigned int height)
     for(unsigned char i=0; i<NUM_CHARACTERS; ++i)
     {
         unsigned int w, h;
-        LoadCharacter(i, height, buffers[i], w, h);
+        LoadCharacter(i + CHARACTER_OFFSET, height, buffers[i], w, h);
         if(w > glyphWidth)
             glyphWidth = w;
         if(h > glyphHeight)
             glyphHeight = h;
     }
 
-    const unsigned int GLYPH_COLS = 16;
+    const unsigned int GLYPH_COLS = 12;
     const unsigned int GLYPH_ROWS = 8;
 
-    assert(GLYPH_ROWS * GLYPH_COLS == NUM_CHARACTERS);
+    assert(GLYPH_ROWS * GLYPH_COLS >= NUM_CHARACTERS);
 
     unsigned int texWidth = next_p2(GLYPH_COLS*glyphWidth);
     unsigned int texHeight = next_p2(GLYPH_ROWS*glyphHeight);
@@ -207,9 +172,8 @@ void SORE_Font::Font::LoadFace(unsigned int height)
 
     if(textures.find(height) == textures.end())
     {
-        textures[height] = SORE_Graphics::Texture2DPtr(
-            new SORE_Graphics::Texture2D(
-            texture, GL_RGBA, GL_RGBA, texWidth, texHeight));
+        textures[height] = new SORE_Resource::Texture2D(
+            texture, GL_RGBA, GL_RGBA, texWidth, texHeight);
     }
     else
     {
@@ -238,37 +202,29 @@ void SORE_Font::Font::LoadFace(unsigned int height)
                 0.0f,
                 static_cast<float>(buffers[i].height));
             SORE_Math::Rect<float> texCoords(xMin, xMax, yMin, yMax);
-            SORE_Graphics::GLSLShaderPtr shader =
-                pool->GetResource<SORE_Graphics::GLSLShader>
-                ("data/Shaders/default.shad");
-
-            characters[height][i].renderable = SORE_Graphics::MakeSprite(
-                bounds, texCoords, 0.0f, textures[height], shader,
-                SORE_Graphics::BLEND_SUBTRACTIVE);
-            characters[height][i].renderable.SetTransform(buffers[i].transform);
 
             characters[height][i].texture = textures[height];
 
-            characters[height][i].vertices[0].x     = buffers[i].transform->GetData()[12];
-            characters[height][i].vertices[0].y     = buffers[i].transform->GetData()[13];
+            characters[height][i].vertices[0].x     = buffers[i].x;
+            characters[height][i].vertices[0].y     = buffers[i].y;
             characters[height][i].vertices[0].z     = 0.0f;
             characters[height][i].vertices[0].tex0i = xMin;
             characters[height][i].vertices[0].tex0j = yMin;
 
-            characters[height][i].vertices[1].x     = buffers[i].transform->GetData()[12];
-            characters[height][i].vertices[1].y     = buffers[i].transform->GetData()[13] + buffers[i].height;
+            characters[height][i].vertices[1].x     = buffers[i].x;
+            characters[height][i].vertices[1].y     = buffers[i].y + buffers[i].height;
             characters[height][i].vertices[1].z     = 0.0f;
             characters[height][i].vertices[1].tex0i = xMin;
             characters[height][i].vertices[1].tex0j = yMax;
 
-            characters[height][i].vertices[2].x     = buffers[i].transform->GetData()[12] + buffers[i].width;
-            characters[height][i].vertices[2].y     = buffers[i].transform->GetData()[13];
+            characters[height][i].vertices[2].x     = buffers[i].x + buffers[i].width;
+            characters[height][i].vertices[2].y     = buffers[i].y;
             characters[height][i].vertices[2].z     = 0.0f;
             characters[height][i].vertices[2].tex0i = xMax;
             characters[height][i].vertices[2].tex0j = yMin;
 
-            characters[height][i].vertices[3].x     = buffers[i].transform->GetData()[12] + buffers[i].width;
-            characters[height][i].vertices[3].y     = buffers[i].transform->GetData()[13] + buffers[i].height;
+            characters[height][i].vertices[3].x     = buffers[i].x + buffers[i].width;
+            characters[height][i].vertices[3].y     = buffers[i].y + buffers[i].height;
             characters[height][i].vertices[3].z     = 0.0f;
             characters[height][i].vertices[3].tex0i = xMax;
             characters[height][i].vertices[3].tex0j = yMax;
@@ -281,7 +237,7 @@ void SORE_Font::Font::LoadFace(unsigned int height)
     delete[] texture;
 }
 
-void SORE_Font::Font::LoadCharacter(char ch, unsigned int h,
+void SORE_Resource::Font::LoadCharacter(char ch, unsigned int h,
                                     CharInfoInternal& info,
                                     unsigned int& width,
                                     unsigned int& height)
@@ -321,24 +277,20 @@ void SORE_Font::Font::LoadCharacter(char ch, unsigned int h,
         }
     }
 
-    unsigned int index = static_cast<unsigned int>(ch);
+    unsigned int index = static_cast<unsigned int>(ch - CHARACTER_OFFSET);
     if(width && height)
     {
-        info.transform = boost::shared_ptr<SORE_Math::Matrix4<float> >(
-            new SORE_Math::Matrix4<float>(
-                SORE_Math::Matrix4<float>::GetTranslation(
-                    static_cast<float>(face->glyph->bitmap_left),
-                    static_cast<float>(bitmap.rows-face->glyph->bitmap_top) +
-                    (h - bitmap.rows),
-                    0.0f)));
+        info.x = static_cast<float>(face->glyph->bitmap_left);
+        info.y = static_cast<float>(
+            bitmap.rows-face->glyph->bitmap_top + (h - bitmap.rows));
     }
     characters[h][index].advance = static_cast<float>(
         face->glyph->advance.x >> 6);
 }
 
-const SORE_Font::CharInfo& SORE_Font::Font::GetCharacter(unsigned int height, char c)
+const SORE_Resource::CharInfo& SORE_Resource::Font::GetCharacter(unsigned int height, char c)
 {
-    if(c > 127 && c < 0)
+    if(c >= CHARACTER_OFFSET + NUM_CHARACTERS && c < CHARACTER_OFFSET)
     {
         ENGINE_LOG(SORE_Logging::LVL_ERROR,
                    "Attempted to get non-existent character");
@@ -351,11 +303,11 @@ const SORE_Font::CharInfo& SORE_Font::Font::GetCharacter(unsigned int height, ch
             ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("Loading face for height %d: %c") % height % c);
             LoadFace(height);
         }
-        return characters[height][static_cast<unsigned int>(c)];
+        return characters[height][static_cast<unsigned int>(c - CHARACTER_OFFSET)];
     }
 }
 
-float SORE_Font::Font::Width(unsigned int height, const std::string str)
+float SORE_Resource::Font::Width(unsigned int height, const std::string str)
 {
     if(characters.find(height)==characters.end())
     {
@@ -366,13 +318,13 @@ float SORE_Font::Font::Width(unsigned int height, const std::string str)
     float width = 0.0f;
     for(std::string::const_iterator it = str.begin(); it != str.end(); ++it)
     {
-        const SORE_Font::CharInfo& c = GetCharacter(height, *it);
+        const SORE_Resource::CharInfo& c = GetCharacter(height, *it);
         width += c.advance;
     }
     return width;
 }
 
-std::string SORE_Font::FontPaths::GetFontPath(const std::string& name)
+std::string SORE_Resource::FontPaths::GetFontPath(const std::string& name)
 {
     if(fontPaths.size()==0) InitPaths();
 

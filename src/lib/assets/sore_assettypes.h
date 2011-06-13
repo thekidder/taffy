@@ -32,58 +32,20 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SLIDERWIDGET_H
-#define SORE_SLIDERWIDGET_H
+#ifndef SORE_ASSETTYPES_H
+#define SORE_ASSETTYPES_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <sore_resourceproxy.h>
 
-#include <boost/signals.hpp>
-#include <boost/function.hpp>
-
-#include <sore_resource.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+namespace SORE_Resource
 {
-    class SORE_EXPORT SliderWidget : public FrameWidget
-    {
-    public:
-        SliderWidget(SVec s, SVec p, int min, int max,
-                     Widget* par=NULL);
-        ~SliderWidget();
+    class Font;
+    class GLSLShader;
+    class Texture2D;
 
-        void ConnectChange(boost::function<void (int)> c);
-
-        int GetValue() const;
-        void SetValue(int value);
-    private:
-        //TODO:fixme
-        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
-        void UpdateSlider();
-
-        float ValueToX(int value) const;
-        int XToValue(float x) const;
-
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Graphics::GeometryChunk* sliderChunk;
-        SORE_Math::Matrix4<float> sliderMat;
-
-        boost::signal<void (int)> onChange;
-        bool dragged;
-
-        int minimum, maximum, current;
-    };
+    typedef ResourceProxyWrapper<Font> FontPtr;
+    typedef ResourceProxyWrapper<GLSLShader> GLSLShaderPtr;
+    typedef ResourceProxyWrapper<Texture2D> Texture2DPtr;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

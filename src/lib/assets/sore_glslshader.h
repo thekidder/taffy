@@ -17,7 +17,7 @@
  * THIS SOFTWARE IS PROVIDED BY ADAM KIDDER ``AS IS'' AND ANY             *
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE      *
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR     *
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ADAM KIDDER OR        *
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ADAM KIDDER OR               *
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,  *
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,    *
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR     *
@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_FONT_H
-#define  SORE_FONT_H
+#ifndef SORE_GLSLSHADER_H
+#define SORE_GLSLSHADER_H
 
 //MSVC++ template-exporting warning
 #ifdef _MSC_VER
@@ -41,91 +41,72 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include <sore_matrix4x4.h>
 #include <sore_allgl.h>
-#include <sore_renderable.h>
-#include <sore_resource.h>
-#include <sore_texture.h>
+#include <sore_dll.h>
 
-//freetype
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <boost/shared_ptr.hpp>
 
-#include <boost/format.hpp>
+#include <vector>
+#include <string>
+#include <map>
 
-namespace SORE_Font
+namespace SORE_Resource
 {
-    //let's define some nice error constants
-    const int LIBRARY_LOAD_FAILED    = 1;
-    const int FONTCONFIG_LOAD_FAILED = 5;
-    const int FONT_LOAD_FAILED       = 2;
-    const int GLYPH_LOAD_FAILED      = 3;
-    const int GET_GLYPH_FAILED       = 4;
-    const int INVALID_FONT_NAME      = 6;
-    const int INVALID_FONT_OBJ       = 7;
-    const int INVALID_FONT_HEIGHT    = 8;
-
-    class SORE_EXPORT FontPaths
+    class SORE_EXPORT GLSLShader
     {
     public:
-        static std::string GetFontPath(const std::string& name);
-    private:
-        static void InitPaths();
+        static int  InitShaders();
+        static void UnbindShaders();
+        static bool ShadersSupported();
 
-        static std::vector<std::string> fontPaths;
-    };
+        GLSLShader();
+        GLSLShader(const char* vertex, const char* fragment);
+        ~GLSLShader();
 
-    struct CharInfo
-    {
-        // two ways to draw: draw the given Renderable, or construct one using vertices and texture
-        SORE_Graphics::Renderable renderable;
-        SORE_Graphics::vertex vertices[4];
-        SORE_Graphics::Texture2DPtr texture;
-        float advance;
-    };
+        int  AddVertexString(const char* vertex);
+        int  AddFragmentString(const char* fragment);
 
-    struct CharInfoInternal
-    {
-        GLubyte* data;
-        unsigned int height;
-        unsigned int width;
-        SORE_Graphics::TransformationPtr transform;
-    };
+        void Link();
+        void Bind() const;
+        bool Loaded() const;
+        unsigned int GetHandle() const;
 
-    class SORE_EXPORT Font : public SORE_Resource::Resource, SORE_Utility::Noncopyable
-    {
-    public:
-        Font(SORE_Resource::WatchedFileArrayPtr wfa);
-        ~Font();
+        //Uniform operators
+        void SetUniform1i(std::string name, GLuint i0);
+        void SetUniform1f(std::string name, GLfloat f0);
+        void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
+        void SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2);
+        void SetUniform4f(
+            std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
-        const char* Type() {return "Font";}
+        void SetUniform1fv(
+            std::string name, unsigned int count, const GLfloat* values);
+        void SetUniformMatrix4fv(
+            std::string name, const GLfloat * values);
 
-        void LoadFace(unsigned int height);
-        const CharInfo& GetCharacter(unsigned int height, char c);
-        float Width(unsigned int height, const std::string str);
+        GLint GetAttributeLocation(std::string name);
+
+        //for sorting
+        bool operator<(const GLSLShader& o) const;
+        bool operator==(const GLSLShader& o) const;
 
         static std::string ProcessFilename(const std::string& filename);
-    protected:
-        //This loads our face, but no specific characters
-        virtual void Load();
     private:
-        Font(const Font& o);
-        Font& operator=(const Font& o);
-        void LoadCharacter(char ch, unsigned int h,
-                           CharInfoInternal& info,
-                           unsigned int& width,
-                           unsigned int& height);
+        void Init();
+        void Unload();
+        int  AddShader(GLuint type, const char* src);
+        GLint GetUniformLocation(std::string name);
 
-        //(height, CharInfo[128])
-        std::map<unsigned int, CharInfo*> characters;
-        std::map<unsigned int, SORE_Graphics::Texture2DPtr> textures;
-        FT_Library library;
-        bool libraryInit;
-        FT_Face face;
-        FT_Byte* fontInfo;
+        std::vector<GLuint> vertexShaders, fragmentShaders;
+        GLuint program;
+        bool linked;
+        std::map<std::string,GLint> uniforms;
+        std::map<std::string,GLint> attributes;
+        static bool initCalled;
+        static bool supported;
     };
 
-    typedef boost::shared_ptr<Font> FontPtr;
+    bool operator!=(const GLSLShader& one, const GLSLShader& two);
 }
 
 #ifdef _MSC_VER

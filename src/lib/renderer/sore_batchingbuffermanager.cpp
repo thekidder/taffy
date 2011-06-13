@@ -39,6 +39,7 @@
 
 #include <sore_batchingbuffermanager.h>
 #include <sore_exception.h>
+#include <sore_logger.h>
 #include <sore_vbo.h>
 
 #ifndef SORE_NO_VBO

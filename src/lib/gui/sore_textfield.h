@@ -44,9 +44,7 @@
 #include <boost/function.hpp>
 #include <boost/signals.hpp>
 
-#include <sore_resource.h>
 #include <sore_font.h>
-#include <sore_text.h>
 #include <sore_framewidget.h>
 
 namespace SORE_GUI
@@ -54,7 +52,7 @@ namespace SORE_GUI
     class SORE_EXPORT TextField : public FrameWidget
     {
     public:
-        TextField(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        TextField(SVec s, SVec p, Widget* par=NULL);
         ~TextField();
 
         const std::string& GetText() const;
@@ -69,12 +67,11 @@ namespace SORE_GUI
         void UpdateText(int dir);
 
         std::string text;
-        SORE_Font::FontPtr font;
-        SORE_Graphics::Text* displayText;
-        SORE_Graphics::Texture2DPtr texture;
+        SORE_Resource::FontPtr font;
+        SORE_Resource::Texture2DPtr texture;
 
         SORE_Graphics::Renderable caret;
-        SORE_Graphics::Texture2DPtr caretTex;
+        SORE_Resource::Texture2DPtr caretTex;
         SORE_Math::Matrix4<float> caretMat;
         unsigned int caretPos;
         unsigned int caretWidth;

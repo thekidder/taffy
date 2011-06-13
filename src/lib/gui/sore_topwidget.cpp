@@ -42,7 +42,7 @@ namespace SORE_GUI
     TopWidget::TopWidget(unsigned int width, unsigned int height)
         : Widget(SVec(SUnit(0.0, width), SUnit(0.0, height)),
                  SVec(SUnit(0.0, 0), SUnit(0.0, 0))),
-                 imm_mode(SORE_Graphics::Texture2DPtr(), SORE_Graphics::GLSLShaderPtr())  
+                 imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
     {
     }
 

@@ -55,11 +55,7 @@ namespace SORE_Game
                                        const std::string& settingsFile)
         : ini(settingsFile), sm(&ini),
         screen(screenInfo, input, windowTitle, iconFilename, &sm),
-        pool(pc
-#ifdef FilesystemWatcherTask
-        , &watcher
-#endif
-        ), popFlag(false)
+        popFlag(false)
     {
         curr = kernel.end();
 
@@ -132,11 +128,6 @@ namespace SORE_Game
     SORE_Kernel::Screen& GamestateManager::GetScreen()
     {
         return screen;
-    }
-
-    SORE_Resource::ResourcePool& GamestateManager::GetPool()
-    {
-        return pool;
     }
 
     int GamestateManager::Run()

@@ -46,9 +46,7 @@
 #include <boost/signals.hpp>
 #include <boost/function.hpp>
 
-#include <sore_resource.h>
 #include <sore_font.h>
-#include <sore_text.h>
 #include <sore_framewidget.h>
 
 namespace SORE_GUI
@@ -56,7 +54,7 @@ namespace SORE_GUI
     class SORE_EXPORT Dropdown : public FrameWidget
     {
     public:
-        Dropdown(SVec s, SVec p, SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+        Dropdown(SVec s, SVec p, Widget* par=NULL);
         ~Dropdown();
 
         //add a new choice or update the one specified by id
@@ -71,20 +69,20 @@ namespace SORE_GUI
         void BuildGeometry();
         void ChangeTexture();
         unsigned int OrderToID(unsigned int order);
-        void SetCurrent(SORE_Graphics::Text* t);
+        //void SetCurrent(SORE_Graphics::Text* t);
 
         SVec originalSize;
 
-        SORE_Font::FontPtr font;
-        SORE_Graphics::GLSLShaderPtr shad;
+        SORE_Resource::FontPtr font;
+        SORE_Resource::GLSLShaderPtr shad;
         unsigned int textHeight;
-        SORE_Graphics::Texture2DPtr
+        SORE_Resource::Texture2DPtr
             normal, active, hover, arrow, menuBg;
         SORE_Math::Matrix4<float> arrowMat;
         SORE_Graphics::Renderable arrowChunk;
 
-        std::map<unsigned int, SORE_Graphics::Text*> choices;
-        SORE_Graphics::Text* curChoice;
+        //std::map<unsigned int, SORE_Graphics::Text*> choices;
+        //SORE_Graphics::Text* curChoice;
         std::vector<SORE_Graphics::Renderable> menu;
 
         boost::signal<void (unsigned int)> onChange;

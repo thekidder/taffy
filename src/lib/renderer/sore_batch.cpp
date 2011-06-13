@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_batch.h>
+#include <sore_logger.h>
 
 SORE_Graphics::RenderBatch::RenderBatch()
     : geometry(0), numberIndices(0)

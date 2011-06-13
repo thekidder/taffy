@@ -34,139 +34,24 @@
 
 #include <fstream>
 
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 #include <sore_util.h>
 #include <sore_fileio.h>
 #include <sore_allgl.h>
 #include <sore_logger.h>
 
-namespace SORE_Graphics
+namespace SORE_Resource
 {
-    void Texture2D::Load()
+    Texture2D::Texture2D(const void* data, GLint internalFormat,
+                         GLenum format, unsigned int width, unsigned int height)
+        : handle(0)
     {
-        char ext[10];
-        SORE_Utility::GetFileExt(GetFilename().c_str(), ext);
-        if(strcmp(ext, "tga")==0)
-        {
-            LoadTGA(GetFilename().c_str());
-        }
-        else
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Unknown file format %s") % ext);
-        }
+        LoadFromData(data, internalFormat, format, width, height);
     }
 
-    void Texture2D::LoadTGA(const char* filename)
+    Texture2D::~Texture2D()
     {
-        if(handle!=0)
-            Unload();
-        bool failed = false;
-        GLubyte header[18];
-
-        SORE_FileIO::InFile* file = File(filename);
-        if(!file->strm().good() )
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       boost::format("Could not open texture file '%s'") % filename);
-            return;
-        }
-        file->strm().read(reinterpret_cast<char*>(header), 18);
-        if(file->strm().gcount() < 18)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Could not read header...corrupted file?");
-            return;
-        }
-
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG2, "Loaded header");
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Name: %s") % filename);
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("Width: %d Height: %d")
-                   % int(header[12]+header[13]*256) % int(header[14]+header[15]*256));
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG2, boost::format("BPP: %d Image type: %d")
-                   % (int)header[16] % (int)header[2]);
-
-        //do some basic checks to make sure we can handle the file
-
-        GLubyte requested[18] = {0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        GLubyte mask     [18] = {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0};
-
-        for(int i=0;i<18;i++)
-        {
-            if(mask[i]!=0 && requested[i]!=header[i])
-            {
-                failed = true;
-            }
-        }
-
-        if(failed)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not read file: Unsupported");
-            return;
-        }
-
-        int width, height, bpp;
-
-        bpp    = int(header[16]);
-        width  = int(header[12])+((int)header[13])*256;
-        height = int(header[14])+((int)header[15])*256;
-
-        char* filler = new char[int(header[0])];
-
-        file->strm().read(filler, static_cast<int>(header[0]));
-        if(file->strm().gcount()!=static_cast<int>(header[0]))
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Could not read filler...corrupted file?");
-            return;
-        }
-
-        delete[] filler;
-
-        unsigned int dataSize = width*height*(bpp/8);
-
-        GLubyte* imgData = new GLubyte[dataSize];
-        GLubyte temp;
-
-        file->strm().read(reinterpret_cast<char*>(imgData), dataSize);
-        if(file->strm().gcount()!=dataSize)
-        {
-            delete[] imgData;
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Could not read image data...corrupted file?");
-            return;
-        }
-        delete file;
-
-        //flip bytes to read in from BGR -> RGB
-        for(size_t i=0;i<dataSize;i+=(bpp/8))
-        {
-            temp = imgData[i];
-            imgData[i] = imgData[i+2];
-            imgData[i+2] = temp;
-        }
-
-        GLint type;
-
-        switch(bpp)
-        {
-        case 24:
-            type = GL_RGB;
-            break;
-        case 32:
-            type = GL_RGBA;
-            break;
-        default:
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Unrecognized image type - only supports 24 or 32 bit "
-                       "(uncompressed) TGAs");
-            delete[] imgData;
-            return;
-        }
-
-        LoadFromData(imgData, type, type, width, height);
-
-        delete[] imgData;
+        Unload();
     }
 
     void Texture2D::SaveTGA(const char* filename)
@@ -255,24 +140,6 @@ namespace SORE_Graphics
                       type, data);
     }
 
-    Texture2D::Texture2D(SORE_Resource::WatchedFileArrayPtr wfa)
-        : Resource(wfa), handle(0)
-    {
-        Load();
-    }
-
-    Texture2D::Texture2D(const void* data, GLint internalFormat,
-                         GLenum format, unsigned int width, unsigned int height)
-        : Resource(SORE_Resource::WatchedFileArrayPtr()), handle(0)
-    {
-        LoadFromData(data, internalFormat, format, width, height);
-    }
-
-    Texture2D::~Texture2D()
-    {
-        Unload();
-    }
-
     bool Texture2D::operator<(const Texture2D& o) const
     {
         return handle < o.handle;
@@ -283,11 +150,6 @@ namespace SORE_Graphics
         return handle == o.handle;
     }
 
-    std::string Texture2D::ProcessFilename(const std::string& file)
-    {
-        return file;
-    }
-
     void Texture2D::Bind(GLSLShaderPtr shader,
                          const std::string& sampleName,
                          unsigned int textureSlot) const
@@ -296,11 +158,6 @@ namespace SORE_Graphics
         shader->SetUniform1i(sampleName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, handle);
-    }
-
-    unsigned int Texture2D::GetHandle() const
-    {
-        return handle;
     }
 
     void Texture2D::Unload()

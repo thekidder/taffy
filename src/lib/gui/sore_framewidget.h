@@ -35,7 +35,7 @@
 #ifndef SORE_FRAMEWIDGET_H
 #define SORE_FRAMEWIDGET_H
 
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 #include <sore_glslshader.h>
 #include <sore_widget.h>
 
@@ -49,8 +49,8 @@ namespace SORE_GUI
         FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);
     protected:
         void SetBorderSizes(float l, float r, float t, float b);
-        void SetTexture(SORE_Graphics::Texture2DPtr tex);
-        void SetShader(SORE_Graphics::GLSLShaderPtr shad);
+        void SetTexture(SORE_Resource::Texture2DPtr tex);
+        void SetShader(SORE_Resource::GLSLShaderPtr shad);
 
         void RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode);
     private:
@@ -59,8 +59,8 @@ namespace SORE_GUI
 
         size_mode mode;
 
-        SORE_Graphics::Texture2DPtr texture;
-        SORE_Graphics::GLSLShaderPtr shader;
+        SORE_Resource::Texture2DPtr texture;
+        SORE_Resource::GLSLShaderPtr shader;
 
         float leftBorder, rightBorder, topBorder, bottomBorder;
     };

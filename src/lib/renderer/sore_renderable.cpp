@@ -41,7 +41,7 @@ SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
 }
 
 SORE_Graphics::Renderable::Renderable(
-    GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
+    GeometryChunkPtr g, SORE_Resource::GLSLShaderPtr s, TransformationPtr trans,
     blend_mode b)
     : geometry(g), shader(s), transformation(trans),
       blending(b), cachedDepth(0.0f), sortKey(0)
@@ -64,19 +64,19 @@ SORE_Graphics::GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() co
     return geometry;
 }
 
-void SORE_Graphics::Renderable::SetShader(GLSLShaderPtr s)
+void SORE_Graphics::Renderable::SetShader(SORE_Resource::GLSLShaderPtr s)
 {
     shader = s;
     CalculateSortKey();
 }
 
-SORE_Graphics::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
+SORE_Resource::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
 {
     return shader;
 }
 
 void SORE_Graphics::Renderable::AddTexture(
-    const std::string& samplerName, Texture2DPtr t)
+    const std::string& samplerName, SORE_Resource::Texture2DPtr t)
 {
     textures->AddTexture(samplerName, t);
     CalculateSortKey();

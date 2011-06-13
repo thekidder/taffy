@@ -40,7 +40,7 @@
 #include <sore_geometryprovider.h>
 #include <sore_glslshader.h>
 #include <sore_simplebuffermanager.h>
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 
 #include <boost/unordered_map.hpp>
 
@@ -49,10 +49,10 @@ namespace SORE_Graphics
     class ImmediateModeProvider : public SORE_Graphics::GeometryProvider
     {
     public:
-        ImmediateModeProvider(SORE_Graphics::Texture2DPtr default_texture, SORE_Graphics::GLSLShaderPtr default_shader);
+        ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader);
 
-        void SetTexture(SORE_Graphics::Texture2DPtr texture);
-        void SetShader(SORE_Graphics::GLSLShaderPtr shader);
+        void SetTexture(SORE_Resource::Texture2DPtr texture);
+        void SetShader(SORE_Resource::GLSLShaderPtr shader);
         void SetColor(SORE_Graphics::Color color);
         void SetTransform(SORE_Graphics::TransformationPtr transform);
         void SetBlendMode(SORE_Graphics::blend_mode blend_mode);
@@ -70,7 +70,7 @@ namespace SORE_Graphics
         void DrawLine(
             float x1, float y1, float z1,
             float x2, float y2, float z2);
-        void DrawString(float x, float y, float z, SORE_Font::Font& face, unsigned int height, const std::string& string);
+        void DrawString(float x, float y, float z, SORE_Resource::FontPtr face, unsigned int height, const std::string& string);
 
         // geometry provider interface
         void MakeUpToDate();
@@ -88,8 +88,8 @@ namespace SORE_Graphics
         // flush the current vertex/index cache to a new renderable and start a new cache
         void CreateRenderableFromData();
 
-        SORE_Graphics::Texture2DPtr current_texture;
-        SORE_Graphics::GLSLShaderPtr current_shader;
+        SORE_Resource::Texture2DPtr current_texture;
+        SORE_Resource::GLSLShaderPtr current_shader;
         SORE_Graphics::Color current_color;
         SORE_Graphics::TransformationPtr current_transform;
         SORE_Graphics::blend_mode current_blend_mode;

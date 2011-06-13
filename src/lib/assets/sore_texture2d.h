@@ -32,27 +32,25 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_TEXTURE_H
-#define SORE_TEXTURE_H
+#ifndef SORE_TEXTURE2D_H
+#define SORE_TEXTURE2D_H
 
 #include <boost/utility.hpp>
 
 #include <sore_allgl.h>
+#include <sore_assettypes.h>
 #include <sore_noncopyable.h>
-#include <sore_resource.h>
 #include <sore_glslshader.h>
 
-namespace SORE_Graphics
+namespace SORE_Resource
 {
-    class SORE_EXPORT Texture2D : public SORE_Resource::Resource, SORE_Utility::Noncopyable
+    class SORE_EXPORT Texture2D : SORE_Utility::Noncopyable
     {
     public:
-        Texture2D(SORE_Resource::WatchedFileArrayPtr wfa);
         Texture2D(const void* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
         ~Texture2D();
 
-        void LoadTGA(const char* filename);
         void LoadFromData(const void* data, GLint internalFormat,
                           GLenum format, unsigned int width, unsigned int height);
 
@@ -60,27 +58,22 @@ namespace SORE_Graphics
             GLSLShaderPtr shader,
             const std::string& sampleName,
             unsigned int textureSlot) const;
-        const char* Type() const {return "2D texture";}
 
         void SaveTGA(const char* filename);
-        unsigned int GetHandle() const;
+        unsigned int GetHandle() const { return handle; }
+        bool Loaded() const { return handle != 0; }
 
         bool operator<(const Texture2D& o) const;
         bool operator==(const Texture2D& o) const;
-
-        static std::string ProcessFilename(const std::string& file);
-    protected:
-        void Load();
+    private:
         void Unload();
 
         GLuint handle;
-    private:
+
         unsigned int w, h;
     };
 
     bool operator!=(const Texture2D& one, const Texture2D& two);
-
-    typedef boost::shared_ptr<Texture2D> Texture2DPtr;
 }
 
 #endif

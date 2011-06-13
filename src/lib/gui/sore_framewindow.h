@@ -35,7 +35,6 @@
 #ifndef SORE_FRAMEWINDOW_H
 #define SORE_FRAMEWINDOW_H
 
-#include <sore_text.h>
 #include <sore_framewidget.h>
 #include <sore_textwidget.h>
 
@@ -45,7 +44,7 @@ namespace SORE_GUI
     {
     public:
         FrameWindow(SVec s, SVec p, const std::string& t,
-                    SORE_Resource::ResourcePool& pool, Widget* par=NULL);
+                    Widget* par=NULL);
         ~FrameWindow();
     protected:
         unsigned int GetClientSize(unit_type type) const;
@@ -56,7 +55,7 @@ namespace SORE_GUI
         void UpdatePosition();
 
         std::string title;
-        SORE_Font::FontPtr font;
+        SORE_Resource::FontPtr font;
         TextWidget* titleText;
         bool dragged;
     };

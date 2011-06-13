@@ -47,15 +47,15 @@ namespace SORE_Graphics
         SORE_Math::Rect<float> bounds,
         SORE_Math::Rect<float> texCoords,
         float z,
-        Texture2DPtr texture,
-        GLSLShaderPtr shader,
+        SORE_Resource::Texture2DPtr texture,
+        SORE_Resource::GLSLShaderPtr shader,
         blend_mode b = BLEND_SUBTRACTIVE);
 
     Renderable SORE_EXPORT MakePointSprite(
         SORE_Math::Vector3<float> position,
         float size,
-        Texture2DPtr texture,
-        GLSLShaderPtr shader,
+        SORE_Resource::Texture2DPtr texture,
+        SORE_Resource::GLSLShaderPtr shader,
         blend_mode b = BLEND_SUBTRACTIVE);
 }
 

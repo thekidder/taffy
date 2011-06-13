@@ -35,10 +35,8 @@
 #ifndef SORE_TEXTWIDGET_H
 #define SORE_TEXTWIDGET_H
 
-#include <sore_font.h>
+#include <sore_assettypes.h>
 #include <sore_glslshader.h>
-#include <sore_text.h>
-#include <sore_resource.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
@@ -46,8 +44,7 @@ namespace SORE_GUI
     class SORE_EXPORT TextWidget : public Widget
     {
     public:
-        TextWidget(SVec p, SORE_Font::Font& f, unsigned int h, const std::string& t,
-                   SORE_Resource::ResourcePool& pool,
+        TextWidget(SVec p, SORE_Resource::FontPtr f, unsigned int h, const std::string& t,
                    const SORE_Graphics::Color& c = SORE_Graphics::White,
                    Widget* parent=NULL);
 
@@ -57,8 +54,8 @@ namespace SORE_GUI
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(SORE_Kernel::Event* e);
 
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Font::Font& face;
+        SORE_Resource::GLSLShaderPtr shader;
+        SORE_Resource::FontPtr face;
         unsigned int height;
         SORE_Graphics::Color color;
 

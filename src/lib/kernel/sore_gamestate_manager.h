@@ -37,7 +37,6 @@
 
 #include <sore_pipeline_renderer.h>
 #include <sore_input.h>
-#include <sore_resource.h>
 #include <sore_screen.h>
 #include <sore_gamestate.h>
 #include <sore_gamekernel.h>
@@ -63,7 +62,6 @@ namespace SORE_Game
 
         SORE_Graphics::IRenderer* GetRenderer();
         SORE_Kernel::InputTask& GetInputTask();
-        SORE_Resource::ResourcePool& GetPool();
         SORE_Kernel::Screen& GetScreen();
 
         bool FileNotifySupported() const;
@@ -83,7 +81,6 @@ namespace SORE_Game
 #ifdef FilesystemWatcherTask
         SORE_FileIO::FilesystemWatcherTask watcher;
 #endif
-        SORE_Resource::ResourcePool pool; //needs watcher (if defined)
 
         SORE_Kernel::task_ref curr;
         std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > states;

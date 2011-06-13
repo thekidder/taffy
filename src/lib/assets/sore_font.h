@@ -17,7 +17,7 @@
  * THIS SOFTWARE IS PROVIDED BY ADAM KIDDER ``AS IS'' AND ANY             *
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE      *
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR     *
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ADAM KIDDER OR               *
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ADAM KIDDER OR        *
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,  *
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,    *
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR     *
@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_SHADERS_H
-#define  SORE_SHADERS_H
+#ifndef SORE_FONT_H
+#define SORE_FONT_H
 
 //MSVC++ template-exporting warning
 #ifdef _MSC_VER
@@ -41,81 +41,75 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include <vector>
-#include <string>
-
-#include <sore_fileio.h>
 #include <sore_allgl.h>
-#include <sore_logger.h>
-#include <sore_resource.h>
+#include <sore_assettypes.h>
+#include <sore_matrix4x4.h>
+#include <sore_geometrychunk.h>
+#include <sore_texture2d.h>
 
-namespace SORE_Graphics
+//freetype
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include <boost/format.hpp>
+
+namespace SORE_Resource
 {
-    class SORE_EXPORT GLSLShader : public SORE_Resource::Resource
+    class SORE_EXPORT FontPaths
     {
     public:
-        static int  InitShaders();
-        static void UnbindShaders();
-        static bool ShadersSupported();
-
-        GLSLShader(const char* vertex, const char* fragment,
-                   SORE_FileIO::PackageCache* pc = NULL);
-        //loads shader as a INI file specifying vertex/shader files
-        GLSLShader(SORE_Resource::WatchedFileArrayPtr wfa);
-        ~GLSLShader();
-
-        int  AddVertexFile(const char* vertex);
-        int  AddVertexString(const char* vertex);
-
-        int  AddFragmentFile(const char* fragment);
-        int  AddFragmentString(const char* fragment);
-
-        void Link();
-        void Bind() const;
-        bool Ready() const;
-        unsigned int GetHandle() const;
-
-        const char* Type() const {return "GLSL shader";}
-
-        //Uniform operators
-        void SetUniform1i(std::string name, GLuint i0);
-        void SetUniform1f(std::string name, GLfloat f0);
-        void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
-        void SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2);
-        void SetUniform4f(
-            std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-
-        void SetUniform1fv(
-            std::string name, unsigned int count, const GLfloat* values);
-        void SetUniformMatrix4fv(
-            std::string name, const GLfloat * values);
-
-        GLint GetAttributeLocation(std::string name);
-
-        //for sorting
-        bool operator<(const GLSLShader& o) const;
-        bool operator==(const GLSLShader& o) const;
-
-        static std::string ProcessFilename(const std::string& filename);
+        static std::string GetFontPath(const std::string& name);
     private:
-        char* LoadFile(const char* filename);
-        void Load(); //load from *.shad file
-        int  Init();
-        int  AddShader(GLuint type, const char* src);
-        GLint GetUniformLocation(std::string name);
+        static void InitPaths();
 
-        std::vector<GLuint> vertexShaders, fragmentShaders;
-        GLuint program;
-        bool ok,linked;
-        std::map<std::string,GLint> uniforms;
-        std::map<std::string,GLint> attributes;
-        static bool initCalled;
-        static bool supported;
+        static std::vector<std::string> fontPaths;
     };
 
-    bool operator!=(const GLSLShader& one, const GLSLShader& two);
+    struct CharInfo
+    {
+        // two ways to draw: draw the given Renderable, or construct one using vertices and texture
+        SORE_Graphics::vertex vertices[4];
+        Texture2DPtr texture;
+        float advance;
+    };
 
-    typedef boost::shared_ptr<GLSLShader> GLSLShaderPtr;
+    // NOT thread safe: each thread needs own instance of FT_library
+    class SORE_EXPORT Font : SORE_Utility::Noncopyable
+    {
+    public:
+        Font(FT_Byte* faceData_, size_t length);
+        ~Font();
+
+        void LoadFace(unsigned int height);
+        const CharInfo& GetCharacter(unsigned int height, char c);
+        float Width(unsigned int height, const std::string str);
+
+        bool Loaded() const { return true; }
+    private:
+        struct CharInfoInternal
+        {
+            GLubyte* data;
+            unsigned int height;
+            unsigned int width;
+            float x;
+            float y;
+        };
+
+        void LoadCharacter(char ch, unsigned int h,
+                           CharInfoInternal& info,
+                           unsigned int& width,
+                           unsigned int& height);
+
+        //(height, CharInfo[128])
+        std::map<unsigned int, CharInfo*> characters;
+        std::map<unsigned int, SORE_Resource::Texture2DPtr> textures;
+        static FT_Library library;
+        FT_Face face;
+        std::vector<FT_Byte> faceData;
+        
+        // used so we know when to clean up freetype
+        static int numFonts;
+    };
 }
 
 #ifdef _MSC_VER

@@ -38,8 +38,8 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
         SORE_Math::Rect<float> bounds,
         SORE_Math::Rect<float> texCoords,
         float z,
-        Texture2DPtr texture,
-        GLSLShaderPtr shader,
+        SORE_Resource::Texture2DPtr texture,
+        SORE_Resource::GLSLShaderPtr shader,
         blend_mode b)
 {
     GeometryChunkPtr g(new GeometryChunk(4, 6, GL_TRIANGLES));
@@ -89,8 +89,8 @@ SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
 SORE_Graphics::Renderable SORE_Graphics::MakePointSprite(
         SORE_Math::Vector3<float> position,
         float size,
-        Texture2DPtr texture,
-        GLSLShaderPtr shader,
+        SORE_Resource::Texture2DPtr texture,
+        SORE_Resource::GLSLShaderPtr shader,
         blend_mode b)
 {
     GeometryChunkPtr g(new GeometryChunk(1, 1, GL_POINTS));

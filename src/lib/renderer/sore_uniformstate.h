@@ -38,6 +38,7 @@
 #include <map>
 #include <string>
 
+#include <sore_assettypes.h>
 #include <sore_dll.h>
 #include <sore_vector2.h>
 #include <sore_vector3.h>
@@ -67,7 +68,7 @@ namespace SORE_Graphics
     class SORE_EXPORT UniformState
     {
     public:
-        void Bind(GLSLShaderPtr s) const;
+        void Bind(SORE_Resource::GLSLShaderPtr s) const;
 
         void SetVariable(std::string name, int i);
         void SetVariable(std::string name, float f);

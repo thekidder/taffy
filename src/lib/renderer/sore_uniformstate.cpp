@@ -34,7 +34,7 @@
 
 #include <sore_uniformstate.h>
 
-void SORE_Graphics::UniformState::Bind(GLSLShaderPtr s) const
+void SORE_Graphics::UniformState::Bind(SORE_Resource::GLSLShaderPtr s) const
 {
     std::map<std::string, uniform_var>::const_iterator it;
     for(it = uniforms.begin(); it!= uniforms.end(); ++it)

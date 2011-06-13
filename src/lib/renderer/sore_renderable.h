@@ -62,16 +62,16 @@ namespace SORE_Graphics
     {
     public:
         Renderable();
-        Renderable(GeometryChunkPtr g, GLSLShaderPtr s, TransformationPtr trans,
+        Renderable(GeometryChunkPtr g, SORE_Resource::GLSLShaderPtr s, TransformationPtr trans,
             blend_mode b);
 
         void SetGeometryChunk(GeometryChunkPtr g);
         GeometryChunkPtr GetGeometryChunk() const;
 
-        void SetShader(GLSLShaderPtr s);
-        GLSLShaderPtr GetShader() const;
+        void SetShader(SORE_Resource::GLSLShaderPtr s);
+        SORE_Resource::GLSLShaderPtr GetShader() const;
 
-        void AddTexture(const std::string& samplerName, Texture2DPtr t);
+        void AddTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr t);
         const TextureState& GetTextures() const;
 
         void MulitplyTransform(TransformationPtr t);
@@ -96,7 +96,7 @@ namespace SORE_Graphics
         void CalculateSortKey() const;
 
         GeometryChunkPtr geometry;
-        GLSLShaderPtr shader;
+        SORE_Resource::GLSLShaderPtr shader;
         TextureStatePtr textures;
         TransformationPtr transformation;
         blend_mode blending;

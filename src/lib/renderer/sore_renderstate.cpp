@@ -32,6 +32,7 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_logger.h>
 #include <sore_renderstate.h>
 
 SORE_Graphics::RenderState::RenderState() : commands(0)

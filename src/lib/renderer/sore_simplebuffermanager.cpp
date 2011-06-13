@@ -38,6 +38,7 @@
 #include <boost/foreach.hpp>
 
 #include <sore_exception.h>
+#include <sore_logger.h>
 #include <sore_simplebuffermanager.h>
 #include <sore_vbo.h>
 

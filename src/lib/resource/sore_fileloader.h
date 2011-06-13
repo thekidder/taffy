@@ -32,58 +32,67 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SLIDERWIDGET_H
-#define SORE_SLIDERWIDGET_H
+#ifndef SORE_FILELOADER_H
+#define SORE_FILELOADER_H
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <sore_fileio.h>
 
-#include <boost/signals.hpp>
-#include <boost/function.hpp>
+#include <string>
 
-#include <sore_resource.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+namespace SORE_Resource
 {
-    class SORE_EXPORT SliderWidget : public FrameWidget
+    // Basic loader infrastructure for many filetypes - provides loading 
+    // resources from a packagecache, with a base filepath. Should be 
+    // overloaded for specific resource types
+    template<typename T>
+    class FileResourceLoader
     {
     public:
-        SliderWidget(SVec s, SVec p, int min, int max,
-                     Widget* par=NULL);
-        ~SliderWidget();
+        FileResourceLoader(
+            SORE_FileIO::PackageCache& packageCache_, 
+            const std::string& basePath_,
+            const std::string& proxyName_);
 
-        void ConnectChange(boost::function<void (int)> c);
-
-        int GetValue() const;
-        void SetValue(int value);
+        virtual T* Load(const std::string& path) = 0;
+        T* LoadProxy();
+    protected:
+        SORE_FileIO::InFile* LoadFile(const std::string& path);
+        SORE_FileIO::InFile* LoadFileWithoutBasePath(const std::string& path);
     private:
-        //TODO:fixme
-        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
-        void UpdateSlider();
-
-        float ValueToX(int value) const;
-        int XToValue(float x) const;
-
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Graphics::GeometryChunk* sliderChunk;
-        SORE_Math::Matrix4<float> sliderMat;
-
-        boost::signal<void (int)> onChange;
-        bool dragged;
-
-        int minimum, maximum, current;
+        SORE_FileIO::PackageCache& packageCache;
+        std::string basePath;
+        std::string proxyName;
     };
-}
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+    template<typename T>
+    FileResourceLoader<T>::FileResourceLoader(
+        SORE_FileIO::PackageCache& packageCache_, 
+        const std::string& basePath_,
+        const std::string& proxyName_)
+        : packageCache(packageCache_), basePath(basePath_), proxyName(proxyName_)
+    {
+    }
+
+    template<typename T>
+    T* FileResourceLoader<T>::LoadProxy()
+    {
+        if(proxyName.empty())
+            return 0;
+        else
+            return Load(proxyName);
+    }
+
+    template<typename T>
+    SORE_FileIO::InFile* FileResourceLoader<T>::LoadFile(const std::string& path)
+    {
+        return new SORE_FileIO::InFile((basePath + path).c_str(), &packageCache);
+    }
+
+    template<typename T>
+    SORE_FileIO::InFile* FileResourceLoader<T>::LoadFileWithoutBasePath(const std::string& path)
+    {
+        return new SORE_FileIO::InFile(path.c_str(), &packageCache);
+    }
+}
 
 #endif

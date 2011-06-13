@@ -69,7 +69,7 @@ namespace SORE_Graphics
 
         UniformState uniforms;
         TextureState textures;
-        GLSLShaderPtr shader;
+        SORE_Resource::GLSLShaderPtr shader;
 
         camera_info camera;
         blend_mode blend;

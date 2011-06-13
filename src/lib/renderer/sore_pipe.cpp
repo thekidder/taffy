@@ -34,6 +34,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <sore_logger.h>
 #include <sore_pipe.h>
 
 void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)

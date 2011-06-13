@@ -32,58 +32,67 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SLIDERWIDGET_H
-#define SORE_SLIDERWIDGET_H
+#include <sore_glslshader_loader.h>
+#include <sore_logger.h>
+#include <sore_util.h>
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
+#include <stdexcept>
 
-#include <boost/signals.hpp>
-#include <boost/function.hpp>
-
-#include <sore_resource.h>
-#include <sore_framewidget.h>
-
-namespace SORE_GUI
+SORE_Resource::GLSLShaderLoader::GLSLShaderLoader(
+    SORE_FileIO::PackageCache& packageCache_, 
+    const std::string& basePath_,
+    const std::string& proxyName_)
+    : FileResourceLoader<GLSLShader>(packageCache_, basePath_, proxyName_)
 {
-    class SORE_EXPORT SliderWidget : public FrameWidget
-    {
-    public:
-        SliderWidget(SVec s, SVec p, int min, int max,
-                     Widget* par=NULL);
-        ~SliderWidget();
-
-        void ConnectChange(boost::function<void (int)> c);
-
-        int GetValue() const;
-        void SetValue(int value);
-    private:
-        //TODO:fixme
-        //virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
-        bool ProcessEvents(SORE_Kernel::Event* e);
-        void UpdatePosition();
-        void UpdateSlider();
-
-        float ValueToX(int value) const;
-        int XToValue(float x) const;
-
-        SORE_Graphics::Texture2DPtr bg, slider;
-        SORE_Graphics::GLSLShaderPtr shader;
-        SORE_Graphics::GeometryChunk* sliderChunk;
-        SORE_Math::Matrix4<float> sliderMat;
-
-        boost::signal<void (int)> onChange;
-        bool dragged;
-
-        int minimum, maximum, current;
-    };
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+SORE_Resource::GLSLShader* SORE_Resource::GLSLShaderLoader::Load(const std::string& path)
+{
+    SORE_FileIO::InFile* in = LoadFile(path);
+    std::map<std::string, std::map<std::string, std::string> > list =
+        SORE_Utility::ParseIniFile(*in);
+    delete in;
 
-#endif
+    GLSLShader* shader = new GLSLShader();
+
+    std::map<std::string, std::map<std::string, std::string> >::iterator i;
+    std::map<std::string, std::string>::iterator j;
+
+    for(i=list.begin();i!=list.end();i++)
+    {
+        std::string section = i->first;
+
+        for(j=i->second.begin();j!=i->second.end();j++)
+        {
+            SORE_FileIO::InFile* file = LoadFileWithoutBasePath(j->first);
+            if(!file->strm().good())
+            {
+                //TODO: FIXME: sore exception handling
+                throw std::runtime_error("Could not load shader from " + j->first);
+            }
+            size_t size = file->size();
+            char* src = new char[size+1];
+            file->strm().read(src, size);
+            delete file;
+            src[size] = '\0';
+            if(section=="Vertex")
+            {
+                shader->AddVertexString(src);
+            }
+            else if(section=="Fragment")
+            {
+                shader->AddFragmentString(src);
+            }
+            else
+            {
+                ENGINE_LOG(SORE_Logging::LVL_WARNING,
+                           boost::format("Invalid material heading: %s") % section);
+            }
+            delete src;
+        }
+    }
+
+    shader->Link();
+
+    return shader;
+}

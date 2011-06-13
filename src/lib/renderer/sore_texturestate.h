@@ -42,16 +42,16 @@
 
 #include <sore_dll.h>
 #include <sore_glslshader.h>
-#include <sore_texture.h>
+#include <sore_texture2d.h>
 
 namespace SORE_Graphics
 {
     class SORE_EXPORT TextureState
     {
     public:
-        void Bind(GLSLShaderPtr s) const;
+        void Bind(SORE_Resource::GLSLShaderPtr s) const;
 
-        void AddTexture(const std::string& samplerName, Texture2DPtr tex);
+        void AddTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr tex);
 
         bool Empty() const; //returns true if there are no uniforms
         std::size_t GetSortKey() const;
@@ -59,7 +59,7 @@ namespace SORE_Graphics
         //returns all textures in this not in o
         TextureState GetDiff(const TextureState& o) const;
     private:
-        std::map<std::string, Texture2DPtr> textures;
+        std::map<std::string, SORE_Resource::Texture2DPtr> textures;
 
         std::size_t cachedHash;
     };
