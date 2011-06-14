@@ -70,6 +70,9 @@ namespace SORE_Kernel
 
         SORE_Kernel::Screen& screen;
 
+        // need this to emulate mousemove from SFML
+        Event lastMouseMoveEvent;
+
         std::queue<Event> allEvents;
         bool quitEvent;
     };

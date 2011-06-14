@@ -40,16 +40,43 @@ namespace SORE_Kernel
     InputTask::InputTask(SORE_Kernel::Screen& screen_) 
         : screen(screen_), quitEvent(false)
     {
+        lastMouseMoveEvent.type = NOEVENT;
     }
 
     void InputTask::HandleEvent(const Event& event)
     {
-        if(event.type == NOEVENT) return;
-        if(event.type == QUIT)
+        switch(event.type)
         {
+        case NOEVENT:
+            return;
+        case QUIT:
             quitEvent = true;
+            break;
+        case RESIZE:
+            // keep the GL context up to date
+            screen.OnResize(event);
+            break;
+        default:
+            break;
         }
-        allEvents.push(event);
+
+        // emulate xmove, ymove
+        if(event.type & INPUT_ALLMOUSE && lastMouseMoveEvent.type != NOEVENT)
+        {
+            Event copy = event;
+            copy.mouse.xmove = copy.mouse.x - lastMouseMoveEvent.mouse.x;
+            copy.mouse.ymove = copy.mouse.y - lastMouseMoveEvent.mouse.y;
+
+            allEvents.push(copy);
+        }
+        else
+        {
+            allEvents.push(event);
+        }
+        if(event.type == MOUSEMOVE)
+        {
+            lastMouseMoveEvent = event;
+        }
     }
 
     void InputTask::Frame(int elapsedTime)

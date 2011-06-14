@@ -61,6 +61,8 @@ SORE_Kernel::Event SORE_Kernel::TranslateEvent(const sf::Event& sfmlEvent)
         break;
     case sf::Event::MouseButtonPressed:
         event.type = MOUSEBUTTONDOWN;
+        event.mouse.x = sfmlEvent.MouseButton.X;
+        event.mouse.y = sfmlEvent.MouseButton.Y;
         switch(sfmlEvent.MouseButton.Button)
         {
         case sf::Mouse::Left:
@@ -79,6 +81,8 @@ SORE_Kernel::Event SORE_Kernel::TranslateEvent(const sf::Event& sfmlEvent)
         break;
     case sf::Event::MouseButtonReleased:
         event.type = MOUSEBUTTONUP;
+        event.mouse.x = sfmlEvent.MouseButton.X;
+        event.mouse.y = sfmlEvent.MouseButton.Y;
         switch(sfmlEvent.MouseButton.Button)
         {
         case sf::Mouse::Left:
