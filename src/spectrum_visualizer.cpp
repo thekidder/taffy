@@ -14,7 +14,7 @@ SpectrumVisualizer::SpectrumVisualizer(
 {
     shader = shaderCache.Get("untextured.shad");
     font_shader = shaderCache.Get("default.shad");
-    face = fontCache.Get("LiberationSans-Regular.ttf");
+    face = fontCache.Get("ix/LiberationSans-Regular.ttf");
 }
 
 void SpectrumVisualizer::SetSpectrum(Spectrum* spectrum_)

@@ -23,13 +23,13 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
     texture_cache(SORE_Resource::Texture2DLoader(stack.PackageCache())),
     shader_cache(SORE_Resource::GLSLShaderLoader(stack.PackageCache())),
-    font_cache(SORE_Resource::FontLoader(stack.PackageCache(), "")),
+    font_cache(SORE_Resource::FontLoader(stack.PackageCache())),
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
     imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
-    gamestateStack.PackageCache().AddPackage("default_shaders.sdp");
+    gamestateStack.PackageCache().AddPackage("default_resources.sdp");
 
     distributor.AddListener(
         SORE_Kernel::KEYDOWN,
@@ -52,7 +52,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
 
     SORE_Resource::GLSLShaderPtr default_shader = shader_cache.Get("default.shad");
-    face = font_cache.Get("data/ix_style/LiberationSans-Regular.ttf");
+    face = font_cache.Get("default.ttf");
     
     particle_texture = texture_cache.Get("particle.tga");
 

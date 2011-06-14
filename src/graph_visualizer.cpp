@@ -13,7 +13,7 @@ GraphVisualizer::GraphVisualizer(
 {
     shader = shaderCache.Get("untextured.shad");
     font_shader = shaderCache.Get("default.shad");
-    face = fontCache.Get("LiberationSans-Regular.ttf");
+    face = fontCache.Get("ix/LiberationSans-Regular.ttf");
 }
 
 void GraphVisualizer::AddDatum(int series, float datum)
