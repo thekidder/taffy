@@ -46,8 +46,56 @@
 #pragma warning(disable: 4996)
 #endif
 
+bool Contains(const std::string& fullname, file_list& files)
+{
+    for(file_list::iterator it = files.begin(); it != files.end(); ++it)
+    {
+        if(strcmp(fullname.c_str(), it->fullname) == 0)
+            return true;
+    }
+    return false;
+}
+
+unsigned short Id(const std::string& fullname, file_list& files)
+{
+    for(file_list::iterator it = files.begin(); it != files.end(); ++it)
+    {
+        if(strcmp(fullname.c_str(), it->fullname) == 0)
+            return it->fileID;
+    }
+    return 0;
+}
+
+unsigned short int AddFileAndParents(boost::filesystem::path p, unsigned short int parent, std::string prefix, file_list& files)
+{
+    if(!boost::filesystem::exists(p))
+    {
+        std::cerr << "Could not open " << p.string() << std::endl;
+        return parent;
+    }
+
+    boost::filesystem::path base;
+
+    for(boost::filesystem::path::iterator it = p.begin(); it != p.end(); ++it)
+    {
+        if(base.empty())
+        {
+            base = *it;
+        }
+        else
+        {
+            std::string name = base.string() + "/" + it->string();
+            base = boost::filesystem::path(name);
+        }
+        parent = AddFile(base, parent, prefix, files);
+    }
+    return parent;
+}
+
 unsigned short int AddFile(boost::filesystem::path p, unsigned short int top, std::string prefix, file_list& files)
 {
+    if(Contains(p.string(), files))
+        return Id(p.string(), files);
     file_info temp;
     temp.fileID = files.size()+1;
     temp.parentID = top;

@@ -45,7 +45,7 @@ namespace SORE_GUI
         : Widget(s, p, parent_), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
-        texture = textureCache.Get("frame.tga");
+        texture = textureCache.Get("ix/frame.tga");
         shader = shaderCache.Get("default.shad");
     }
 

@@ -53,5 +53,9 @@ struct file_info
 
 typedef std::vector<file_info> file_list;
 
+bool Contains(const std::string& fullname, file_list& files);
+unsigned short Id(const std::string& fullname, file_list& files);
+
+unsigned short int AddFileAndParents(boost::filesystem::path p, unsigned short int parent, std::string prefix, file_list& files);
 unsigned short int AddFile(boost::filesystem::path p, unsigned short int parent, std::string prefix, file_list& files);
 void Walk(boost::filesystem::path p, unsigned short int top, std::string prefix, file_list& files);

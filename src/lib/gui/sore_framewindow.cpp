@@ -44,7 +44,7 @@ namespace SORE_GUI
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), fontCache.Get("LiberationSans-Regular.ttf"), 24, t, SORE_Graphics::White, this);
+        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), fontCache.Get("ix/LiberationSans-Regular.ttf"), 24, t, SORE_Graphics::White, this);
 
         SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
         UpdatePosition();

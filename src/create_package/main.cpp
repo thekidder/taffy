@@ -136,7 +136,7 @@ int main(int argc, char** argv)
         else if(boost::filesystem::is_directory(boost::filesystem::status(p)))
             Walk(p, top, prefix, files);
         else
-            AddFile(p, top, prefix, files);
+            AddFileAndParents(p, top, prefix, files);
     }
     if(files.size()>65534)
     {
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
         }
     }
 
-cout << "Finished writing file table, now copying data...\n";
+    cout << "Finished writing file table, now copying data...\n";
     if(vm.count("compression"))
         cout << "Using DEFLATE compression mode\n";
 

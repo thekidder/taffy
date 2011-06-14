@@ -50,7 +50,7 @@ namespace SORE_GUI
     renderer(r), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
     polys(0), polysLabel(0), ms(0), msLabel(0)
     {
-        SORE_Resource::FontPtr font = fontCache.Get("LiberationSans-Regular.ttf");
+        SORE_Resource::FontPtr font = fontCache.Get("ix/LiberationSans-Regular.ttf");
 
         fpsLabel   = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 0)),
                                               font, 16, "FPS:",
