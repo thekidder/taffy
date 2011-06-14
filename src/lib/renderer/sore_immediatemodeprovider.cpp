@@ -50,7 +50,9 @@ SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::Textu
 
 void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Resource::Texture2DPtr texture)
 {
-    if(texture == current_texture)
+    if(current_texture && texture && texture == current_texture)
+        return;
+    if(!current_texture && !texture)
         return;
     CreateRenderableFromData();
     current_texture = texture;
@@ -58,7 +60,9 @@ void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Resource::Texture2DPt
 
 void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Resource::GLSLShaderPtr shader)
 {
-    if(shader == current_shader)
+    if(current_shader && shader && shader == current_shader)
+        return;
+    if(!current_shader && !shader)
         return;
     CreateRenderableFromData();
     current_shader = shader;
@@ -71,7 +75,9 @@ void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
 
 void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::TransformationPtr transform)
 {
-    if(transform == current_transform)
+    if(current_transform && transform && transform == current_transform)
+        return;
+    if(!current_transform && !current_transform)
         return;
     CreateRenderableFromData();
     current_transform = transform;
