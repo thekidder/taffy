@@ -46,7 +46,7 @@ namespace SORE_GUI
         styleDir += StyleName() + "/";
 
         unsigned int height = GetSize(VERTICAL);
-        unsigned int width = GetSize(HORIZONTAL);
+        // unsigned int width = GetSize(HORIZONTAL);
 
         unsigned int textHeight = height / 2;
         if(textHeight < 16) textHeight = 16;

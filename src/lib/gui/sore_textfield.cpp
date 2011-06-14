@@ -42,7 +42,7 @@
 namespace SORE_GUI
 {
     TextField::TextField(SVec s, SVec p, Widget* par)
-        : FrameWidget(s, p, SCALE_CENTER, par), text(""), 
+        : FrameWidget(s, p, SCALE_CENTER, par), text(""),
           pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
@@ -65,7 +65,7 @@ namespace SORE_GUI
 
         caretEnd = SORE_Kernel::GetGlobalTicks();
 
-        unsigned int textHeight = GetSize(VERTICAL) - 16;
+        // unsigned int textHeight = GetSize(VERTICAL) - 16;
 
         UpdateText(0);
         UpdatePosition();
@@ -181,14 +181,14 @@ namespace SORE_GUI
         }
         else if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
         {
-            float x = static_cast<float>(e.mouse.x - 8);
-            size_t index;// = displayText->GetIndex(x);
-            unsigned int oldPos = pos;
-            pos = index + textStart;
-            dir = pos > oldPos ? 1 :
-                pos < oldPos ? -1 : 0;
-            UpdateText(dir);
-            UpdatePosition();
+            // float x = static_cast<float>(e.mouse.x - 8);
+            // size_t index;// = displayText->GetIndex(x);
+            // unsigned int oldPos = pos;
+            // pos = index + textStart;
+            // dir = pos > oldPos ? 1 :
+            //     pos < oldPos ? -1 : 0;
+            // UpdateText(dir);
+            // UpdatePosition();
         }
         return false;
     }
@@ -196,29 +196,29 @@ namespace SORE_GUI
     void TextField::UpdateText(int dir)
     {
         //displayText->UpdateText(text);
-        unsigned int contentsWidth;// = displayText->GetWidth() + caretWidth;
-        if(pos < textStart && dir < 0)
-            textStart = pos;
-        unsigned int numChars = text.length();
-        textEnd = textStart + numChars;
-        while(contentsWidth > GetSize(HORIZONTAL) -  16.0f)
-        {
-            numChars--;
-            if( (dir > 0 && pos > textEnd) || (textEnd - textStart > numChars) )
-            {
-                int adjust = pos - numChars;
-                if(adjust < 0) adjust = 0;
-                textStart = adjust;
-                textEnd = textStart + numChars;
-            }
-            else if(dir < 0)
-            {
-                textStart = pos - numChars;
-                textEnd = numChars + textStart;
-            }
+        // unsigned int contentsWidth;// = displayText->GetWidth() + caretWidth;
+        // if(pos < textStart && dir < 0)
+        //     textStart = pos;
+        // unsigned int numChars = text.length();
+        // textEnd = textStart + numChars;
+        // while(contentsWidth > GetSize(HORIZONTAL) -  16.0f)
+        // {
+        //     numChars--;
+        //     if( (dir > 0 && pos > textEnd) || (textEnd - textStart > numChars) )
+        //     {
+        //         int adjust = pos - numChars;
+        //         if(adjust < 0) adjust = 0;
+        //         textStart = adjust;
+        //         textEnd = textStart + numChars;
+        //     }
+        //     else if(dir < 0)
+        //     {
+        //         textStart = pos - numChars;
+        //         textEnd = numChars + textStart;
+        //     }
             //displayText->UpdateText(text.substr(textStart, numChars));
             //contentsWidth = displayText->GetWidth() + caretWidth;
-        }
+        // }
         //displayText->UpdateText(text.substr(textStart, pos - textStart));
         //caretPos = displayText->GetWidth();
         //displayText->UpdateText(text.substr(textStart, numChars));

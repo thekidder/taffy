@@ -51,28 +51,9 @@ namespace SORE_Resource
 
         // retrieve the asset pointed to by key
         // if the asset does not exist in cache, calls the loader to retrieve it
-        // defined in place so we can use the Resource_t typedef
-        Resource_t ResourceCache<Key,Asset,ResourceLoader>::Get(const Key& key)
-        {
-            // make sure proxy is loaded
-            if(!proxyObject)
-                proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
+        Resource_t Get(const Key& key);
 
-            Asset_container_t::iterator it = map.find(key);
-            if(it == map.end())
-            {
-                // load the resource
-                Asset* rawResource = loader.Load(key);
-                Resource_t resource(new ResourceProxy<Asset>(rawResource, proxyObject));
-                map.insert(std::make_pair(key, resource));
-                return resource;
-            }
-            else
-            {
-                return it->second;
-            }
-        }
-        // Unloads the given resource. Does not actually remove it from cache; only 
+        // Unloads the given resource. Does not actually remove it from cache; only
         // unloads it from the proxy.
         void Unload(const Key& key);
         // Ensure the given resource is loaded
@@ -95,6 +76,29 @@ namespace SORE_Resource
     };
 
     template<typename Key, typename Asset, typename ResourceLoader>
+    typename ResourceCache<Key,Asset,ResourceLoader>::Resource_t
+    ResourceCache<Key,Asset,ResourceLoader>::Get(const Key& key)
+    {
+        // make sure proxy is loaded
+        if(!proxyObject)
+            proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
+
+        typename Asset_container_t::iterator it = map.find(key);
+        if(it == map.end())
+        {
+            // load the resource
+            Asset* rawResource = loader.Load(key);
+            Resource_t resource(new ResourceProxy<Asset>(rawResource, proxyObject));
+            map.insert(std::make_pair(key, resource));
+            return resource;
+        }
+        else
+        {
+            return it->second;
+        }
+    }
+
+    template<typename Key, typename Asset, typename ResourceLoader>
     ResourceCache<Key,Asset,ResourceLoader>::ResourceCache(const ResourceLoader& loader_)
         : loader(loader_)
     {
@@ -103,7 +107,7 @@ namespace SORE_Resource
     template<typename Key, typename Asset, typename ResourceLoader>
     void ResourceCache<Key,Asset,ResourceLoader>::Unload(const Key& key)
     {
-        Asset_container_t::iterator it = map.find(key);
+        typename Asset_container_t::iterator it = map.find(key);
         if(it != map.end())
         {
             it->second.Unload();
@@ -113,7 +117,7 @@ namespace SORE_Resource
     template<typename Key, typename Asset, typename ResourceLoader>
     void ResourceCache<Key,Asset,ResourceLoader>::Load(const Key& key)
     {
-        Asset_container_t::iterator it = map.find(key);
+        typename Asset_container_t::iterator it = map.find(key);
         if(it != map.end())
         {
             // in the cache, but maybe not loaded
@@ -138,7 +142,7 @@ namespace SORE_Resource
     template<typename Key, typename Asset, typename ResourceLoader>
     bool ResourceCache<Key,Asset,ResourceLoader>::Loaded(const Key& key) const
     {
-        Asset_container_t::const_iterator it = map.find(key);
+        typename Asset_container_t::const_iterator it = map.find(key);
         return it != map.end() && it->second.Loaded();
     }
 }

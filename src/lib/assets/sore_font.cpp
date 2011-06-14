@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       * 
+ * Copyright 2010 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -293,7 +293,8 @@ void SORE_Resource::Font::LoadCharacter(char ch, unsigned int h,
 
 const SORE_Resource::CharInfo& SORE_Resource::Font::GetCharacter(unsigned int height, char c)
 {
-    if(c >= CHARACTER_OFFSET + NUM_CHARACTERS && c < CHARACTER_OFFSET)
+    unsigned char index = static_cast<unsigned char>(c);
+    if(index >= CHARACTER_OFFSET + NUM_CHARACTERS || index < CHARACTER_OFFSET)
     {
         ENGINE_LOG(SORE_Logging::LVL_ERROR,
                    "Attempted to get non-existent character");

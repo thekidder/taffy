@@ -34,7 +34,7 @@
 
 #include <sore_font.h>
 
-void SORE_Font::FontPaths::InitPaths()
+void SORE_Resource::FontPaths::InitPaths()
 {
     fontPaths.clear();
     if(!FcInit())

@@ -96,7 +96,7 @@ namespace SORE_GUI
     void Dropdown::BuildGeometry()
     {
         menu.clear();
-        unsigned int currHeight = GetPixels(VERTICAL, originalSize.GetVertical());
+        // unsigned int currHeight = GetPixels(VERTICAL, originalSize.GetVertical());
         //for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
         //    it!=choices.end();++it)
         //{
@@ -242,7 +242,7 @@ namespace SORE_GUI
 
     unsigned int Dropdown::OrderToID(unsigned int order)
     {
-        unsigned int id = 0;
+        // unsigned int id = 0;
         /*for(std::map<unsigned int, SORE_Graphics::Text*>::iterator it=choices.begin();
             it!=choices.end();++it,++id)
         {
