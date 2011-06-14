@@ -35,6 +35,7 @@
 #ifndef SORE_ASSETTYPES_H
 #define SORE_ASSETTYPES_H
 
+#include <sore_resourcecache.h>
 #include <sore_resourceproxy.h>
 
 namespace SORE_Resource
@@ -43,9 +44,19 @@ namespace SORE_Resource
     class GLSLShader;
     class Texture2D;
 
+    class FontLoader;
+    class GLSLShaderLoader;
+    class Texture2DLoader;
+
     typedef ResourceProxyWrapper<Font> FontPtr;
     typedef ResourceProxyWrapper<GLSLShader> GLSLShaderPtr;
     typedef ResourceProxyWrapper<Texture2D> Texture2DPtr;
+
+    // standard cache types
+    typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Font,       SORE_Resource::FontLoader>       Font_cache_t;
+    typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> Shader_cache_t;
+    typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D,  SORE_Resource::Texture2DLoader>  Texture_cache_t;
+        
 }
 
 #endif
