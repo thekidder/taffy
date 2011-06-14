@@ -52,6 +52,7 @@ namespace SORE_Game
         int GetInterval() const { return interval; }
 
         virtual bool OnEvent(const SORE_Kernel::Event& e) { return false; }
+        virtual void Render() {}
     protected:
         GamestateStack& gamestateStack;
 	private:

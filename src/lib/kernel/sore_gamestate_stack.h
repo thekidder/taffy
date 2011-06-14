@@ -50,18 +50,16 @@
 
 namespace SORE_Game
 {
-    class SORE_EXPORT GamestateStack
+    class SORE_EXPORT GamestateStack : public SORE_Kernel::Task
     {
     public:
-        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Font,       SORE_Resource::FontLoader>       Font_cache_t;
-        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> Shader_cache_t;
-        typedef SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D,  SORE_Resource::Texture2DLoader>  Texture_cache_t;
-        
         GamestateStack(
             const std::string& windowTitle = "SORE Framework Application",
             const std::string& iconFilename = "",
             const std::string& settingsFile = "");
-        ~GamestateStack();
+
+        void Frame(int elapsed);
+        const char* GetName() const { return "Gamestate Stack render task"; }
 
         //use new to instantiate newState; the stack will handle its deallocation
         void PushState(Gamestate* newState);
@@ -74,9 +72,9 @@ namespace SORE_Game
         SORE_FileIO::PackageCache& PackageCache() { return packageCache; }
 
         // global resource caches
-        Font_cache_t& FontCache() { return fontCache; }
-        Shader_cache_t& ShaderCache() { return shaderCache; }
-        Texture_cache_t& TextureCache() { return textureCache; }
+        SORE_Resource::Font_cache_t& FontCache() { return fontCache; }
+        SORE_Resource::Shader_cache_t& ShaderCache() { return shaderCache; }
+        SORE_Resource::Texture_cache_t& TextureCache() { return textureCache; }
     private:
         void Pop();
 
@@ -91,9 +89,9 @@ namespace SORE_Game
         SORE_FileIO::PackageCache packageCache;
 
         // resource caches accessible from gamestates
-        Font_cache_t fontCache;
-        Shader_cache_t shaderCache;
-        Texture_cache_t textureCache;
+        SORE_Resource::Font_cache_t fontCache;
+        SORE_Resource::Shader_cache_t shaderCache;
+        SORE_Resource::Texture_cache_t textureCache;
 
         typedef std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > State_stack_t;
         State_stack_t states;

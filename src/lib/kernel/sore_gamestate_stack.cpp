@@ -60,12 +60,18 @@ namespace SORE_Game
         popFlag(false)
     {
         kernel.AddTask(10, &input);
+        // Render everything right before we display
+        kernel.AddTask(999, this);
         // sf::window.Display() should be last call
         kernel.AddTask(1000, &screen);
     }
 
-    GamestateStack::~GamestateStack()
+    void GamestateStack::Frame(int elapsed)
     {
+        for(State_stack_t::iterator it = states.begin(); it != states.end(); ++it)
+        {
+            it->second->Render();
+        }
     }
 
     void GamestateStack::Pop()
