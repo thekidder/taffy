@@ -55,7 +55,8 @@ namespace SORE_Resource
         Resource_t ResourceCache<Key,Asset,ResourceLoader>::Get(const Key& key)
         {
             // make sure proxy is loaded
-            proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
+            if(!proxyObject)
+                proxyObject = boost::shared_ptr<Asset>(loader.LoadProxy());
 
             Asset_container_t::iterator it = map.find(key);
             if(it == map.end())
