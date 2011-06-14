@@ -61,8 +61,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     
     particle_texture = texture_cache.Get("particle.tga");
 
-    gui::TextWidget* text = new gui::TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), face, 24, "Hello, world!", SORE_Graphics::White, top);
-
     SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), top);
 
     beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
