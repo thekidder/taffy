@@ -1,6 +1,10 @@
 #include "spectrum_visualizer.h"
 #include "utility.h"
 
+#include <sore_font_loader.h>
+#include <sore_glslshader_loader.h>
+#include <sore_texture2d_loader.h>
+
 #include <boost/format.hpp>
 
 SpectrumVisualizer::SpectrumVisualizer(
@@ -8,9 +12,9 @@ SpectrumVisualizer::SpectrumVisualizer(
         Spectrum* spectrum_)
         : Widget(size, position, parent), spectrum(spectrum_)
 {
-    /*shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
-    font_shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");*/
+    shader = shaderCache.Get("untextured.shad");
+    font_shader = shaderCache.Get("default.shad");
+    face = fontCache.Get("LiberationSans-Regular.ttf");
 }
 
 void SpectrumVisualizer::SetSpectrum(Spectrum* spectrum_)

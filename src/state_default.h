@@ -40,6 +40,7 @@ public:
     ~DefaultState();
 
     void Frame(int elapsed);
+    void Render();
     const char* GetName() const {return "Default state";}
 
     virtual bool OnEvent(const SORE_Kernel::Event& e); 
@@ -51,7 +52,6 @@ private:
     SORE_Graphics::PipelineRenderer renderer;
     SORE_Kernel::InputDistributor distributor;
 
-    SORE_FileIO::PackageCache package_cache;
     SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D, SORE_Resource::Texture2DLoader> texture_cache;
     SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> shader_cache;
     SORE_Resource::ResourceCache<std::string, SORE_Resource::Font, SORE_Resource::FontLoader> font_cache;

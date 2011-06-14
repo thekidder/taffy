@@ -1,15 +1,19 @@
 #include "graph_visualizer.h"
 #include "utility.h"
 
+#include <sore_font_loader.h>
+#include <sore_glslshader_loader.h>
+#include <sore_texture2d_loader.h>
+
 GraphVisualizer::GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
         std::pair<float, float> input_range_, int num_series, int history_size_)
         : Widget(size, position, parent), input_range(input_range_), 
         data(num_series), history_size(history_size_)
 {
-    /*shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/untextured.shad");
-    font_shader = pool.GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    face = pool.GetResource<SORE_Font::Font>("data/ix_style/LiberationSans-Regular.ttf");*/
+    shader = shaderCache.Get("untextured.shad");
+    font_shader = shaderCache.Get("default.shad");
+    face = fontCache.Get("LiberationSans-Regular.ttf");
 }
 
 void GraphVisualizer::AddDatum(int series, float datum)

@@ -21,13 +21,16 @@ const int kNumChannels = 2;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack) 
     : Gamestate(stack, 20), // run every 20 milliseconds
-    texture_cache(SORE_Resource::Texture2DLoader(package_cache)),
-    shader_cache(SORE_Resource::GLSLShaderLoader(package_cache)),
-    font_cache(SORE_Resource::FontLoader(package_cache, "")),
+    texture_cache(SORE_Resource::Texture2DLoader(stack.PackageCache())),
+    shader_cache(SORE_Resource::GLSLShaderLoader(stack.PackageCache())),
+    font_cache(SORE_Resource::FontLoader(stack.PackageCache(), "")),
     top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
     imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
+    gamestateStack.PackageCache().AddPackage("ix_style.sdp");
+    gamestateStack.PackageCache().AddPackage("default_shaders.sdp");
+
     distributor.AddListener(
         SORE_Kernel::KEYDOWN,
          boost::bind(&DefaultState::HandleKeyboard, this, _1));
@@ -38,28 +41,32 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         SORE_Kernel::RESIZE,
         boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
 
-    //top = new gui::TopWidget(owner->GetRenderer()->GetScreenInfo().width,
-    //                         owner->GetRenderer()->GetScreenInfo().height);
+    top = new gui::TopWidget(
+        gamestateStack.FontCache(),
+        gamestateStack.ShaderCache(),
+        gamestateStack.TextureCache());
 
-    //SORE_Kernel::InputTask& input = owner->GetInputTask();
-    //input.AddListener(SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
-    //                   std::bind1st(std::mem_fun(
-    //                                    &SORE_GUI::TopWidget::PropagateEvents), top));
-    //input.AddListener(SORE_Kernel::RESIZE ,
-    //                   std::bind1st(std::mem_fun(&gui::TopWidget::OnResize), top));
+    distributor.AddListener(
+        SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
+        boost::bind(&SORE_GUI::TopWidget::PropagateEvents, top, _1));
 
-    //SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), top);
 
-    //beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
-    //beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
-    //beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
-
-    //spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), top, 0);
-
-    //debug = new DebugGUI(owner->GetRenderer(),
-    //                     owner->GetInputTask(), container);
-
+    SORE_Resource::GLSLShaderPtr default_shader = shader_cache.Get("default.shad");
+    face = font_cache.Get("data/ix_style/LiberationSans-Regular.ttf");
     
+    particle_texture = texture_cache.Get("particle.tga");
+
+    gui::TextWidget* text = new gui::TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), face, 24, "Hello, world!", SORE_Graphics::White, top);
+
+    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), top);
+
+    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
+
+    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), top, 0);
+
+    debug = new DebugGUI(renderer, container);
 
     /*SORE_Graphics::GLSLShaderPtr point_sprite =
         owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/point_sprite.shad");
@@ -69,12 +76,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         owner->GetPool().GetResource<SORE_Graphics::Texture2D>("data/Textures/particle.tga");
     particles = new ParticleSystem(particle_texture, point_sprite);*/
 
-    package_cache.AddPackage("ix_style.sdp");
-    package_cache.AddPackage("default_shaders.sdp");
-    SORE_Resource::GLSLShaderPtr default_shader = shader_cache.Get("default.shad");
-    face = font_cache.Get("data/ix_style/LiberationSans-Regular.ttf");
-    
-    particle_texture = texture_cache.Get("particle.tga");
+
 
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.SetShader(default_shader);
@@ -82,8 +84,8 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     imm_mode.SetTexture(particle_texture);
 
     //owner->GetRenderer()->AddGeometryProvider(particles);
-    renderer.AddGeometryProvider(&imm_mode);
-    //owner->GetRenderer()->AddGeometryProvider(top->GetGeometryProvider());
+    //renderer.AddGeometryProvider(&imm_mode);
+    renderer.AddGeometryProvider(top->GetGeometryProvider());
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -131,14 +133,14 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     mid  = new PartialSpectrum(*fmod_g_spectrum, 8, 16);
     high = new PartialSpectrum(*fmod_g_spectrum, 16, 24);
 
-    //spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
+    spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
     beat_detector_low.SetSpectrum(low);
     beat_detector_mid.SetSpectrum(mid);
     beat_detector_high.SetSpectrum(high);
 
-    //beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low->TotalHz().first % low->TotalHz().second).str());
-    //beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid->TotalHz().first % mid->TotalHz().second).str());
-    //beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high->TotalHz().first % high->TotalHz().second).str());
+    beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low->TotalHz().first % low->TotalHz().second).str());
+    beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid->TotalHz().first % mid->TotalHz().second).str());
+    beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high->TotalHz().first % high->TotalHz().second).str());
 }
 
 DefaultState::~DefaultState()
@@ -150,7 +152,7 @@ DefaultState::~DefaultState()
     delete kiss_g_spectrum;
     delete fmod_spectrum;
     delete kiss_spectrum;
-    //delete top;
+    delete top;
     
     system->release();
 }
@@ -162,9 +164,9 @@ bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
 
 void DefaultState::Frame(int elapsed)
 {
-    imm_mode.Start();
+    //imm_mode.Start();
 
-    imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, 32, "Hello, world!");
+    //imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, 32, "Hello, world!");
 
     system->update();
 
@@ -188,10 +190,10 @@ void DefaultState::Frame(int elapsed)
         else
             spectrum = fmod_g_spectrum;
     }
-    //spectrum_visualizer->SetSpectrum(spectrum);
+    spectrum_visualizer->SetSpectrum(spectrum);
     //beat_detector.SetSpectrum(spectrum);
 
-    /*beat_visualizer_low->AddDatum(0, beat_detector_low.Flux());
+    beat_visualizer_low->AddDatum(0, beat_detector_low.Flux());
     beat_visualizer_low->AddDatum(1, beat_detector_low.Threshold());
     beat_visualizer_low->AddDatum(2, beat_detector_low.ThresholdedFlux());
     beat_visualizer_low->AddDatum(3, 30.0f - beat_detector_low.Beat());
@@ -204,11 +206,14 @@ void DefaultState::Frame(int elapsed)
     beat_visualizer_high->AddDatum(0, beat_detector_high.Flux());
     beat_visualizer_high->AddDatum(1, beat_detector_high.Threshold());
     beat_visualizer_high->AddDatum(2, beat_detector_high.ThresholdedFlux());
-    beat_visualizer_high->AddDatum(3, 30.0f - beat_detector_high.Beat());*/
+    beat_visualizer_high->AddDatum(3, 30.0f - beat_detector_high.Beat());
 
     // draw gui
-    //top->Frame(elapsed);
+    top->Frame(elapsed);
+}
 
+void DefaultState::Render()
+{
     renderer.Render();
 }
 
