@@ -48,7 +48,7 @@ namespace SORE_Resource
         Texture2DLoader(
             SORE_FileIO::PackageCache& packageCache_, 
             const std::string& basePath_ = "data/Textures/",
-            const std::string& proxyName_ = "proxy.tga");
+            const std::string& proxyName_ = "default.tga");
 
         virtual Texture2D* Load(const std::string& path);
     };

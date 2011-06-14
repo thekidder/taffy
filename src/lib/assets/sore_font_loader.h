@@ -46,7 +46,7 @@ namespace SORE_Resource
         FontLoader(
             SORE_FileIO::PackageCache& packageCache_, 
             const std::string& basePath_ = "data/Fonts/",
-            const std::string& proxyName_ = "");
+            const std::string& proxyName_ = "default.ttf");
 
         virtual Font* Load(const std::string& path);
     };
