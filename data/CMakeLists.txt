@@ -5,7 +5,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # ix widget style
 SET(
   IX_STYLE_SRCS
+  ix.json
+
   Fonts/ix/LiberationSans-Regular.ttf
+
   Textures/ix/arrow.tga
   Textures/ix/button_sheet_active.tga
   Textures/ix/button_sheet_hover.tga

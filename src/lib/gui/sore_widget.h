@@ -44,12 +44,13 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <json/json.h>
 
-#include <sore_matrix4x4.h>
 #include <sore_dll.h>
-#include <sore_immediatemodeprovider.h>
 #include <sore_event.h>
-
+#include <sore_fileio.h>
+#include <sore_immediatemodeprovider.h>
+#include <sore_matrix4x4.h>
 #include <sore_units.h>
 
 namespace SORE_GUI
@@ -85,8 +86,10 @@ namespace SORE_GUI
 
         bool HasFocus() const;
 
-        static void SetStyle(std::string style);
-        static std::string GetStyle();
+        void SetStyleName(const std::string& style_);
+        const std::string& StyleName() { return style; }
+
+        void LoadStyle(SORE_FileIO::InFile& file);
 
         void SetVisible(bool visible = true);
     protected:
@@ -112,6 +115,8 @@ namespace SORE_GUI
 
         void ClearFocus();
         float GetTopLayer();
+
+        const Json::Value& Style() { return styleConfig[style]; }
 
         SORE_Resource::Font_cache_t& fontCache;
         SORE_Resource::Shader_cache_t& shaderCache;
@@ -156,7 +161,8 @@ namespace SORE_GUI
         float& HighestLayer();
         float highestLayer;
 
-        static std::string style;
+        std::string style;
+        Json::Value styleConfig;
 
         //render/process inputs from this widget?
         bool isVisible;

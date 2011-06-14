@@ -46,7 +46,7 @@ namespace SORE_GUI
           pos(0), textStart(0), textEnd(0)
     {
         std::string styleDir("data/");
-        styleDir += GetStyle() + "/";
+        styleDir += StyleName() + "/";
 
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(texture);

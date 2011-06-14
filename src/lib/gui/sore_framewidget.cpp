@@ -45,8 +45,8 @@ namespace SORE_GUI
         : Widget(s, p, parent_), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
-        texture = textureCache.Get("ix/frame.tga");
-        shader = shaderCache.Get("default.shad");
+        texture = textureCache.Get(Style()["FrameWidget"]["texture"].asString());
+        shader = shaderCache.Get(Style()["FrameWidget"]["shader"].asString());
     }
 
     void FrameWidget::SetBorderSizes(float l, float r, float t, float b)
@@ -102,13 +102,25 @@ namespace SORE_GUI
         float width  = static_cast<float>(GetSize(HORIZONTAL));
         float height = static_cast<float>(GetSize(VERTICAL));
 
+        float tex_left   = static_cast<float>(Style()["FrameWidget"]["tex_coords"][0u].asDouble());
+        float tex_right  = static_cast<float>(Style()["FrameWidget"]["tex_coords"][1u].asDouble());
+        float tex_top    = static_cast<float>(Style()["FrameWidget"]["tex_coords"][2u].asDouble());
+        float tex_bottom = static_cast<float>(Style()["FrameWidget"]["tex_coords"][3u].asDouble());
+
+        float tex_width = tex_right - tex_left;
+        float tex_height = tex_bottom - tex_top;
+
         SORE_Math::Rect<float> bounds;
         SORE_Math::Rect<float> texCoords;
 
         if(leftBorder + rightBorder < width && bottomBorder + topBorder < height)
         {
             //center
-            texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.25f, 0.75f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.25f + tex_left,
+                tex_width *  0.75f + tex_left,
+                tex_height * 0.25f + tex_top,
+                tex_height * 0.75f + tex_top);
             imm_mode.DrawQuad(
                 leftBorder,         topBorder,             0.0f,
                 leftBorder,         height - bottomBorder, 0.0f,
@@ -120,7 +132,11 @@ namespace SORE_GUI
         if(leftBorder && bottomBorder + topBorder < height)
         {
             //left border
-            texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.25f, 0.75f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_left, 
+                tex_width *  0.25f + tex_left, 
+                tex_height * 0.25f + tex_top, 
+                tex_height * 0.75f + tex_top);
             imm_mode.DrawQuad(
                 0.0f,       topBorder,             0.0f,
                 0.0f,       height - bottomBorder, 0.0f,
@@ -132,7 +148,11 @@ namespace SORE_GUI
         if(leftBorder && topBorder)
         {
             //top left corner
-            texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.0f, 0.25f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_left,
+                tex_width *  0.25f + tex_left,
+                tex_top, 
+                tex_height * 0.25f + tex_top);
             imm_mode.DrawQuad(
                 0.0f,       0.0f,      0.0f,
                 0.0f,       topBorder, 0.0f,
@@ -144,7 +164,11 @@ namespace SORE_GUI
         if(leftBorder + rightBorder < width && topBorder)
         {
             //top border
-            texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.0f, 0.25f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.25f + tex_left, 
+                tex_width *  0.75f + tex_left, 
+                tex_top,
+                tex_height * 0.25f + tex_top);
             imm_mode.DrawQuad(
                 leftBorder,          0.0f,      0.0f,
                 leftBorder,          topBorder, 0.0f,
@@ -156,7 +180,11 @@ namespace SORE_GUI
         if(rightBorder && topBorder)
         {
             //top right corner
-            texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.0f, 0.25f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.75f + tex_left, 
+                tex_right, 
+                tex_top, 
+                tex_height * 0.25f + tex_top);
             imm_mode.DrawQuad(
                 width - rightBorder, 0.0f,      0.0f,
                 width - rightBorder, topBorder, 0.0f,
@@ -168,7 +196,11 @@ namespace SORE_GUI
         if(rightBorder && topBorder + bottomBorder < height)
         {
             //right border
-            texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.25f, 0.75f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.75f + tex_left, 
+                tex_right, 
+                tex_height * 0.25f + tex_top, 
+                tex_height * 0.75f + tex_top);
             imm_mode.DrawQuad(
                 width - rightBorder, topBorder,             0.0f,
                 width - rightBorder, height - bottomBorder, 0.0f,
@@ -180,7 +212,11 @@ namespace SORE_GUI
         if(rightBorder && bottomBorder)
         {
             //bottom right corner
-            texCoords = SORE_Math::Rect<float>(0.75f, 1.0f, 0.75f, 1.0f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.75f + tex_left, 
+                tex_right,
+                tex_height * 0.75f + tex_top, 
+                tex_bottom);
             imm_mode.DrawQuad(
                 width - rightBorder, height - bottomBorder, 0.0f,
                 width - rightBorder, height,                0.0f,
@@ -192,7 +228,11 @@ namespace SORE_GUI
         if(bottomBorder && rightBorder + leftBorder < width)
         {
             //bottom border
-            texCoords = SORE_Math::Rect<float>(0.25f, 0.75f, 0.75f, 1.0f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_width *  0.25f + tex_left, 
+                tex_width *  0.75f + tex_left, 
+                tex_height * 0.75f + tex_top, 
+                tex_bottom);
             imm_mode.DrawQuad(
                 leftBorder,          height - bottomBorder, 0.0f,
                 leftBorder,          height,                0.0f,
@@ -204,7 +244,11 @@ namespace SORE_GUI
         if(leftBorder && bottomBorder)
         {
             //bottom left corner
-            texCoords = SORE_Math::Rect<float>(0.0f, 0.25f, 0.75f, 1.0f);
+            texCoords = SORE_Math::Rect<float>(
+                tex_left, 
+                tex_width *  0.25f + tex_left, 
+                tex_height * 0.75f + tex_top, 
+                tex_bottom);
             imm_mode.DrawQuad(
                 0.0f,       height - bottomBorder, 0.0f,
                 0.0f,       height,                0.0f,

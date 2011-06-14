@@ -43,7 +43,7 @@ namespace SORE_GUI
         : FrameWidget(s, p, SCALE_ALL, par), pressed(false), inArea(false)
     {
         std::string styleDir("data/");
-        styleDir += GetStyle() + "/";
+        styleDir += StyleName() + "/";
 
         unsigned int height = GetSize(VERTICAL);
         unsigned int width = GetSize(HORIZONTAL);

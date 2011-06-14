@@ -42,7 +42,8 @@ namespace SORE_GUI
     Widget::Widget(SVec size_, SVec position_, Widget* parent_)
         : fontCache(parent_->fontCache), shaderCache(parent_->shaderCache), textureCache(parent_->textureCache),
         position(position_), size(size_), parent(parent_), 
-        focus(0), oldFocus(0), highestLayer(0.0f), isVisible(true)
+        focus(0), oldFocus(0), highestLayer(0.0f), 
+        style(parent->style), styleConfig(parent->styleConfig), isVisible(true)
     {
         parent->AddChild(this);
         layer = parent->GetLayer() + LAYER_SEPARATION;
@@ -354,16 +355,15 @@ namespace SORE_GUI
         }
     }
 
-    std::string Widget::style = "ix_style";
-
-    void Widget::SetStyle(std::string widgetStyle)
+    void Widget::SetStyleName(const std::string& style_)
     {
-        style = widgetStyle;
+        style = style_;
     }
 
-    std::string Widget::GetStyle()
+    void Widget::LoadStyle(SORE_FileIO::InFile& file)
     {
-        return style;
+        Json::Reader reader;
+        reader.parse(file.strm(), styleConfig, false);
     }
 
     void Widget::SetVisible(bool visible)

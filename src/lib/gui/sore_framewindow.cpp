@@ -41,12 +41,17 @@ namespace SORE_GUI
                              Widget* parent_)
         : FrameWidget(s, p, SCALE_CENTER, parent_), title(t), titleText(0), dragged(false)
     {
-        std::string styleDir("data/");
-        styleDir += GetStyle() + "/";
+        titleText = new TextWidget(
+            SVec(SUnit(0.0, 0), SUnit(0.0, 0)), 
+            fontCache.Get(Style()["FrameWindow"]["title_font"].asString()), 
+            static_cast<unsigned int>(Style()["FrameWindow"]["title_size"].asInt()), 
+            t, SORE_Graphics::White, this);
 
-        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), fontCache.Get("ix/LiberationSans-Regular.ttf"), 24, t, SORE_Graphics::White, this);
-
-        SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
+        SetBorderSizes(
+            static_cast<float>(Style()["FrameWindow"]["border_sizes"][0u].asDouble()),
+            static_cast<float>(Style()["FrameWindow"]["border_sizes"][1u].asDouble()),
+            static_cast<float>(Style()["FrameWindow"]["border_sizes"][2u].asDouble()),
+            static_cast<float>(Style()["FrameWindow"]["border_sizes"][3u].asDouble()));
         UpdatePosition();
     }
 

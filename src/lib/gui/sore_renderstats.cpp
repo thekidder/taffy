@@ -50,32 +50,33 @@ namespace SORE_GUI
     renderer(r), draws(0), drawsLabel(0), fps(0), fpsLabel(0),
     polys(0), polysLabel(0), ms(0), msLabel(0)
     {
-        SORE_Resource::FontPtr font = fontCache.Get("ix/LiberationSans-Regular.ttf");
+        SORE_Resource::FontPtr font = fontCache.Get(Style()["RenderStats"]["font"].asString());
 
+        unsigned int textHeight = static_cast<unsigned int>(Style()["RenderStats"]["text_size"].asInt());
         fpsLabel   = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 0)),
-                                              font, 16, "FPS:",
+                                              font, textHeight, "FPS:",
                                               SORE_Graphics::White, this);
-        drawsLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 16)),
-                                              font, 16, "Draw Calls:",
+        drawsLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, textHeight)),
+                                              font, textHeight, "Draw Calls:",
                                               SORE_Graphics::White, this);
-        polysLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 32)),
-                                              font, 16, "Polygons:",
+        polysLabel = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*2)),
+                                              font, textHeight, "Polygons:",
                                               SORE_Graphics::White, this);
-        msLabel    = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, 48)),
-                                              font, 16, "Milliseconds:",
+        msLabel    = new SORE_GUI::TextWidget(SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*3)),
+                                              font, textHeight, "Milliseconds:",
                                               SORE_Graphics::White, this);
 
         fps        = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 0)),
-                                              font, 16, "0", SORE_Graphics::White,
+                                              font, textHeight, "0", SORE_Graphics::White,
                                               this);
-        draws      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 16)),
-                                              font, 16, "0", SORE_Graphics::White,
+        draws      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, textHeight)),
+                                              font, textHeight, "0", SORE_Graphics::White,
                                               this);
-        polys      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 32)),
-                                              font, 16, "0", SORE_Graphics::White,
+        polys      = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*2)),
+                                              font, textHeight, "0", SORE_Graphics::White,
                                               this);
-        ms         = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, 48)),
-                                              font, 16, "0", SORE_Graphics::White,
+        ms         = new SORE_GUI::TextWidget(SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*3)),
+                                              font, textHeight, "0", SORE_Graphics::White,
                                               this);
     }
 
@@ -98,14 +99,15 @@ namespace SORE_GUI
         polys->SetText(boost::str(boost::format("%d") % renderer.GetNumPolys()));
         ms->SetText(boost::str(boost::format("%d") % renderer.GetFrameMS()));
 
+        unsigned int textHeight = static_cast<unsigned int>(Style()["RenderStats"]["text_size"].asInt());
         fps->SetPosition(SVec(SUnit(1.0, -10 - fps->GetSize(HORIZONTAL)),
                               SUnit(0.0, 0)));
         draws->SetPosition(SVec(SUnit(1.0, -10 - draws->GetSize(HORIZONTAL)),
-                                SUnit(0.0, 16)));
+                                SUnit(0.0, textHeight)));
         polys->SetPosition(SVec(SUnit(1.0, -10 - polys->GetSize(HORIZONTAL)),
-                                SUnit(0.0, 32)));
+                                SUnit(0.0, textHeight*2)));
         ms->SetPosition(SVec(SUnit(1.0, -10 - ms->GetSize(HORIZONTAL)),
-                             SUnit(0.0, 48)));
+                             SUnit(0.0, textHeight*3)));
 
         RenderFrame(imm_mode);
     }

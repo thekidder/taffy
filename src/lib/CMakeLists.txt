@@ -59,8 +59,22 @@ SET(CMAKE_VERSION_IN  ${CMAKE_CURRENT_SOURCE_DIR}/sore_cmake_version.h.in)
 
 CONFIGURE_FILE(${CMAKE_VERSION_IN} ${CMAKE_VERSION_OUT})
 
-SET(SORE_JSON_SRCS 3rdparty/json/json_reader.cpp 3rdparty/json/json_value.cpp
+SET(SORE_JSON_SRCS 
+  3rdparty/json/json_reader.cpp
+  3rdparty/json/json_value.cpp
   3rdparty/json/json_writer.cpp)
+
+SET(SORE_JSON_HEADERS
+  3rdparty/json/autolink.h
+  3rdparty/json/config.h
+  3rdparty/json/features.h
+  3rdparty/json/forwards.h
+  3rdparty/json/json.h
+  3rdparty/json/json_batchallocator.h
+  3rdparty/json/json_tool.h
+  3rdparty/json/reader.h
+  3rdparty/json/value.h
+  3rdparty/json/writer.h)
 
 IF(UNIX)
   SET(SORE_PLATFORM_SRCS sore_fileio_linux.cpp sore_font_linux.cpp 
@@ -111,6 +125,7 @@ SOURCE_GROUP("Source Files" FILES ${SORE_SRCS})
 SOURCE_GROUP("Header Files" FILES ${SORE_HEADERS})
 
 SOURCE_GROUP("3rd Party\\Source Files" FILES ${SORE_JSON_SRCS})
+SOURCE_GROUP("3rd Party\\Header Files" FILES ${SORE_JSON_HEADERS})
 
 SOURCE_GROUP("Assets\\Source Files" FILES ${SORE_ASSETS_SRCS})
 SOURCE_GROUP("Assets\\Header Files" FILES ${SORE_ASSETS_HEADERS})
@@ -143,6 +158,7 @@ ADD_LIBRARY(sore_lib STATIC
   ${SORE_GUI_HEADERS}
   ${SORE_GUI_SRCS}
   ${SORE_HEADERS}
+  ${SORE_JSON_HEADERS}
   ${SORE_JSON_SRCS}
   ${SORE_KERNEL_HEADERS}
   ${SORE_KERNEL_SRCS}
@@ -200,3 +216,8 @@ INSTALL(
   ${SORE_RENDERER_HEADERS}
   ${SORE_RESOURCE_HEADERS}
   DESTINATION include/sore)
+
+INSTALL(
+  FILES
+  ${SORE_JSON_HEADERS}
+  DESTINATION include/sore/json)

@@ -44,7 +44,7 @@ namespace SORE_GUI
           pressed(false), inArea(false)
     {
         std::string styleDir("data/");
-        styleDir += GetStyle() + "/";
+        styleDir += StyleName() + "/";
 
 
         textHeight = GetSize(VERTICAL) / 2;

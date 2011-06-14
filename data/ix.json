@@ -1,0 +1,27 @@
+{
+    "ix":
+    {
+        "TextWidget":
+        {
+            "font":   "ix/LiberationSans-Regular.ttf",
+            "shader": "default.shad"
+	},
+	"FrameWidget":
+	{
+    	    "texture":      "ix/frame.tga",
+	    "tex_coords":   [0.0, 1.0, 0.0, 1.0],
+    	    "shader":       "default.shad"
+	},
+	"FrameWindow":
+	{
+	    "title_font":   "ix/LiberationSans-Regular.ttf",
+	    "title_size":   24,
+	    "border_sizes": [32, 32, 32, 32]
+	},
+	"RenderStats":
+	{
+	    "font":      "ix/LiberationSans-Regular.ttf",
+	    "text_size": 20
+	}
+    }
+}

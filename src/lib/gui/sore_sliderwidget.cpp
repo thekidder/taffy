@@ -44,7 +44,7 @@ namespace SORE_GUI
           minimum(min), maximum(max), current((max -  min)/2)
     {
         std::string styleDir("data/");
-        styleDir += GetStyle() + "/";
+        styleDir += StyleName() + "/";
 
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
