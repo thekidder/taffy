@@ -66,7 +66,13 @@ namespace SORE_GUI
     class SORE_EXPORT Widget
     {
     public:
-        Widget(SVec s, SVec p, Widget* par=NULL);
+        Widget(SVec size_, SVec position_, Widget* parent_);
+        Widget(
+            SORE_Resource::Font_cache_t& fontCache_,
+            SORE_Resource::Shader_cache_t& shaderCache_,
+            SORE_Resource::Texture_cache_t& textureCache_,
+            SVec size_, SVec position_, 
+            Widget* parent_ = NULL);
         ~Widget();
 
         std::vector<SORE_Graphics::Renderable> GetRenderList();
@@ -106,6 +112,10 @@ namespace SORE_GUI
 
         void ClearFocus();
         float GetTopLayer();
+
+        SORE_Resource::Font_cache_t& fontCache;
+        SORE_Resource::Shader_cache_t& shaderCache;
+        SORE_Resource::Texture_cache_t& textureCache;
     private:
         //these events are preprocessed: mouse coordinates are relative to the widget,
         //not absolute
@@ -125,14 +135,16 @@ namespace SORE_GUI
 
         SORE_Kernel::Event prev;
 
+
         //position matrix
         SORE_Math::Matrix4<float> mat;
         float layer;
-        typedef std::vector<Widget*> Widget_container_t;
-        Widget_container_t children;
-        Widget* parent;
+
         SVec position;
         SVec size;
+        Widget* parent;
+        typedef std::vector<Widget*> Widget_container_t;
+        Widget_container_t children;
 
         const Widget* Focus() const;
         Widget*& Focus();

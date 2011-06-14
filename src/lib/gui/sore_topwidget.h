@@ -35,6 +35,7 @@
 #ifndef SORE_TOPWIDGET_H
 #define SORE_TOPWIDGET_H
 
+#include <sore_assettypes.h>
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
 #include <sore_event.h>
@@ -45,9 +46,10 @@ namespace SORE_GUI
     class SORE_EXPORT TopWidget : public Widget
     {
     public:
-        TopWidget(unsigned int width, unsigned int height);
-
-        bool OnResize(const SORE_Kernel::Event& e);
+        TopWidget(
+            SORE_Resource::Font_cache_t& fontCache,
+            SORE_Resource::Shader_cache_t& shaderCache,
+            SORE_Resource::Texture_cache_t& textureCache);
 
         virtual SORE_Graphics::GeometryProvider* GetGeometryProvider() { return &imm_mode; }
 

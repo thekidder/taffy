@@ -32,6 +32,7 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_glslshader_loader.h>
 #include <sore_textwidget.h>
 
 namespace SORE_GUI
@@ -42,10 +43,10 @@ namespace SORE_GUI
         : Widget(SVec(SUnit(), SUnit()), p, parent), face(f), height(h),
           color(c)
     {
-        UpdateText(t);
+        SetText(t);
     }
 
-    void TextWidget::UpdateText(const std::string& t)
+    void TextWidget::SetText(const std::string& t)
     {
         text = t;
         SetSize(SVec(SUnit(0.0, static_cast<int>(face->Width(height, text))), SUnit(0.0, height)));
@@ -60,7 +61,7 @@ namespace SORE_GUI
     {
         imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
         imm_mode.SetColor(color);
-        imm_mode.SetShader(shader);
+        imm_mode.SetShader(shaderCache.Get("default.shad"));
         imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
         imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, height, text);
     }

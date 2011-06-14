@@ -32,23 +32,21 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_font_loader.h>
 #include <sore_framewindow.h>
 
 namespace SORE_GUI
 {
     FrameWindow::FrameWindow(SVec s, SVec p, const std::string& t,
-                             Widget* par)
-        : FrameWidget(s, p, SCALE_CENTER, par), title(t), titleText(0), dragged(false)
+                             Widget* parent_)
+        : FrameWidget(s, p, SCALE_CENTER, parent_), title(t), titleText(0), dragged(false)
     {
         std::string styleDir("data/");
         styleDir += GetStyle() + "/";
 
-        SORE_Resource::Texture2DPtr tex;
-        SORE_Resource::GLSLShaderPtr shad;
-        SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
-        SetTexture(tex);
-        SetShader(shad);
+        titleText = new TextWidget(SVec(SUnit(0.0, 0), SUnit(0.0, 0)), fontCache.Get("LiberationSans-Regular.ttf"), 24, t, SORE_Graphics::White, this);
 
+        SetBorderSizes(32.0f, 32.0f, 32.0f, 32.0f);
         UpdatePosition();
     }
 

@@ -35,11 +35,34 @@
 #include <sore_logger.h>
 #include <sore_widget.h>
 
+#include <stdexcept>
+
 namespace SORE_GUI
 {
-    Widget::Widget(SVec s, SVec p, Widget* par)
-        : parent(par), position(p), size(s), focus(0), oldFocus(0), highestLayer(0.0f),
-          isVisible(true)
+    Widget::Widget(SVec size_, SVec position_, Widget* parent_)
+        : fontCache(parent_->fontCache), shaderCache(parent_->shaderCache), textureCache(parent_->textureCache),
+        position(position_), size(size_), parent(parent_), 
+        focus(0), oldFocus(0), highestLayer(0.0f), isVisible(true)
+    {
+        parent->AddChild(this);
+        layer = parent->GetLayer() + LAYER_SEPARATION;
+           
+        if(layer > HighestLayer()) HighestLayer() = layer;
+
+        SetPosition(position);
+        prev.type = SORE_Kernel::NOEVENT;
+
+    }
+
+    Widget::Widget(
+            SORE_Resource::Font_cache_t& fontCache_,
+            SORE_Resource::Shader_cache_t& shaderCache_,
+            SORE_Resource::Texture_cache_t& textureCache_,
+            SVec size_, SVec position_, 
+            Widget* parent_)
+        : fontCache(fontCache_), shaderCache(shaderCache_), textureCache(textureCache_),
+        position(position_), size(size_), parent(parent_), 
+        focus(0), oldFocus(0), highestLayer(0.0f), isVisible(true)
     {
         if(parent)
         {
@@ -47,12 +70,13 @@ namespace SORE_GUI
             layer = parent->GetLayer() + LAYER_SEPARATION;
         }
         else
+        {
             layer = 0.0f;
+        }
 
         if(layer > HighestLayer()) HighestLayer() = layer;
 
-        SetPosition(p);
-
+        SetPosition(position);
         prev.type = SORE_Kernel::NOEVENT;
     }
 

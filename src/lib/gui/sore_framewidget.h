@@ -46,7 +46,7 @@ namespace SORE_GUI
     class SORE_EXPORT FrameWidget : public Widget
     {
     public:
-        FrameWidget(SVec s, SVec p, size_mode m, Widget* par=NULL);
+        FrameWidget(SVec s, SVec p, size_mode m, Widget* parent_ = NULL);
     protected:
         void SetBorderSizes(float l, float r, float t, float b);
         void SetTexture(SORE_Resource::Texture2DPtr tex);

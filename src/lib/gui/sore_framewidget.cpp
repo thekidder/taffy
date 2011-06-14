@@ -33,16 +33,20 @@
  **************************************************************************/
 
 #include <sore_geometry.h>
+#include <sore_glslshader_loader.h>
 #include <sore_logger.h>
 #include <sore_sprite.h>
 #include <sore_framewidget.h>
+#include <sore_texture2d_loader.h>
 
 namespace SORE_GUI
 {
-    FrameWidget::FrameWidget(SVec s, SVec p, size_mode m, Widget* par)
-        : Widget(s, p, par), mode(m), leftBorder(16),
+    FrameWidget::FrameWidget(SVec s, SVec p, size_mode m, Widget* parent_)
+        : Widget(s, p, parent_), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
+        texture = textureCache.Get("frame.tga");
+        shader = shaderCache.Get("default.shad");
     }
 
     void FrameWidget::SetBorderSizes(float l, float r, float t, float b)

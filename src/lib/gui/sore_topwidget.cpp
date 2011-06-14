@@ -39,21 +39,15 @@
 
 namespace SORE_GUI
 {
-    TopWidget::TopWidget(unsigned int width, unsigned int height)
-        : Widget(SVec(SUnit(0.0, width), SUnit(0.0, height)),
-                 SVec(SUnit(0.0, 0), SUnit(0.0, 0))),
-                 imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
+    TopWidget::TopWidget(
+        SORE_Resource::Font_cache_t& fontCache,
+        SORE_Resource::Shader_cache_t& shaderCache,
+        SORE_Resource::Texture_cache_t& textureCache)
+        : Widget(fontCache, shaderCache, textureCache,
+        SVec(SUnit(0.0, 400), SUnit(0.0, 400)), // bogus initial size until we receive a resize event
+        SVec(SUnit(0.0, 0), SUnit(0.0, 0)), NULL),
+        imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
     {
-    }
-
-    bool TopWidget::OnResize(const SORE_Kernel::Event& e)
-    {
-        if(e.type == SORE_Kernel::RESIZE)
-        {
-            UpdateResolution(e.resize.w, e.resize.h);
-            return true;
-        }
-        return false;
     }
 
     void TopWidget::UpdateResolution(unsigned int w, unsigned int h)
@@ -87,6 +81,11 @@ namespace SORE_GUI
 
     bool TopWidget::ProcessEvents(const SORE_Kernel::Event& e)
     {
+        if(e.type == SORE_Kernel::RESIZE)
+        {
+            UpdateResolution(e.resize.w, e.resize.h);
+            return true;
+        }
         return false;
     }
 }

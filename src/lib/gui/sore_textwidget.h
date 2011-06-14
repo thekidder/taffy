@@ -48,7 +48,7 @@ namespace SORE_GUI
                    const SORE_Graphics::Color& c = SORE_Graphics::White,
                    Widget* parent=NULL);
 
-        void UpdateText(const std::string& t);
+        void SetText(const std::string& t);
         void SetColor(const SORE_Graphics::Color& c);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
