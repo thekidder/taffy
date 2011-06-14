@@ -46,6 +46,11 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         gamestateStack.ShaderCache(),
         gamestateStack.TextureCache());
 
+    // setup the style
+    top->SetStyleName("ix");
+    SORE_FileIO::InFile ix_style("data/ix.json", &stack.PackageCache());
+    top->LoadStyle(ix_style);
+
     distributor.AddListener(
         SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
         boost::bind(&SORE_GUI::TopWidget::PropagateEvents, top, _1));
