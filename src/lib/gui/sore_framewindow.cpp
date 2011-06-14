@@ -80,11 +80,6 @@ namespace SORE_GUI
             return 32;
     }
 
-    FrameWindow::~FrameWindow()
-    {
-        delete titleText;
-    }
-
     bool FrameWindow::ProcessEvents(const SORE_Kernel::Event& e)
     {
         if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)

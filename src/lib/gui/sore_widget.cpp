@@ -85,9 +85,10 @@ namespace SORE_GUI
     {
         if(HasFocus())
             ClearFocus();
-        if(parent)
-            parent->RemoveChild(this);
+
+        children.clear();
     }
+
 
     const SVec& Widget::GetPosition() const
     {
@@ -123,10 +124,10 @@ namespace SORE_GUI
             static_cast<float>(GetPosition(VERTICAL)),
             layer);
         UpdatePosition();
-        for(std::vector<Widget*>::iterator it=children.begin();it!=children.end();++it)
+        for(Widget_container_t::iterator it=children.begin();it!=children.end();++it)
         {
-            (*it)->UpdatePositionMatrix();
-            (*it)->UpdatePosition();
+            it->UpdatePositionMatrix();
+            it->UpdatePosition();
         }
     }
 
@@ -144,7 +145,7 @@ namespace SORE_GUI
             Widget_container_t::iterator it;
             for(it = children.begin(); it != children.end(); ++it)
             {
-                (*it)->Frame(elapsed, imm_mode);
+                it->Frame(elapsed, imm_mode);
             }
         }
     }
@@ -193,8 +194,8 @@ namespace SORE_GUI
             SORE_Kernel::Event relative;
             relative = e;
 
-            bool inWidget = (*it)->InBounds(e.mouse.x, e.mouse.y);
-            bool inPrevWidget = (*it)->InBounds(p.mouse.x, p.mouse.y);
+            bool inWidget = it->InBounds(e.mouse.x, e.mouse.y);
+            bool inPrevWidget = it->InBounds(p.mouse.x, p.mouse.y);
 
             if(inWidget && !inPrevWidget)
                 relative.type = SORE_Kernel::MOUSEENTER;
@@ -202,12 +203,12 @@ namespace SORE_GUI
                 relative.type = SORE_Kernel::MOUSELEAVE;
 
             if(inWidget || relative.type == SORE_Kernel::MOUSEENTER
-               || relative.type == SORE_Kernel::MOUSELEAVE || (*it)->HasFocus())
+               || relative.type == SORE_Kernel::MOUSELEAVE || it->HasFocus())
             {
-                relative.mouse.x -= (*it)->GetPosition(HORIZONTAL);
-                relative.mouse.y -= (*it)->GetPosition(VERTICAL);
+                relative.mouse.x -= it->GetPosition(HORIZONTAL);
+                relative.mouse.y -= it->GetPosition(VERTICAL);
 
-                bool accepted = (*it)->PropagateEventHelper(relative, p);
+                bool accepted = it->PropagateEventHelper(relative, p);
 
                 if(accepted)
                 {
@@ -331,11 +332,17 @@ namespace SORE_GUI
         return Focus() == this;
     }
 
+    bool operator==(const SORE_GUI::Widget& one, const SORE_GUI::Widget& two)
+    {
+        // little bit of a hack
+        return &one == &two;
+    }
+
     void Widget::AddChild(Widget* c)
     {
         if(c)
         {
-            if(find(children.begin(), children.end(), c) == children.end())
+            if(std::find(children.begin(), children.end(), *c) == children.end())
             {
                 children.push_back(c);
                 c->parent = this;
@@ -348,7 +355,7 @@ namespace SORE_GUI
         if(c)
         {
             Widget_container_t::iterator it;
-            if((it = find(children.begin(), children.end(), c)) != children.end())
+            if((it = find(children.begin(), children.end(), *c)) != children.end())
             {
                 children.erase(it);
             }

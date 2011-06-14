@@ -43,7 +43,7 @@
 
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <json/json.h>
 
 #include <sore_dll.h>
@@ -58,11 +58,6 @@ namespace SORE_GUI
     const static float LAYER_SEPARATION = 0.05f;
 
     enum unit_type {HORIZONTAL, VERTICAL};
-
-    class Widget;
-
-    typedef boost::shared_ptr<Widget> WidgetPtr;
-    typedef boost::weak_ptr<Widget> WeakWidgetPtr;
 
     class SORE_EXPORT Widget
     {
@@ -148,7 +143,7 @@ namespace SORE_GUI
         SVec position;
         SVec size;
         Widget* parent;
-        typedef std::vector<Widget*> Widget_container_t;
+        typedef boost::ptr_vector<Widget> Widget_container_t;
         Widget_container_t children;
 
         const Widget* Focus() const;

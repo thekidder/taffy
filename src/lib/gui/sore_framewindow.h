@@ -45,7 +45,6 @@ namespace SORE_GUI
     public:
         FrameWindow(SVec s, SVec p, const std::string& t,
                     Widget* parent_ = NULL);
-        ~FrameWindow();
     protected:
         unsigned int GetClientSize(unit_type type) const;
         unsigned int GetClientPosition(unit_type type) const;
