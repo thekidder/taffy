@@ -90,7 +90,7 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
         newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
     }
 
-    if(old.shader != shader)
+    if(!old.shader || old.shader != shader)
     {
         newState.commands |= RENDER_CMD_BIND_SHADER;
     }
