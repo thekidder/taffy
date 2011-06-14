@@ -42,9 +42,9 @@ namespace SORE_GUI
         : FrameWidget(s, p, SCALE_CENTER, parent_), title(t), titleText(0), dragged(false)
     {
         titleText = new TextWidget(
+            SUnit(0.0, static_cast<unsigned int>(Style()["FrameWindow"]["title_size"].asInt())),
             SVec(SUnit(0.0, 0), SUnit(0.0, 0)), 
             fontCache.Get(Style()["FrameWindow"]["title_font"].asString()), 
-            static_cast<unsigned int>(Style()["FrameWindow"]["title_size"].asInt()), 
             t, SORE_Graphics::White, this);
 
         SetBorderSizes(
