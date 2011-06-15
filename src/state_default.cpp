@@ -123,7 +123,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     renderer.AddGeometryProvider(&particles);
     renderer.AddGeometryProvider(top.GetGeometryProvider());
-    //renderer.AddGeometryProvider(&imm_mode);
+    renderer.AddGeometryProvider(&imm_mode);
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -224,15 +224,23 @@ void DefaultState::Frame(int elapsed)
 
     particles.Update(elapsed);
 
-    for(int i = 0; i < 1; ++i)
+    for(int i = 0; i < 100; ++i)
     {
         Particle p(0.0f, 0.0f, 0.0f, 0.05f);
+
+        SORE_Math::Vector3<float> velocity(
+            SORE_Utility::getRandomMinMax(-0.1f, 0.1f),
+            SORE_Utility::getRandomMinMax(-0.1f, 0.1f),
+            SORE_Utility::getRandomMinMax(-0.1f, 0.1f));
+
+        velocity = velocity.Normalize();
+        velocity *= SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
         //p.ya = -0.1f;
-        p.xv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
-        p.yv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
-        p.zv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
-        p.color = SORE_Graphics::Red;
-        p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.1f);
+        p.xv = velocity[0];
+        p.yv = velocity[1];
+        p.zv = velocity[2];
+        p.color = SORE_Graphics::White;
+        p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.03f);
 
         particles.AddParticle(p);
     }
@@ -240,16 +248,20 @@ void DefaultState::Frame(int elapsed)
     // draw gui
     top.Frame(elapsed);
 
-    //imm_mode.Start();
-    //imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
-    //imm_mode.SetColor(SORE_Graphics::White);
-    //imm_mode.SetKeywords("game");
+    imm_mode.Start();
+    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
+    imm_mode.SetKeywords("game");
 
-    //imm_mode.DrawQuad(
-    //    -1.0f, -1.0f, -1.0f,
-    //    -1.0f,  1.0f, -1.0f,
-    //     1.0f, -1.0f, -1.0f,
-    //     1.0f,  1.0f, -1.0f);
+    // draw some axes
+
+    const float AXIS_LENGTH = 1.5f;
+
+    imm_mode.SetColor(SORE_Graphics::Green);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f, 0.0f);
+    imm_mode.SetColor(SORE_Graphics::Red);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
+    imm_mode.SetColor(SORE_Graphics::Blue);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
 }
 
 void DefaultState::Render()

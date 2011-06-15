@@ -12,8 +12,7 @@ public:
     void Rotate(float x, float y);
     SORE_Math::Matrix4<float> Matrix() const;
 private:
-    SORE_Math::Quaternion<float> q_x;
-    SORE_Math::Quaternion<float> q_y;
+    float x_rads, y_rads;
 };
 
 #endif
