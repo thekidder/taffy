@@ -19,16 +19,16 @@ using SORE_GUI::SUnit;
 const int k_fft_samples = 1024;
 const int k_num_channels = 2;
 
-DefaultState::DefaultState(SORE_Game::GamestateStack& stack) 
+DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
-    top(gamestateStack.FontCache(),
-        gamestateStack.ShaderCache(),
-        gamestateStack.TextureCache()),
-    debug(0), buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
-    beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
-    kiss_spectrum(k_fft_samples, 48000), fmod_spectrum(k_fft_samples, 48000),
-    kiss_g_spectrum(kiss_spectrum, 24), fmod_g_spectrum(fmod_spectrum, 24),
-    low(fmod_g_spectrum, 0, 8), mid(fmod_g_spectrum, 8, 16), high(fmod_g_spectrum, 16, 24)
+      top(gamestateStack.FontCache(),
+          gamestateStack.ShaderCache(),
+          gamestateStack.TextureCache()),
+      debug(0), buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
+      kiss_spectrum(k_fft_samples, 48000), fmod_spectrum(k_fft_samples, 48000),
+      kiss_g_spectrum(kiss_spectrum, 24), fmod_g_spectrum(fmod_spectrum, 24),
+      low(fmod_g_spectrum, 0, 8), mid(fmod_g_spectrum, 8, 16), high(fmod_g_spectrum, 16, 24),
+      beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
     gamestateStack.PackageCache().AddPackage("default_resources.sdp");
@@ -116,7 +116,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
 DefaultState::~DefaultState()
 {
-    SetAdapter(0);  
+    SetAdapter(0);
     system->release();
 }
 
@@ -138,7 +138,7 @@ void DefaultState::Frame(int elapsed)
     beat_visualizer_low->AddDatum(1, beat_detector_low.Threshold());
     beat_visualizer_low->AddDatum(2, beat_detector_low.ThresholdedFlux());
     beat_visualizer_low->AddDatum(3, 30.0f - beat_detector_low.Beat());
-            
+
     beat_visualizer_mid->AddDatum(0, beat_detector_mid.Flux());
     beat_visualizer_mid->AddDatum(1, beat_detector_mid.Threshold());
     beat_visualizer_mid->AddDatum(2, beat_detector_mid.ThresholdedFlux());
@@ -206,7 +206,7 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
     proj.right = 1.0f;
     proj.bottom = 1.0f;
     proj.top = -1.0f;
-    
+
     SORE_Math::Matrix4<float> identity;
     SORE_Graphics::camera_info cam = {proj, identity};
     return cam;

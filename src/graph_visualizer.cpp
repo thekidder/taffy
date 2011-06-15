@@ -7,8 +7,8 @@
 
 GraphVisualizer::GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        std::pair<double, double> input_range_, int num_series, int history_size_)
-        : Widget(size, position, parent), input_range(input_range_), 
+        std::pair<double, double> input_range_, int num_series, size_t history_size_)
+        : Widget(size, position, parent), input_range(input_range_),
         data(num_series), history_size(history_size_)
 {
     shader = shaderCache.Get("untextured.shad");
@@ -82,19 +82,19 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
             double y = GetSize(SORE_GUI::VERTICAL) - MapToRange(*it, k_std_range_d, render_range);
 
             imm_mode.DrawLine(
-                static_cast<float>(x_last), static_cast<float>(y_last), SORE_GUI::LAYER_SEPARATION / 3.0f, 
+                static_cast<float>(x_last), static_cast<float>(y_last), SORE_GUI::LAYER_SEPARATION / 3.0f,
                 static_cast<float>(x),      static_cast<float>(y),      SORE_GUI::LAYER_SEPARATION / 3.0f);
 
             x_last = x;
             y_last = y;
         }
     }
-    
+
     imm_mode.SetColor(SORE_Graphics::White);
     imm_mode.SetShader(font_shader);
     imm_mode.DrawString(
-        static_cast<float>(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment)), 
-        static_cast<float>(GetSize(SORE_GUI::VERTICAL) - 24), 
-        2.0f * SORE_GUI::LAYER_SEPARATION / 3.0f, 
+        static_cast<float>(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment)),
+        static_cast<float>(GetSize(SORE_GUI::VERTICAL) - 24),
+        2.0f * SORE_GUI::LAYER_SEPARATION / 3.0f,
         face, 24u, comment);
 }
