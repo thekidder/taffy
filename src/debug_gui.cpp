@@ -23,7 +23,6 @@ DebugGUI::DebugGUI(
     : Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(), SUnit()), parent),
     renderStats(0), version(0)
 {
-
     renderStats = new gui::RenderStats(r, this);
     version = new gui::TextWidget(gui::SUnit(24), gui::SVec(gui::SUnit(1.0), gui::SUnit()), parent, GetVersionString());
     version->SetPosition(gui::SVec(gui::SUnit(1.0, -version->GetSize(gui::HORIZONTAL)), gui::SUnit()));
