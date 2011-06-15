@@ -25,10 +25,8 @@ DebugGUI::DebugGUI(
 {
 
     renderStats = new gui::RenderStats(r, this);
-
-    //version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
-    //                              guiFont, 24, GetVersionString(), 
-    //                              SORE_Graphics::White, top);
+    version = new gui::TextWidget(gui::SUnit(24), gui::SVec(gui::SUnit(1.0), gui::SUnit()), parent, GetVersionString());
+    version->SetPosition(gui::SVec(gui::SUnit(1.0, -version->GetSize(gui::HORIZONTAL)), gui::SUnit()));
 }
 
 #ifdef _MSC_VER //boost warnings in MSVC++
