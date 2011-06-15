@@ -15,10 +15,10 @@ public:
     size_t FFTSize() const { return fft_size; }
     int SampleRate() const { return sample_rate; }
 
-    virtual float Value(size_t bucket, Audio_channel channel) const;
+    virtual double Value(size_t bucket, Audio_channel channel) const;
     virtual const SpectrumSnapshot& Snapshot() const;
 
-    virtual std::pair<float, float> HzRange(size_t bucket) const;
+    virtual std::pair<double, double> HzRange(size_t bucket) const;
 protected:
     void Clear();
     void SetSnapshot(const SpectrumSnapshot& new_snapshot);

@@ -15,13 +15,13 @@ enum Audio_channel
 class SpectrumSnapshot
 {
 public:
-    SpectrumSnapshot(std::vector<float> left_data, std::vector<float> right_data);
+    SpectrumSnapshot(std::vector<double> left_data, std::vector<double> right_data);
     SpectrumSnapshot(size_t num_buckets_); // construct an empty snapshot
 
     size_t NumBuckets() const { return num_buckets; }
-    float Value(size_t bucket, Audio_channel channel) const;
+    double Value(size_t bucket, Audio_channel channel) const;
 private:
-    std::vector<float> left, right;
+    std::vector<double> left, right;
     size_t num_buckets;
 };
 

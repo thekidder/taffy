@@ -11,9 +11,9 @@ class GraphVisualizer : public SORE_GUI::Widget
 public:
     GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        std::pair<float, float> input_range_, int num_series, int history_size_);
+        std::pair<double, double> input_range_, int num_series, int history_size_);
 
-    void AddDatum(int series, float datum);
+    void AddDatum(int series, double datum);
 
     // set a comment to be rendered
     void SetComment(const std::string& comment_);
@@ -21,9 +21,9 @@ private:
     virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
     virtual bool ProcessEvents(SORE_Kernel::Event*) { return false; }
 
-    std::pair<float, float> input_range;
+    std::pair<double, double> input_range;
 
-    typedef std::list<float> data_container;
+    typedef std::list<double> data_container;
     std::vector<data_container> data;
     int history_size;
 

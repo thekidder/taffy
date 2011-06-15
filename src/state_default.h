@@ -19,6 +19,7 @@
 #include <sore_gamestate_stack.h>
 #include <sore_immediatemodeprovider.h>
 #include <sore_inputdistributor.h>
+#include <sore_noncopyable.h>
 #include <sore_pipeline_renderer.h>
 #include <sore_resourcecache.h>
 #include <sore_topwidget.h>
@@ -33,7 +34,7 @@ namespace FMOD
 
 class FMOD_Spectrum;
 
-class DefaultState : public SORE_Game::Gamestate
+class DefaultState : public SORE_Game::Gamestate, SORE_Utility::Noncopyable
 {
 public:
     DefaultState(SORE_Game::GamestateStack& stack);
@@ -63,7 +64,8 @@ private:
     SORE_Resource::FontPtr face;
     SORE_Resource::Texture2DPtr particle_texture;
 
-    SORE_GUI::TopWidget* top;
+    // widgets
+    SORE_GUI::TopWidget top;
     GraphVisualizer* beat_visualizer_low;
     GraphVisualizer* beat_visualizer_mid;
     GraphVisualizer* beat_visualizer_high;

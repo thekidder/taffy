@@ -18,6 +18,10 @@ private:
     std::vector<kiss_fft_scalar> timedata;
     std::vector<kiss_fft_cpx> freqdata_left;
     std::vector<kiss_fft_cpx> freqdata_right;
+
+    // some temporary buffers for transforming the data
+    // keep them here to reduce allocations
+    std::vector<double> left_temp, right_temp;
 };
 
 #endif

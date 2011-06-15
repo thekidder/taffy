@@ -4,7 +4,7 @@
 #include <limits>
 #include <stdexcept>
 
-SpectrumSnapshot::SpectrumSnapshot(std::vector<float> left_data, std::vector<float> right_data)
+SpectrumSnapshot::SpectrumSnapshot(std::vector<double> left_data, std::vector<double> right_data)
     : left(left_data), right(right_data), num_buckets(left.size())
 {
     //channels must be of the same size
@@ -16,12 +16,12 @@ SpectrumSnapshot::SpectrumSnapshot(size_t num_buckets_) // construct an empty sn
 {
 }
 
-float SpectrumSnapshot::Value(size_t bucket, Audio_channel channel) const
+double SpectrumSnapshot::Value(size_t bucket, Audio_channel channel) const
 {
     // if we have an empty snapshot, return a default value
     // of no sound (-inf dB)
     if(left.size() == 0)
-        return -std::numeric_limits<float>::max();
+        return -std::numeric_limits<double>::max();
 
     switch(channel)
     {
@@ -35,5 +35,5 @@ float SpectrumSnapshot::Value(size_t bucket, Audio_channel channel) const
         throw std::runtime_error("Invalid channel ID accessed");
     }
 
-    return -std::numeric_limits<float>::max();
+    return -std::numeric_limits<double>::max();
 }

@@ -7,7 +7,7 @@
 
 GraphVisualizer::GraphVisualizer(
         SORE_GUI::SVec size, SORE_GUI::SVec position, SORE_GUI::Widget* parent,
-        std::pair<float, float> input_range_, int num_series, int history_size_)
+        std::pair<double, double> input_range_, int num_series, int history_size_)
         : Widget(size, position, parent), input_range(input_range_), 
         data(num_series), history_size(history_size_)
 {
@@ -16,12 +16,12 @@ GraphVisualizer::GraphVisualizer(
     face = fontCache.Get("ix/LiberationSans-Regular.ttf");
 }
 
-void GraphVisualizer::AddDatum(int series, float datum)
+void GraphVisualizer::AddDatum(int series, double datum)
 {
     if(data[series].size() == history_size)
         data[series].pop_front();
 
-    data[series].push_back(MapToRange(datum, input_range, k_std_range));
+    data[series].push_back(MapToRange(datum, input_range, k_std_range_d));
 }
 
 void GraphVisualizer::SetComment(const std::string& comment_)
@@ -31,7 +31,9 @@ void GraphVisualizer::SetComment(const std::string& comment_)
 
 void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
 {
-    Float_range_t render_range(0.0f, GetSize(SORE_GUI::VERTICAL));
+    Double_range_t render_range(0.0, static_cast<double>(GetSize(SORE_GUI::VERTICAL)));
+    float width  = static_cast<float>(GetSize(SORE_GUI::HORIZONTAL));
+    float height = static_cast<float>(GetSize(SORE_GUI::VERTICAL));
 
     // draw background
     imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
@@ -40,10 +42,10 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     imm_mode.SetColor(SORE_Graphics::Grey);
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
-        0.0f,                          0.0f,                        0.0f,
-        0.0f,                          GetSize(SORE_GUI::VERTICAL), 0.0f,
-        GetSize(SORE_GUI::HORIZONTAL), 0.0f,                        0.0f,
-        GetSize(SORE_GUI::HORIZONTAL), GetSize(SORE_GUI::VERTICAL), 0.0f);
+        0.0f,  0.0f,   0.0f,
+        0.0f,  height, 0.0f,
+        width, 0.0f,   0.0f,
+        width, height, 0.0f);
 
     for(size_t i = 0; i < data.size(); ++i)
     {
@@ -67,19 +69,21 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
             break;
         }
 
-        float x_start = GetSize(SORE_GUI::HORIZONTAL);
-        float x_decrement = static_cast<float>(GetSize(SORE_GUI::HORIZONTAL)) / history_size;
+        double x_start = GetSize(SORE_GUI::HORIZONTAL);
+        double x_decrement = static_cast<double>(GetSize(SORE_GUI::HORIZONTAL)) / history_size;
 
-        float x_last = x_start;
-        float y_last = GetSize(SORE_GUI::VERTICAL) - MapToRange(data[i].back(), k_std_range, render_range);
+        double x_last = x_start;
+        double y_last = GetSize(SORE_GUI::VERTICAL) - MapToRange(data[i].back(), k_std_range_d, render_range);
 
-        float x = x_last;
+        double x = x_last;
         for(data_container::reverse_iterator it = ++data[i].rbegin(); it != data[i].rend(); ++it)
         {
             x -= x_decrement;
-            float y = GetSize(SORE_GUI::VERTICAL) - MapToRange(*it, k_std_range, render_range);
+            double y = GetSize(SORE_GUI::VERTICAL) - MapToRange(*it, k_std_range_d, render_range);
 
-            imm_mode.DrawLine(x_last, y_last, SORE_GUI::LAYER_SEPARATION / 3.0, x, y, SORE_GUI::LAYER_SEPARATION / 3.0);
+            imm_mode.DrawLine(
+                static_cast<float>(x_last), static_cast<float>(y_last), SORE_GUI::LAYER_SEPARATION / 3.0f, 
+                static_cast<float>(x),      static_cast<float>(y),      SORE_GUI::LAYER_SEPARATION / 3.0f);
 
             x_last = x;
             y_last = y;
@@ -89,8 +93,8 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     imm_mode.SetColor(SORE_Graphics::White);
     imm_mode.SetShader(font_shader);
     imm_mode.DrawString(
-        GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment), 
-        GetSize(SORE_GUI::VERTICAL) - 24, 
-        2.0 * SORE_GUI::LAYER_SEPARATION / 3.0, 
-        face, 24, comment);
+        static_cast<float>(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment)), 
+        static_cast<float>(GetSize(SORE_GUI::VERTICAL) - 24), 
+        2.0f * SORE_GUI::LAYER_SEPARATION / 3.0f, 
+        face, 24u, comment);
 }

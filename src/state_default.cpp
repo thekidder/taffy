@@ -21,10 +21,13 @@ const int kNumChannels = 2;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack) 
     : Gamestate(stack, 20), // run every 20 milliseconds
+    top(gamestateStack.FontCache(),
+        gamestateStack.ShaderCache(),
+        gamestateStack.TextureCache()),
     texture_cache(SORE_Resource::Texture2DLoader(stack.PackageCache())),
     shader_cache(SORE_Resource::GLSLShaderLoader(stack.PackageCache())),
     font_cache(SORE_Resource::FontLoader(stack.PackageCache())),
-    top(0), debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
+    debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
     use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
     imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
@@ -41,19 +44,14 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         SORE_Kernel::RESIZE,
         boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
 
-    top = new gui::TopWidget(
-        gamestateStack.FontCache(),
-        gamestateStack.ShaderCache(),
-        gamestateStack.TextureCache());
-
     // setup the style
-    top->SetStyleName("ix");
+    top.SetStyleName("ix");
     SORE_FileIO::InFile ix_style("data/ix.json", &stack.PackageCache());
-    top->LoadStyle(ix_style);
+    top.LoadStyle(ix_style);
 
     distributor.AddListener(
         SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
-        boost::bind(&SORE_GUI::TopWidget::PropagateEvents, top, _1));
+        boost::bind(&SORE_GUI::TopWidget::PropagateEvents, boost::ref(top), _1));
 
 
     SORE_Resource::GLSLShaderPtr default_shader = shader_cache.Get("default.shad");
@@ -61,13 +59,13 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     
     particle_texture = texture_cache.Get("particle.tga");
 
-    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), top);
+    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), &top);
 
-    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
-    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
-    beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
 
-    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), top, 0);
+    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), &top, 0);
 
     debug = new DebugGUI(renderer, container);
 
@@ -88,7 +86,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     //owner->GetRenderer()->AddGeometryProvider(particles);
     //renderer.AddGeometryProvider(&imm_mode);
-    renderer.AddGeometryProvider(top->GetGeometryProvider());
+    renderer.AddGeometryProvider(top.GetGeometryProvider());
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -155,7 +153,6 @@ DefaultState::~DefaultState()
     delete kiss_g_spectrum;
     delete fmod_spectrum;
     delete kiss_spectrum;
-    delete top;
     
     system->release();
 }
@@ -212,7 +209,7 @@ void DefaultState::Frame(int elapsed)
     beat_visualizer_high->AddDatum(3, 30.0f - beat_detector_high.Beat());
 
     // draw gui
-    top->Frame(elapsed);
+    top.Frame(elapsed);
 }
 
 void DefaultState::Render()

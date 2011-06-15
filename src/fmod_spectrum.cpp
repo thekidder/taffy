@@ -3,7 +3,8 @@
 #include <fmod.hpp>
 
 FMOD_Spectrum::FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* system_) 
-    : FFTSpectrum(fft_size, sample_rate), system(system_), window_type(FMOD_DSP_FFT_WINDOW_HANNING)
+    : FFTSpectrum(fft_size, sample_rate), system(system_), window_type(FMOD_DSP_FFT_WINDOW_HANNING),
+    left_src(NumBuckets()), right_src(NumBuckets()), left_temp(NumBuckets()), right_temp(NumBuckets())
 {
 }
 
@@ -14,20 +15,18 @@ void FMOD_Spectrum::SetWindowType(FMOD_DSP_FFT_WINDOW window)
 
 void FMOD_Spectrum::Update()
 {
-    std::vector<float> left(NumBuckets());
-    std::vector<float> right(NumBuckets());
-    if(system->getSpectrum(&left[0],  NumBuckets(), 0, window_type) != FMOD_OK)
+    if(system->getSpectrum(&left_src[0],  NumBuckets(), 0, window_type) != FMOD_OK)
         throw std::runtime_error("Could not get spectrum for left channel");
-    if(system->getSpectrum(&right[0], NumBuckets(), 1, window_type) != FMOD_OK)
+    if(system->getSpectrum(&right_src[0], NumBuckets(), 1, window_type) != FMOD_OK)
         throw std::runtime_error("Could not get spectrum for right channel");
 
     // convert to decibels
     for(size_t i = 0; i < NumBuckets(); ++i)
     {
-        left[i]  = 20.0f * log10(left[i]);
-        right[i] = 20.0f * log10(right[i]);
+        left_temp[i]  = 20.0 * log10(static_cast<double>(left_src[i]));
+        right_temp[i] = 20.0 * log10(static_cast<double>(right_src[i]));
     }
 
-    SpectrumSnapshot new_snapshot(left, right);
+    SpectrumSnapshot new_snapshot(left_temp, right_temp);
     SetSnapshot(new_snapshot);
 }

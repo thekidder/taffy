@@ -6,12 +6,12 @@
 {
 }
 
-float AveragingSpectrum::Value(size_t bucket, Audio_channel channel) const
+double AveragingSpectrum::Value(size_t bucket, Audio_channel channel) const
 {
     size_t min_bucket = bucket_src_ranges[bucket].first;
     size_t max_bucket = bucket_src_ranges[bucket].first;
 
-    float avg = 0.0f;
+    double avg = 0.0f;
     for(size_t i = min_bucket; i <= max_bucket; ++i)
     {
         avg += Source().Value(i, channel);
@@ -23,8 +23,8 @@ float AveragingSpectrum::Value(size_t bucket, Audio_channel channel) const
 
 const SpectrumSnapshot& AveragingSpectrum::Snapshot() const
 {
-    std::vector<float> left(NumBuckets());
-    std::vector<float> right(NumBuckets());
+    std::vector<double> left(NumBuckets());
+    std::vector<double> right(NumBuckets());
     for(size_t i = 0; i < NumBuckets(); ++i)
     {
         left[i] = Value(i, CHANNEL_LEFT);
@@ -36,7 +36,7 @@ const SpectrumSnapshot& AveragingSpectrum::Snapshot() const
     return snapshot_cache;
 }
 
-std::pair<float, float> AveragingSpectrum::HzRange(size_t bucket) const
+std::pair<double, double> AveragingSpectrum::HzRange(size_t bucket) const
 {
     size_t min_bucket = bucket_src_ranges[bucket].first;
     size_t max_bucket = bucket_src_ranges[bucket].second;

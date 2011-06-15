@@ -14,33 +14,21 @@
 
 namespace gui = SORE_GUI;
 
+using gui::SVec;
+using gui::SUnit;
+
 DebugGUI::DebugGUI(
     SORE_Graphics::Renderer& r,
-    gui::Widget* top)
-    : renderStats(0), version(0)
+    gui::Widget* parent)
+    : Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(), SUnit()), parent),
+    renderStats(0), version(0)
 {
 
-    renderStats = new gui::RenderStats(r, top);
+    renderStats = new gui::RenderStats(r, this);
 
     //version = new gui::TextWidget(gui::SVec(gui::SUnit(1.0, -guiFont->Width(24, GetVersionString())), gui::SUnit(0.0, 0)),
     //                              guiFont, 24, GetVersionString(), 
     //                              SORE_Graphics::White, top);
-}
-
-DebugGUI::~DebugGUI()
-{
-    delete version;
-    delete renderStats;
-}
-
-void DebugGUI::SetVisible(bool visible)
-{
-    version->SetVisible(visible);
-    renderStats->SetVisible(visible);
-}
-
-void DebugGUI::Frame(int elapsed)
-{
 }
 
 #ifdef _MSC_VER //boost warnings in MSVC++

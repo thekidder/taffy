@@ -15,6 +15,11 @@ public:
 private:
     FMOD::System* system;
     FMOD_DSP_FFT_WINDOW window_type;
+
+    // some temporary buffers for getting and transforming the data
+    // keep them here to reduce allocations
+    std::vector<float> left_src, right_src;
+    std::vector<double> left_temp, right_temp;
 };
 
 #endif

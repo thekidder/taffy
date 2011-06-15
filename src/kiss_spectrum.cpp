@@ -6,7 +6,8 @@
 float WindowFunc(float sample);
 
 KISS_Spectrum::KISS_Spectrum(size_t fft_size, int sample_rate) 
-    : FFTSpectrum(fft_size, sample_rate), timedata(fft_size), freqdata_left(fft_size), freqdata_right(fft_size)
+    : FFTSpectrum(fft_size, sample_rate), timedata(fft_size), freqdata_left(fft_size), freqdata_right(fft_size),
+    left_temp(NumBuckets()), right_temp(NumBuckets())
 {
     kiss_cfg = kiss_fftr_alloc(fft_size, 0, 0, 0);
 }
@@ -33,18 +34,16 @@ void KISS_Spectrum::AddSamples(float* buffer, unsigned int length, int channels)
     kiss_fftr(kiss_cfg, &timedata[0], &freqdata_right[0]);
 
     const int samples = NumBuckets();
-    std::vector<float> left(samples);
-    std::vector<float> right(samples);
     for(int i = 0; i < samples - 1; ++i)
     {
         int k = i + 1; // first sample is average over all frequencies
         kiss_fft_scalar mag_left  = freqdata_left[k].r * freqdata_left[k].r + freqdata_left[k].i * freqdata_left[k].i;
-        left[i] = 10.0f * log10(mag_left / SampleRate());
+        left_temp[i] = 10.0 * log10(static_cast<double>(mag_left) / SampleRate());
 
         kiss_fft_scalar mag_right  = freqdata_right[k].r * freqdata_right[k].r + freqdata_right[k].i * freqdata_right[k].i;
-        right[i] = 10.0f * log10(mag_right / SampleRate());
+        right_temp[i] = 10.0 * log10(static_cast<double>(mag_right) / SampleRate());
     }
-    SpectrumSnapshot new_snapshot(left, right);
+    SpectrumSnapshot new_snapshot(left_temp, right_temp);
     SetSnapshot(new_snapshot);
 }
 

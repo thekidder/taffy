@@ -11,15 +11,11 @@ namespace SORE_GUI
 }
 namespace gui = SORE_GUI;
 
-class DebugGUI
+class DebugGUI : public SORE_GUI::Widget
 {
 public:
-    DebugGUI(SORE_Graphics::Renderer& r, gui::Widget* top);
-    ~DebugGUI();
+    DebugGUI(SORE_Graphics::Renderer& r, gui::Widget* parent);
 
-    void SetVisible(bool visible = true);
-
-    void Frame(int elapsed);
 private:
     gui::RenderStats* renderStats;
     gui::TextWidget* version;

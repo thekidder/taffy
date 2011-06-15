@@ -9,7 +9,7 @@ FFTSpectrum::FFTSpectrum(size_t fft_size_, int sample_rate_)
     assert(fft_size && ((fft_size & (fft_size - 1)) == 0));
 }
 
-float FFTSpectrum::Value(size_t bucket, Audio_channel channel) const
+double FFTSpectrum::Value(size_t bucket, Audio_channel channel) const
 {
     assert(bucket < NumBuckets());
 
@@ -22,7 +22,7 @@ const SpectrumSnapshot& FFTSpectrum::Snapshot() const
     return current_snapshot;
 }
 
-std::pair<float, float> FFTSpectrum::HzRange(size_t bucket) const
+std::pair<double, double> FFTSpectrum::HzRange(size_t bucket) const
 {
     double hz_per_bucket = SampleRate() / 2.0 / NumBuckets();
     return std::make_pair(bucket * hz_per_bucket, (bucket + 1) * hz_per_bucket);

@@ -10,10 +10,10 @@ class AveragingSpectrum : public Spectrum
 public:
      AveragingSpectrum(Spectrum& source_, size_t num_buckets_);
 
-    virtual float Value(size_t bucket, Audio_channel channel) const;
+    virtual double Value(size_t bucket, Audio_channel channel) const;
     virtual const SpectrumSnapshot& Snapshot() const;
 
-    virtual std::pair<float, float> HzRange(size_t bucket) const;
+    virtual std::pair<double, double> HzRange(size_t bucket) const;
 protected:
     const Spectrum& Source() const;
 
