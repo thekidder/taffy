@@ -155,13 +155,12 @@ void SORE_Graphics::SimpleBufferManager::Clear()
     geometryMapping.clear();
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
-        // TODO: FIXME
         BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
         {
             buffer->geometryMap.clear();
             buffer->needsRebuild = true;
+            buffer->buffer.Clear();
         }
-        //heaps[i].clear();
     }
 }
 
@@ -169,7 +168,7 @@ void SORE_Graphics::SimpleBufferManager::RebuildBuffer(geometry_buffer* buffer)
 {
     //ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("rebuilding geometry buffer %p") % buffer);
     buffer->buffer.Clear();
-    geometry_buffer::geometry_map::iterator it;
+    geometry_buffer::Geometry_map_t::iterator it;
     for(it = buffer->geometryMap.begin(); it != buffer->geometryMap.end(); ++it)
     {
         buffer->buffer.AddObject(it->first);
@@ -185,8 +184,17 @@ SORE_Graphics::SimpleBufferManager::geometry_buffer* SORE_Graphics::SimpleBuffer
 )
 {
     std::vector<geometry_buffer*>& heap = heaps[type];
-    geometry_buffer* current = heap.size() ? heap.back() : 0;
-    if(heap.size() == 0 || !current->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
+    geometry_buffer* current = 0;
+
+    std::vector<geometry_buffer*>::iterator it;
+    for(it = heap.begin(); it != heap.end(); ++it)
+    {
+        current = *it;
+        if((*it)->buffer.HasRoomFor(g->NumIndices(), g->NumVertices()))
+            break;
+        current = 0;
+    }
+    if(current == 0)
     {
         current = new geometry_buffer(type);
         heap.push_back(current);

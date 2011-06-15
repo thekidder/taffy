@@ -76,12 +76,12 @@ namespace SORE_Graphics
              GraphicsArrayClass buffer;
              bool needsRebuild;
              // master list of renderables (multiset: multiple renderables with same sort key)
-             typedef std::multiset<Renderable> geometry_list;
-             geometry_list allGeometry;
+             typedef std::multiset<Renderable> Geometry_list_t;
+             Geometry_list_t allGeometry;
 
              // used to look up geoemtrychunks: generated from master list
-             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-             geometry_map geometryChunkLookup;
+             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> Geometry_map_t;
+             Geometry_map_t geometryChunkLookup;
         };
 
         geometry_buffer* Insert(const Renderable& r, geometry_type type);

@@ -75,8 +75,8 @@ namespace SORE_Graphics
              GraphicsArrayClass buffer;
              bool needsRebuild;
              //generated from renderables
-             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> geometry_map;
-             geometry_map geometryMap;
+             typedef boost::unordered_map<GeometryChunkPtr, geometry_entry> Geometry_map_t;
+             Geometry_map_t geometryMap;
         };
 
         geometry_buffer* Insert(GeometryChunkPtr g, geometry_type type);

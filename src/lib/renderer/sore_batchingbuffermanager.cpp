@@ -143,15 +143,16 @@ void SORE_Graphics::BatchingBufferManager::GeometryRemoved(const Renderable& gc)
 
 void SORE_Graphics::BatchingBufferManager::Clear()
 {
-    // TODO: FIXME! should not delete/regen VBOs all the time
     geometryMapping.clear();
     for(unsigned int i = 0; i < MAX_GEOMETRY_TYPE; ++i)
     {
         BOOST_FOREACH(geometry_buffer* buffer, heaps[i])
         {
-            delete buffer;
+            buffer->geometryChunkLookup.clear();
+            buffer->allGeometry.clear();
+            buffer->needsRebuild = true;
+            buffer->buffer.Clear();
         }
-        heaps[i].clear();
     }
 }
 
@@ -160,7 +161,7 @@ void SORE_Graphics::BatchingBufferManager::RebuildBuffer(geometry_buffer* buffer
     //ENGINE_LOG(SORE_Logging::LVL_INFO, boost::format("rebuilding geometry buffer %p") % buffer);
     buffer->buffer.Clear();
     buffer->geometryChunkLookup.clear();
-    geometry_buffer::geometry_list::iterator it;
+    geometry_buffer::Geometry_list_t::iterator it;
     for(it = buffer->allGeometry.begin(); it != buffer->allGeometry.end(); ++it)
     {
         buffer->buffer.AddObject(it->GetGeometryChunk());
