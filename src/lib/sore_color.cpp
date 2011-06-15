@@ -38,22 +38,16 @@
 
 namespace SORE_Graphics
 {
-    static inline float clamp(float value, float minValue,  float maxValue)
-    {
-        return std::min(std::max(minValue, value), maxValue);
-    }
-
     Color::Color(float r, float g, float b, float a)
     {
-        color[0] = clamp(r, 0.0f, 1.0f);
-        color[1] = clamp(g, 0.0f, 1.0f);
-        color[2] = clamp(b, 0.0f, 1.0f);
-        color[3] = clamp(a, 0.0f, 1.0f);
+        color[0] = r;
+        color[1] = g;
+        color[2] = b;
+        color[3] = a;
     }
 
     Color::Color(float all)
     {
-        all = clamp(all, 0.0f, 1.0f);
         color[0] = all;
         color[1] = all;
         color[2] = all;
@@ -78,14 +72,14 @@ namespace SORE_Graphics
 
     void Color::SetComponent(ColorComponent c, float v)
     {
-        color[c] = clamp(v, 0.0f, 1.0f);
+        color[c] = v;
     }
 
     Color& Color::operator+=(const Color& c)
     {
         for(unsigned int i=0;i<4;++i)
         {
-            color[i] = clamp(color[i]+c.color[i], 0.0f, 1.0f);
+            color[i] = color[i]+c.color[i];
         }
         return *this;
     }
@@ -94,7 +88,7 @@ namespace SORE_Graphics
     {
         for(unsigned int i=0;i<4;++i)
         {
-            color[i] = clamp(color[i]-c.color[i], 0.0f, 1.0f);
+            color[i] = color[i]-c.color[i];
         }
         return *this;
     }
@@ -103,7 +97,7 @@ namespace SORE_Graphics
     {
         for(unsigned int i=0;i<4;++i)
         {
-            color[i] = clamp(color[i]*c.color[i], 0.0f, 1.0f);
+            color[i] = color[i]*c.color[i];
         }
         return *this;
     }
@@ -112,7 +106,7 @@ namespace SORE_Graphics
     {
         for(unsigned int i=0;i<4;++i)
         {
-            color[i] = clamp(color[i]/c.color[i], 0.0f, 1.0f);
+            color[i] = color[i]/c.color[i];
         }
         return *this;
     }
