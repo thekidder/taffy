@@ -276,8 +276,6 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     std::copy(vertices.begin(), vertices.end(), geometry->GetVertices());
     std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
 
-    buffer_manager.GeometryAdded(geometry, SORE_Graphics::STREAM);
-
     Renderable r(geometry, current_shader, current_transform, current_blend_mode);
     if(current_texture)
         r.AddTexture("texture", current_texture);
@@ -291,6 +289,8 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
         std::insert_iterator<std::set<std::string> >(keyword_list,keyword_list.begin()));
     for(std::set<std::string>::iterator it = keyword_list.begin(); it != keyword_list.end(); ++it)
         r.AddKeyword(*it);
+
+    buffer_manager.GeometryAdded(r, SORE_Graphics::STREAM);
 
     renderables.push_back(r);
 

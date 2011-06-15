@@ -39,7 +39,7 @@
 #include <sore_geometry.h>
 #include <sore_geometryprovider.h>
 #include <sore_glslshader.h>
-#include <sore_simplebuffermanager.h>
+#include <sore_batchingbuffermanager.h>
 #include <sore_texture2d.h>
 
 #include <boost/unordered_map.hpp>
@@ -100,7 +100,7 @@ namespace SORE_Graphics
         std::vector<SORE_Graphics::vertex> vertices;
         std::vector<unsigned short> indices;
 
-        SORE_Graphics::SimpleBufferManager buffer_manager;
+        SORE_Graphics::BatchingBufferManager buffer_manager;
         std::vector<SORE_Graphics::Renderable> renderables;
     };
 }
