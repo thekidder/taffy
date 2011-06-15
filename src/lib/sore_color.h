@@ -54,7 +54,6 @@ namespace SORE_Graphics
         float GetComponent(ColorComponent c) const;
         void SetComponent(ColorComponent c, float v);
 
-        //all operations clamp to [0,1]
         Color& operator+=(const Color& c);
         Color& operator-=(const Color& c);
         Color& operator*=(const Color& c);
