@@ -6,6 +6,16 @@
             "font":   "ix/LiberationSans-Regular.ttf",
             "shader": "default.shad"
 	},
+	"Checkbox":
+	{
+	    "texture":            "ix/checkbox.tga",
+	    "tex_coords":         [0.0, 1.0, 0.0, 1.0],
+
+	    "texture_checked":    "ix/checkbox_checked.tga",
+	    "tex_coords_checked": [0.0, 1.0, 0.0, 1.0],
+
+    	    "shader":             "default.shad"
+	},
 	"FrameWidget":
 	{
     	    "texture":      "ix/frame.tga",

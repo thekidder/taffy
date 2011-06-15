@@ -10,6 +10,8 @@ SET(
   Fonts/ix/LiberationSans-Regular.ttf
 
   Textures/ix/arrow.tga
+  Textures/ix/checkbox.tga
+  Textures/ix/checkbox_checked.tga
   Textures/ix/button_sheet_active.tga
   Textures/ix/button_sheet_hover.tga
   Textures/ix/button_sheet_normal.tga
