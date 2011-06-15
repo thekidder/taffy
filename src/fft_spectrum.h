@@ -15,6 +15,8 @@ public:
     size_t FFTSize() const { return fft_size; }
     int SampleRate() const { return sample_rate; }
 
+    void SetSampleRate(int sample_rate_) { sample_rate = sample_rate_; }
+
     virtual double Value(size_t bucket, Audio_channel channel) const;
     virtual const SpectrumSnapshot& Snapshot() const;
 

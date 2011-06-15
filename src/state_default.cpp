@@ -16,20 +16,19 @@
 using SORE_GUI::SVec;
 using SORE_GUI::SUnit;
 
-const int kFFTSamples = 1024;
-const int kNumChannels = 2;
+const int k_fft_samples = 1024;
+const int k_num_channels = 2;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack) 
     : Gamestate(stack, 20), // run every 20 milliseconds
     top(gamestateStack.FontCache(),
         gamestateStack.ShaderCache(),
         gamestateStack.TextureCache()),
-    texture_cache(SORE_Resource::Texture2DLoader(stack.PackageCache())),
-    shader_cache(SORE_Resource::GLSLShaderLoader(stack.PackageCache())),
-    font_cache(SORE_Resource::FontLoader(stack.PackageCache())),
-    debug(0), buffer(kFFTSamples * kNumChannels, kNumChannels), fmod_adapter(buffer),
-    use_kiss(false), use_original(false), beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
-    imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
+    debug(0), buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
+    beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0),
+    kiss_spectrum(k_fft_samples, 48000), fmod_spectrum(k_fft_samples, 48000),
+    kiss_g_spectrum(kiss_spectrum, 24), fmod_g_spectrum(fmod_spectrum, 24),
+    low(fmod_g_spectrum, 0, 8), mid(fmod_g_spectrum, 8, 16), high(fmod_g_spectrum, 16, 24)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
     gamestateStack.PackageCache().AddPackage("default_resources.sdp");
@@ -53,12 +52,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
         boost::bind(&SORE_GUI::TopWidget::PropagateEvents, boost::ref(top), _1));
 
-
-    SORE_Resource::GLSLShaderPtr default_shader = shader_cache.Get("default.shad");
-    face = font_cache.Get("default.ttf");
-    
-    particle_texture = texture_cache.Get("particle.tga");
-
     SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), &top);
 
     beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
@@ -69,23 +62,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     debug = new DebugGUI(renderer, container);
 
-    /*SORE_Graphics::GLSLShaderPtr point_sprite =
-        owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/point_sprite.shad");
-    SORE_Graphics::GLSLShaderPtr default_shader =
-        owner->GetPool().GetResource<SORE_Graphics::GLSLShader>("data/Shaders/default.shad");
-    particle_texture =
-        owner->GetPool().GetResource<SORE_Graphics::Texture2D>("data/Textures/particle.tga");
-    particles = new ParticleSystem(particle_texture, point_sprite);*/
-
-
-
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
-    imm_mode.SetShader(default_shader);
-    imm_mode.SetKeywords("gui");
-    imm_mode.SetTexture(particle_texture);
-
-    //owner->GetRenderer()->AddGeometryProvider(particles);
-    //renderer.AddGeometryProvider(&imm_mode);
     renderer.AddGeometryProvider(top.GetGeometryProvider());
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
@@ -124,36 +100,23 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     int sample_rate;
     system->getSoftwareFormat(&sample_rate, 0, 0, 0, 0, 0);
 
-    fmod_spectrum = new FMOD_Spectrum(kFFTSamples, sample_rate, system);
-    kiss_spectrum = new KISS_Spectrum(kFFTSamples, sample_rate);
+    kiss_spectrum.SetSampleRate(sample_rate);
+    fmod_spectrum.SetSampleRate(sample_rate);
+    fmod_spectrum.SetFMODSystem(system);
 
-    fmod_g_spectrum = new GeometricSpectrum(*fmod_spectrum, 24);
-    kiss_g_spectrum = new GeometricSpectrum(*kiss_spectrum, 24);
+    spectrum_visualizer->SetSpectrum(&fmod_g_spectrum);
+    beat_detector_low.SetSpectrum(&low);
+    beat_detector_mid.SetSpectrum(&mid);
+    beat_detector_high.SetSpectrum(&high);
 
-    low  = new PartialSpectrum(*fmod_g_spectrum, 0, 8);
-    mid  = new PartialSpectrum(*fmod_g_spectrum, 8, 16);
-    high = new PartialSpectrum(*fmod_g_spectrum, 16, 24);
-
-    spectrum_visualizer->SetSpectrum(fmod_g_spectrum);
-    beat_detector_low.SetSpectrum(low);
-    beat_detector_mid.SetSpectrum(mid);
-    beat_detector_high.SetSpectrum(high);
-
-    beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low->TotalHz().first % low->TotalHz().second).str());
-    beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid->TotalHz().first % mid->TotalHz().second).str());
-    beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high->TotalHz().first % high->TotalHz().second).str());
+    beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low.TotalHz().first % low.TotalHz().second).str());
+    beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
+    beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high.TotalHz().first % high.TotalHz().second).str());
 }
 
 DefaultState::~DefaultState()
 {
-    SetAdapter(0);
-
-    //delete particles;
-    delete fmod_g_spectrum;
-    delete kiss_g_spectrum;
-    delete fmod_spectrum;
-    delete kiss_spectrum;
-    
+    SetAdapter(0);  
     system->release();
 }
 
@@ -164,34 +127,12 @@ bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
 
 void DefaultState::Frame(int elapsed)
 {
-    //imm_mode.Start();
-
-    //imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, 32, "Hello, world!");
-
     system->update();
+    fmod_spectrum.Update();
 
-    fmod_spectrum->Update();
     beat_detector_low.Update();
     beat_detector_mid.Update();
     beat_detector_high.Update();
-
-    Spectrum* spectrum;
-    if(use_kiss)
-    {
-        if(use_original)
-            spectrum = kiss_spectrum;
-        else
-            spectrum = kiss_g_spectrum;
-    }
-    else
-    {
-        if(use_original)
-            spectrum = fmod_spectrum;
-        else
-            spectrum = fmod_g_spectrum;
-    }
-    spectrum_visualizer->SetSpectrum(spectrum);
-    //beat_detector.SetSpectrum(spectrum);
 
     beat_visualizer_low->AddDatum(0, beat_detector_low.Flux());
     beat_visualizer_low->AddDatum(1, beat_detector_low.Threshold());
@@ -232,29 +173,19 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             Quit();
             return true;
         case SORE_Kernel::Key::SSYM_r:
-            fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_RECT);
+            fmod_spectrum.SetWindowType(FMOD_DSP_FFT_WINDOW_RECT);
             return true;
         case SORE_Kernel::Key::SSYM_t:
-            fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_TRIANGLE);
+            fmod_spectrum.SetWindowType(FMOD_DSP_FFT_WINDOW_TRIANGLE);
             return true;
         case SORE_Kernel::Key::SSYM_m:
-            fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HAMMING);
+            fmod_spectrum.SetWindowType(FMOD_DSP_FFT_WINDOW_HAMMING);
             return true;
         case SORE_Kernel::Key::SSYM_n:
-            fmod_spectrum->SetWindowType(FMOD_DSP_FFT_WINDOW_HANNING);
+            fmod_spectrum.SetWindowType(FMOD_DSP_FFT_WINDOW_HANNING);
             return true;
-        case SORE_Kernel::Key::SSYM_k:
-            use_kiss = !use_kiss;
-            return true;
-        case SORE_Kernel::Key::SSYM_o:
-            use_original = !use_original;
-            return true;
-        case SORE_Kernel::Key::SSYM_l:
-            if(particle_texture.Loaded())
-                texture_cache.Unload("particle.tga");
-            else
-                texture_cache.Load("particle.tga");
-            return true;
+        default:
+            break;
         }
     }
     return false;
@@ -283,5 +214,5 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 
 void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 {
-    kiss_spectrum->AddSamples(buffer, length, channels);
+    kiss_spectrum.AddSamples(buffer, length, channels);
 }

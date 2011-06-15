@@ -4,6 +4,7 @@
 #include "beat_detector.h"
 #include "debug_gui.h"
 #include "kiss_spectrum.h"
+#include "fmod_spectrum.h"
 #include "fmod_pass_through_adapter.h"
 #include "geometric_spectrum.h"
 #include "graph_visualizer.h"
@@ -50,19 +51,11 @@ private:
     bool HandleResize(const SORE_Kernel::Event& e);
     void Quit();
 
-    SORE_Graphics::PipelineRenderer renderer;
-    SORE_Kernel::InputDistributor distributor;
-
-    SORE_Resource::ResourceCache<std::string, SORE_Resource::Texture2D, SORE_Resource::Texture2DLoader> texture_cache;
-    SORE_Resource::ResourceCache<std::string, SORE_Resource::GLSLShader, SORE_Resource::GLSLShaderLoader> shader_cache;
-    SORE_Resource::ResourceCache<std::string, SORE_Resource::Font, SORE_Resource::FontLoader> font_cache;
-
     SORE_Graphics::camera_info GetCamera();
-
     void GotSamples(float* buffer, unsigned int length, int channels);
 
-    SORE_Resource::FontPtr face;
-    SORE_Resource::Texture2DPtr particle_texture;
+    SORE_Graphics::PipelineRenderer renderer;
+    SORE_Kernel::InputDistributor distributor;
 
     // widgets
     SORE_GUI::TopWidget top;
@@ -72,6 +65,7 @@ private:
     SpectrumVisualizer* spectrum_visualizer;
     DebugGUI* debug;
 
+    // sound things
     SoundPassThroughBuffer buffer;
     FMODPassThroughAdapter fmod_adapter;
 
@@ -80,23 +74,18 @@ private:
     FMOD::Channel* channel;
     FMOD::DSP* listener;
 
-    KISS_Spectrum* kiss_spectrum;
-    FMOD_Spectrum* fmod_spectrum;
+    // spectrums
+    KISS_Spectrum kiss_spectrum;
+    FMOD_Spectrum fmod_spectrum;
 
-    GeometricSpectrum* kiss_g_spectrum;
-    GeometricSpectrum* fmod_g_spectrum;
+    GeometricSpectrum kiss_g_spectrum;
+    GeometricSpectrum fmod_g_spectrum;
 
-    PartialSpectrum* low, *mid, *high;
-
-    bool use_kiss;
-    bool use_original;
+    PartialSpectrum low, mid, high;
 
     BeatDetector beat_detector_low;
     BeatDetector beat_detector_mid;
     BeatDetector beat_detector_high;
-
-    ParticleSystem* particles;
-    SORE_Graphics::ImmediateModeProvider imm_mode;
 };
 
 #endif
