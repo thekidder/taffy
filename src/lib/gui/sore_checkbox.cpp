@@ -37,7 +37,7 @@
 #include <sore_texture2d_loader.h>
 
 SORE_GUI::Checkbox::Checkbox(SUnit size, SVec position, Widget* parent)
-    : Widget(SVec(size, size), position, parent), is_checked(false)
+    : Widget(SVec(size, size), position, parent), isChecked(false)
 {
     shader = shaderCache.Get(Style()["Checkbox"]["shader"].asString());
     normal = textureCache.Get(Style()["Checkbox"]["texture"].asString());
@@ -49,12 +49,16 @@ SORE_GUI::Checkbox::Checkbox(SUnit size, SVec position, Widget* parent)
         static_cast<float>(Style()["Checkbox"]["tex_coords"][2u].asDouble()),
         static_cast<float>(Style()["Checkbox"]["tex_coords"][3u].asDouble()));
 
-    texcoords_checked = SORE_Math::Rect<float>(
+    texcoordsChecked = SORE_Math::Rect<float>(
         static_cast<float>(Style()["Checkbox"]["tex_coords_checked"][0u].asDouble()),
         static_cast<float>(Style()["Checkbox"]["tex_coords_checked"][1u].asDouble()),
         static_cast<float>(Style()["Checkbox"]["tex_coords_checked"][2u].asDouble()),
         static_cast<float>(Style()["Checkbox"]["tex_coords_checked"][3u].asDouble()));
+}
 
+boost::signals::connection SORE_GUI::Checkbox::ConnectChecked(const boost::function<void (bool)>& c)
+{
+    return checkedSignal.connect(c);
 }
 
 void SORE_GUI::Checkbox::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
@@ -68,7 +72,7 @@ void SORE_GUI::Checkbox::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
                     GetPositionMatrix())));
 
     SORE_Math::Rect<float> coords;
-    if(!is_checked)
+    if(!isChecked)
     {
         imm_mode.SetTexture(normal);
         coords = texcoords;
@@ -76,7 +80,7 @@ void SORE_GUI::Checkbox::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
     else
     {
         imm_mode.SetTexture(checked);
-        coords = texcoords_checked;
+        coords = texcoordsChecked;
     }
 
     float width  = static_cast<float>(GetSize(HORIZONTAL));
@@ -97,7 +101,8 @@ bool SORE_GUI::Checkbox::ProcessEvents(const SORE_Kernel::Event& e)
     case SORE_Kernel::MOUSEBUTTONUP:
         if(HasFocus())
         {
-            is_checked = !is_checked;
+            isChecked = !isChecked;
+            checkedSignal(isChecked);
             return true;
         }
         break;

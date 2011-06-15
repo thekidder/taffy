@@ -47,6 +47,10 @@ namespace SORE_GUI
     {
     public:
         Checkbox(SUnit size, SVec position, Widget* parent = NULL);
+
+        bool Checked() const { return isChecked; }
+        void SetChecked(bool isChecked_ = true) { isChecked = isChecked_; }
+        boost::signals::connection ConnectChecked(const boost::function<void (bool)>& c);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         virtual bool ProcessEvents(const SORE_Kernel::Event& e);
@@ -54,11 +58,11 @@ namespace SORE_GUI
         SORE_Resource::GLSLShaderPtr shader;
         SORE_Resource::Texture2DPtr normal, checked;
 
-        SORE_Math::Rect<float> texcoords, texcoords_checked;
+        SORE_Math::Rect<float> texcoords, texcoordsChecked;
 
-        boost::signal<void (bool)> checked_signal;
+        boost::signal<void (bool)> checkedSignal;
 
-        bool is_checked;
+        bool isChecked;
     };
 }
 
