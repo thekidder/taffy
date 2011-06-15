@@ -56,6 +56,8 @@ namespace SORE_Graphics
         //all operations clamp to [0,1]
         Color& operator+=(const Color& c);
         Color& operator-=(const Color& c);
+        Color& operator*=(const Color& c);
+        Color& operator/=(const Color& c);
     private:
         //stored in array to make passing to an OpenGL *fv function easier
         float color[4];
@@ -63,6 +65,9 @@ namespace SORE_Graphics
 
     Color operator+(const Color& lhs, const Color& rhs);
     Color operator-(const Color& lhs, const Color& rhs);
+
+    Color operator*(const Color& lhs, const Color& rhs);
+    Color operator/(const Color& lhs, const Color& rhs);
 
     static const Color White (1.0f, 1.0f, 1.0f, 1.0f);
     static const Color Grey  (0.5f, 0.5f, 0.5f, 1.0f);

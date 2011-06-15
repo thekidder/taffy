@@ -34,21 +34,13 @@
 
 #include <sore_color.h>
 
+#include <algorithm>
+
 namespace SORE_Graphics
 {
-    static inline float min(float lhs, float rhs)
-    {
-        return lhs < rhs ? lhs : rhs;
-    }
-
-    static inline float max(float lhs, float rhs)
-    {
-        return lhs > rhs ? lhs : rhs;
-    }
-
     static inline float clamp(float value, float minValue,  float maxValue)
     {
-        return min( max(minValue, value), maxValue);
+        return std::min(std::max(minValue, value), maxValue);
     }
 
     Color::Color(float r, float g, float b, float a)
@@ -98,6 +90,24 @@ namespace SORE_Graphics
         return *this;
     }
 
+    Color& Color::operator*=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]*c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
+
+    Color& Color::operator/=(const Color& c)
+    {
+        for(unsigned int i=0;i<4;++i)
+        {
+            color[i] = clamp(color[i]/c.color[i], 0.0f, 1.0f);
+        }
+        return *this;
+    }
+
     Color operator+(const Color& lhs, const Color& rhs)
     {
         Color temp = lhs;
@@ -108,5 +118,17 @@ namespace SORE_Graphics
     {
         Color temp = lhs;
         return temp -= rhs;
+    }
+
+    Color operator*(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp *= rhs;
+    }
+
+    Color operator/(const Color& lhs, const Color& rhs)
+    {
+        Color temp = lhs;
+        return temp /= rhs;
     }
 }
