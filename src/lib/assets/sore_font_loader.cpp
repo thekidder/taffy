@@ -34,6 +34,8 @@
 
 #include <sore_font_loader.h>
 
+#include <stdexcept>
+
 SORE_Resource::FontLoader::FontLoader(
     SORE_FileIO::PackageCache& packageCache_, 
     const std::string& basePath_,
@@ -48,6 +50,10 @@ SORE_Resource::Font* SORE_Resource::FontLoader::Load(const std::string& path)
 
     size_t size = in->size();
     FT_Byte* faceData = new FT_Byte[size];
+
+    //TODO: sore exception handling
+    if(!in->strm().good())
+        throw std::runtime_error("Could not open " + path + " from disk");
 
     in->strm().read(reinterpret_cast<char*>(faceData), size);
     delete in;
