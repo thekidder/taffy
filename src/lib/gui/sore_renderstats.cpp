@@ -82,7 +82,7 @@ namespace SORE_GUI
         polys->SetText(boost::str(boost::format("%d") % renderer.GetNumPolys()));
         ms->SetText(boost::str(boost::format("%d") % renderer.GetFrameMS()));
 
-        unsigned int textHeight = static_cast<unsigned int>(Style()["RenderStats"]["text_size"].asInt());
+        int textHeight = static_cast<int>(Style()["RenderStats"]["text_size"].asInt());
         fps->SetPosition(SVec(SUnit(1.0, -10 - fps->GetSize(HORIZONTAL)),
                               SUnit(0.0, 0)));
         draws->SetPosition(SVec(SUnit(1.0, -10 - draws->GetSize(HORIZONTAL)),
