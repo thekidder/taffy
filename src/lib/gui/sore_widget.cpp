@@ -160,8 +160,8 @@ namespace SORE_GUI
 
     bool Widget::InBounds(unsigned int x, unsigned int y)
     {
-        unsigned int wPos = GetPosition(HORIZONTAL);
-        unsigned int hPos = GetPosition(VERTICAL);
+        unsigned int wPos = GetRelativePosition(HORIZONTAL);
+        unsigned int hPos = GetRelativePosition(VERTICAL);
 
         unsigned int wEnd = GetSize(HORIZONTAL) + wPos;
         unsigned int hEnd = GetSize(VERTICAL) + hPos;
@@ -175,16 +175,9 @@ namespace SORE_GUI
     {
         if(!isVisible)
             return false;
-        if(Focus() && Focus()->InBounds(e.mouse.x, e.mouse.y))
-        {
-            SORE_Kernel::Event relative = e;
-            relative.mouse.x -= Focus()->GetPosition(HORIZONTAL);
-            relative.mouse.y -= Focus()->GetPosition(VERTICAL);
-            if(Focus()->ProcessEvents(relative))
-                return true;
-        }
+
         //if there is a mousedown, set focus accordingly
-        if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
+        if(e.type == SORE_Kernel::MOUSEBUTTONDOWN && Focus())
         {
             OldFocus() = Focus();
             Focus() = 0;
@@ -197,10 +190,19 @@ namespace SORE_GUI
             bool inWidget = it->InBounds(e.mouse.x, e.mouse.y);
             bool inPrevWidget = it->InBounds(p.mouse.x, p.mouse.y);
 
+            // first send relavent mouseenter/mouseleave events
             if(inWidget && !inPrevWidget)
-                relative.type = SORE_Kernel::MOUSEENTER;
-            if(!inWidget && inPrevWidget)
-                relative.type = SORE_Kernel::MOUSELEAVE;
+            {
+                SORE_Kernel::Event mouseEnter;
+                mouseEnter.type = SORE_Kernel::MOUSEENTER;
+                it->PropagateEventHelper(mouseEnter, p);
+            }
+            else if(!inWidget && inPrevWidget)
+            {
+                SORE_Kernel::Event mouseLeave;
+                mouseLeave.type = SORE_Kernel::MOUSELEAVE;
+                it->PropagateEventHelper(mouseLeave, p);
+            }
 
             if(inWidget || relative.type == SORE_Kernel::MOUSEENTER
                || relative.type == SORE_Kernel::MOUSELEAVE || it->HasFocus())
@@ -282,6 +284,18 @@ namespace SORE_GUI
             return GetPixels(type, position.GetHorizontal());
         else if(type == VERTICAL)
             return GetPixels(type, position.GetVertical());
+        return 0;
+    }
+
+    int Widget::GetRelativePosition(unit_type type) const
+    {
+        if(!parent)
+            return GetPosition(type);
+
+        if(type == HORIZONTAL)
+            return GetPixels(type, position.GetHorizontal()) - parent->GetPixels(type, parent->position.GetHorizontal());
+        else if(type == VERTICAL)
+            return GetPixels(type, position.GetVertical()) - parent->GetPixels(type, parent->position.GetVertical());
         return 0;
     }
 

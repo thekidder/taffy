@@ -74,8 +74,11 @@ namespace SORE_GUI
         std::vector<SORE_Graphics::Renderable> GetRenderList();
         bool PropagateEvents(const SORE_Kernel::Event& e);
 
+        // return absolute values - in screen units
         int GetSize(unit_type type) const;
         int GetPosition(unit_type type) const;
+
+        int GetRelativePosition(unit_type type) const;
 
         void SetPosition(const SVec& p);
 

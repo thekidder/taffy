@@ -80,18 +80,15 @@ namespace SORE_GUI
 
     bool FrameWindow::ProcessEvents(const SORE_Kernel::Event& e)
     {
-        if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
+        switch(e.type)
         {
+        case SORE_Kernel::MOUSEBUTTONDOWN:
             dragged = true;
             return true;
-        }
-        else if(e.type == SORE_Kernel::MOUSEBUTTONUP)
-        {
+        case SORE_Kernel::MOUSEBUTTONUP:
             dragged = false;
             return true;
-        }
-        else if(e.type == SORE_Kernel::MOUSEMOVE)
-        {
+        case SORE_Kernel::MOUSEMOVE:
             if(dragged)
             {
                 SetPosition(SVec(SUnit(GetPosition().GetHorizontal().GetRelative(),
@@ -102,6 +99,8 @@ namespace SORE_GUI
                                        e.mouse.ymove)));
                 return true;
             }
+        default:
+            break;
         }
         return false;
     }
