@@ -6,6 +6,7 @@
 #include "state_default.h"
 #include "utility.h"
 
+#include <sore_checkbox.h>
 #include <sore_util.h>
 
 #include <boost/bind.hpp>
@@ -55,7 +56,19 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
         boost::bind(&SORE_GUI::TopWidget::PropagateEvents, boost::ref(top), _1));
 
-    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0, 0), SUnit(1.0, 0)), SVec(SUnit(0.0, 0), SUnit(0.0, 0)), &top);
+    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0), SUnit(1.0)), SVec(), &top);
+
+    SORE_GUI::FrameWindow* displays = new SORE_GUI::FrameWindow(
+        SVec(SUnit(200), SUnit(100)), SVec(SUnit(1.0, -210), SUnit(36)),
+        "Visibility Controls", container);
+
+    SORE_GUI::Checkbox* visualizers_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit()), displays);
+    visualizers_controls->SetChecked();
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), displays, "Beat detectors");
+
+    SORE_GUI::Checkbox* spectrum_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), displays);
+    spectrum_controls->SetChecked();
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(20)), displays, "Spectrum");
 
     beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
     beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
@@ -64,6 +77,12 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), &top, 0);
 
     debug = new DebugGUI(renderer, container);
+
+    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_low, _1));
+    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_mid, _1));
+    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_high, _1));
+
+    spectrum_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, spectrum_visualizer, _1));
 
     renderer.AddGeometryProvider(top.GetGeometryProvider());
 
