@@ -33,17 +33,30 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       log_spectrum(fmod_spectrum, 20),
       low(log_spectrum, 0, 5), mid(log_spectrum, 5, 10), high(log_spectrum, 10, 20),
       beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
-      energy_analyzer(&log_spectrum)
+      energy_analyzer(&log_spectrum),
+      rotating(false), paused(false),
+      imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
     gamestateStack.PackageCache().AddPackage("default_resources.sdp");
+
+    // gui gets to look at all events first
+    distributor.AddListener(
+        SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
+        boost::bind(&SORE_GUI::TopWidget::PropagateEvents, boost::ref(top), _1));
 
     distributor.AddListener(
         SORE_Kernel::KEYDOWN,
          boost::bind(&DefaultState::HandleKeyboard, this, _1));
     distributor.AddListener(
+        SORE_Kernel::INPUT_ALLMOUSE,
+         boost::bind(&DefaultState::HandleMouse, this, _1));
+    distributor.AddListener(
         SORE_Kernel::RESIZE,
         boost::bind(&DefaultState::HandleResize, this, _1));
+    distributor.AddListener(
+        SORE_Kernel::RESIZE,
+        boost::bind(&ParticleSystem::OnResize, boost::ref(particles), _1));
     distributor.AddListener(
         SORE_Kernel::RESIZE,
         boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
@@ -57,51 +70,60 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     SORE_FileIO::InFile ix_style("data/ix.json", &stack.PackageCache());
     top.LoadStyle(ix_style);
 
-    distributor.AddListener(
-        SORE_Kernel::INPUT_ALL | SORE_Kernel::RESIZE,
-        boost::bind(&SORE_GUI::TopWidget::PropagateEvents, boost::ref(top), _1));
+    SORE_GUI::Widget* container2 = new SORE_GUI::Widget(SVec(SUnit(1.0), SUnit(1.0)), SVec(), &top);
+    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0), SUnit(1.0)), SVec(), container2);
 
-    SORE_GUI::Widget* container = new SORE_GUI::Widget(SVec(SUnit(1.0), SUnit(1.0)), SVec(), &top);
-
-    SORE_GUI::FrameWindow* displays = new SORE_GUI::FrameWindow(
-        SVec(SUnit(200), SUnit(100)), SVec(SUnit(1.0, -210), SUnit(36)),
+    SORE_GUI::FrameWindow* displays_controls = new SORE_GUI::FrameWindow(
+        SVec(SUnit(200), SUnit(120)), SVec(SUnit(1.0, -210), SUnit(36)),
         "Visibility Controls", container);
 
-    SORE_GUI::Checkbox* visualizers_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit()), displays);
+    SORE_GUI::Checkbox* visualizers_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit()), displays_controls);
     visualizers_controls->SetChecked();
-    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), displays, "Beat detectors");
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), displays_controls, "All Displays");
 
-    SORE_GUI::Checkbox* energy_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), displays);
+    SORE_GUI::Widget* controls_container = new SORE_GUI::Widget(SVec(SUnit(1.0, -16), SUnit(60)), SVec(SUnit(16), SUnit(20)), displays_controls);
+
+    SORE_GUI::Checkbox* beats_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit()), controls_container);
+    beats_controls->SetChecked();
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), controls_container, "Beat detectors");
+
+    SORE_GUI::Checkbox* energy_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), controls_container);
     energy_controls->SetChecked();
-    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(20)), displays, "Energy Analyzer");
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(20)), controls_container, "Energy Analyzer");
 
-    SORE_GUI::Checkbox* spectrum_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(40)), displays);
+    SORE_GUI::Checkbox* spectrum_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(40)), controls_container);
     spectrum_controls->SetChecked();
-    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(40)), displays, "Frequency Spectrum");
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(40)), controls_container, "Frequency Spectrum");
 
-    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 0)), &top, 
+    SORE_GUI::Widget* displays = new SORE_GUI::Widget(SVec(SUnit(1.0), SUnit(1.0)), SVec(), &top);
+
+    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 0)), displays, 
         beat_detector_low.Range(), beat_detector_low.NumValues(), 500);
-    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 1)), &top, 
+    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 1)), displays, 
         beat_detector_mid.Range(), beat_detector_mid.NumValues(), 500);
-    beat_visualizer_high = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 2)), &top, 
+    beat_visualizer_high = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 2)), displays, 
         beat_detector_high.Range(), beat_detector_high.NumValues(), 500);
 
-    energy_visualizer    = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 3)), &top, 
+    energy_visualizer    = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 3)), displays, 
         energy_analyzer.Range(), energy_analyzer.NumValues(), 500);
 
-    spectrum_visualizer  = new SpectrumVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 4)), &top, 0);
+    spectrum_visualizer  = new SpectrumVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 4)), displays, 0);
 
     debug = new DebugGUI(renderer, container);
 
-    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_low, _1));
-    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_mid, _1));
-    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_high, _1));
+    visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, displays, _1));
+
+    beats_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_low, _1));
+    beats_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_mid, _1));
+    beats_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_high, _1));
 
     energy_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, energy_visualizer, _1));
 
     spectrum_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, spectrum_visualizer, _1));
 
+    renderer.AddGeometryProvider(&particles);
     renderer.AddGeometryProvider(top.GetGeometryProvider());
+    //renderer.AddGeometryProvider(&imm_mode);
 
     SORE_Graphics::camera_callback guiCam = boost::bind(
         &SORE_GUI::TopWidget::GetCamera,
@@ -149,9 +171,18 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     spectrum_visualizer->SetSpectrum(&log_spectrum);
 
-    beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low.TotalHz().first % low.TotalHz().second).str());
-    beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
-    beat_visualizer_high->SetComment((boost::format("%.2f - %.2f Hz") % high.TotalHz().first % high.TotalHz().second).str());
+    beat_visualizer_low->SetComment((boost::format("%.1f - %.1f Hz") % low.TotalHz().first % low.TotalHz().second).str());
+    beat_visualizer_mid->SetComment((boost::format("%.1f - %.1f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
+    beat_visualizer_high->SetComment((boost::format("%.1f - %.1f Hz") % high.TotalHz().first % high.TotalHz().second).str());
+
+    
+    particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
+    particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
+
+    glEnable(GL_POINT_SPRITE);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
+	glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 }
 
 DefaultState::~DefaultState()
@@ -168,6 +199,10 @@ bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
 void DefaultState::Frame(int elapsed)
 {
     system->update();
+
+    if(paused)
+        return;
+
     fmod_spectrum.Update();
 
     beat_detector_low.Update();
@@ -187,8 +222,34 @@ void DefaultState::Frame(int elapsed)
     for(size_t i = 0; i < energy_analyzer.NumValues(); ++i)
         energy_visualizer->AddDatum(i, energy_analyzer.Value(i));
 
+    particles.Update(elapsed);
+
+    for(int i = 0; i < 1; ++i)
+    {
+        Particle p(0.0f, 0.0f, 0.0f, 0.05f);
+        //p.ya = -0.1f;
+        p.xv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
+        p.yv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
+        p.zv = SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
+        p.color = SORE_Graphics::Red;
+        p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.1f);
+
+        particles.AddParticle(p);
+    }
+
     // draw gui
     top.Frame(elapsed);
+
+    //imm_mode.Start();
+    //imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
+    //imm_mode.SetColor(SORE_Graphics::White);
+    //imm_mode.SetKeywords("game");
+
+    //imm_mode.DrawQuad(
+    //    -1.0f, -1.0f, -1.0f,
+    //    -1.0f,  1.0f, -1.0f,
+    //     1.0f, -1.0f, -1.0f,
+    //     1.0f,  1.0f, -1.0f);
 }
 
 void DefaultState::Render()
@@ -222,6 +283,9 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
         case SORE_Kernel::Key::SSYM_n:
             fmod_spectrum.SetWindowType(FMOD_DSP_FFT_WINDOW_HANNING);
             return true;
+        case SORE_Kernel::Key::SSYM_p:
+            paused = !paused;
+            return true;
         default:
             break;
         }
@@ -229,24 +293,54 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
     return false;
 }
 
+bool DefaultState::HandleMouse(const SORE_Kernel::Event& e)
+{
+    switch(e.type)
+    {
+    case SORE_Kernel::MOUSEMOVE:
+        if(rotating)
+        {
+            // rotate 2pi every half screen
+            float x = static_cast<float>(e.mouse.xmove) / width;
+            float y = static_cast<float>(e.mouse.ymove) / height;
+
+            x *= 4 * static_cast<float>(M_PI);
+            y *= 4 * static_cast<float>(M_PI);
+
+            camera.Rotate(x, y);
+            return true;
+        }
+        break;
+    case SORE_Kernel::MOUSEBUTTONDOWN:
+        rotating = true;
+        return true;
+    case SORE_Kernel::MOUSEBUTTONUP:
+        rotating = false;
+        return true;
+    default:
+        break;
+    }
+    return false;
+}
+
 bool DefaultState::HandleResize(const SORE_Kernel::Event& e)
 {
-    return false;
+    width = e.resize.w;
+    height = e.resize.h;
+    return true;
 }
 
 SORE_Graphics::camera_info DefaultState::GetCamera()
 {
     SORE_Graphics::ProjectionInfo proj;
-    proj.type = SORE_Graphics::ORTHO2D;
-    proj.useScreenRatio = false;
-    proj.useScreenCoords = false;
-    proj.left = -1.0f;
-    proj.right = 1.0f;
-    proj.bottom = 1.0f;
-    proj.top = -1.0f;
+    proj.type = SORE_Graphics::PERSPECTIVE;
+    proj.fov = 45.0f;
+    proj.znear = 1.0f;
+    proj.zfar = 100.0f;
+    proj.useScreenRatio = true;
 
-    SORE_Math::Matrix4<float> identity;
-    SORE_Graphics::camera_info cam = {proj, identity};
+    SORE_Math::Matrix4<float> view = camera.Matrix();
+    SORE_Graphics::camera_info cam = {proj, view};
     return cam;
 }
 

@@ -44,6 +44,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   main.cpp
   partial_spectrum.cpp
   particle_system.cpp
+  pivot_camera.cpp
   sound_pass_through_buffer.cpp
   spectrum.cpp
   spectrum_snapshot.cpp
@@ -68,6 +69,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   kiss_spectrum.h
   partial_spectrum.h
   particle_system.h
+  pivot_camera.h
   sound_pass_through_buffer.h
   spectrum.h
   spectrum_snapshot.h

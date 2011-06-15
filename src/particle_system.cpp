@@ -3,7 +3,7 @@
 #include <sore_sprite.h>
 
 ParticleSystem::ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLSLShaderPtr s)
-    : vbo(SORE_Graphics::STREAM, true, false, false), texture(t), shader(s)
+    : vbo(SORE_Graphics::STREAM, true, true, false), texture(t), shader(s)
 {
     SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(0, 0, GL_POINTS));
     SORE_Graphics::TransformationPtr trans(new SORE_Math::Matrix4<float>());
@@ -16,23 +16,30 @@ ParticleSystem::ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLS
     UpdateGeometry();
 }
 
+void ParticleSystem::SetShader(SORE_Resource::GLSLShaderPtr s)
+{
+    geometry.front().SetShader(s);
+}
+
+void ParticleSystem::SetTexture(SORE_Resource::Texture2DPtr t)
+{
+    geometry.front().AddTexture("texture", t);
+}
+
 void ParticleSystem::MakeUpToDate()
 {
+    UpdateGeometry();
+
+    if(particles.size())
     {
-        boost::lock_guard<boost::mutex> lock(particle_mutex);
-
-        UpdateGeometry();
-
-        if(particles.size())
-        {
-            float size = particles.front().size;
-            geometry.front().Uniforms().SetVariable("pointSize", size);
-        }
-
-        vbo.Clear();
-        vbo.AddObject(geometry.front().GetGeometryChunk());
-        vbo.Build();
+        float size = particles.front().size;
+        geometry.front().Uniforms().SetVariable("pointSize", size);
+        geometry.front().Uniforms().SetVariable("halfWidth", half_width);
     }
+
+    vbo.Clear();
+    vbo.AddObject(geometry.front().GetGeometryChunk());
+    vbo.Build();
 
     geometry_lookup.geometry = &vbo;
     geometry_lookup.offset = 0;
@@ -63,14 +70,13 @@ bool ParticleSystem::Contains(SORE_Graphics::GeometryChunkPtr gc)
 
 void ParticleSystem::ClearParticles()
 {
-    boost::lock_guard<boost::mutex> lock(particle_mutex);
     particles.clear();
 }
 
 void ParticleSystem::AddParticle(const Particle& p)
 {
-    boost::lock_guard<boost::mutex> lock(particle_mutex);
-    particles.push_back(p);
+    if(particles.size() < 65535)
+        particles.push_back(p);
 }
 
 void ParticleSystem::UpdateGeometry()
@@ -89,6 +95,41 @@ void ParticleSystem::UpdateGeometry()
         vertices[i].y = particles[i].y;
         vertices[i].z = particles[i].z;
 
+        vertices[i].r = particles[i].color.GetComponent(SORE_Graphics::RED);
+        vertices[i].g = particles[i].color.GetComponent(SORE_Graphics::GREEN);
+        vertices[i].b = particles[i].color.GetComponent(SORE_Graphics::BLUE);
+        vertices[i].a = particles[i].color.GetComponent(SORE_Graphics::ALPHA);
+
         indices[i] = i;
     }
+}
+
+void ParticleSystem::Update(int elapsed)
+{
+    float seconds = elapsed / 1000.0f;
+
+    for(Particles_t::iterator it = particles.begin(); it != particles.end(); ++it)
+    {
+        it->x += it->xv * seconds;
+        it->y += it->yv * seconds;
+        it->z += it->zv * seconds;
+
+        it->xv += it->xa * seconds;
+        it->yv += it->ya * seconds;
+        it->zv += it->za * seconds;
+
+        it->lifetime += seconds;
+
+        it->color += it->colorChange * seconds;
+    }
+}
+
+bool ParticleSystem::OnResize(const SORE_Kernel::Event& e)
+{
+    if(e.type == SORE_Kernel::RESIZE)
+    {
+        half_width = static_cast<float>(e.resize.w);
+        return true;
+    }
+    return false;
 }

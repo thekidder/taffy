@@ -3,26 +3,40 @@
 
 #include <sore_buffermanager.h>
 #include <sore_color.h>
+#include <sore_event.h>
 #include <sore_geometryprovider.h>
 #include <sore_vbo.h>
-
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <vector>
 
 struct Particle
 {
-    Particle(float x_, float y_, float z_, float s_) : x(x_), y(y_), z(z_), size(s_) {}
+    Particle(float x_, float y_, float z_, float s_) 
+        : x(x_), y(y_), z(z_), size(s_), 
+          xv(0.0f), yv(0.0f), zv(0.0f),
+          xa(0.0f), ya(0.0f), za(0.0f),
+          lifetime(0.0f), colorChange(0.0f)
+    {}
     float x, y, z;
     float size;
-    SORE_Graphics::Color color;
+
+    float xv, yv, zv;
+    float xa, ya, za;
+
+    float lifetime;
+
+    SORE_Graphics::Color color, colorChange;
 };
 
 class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
 {
 public:
-    ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLSLShaderPtr s);
+    ParticleSystem(
+        SORE_Resource::Texture2DPtr t = SORE_Resource::Texture2DPtr(), 
+        SORE_Resource::GLSLShaderPtr s = SORE_Resource::GLSLShaderPtr());
+
+    void SetShader(SORE_Resource::GLSLShaderPtr s);
+    void SetTexture(SORE_Resource::Texture2DPtr t);
 
     void MakeUpToDate();
     std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
@@ -35,9 +49,14 @@ public:
 
     void ClearParticles();
     void AddParticle(const Particle& p);
+    void Update(int elapsed);
+
+    bool OnResize(const SORE_Kernel::Event& e);
 private:
     void UpdateGeometry();
-    std::vector<Particle> particles;
+
+    typedef std::vector<Particle> Particles_t;
+    Particles_t particles;
 
     SORE_Resource::Texture2DPtr texture;
     SORE_Resource::GLSLShaderPtr shader;
@@ -46,7 +65,7 @@ private:
     SORE_Graphics::geometry_entry geometry_lookup;
     SORE_Graphics::VBO vbo;
 
-    boost::mutex particle_mutex;
+    float half_width;
 };
 
 #endif

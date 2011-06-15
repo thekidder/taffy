@@ -11,6 +11,7 @@
 #include "graph_visualizer.h"
 #include "partial_spectrum.h"
 #include "particle_system.h"
+#include "pivot_camera.h"
 #include "sound_pass_through_buffer.h"
 #include "spectrum_visualizer.h"
 
@@ -49,6 +50,7 @@ public:
     virtual bool OnEvent(const SORE_Kernel::Event& e); 
 private:
     bool HandleKeyboard(const SORE_Kernel::Event& e);
+    bool HandleMouse(const SORE_Kernel::Event& e);
     bool HandleResize(const SORE_Kernel::Event& e);
     void Quit();
 
@@ -93,6 +95,18 @@ private:
     BeatDetector beat_detector_high;
 
     EnergyAnalyzer energy_analyzer;
+
+    PivotCamera camera;
+    bool rotating;
+
+    // visualizer
+    ParticleSystem particles;
+
+    bool paused;
+
+    SORE_Graphics::ImmediateModeProvider imm_mode;
+
+    int width, height;
 };
 
 #endif
