@@ -43,9 +43,7 @@ namespace SORE_GUI
     {
         titleText = new TextWidget(
             SUnit(0.0, static_cast<unsigned int>(Style()["FrameWindow"]["title_size"].asInt())),
-            SVec(SUnit(0.0, 0), SUnit(0.0, 0)), 
-            fontCache.Get(Style()["FrameWindow"]["title_font"].asString()), 
-            t, SORE_Graphics::White, this);
+            SVec(SUnit(0.0, 0), SUnit(0.0, 0)),  this, t);
 
         SetBorderSizes(
             static_cast<float>(Style()["FrameWindow"]["border_sizes"][0u].asDouble()),

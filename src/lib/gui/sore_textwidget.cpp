@@ -32,16 +32,21 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_font_loader.h>
 #include <sore_glslshader_loader.h>
 #include <sore_textwidget.h>
 
 namespace SORE_GUI
 {
     TextWidget::TextWidget(
-        SUnit height, SVec p, SORE_Resource::FontPtr f, const std::string& t,
-        const SORE_Graphics::Color& c, Widget* parent)
-        : Widget(SVec(SUnit(), height), p, parent), face(f), color(c)
+        SUnit height, SVec p, Widget* parent, 
+        const std::string& t,
+        const SORE_Graphics::Color& c)
+        : Widget(SVec(SUnit(), height), p, parent), color(c)
     {
+        face = fontCache.Get(Style()["TextWidget"]["font"].asString());
+        shader = shaderCache.Get(Style()["TextWidget"]["shader"].asString());
+
         SetText(t);
     }
 
@@ -62,7 +67,7 @@ namespace SORE_GUI
         unsigned int h = static_cast<unsigned int>(GetSize(VERTICAL));
         imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
         imm_mode.SetColor(color);
-        imm_mode.SetShader(shaderCache.Get("default.shad"));
+        imm_mode.SetShader(shader);
         imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
         imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, h, text);
     }

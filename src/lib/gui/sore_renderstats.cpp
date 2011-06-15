@@ -54,31 +54,15 @@ namespace SORE_GUI
 
         unsigned int textHeight = static_cast<unsigned int>(Style()["RenderStats"]["text_size"].asInt());
         SUnit height(0.0, textHeight);
-        fpsLabel   = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, 0)),
-                                              font, "FPS:",
-                                              SORE_Graphics::White, this);
-        drawsLabel = new SORE_GUI::TextWidget(height,SVec(SUnit(0.0, 5), SUnit(0.0, textHeight)),
-                                              font, "Draw Calls:",
-                                              SORE_Graphics::White, this);
-        polysLabel = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*2)),
-                                              font, "Polygons:",
-                                              SORE_Graphics::White, this);
-        msLabel    = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*3)),
-                                              font, "Milliseconds:",
-                                              SORE_Graphics::White, this);
+        fpsLabel   = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, 0)), this, "FPS:");
+        drawsLabel = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, textHeight)), this, "Draw Calls:"),
+        polysLabel = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*2)), this, "Polygons:"),
+        msLabel    = new SORE_GUI::TextWidget(height, SVec(SUnit(0.0, 5), SUnit(0.0, textHeight*3)), this, "Milliseconds"),
 
-        fps        = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, 0)),
-                                              font, "0", SORE_Graphics::White,
-                                              this);
-        draws      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight)),
-                                              font, "0", SORE_Graphics::White,
-                                              this);
-        polys      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*2)),
-                                              font, "0", SORE_Graphics::White,
-                                              this);
-        ms         = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*3)),
-                                              font, "0", SORE_Graphics::White,
-                                              this);
+        fps        = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, 0)), this);
+        draws      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight)), this);
+        polys      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*2)), this);
+        ms         = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0.0, textHeight*3)), this);
     }
 
     void RenderStats::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)

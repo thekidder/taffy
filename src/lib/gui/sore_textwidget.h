@@ -44,9 +44,10 @@ namespace SORE_GUI
     class SORE_EXPORT TextWidget : public Widget
     {
     public:
-        TextWidget(SUnit height, SVec p, SORE_Resource::FontPtr f, const std::string& t,
-                   const SORE_Graphics::Color& c = SORE_Graphics::White,
-                   Widget* parent=NULL);
+        TextWidget(
+            SUnit height, SVec p, Widget* parent = NULL, 
+            const std::string& t = "",
+            const SORE_Graphics::Color& c = SORE_Graphics::White);
 
         void SetText(const std::string& t);
         void SetColor(const SORE_Graphics::Color& c);
