@@ -54,7 +54,7 @@ namespace SORE_GUI
     {
         text = t;
         unsigned int h = static_cast<unsigned int>(GetSize(VERTICAL));
-        SetSize(SVec(SUnit(0.0, static_cast<int>(face->Width(h, text))), GetSize().GetVertical()));
+        SetSize(SVec(SUnit(static_cast<int>(face->Width(h, text))), GetSize().GetVertical()));
     }
 
     void TextWidget::SetColor(const SORE_Graphics::Color& c)

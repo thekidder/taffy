@@ -42,8 +42,8 @@ namespace SORE_GUI
         : FrameWidget(s, p, SCALE_CENTER, parent_), title(t), titleText(0), dragged(false)
     {
         titleText = new TextWidget(
-            SUnit(0.0, static_cast<unsigned int>(Style()["FrameWindow"]["title_size"].asInt())),
-            SVec(SUnit(0.0, 0), SUnit(0.0, 0)),  this, t);
+            SUnit(static_cast<int>(Style()["FrameWindow"]["title_size"].asInt())),
+            SVec(),  this, t);
 
         SetBorderSizes(
             static_cast<float>(Style()["FrameWindow"]["border_sizes"][0u].asDouble()),

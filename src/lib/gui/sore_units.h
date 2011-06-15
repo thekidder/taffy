@@ -46,6 +46,8 @@ namespace SORE_GUI
 	{
 	public:
 		SUnit(double rel, int abs);
+        SUnit(double rel);
+        SUnit(int abs);
 		SUnit();
 		double GetRelative() const;
 		int GetAbsolute() const;
@@ -64,6 +66,7 @@ namespace SORE_GUI
 	{
 	public:
 		SVec(SUnit h, SUnit v);
+        SVec();
 
 		SUnit GetHorizontal() const;
 		SUnit GetVertical() const;

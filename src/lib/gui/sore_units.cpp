@@ -41,8 +41,17 @@ namespace SORE_GUI
 	{
 	}
 
+    SUnit::SUnit(double rel) : relative(rel), absolute(0)
+	{
+	}
+
+    SUnit::SUnit(int abs) : relative(0.0), absolute(abs)
+	{
+	}
+
 	SUnit::SUnit() : relative(0.0), absolute(0)
-	{}
+	{
+    }
 
 	double SUnit::GetRelative() const
 	{
@@ -83,6 +92,10 @@ namespace SORE_GUI
 	}
 
 	SVec::SVec(SUnit h, SUnit v) : horz(h), vert(v)
+	{
+	}
+
+    SVec::SVec()
 	{
 	}
 

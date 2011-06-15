@@ -44,8 +44,8 @@ namespace SORE_GUI
         SORE_Resource::Shader_cache_t& shaderCache,
         SORE_Resource::Texture_cache_t& textureCache)
         : Widget(fontCache, shaderCache, textureCache,
-        SVec(SUnit(0.0, 400), SUnit(0.0, 400)), // bogus initial size until we receive a resize event
-        SVec(SUnit(0.0, 0), SUnit(0.0, 0)), NULL),
+        // bogus initial size until we receive a resize event
+        SVec(SUnit(400), SUnit(400)), SVec(), NULL),
         imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
     {
     }
