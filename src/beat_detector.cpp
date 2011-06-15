@@ -29,10 +29,11 @@ void BeatDetector::Update()
         for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
         {
             double diff = spectrum->Value(i, STEREO_MIX) - last_frame.Value(i, STEREO_MIX);
-            diff = diff > 0.0 ? diff : 0.0;
+            // diff = std::max(0.0, diff);
             flux += diff;
         }
         flux /= spectrum->NumBuckets();
+        flux = std::max(0.0, flux);
 
         
         double flux_moving_average = std::accumulate(flux_history.begin(), flux_history.end(), 0.0);
@@ -96,4 +97,21 @@ void BeatDetector::Update()
     }
 
     last_frame = spectrum->Snapshot();
+}
+
+double BeatDetector::Value(size_t index) const
+{
+    switch(index)
+    {
+    case 0:
+        return Flux();
+    case 1:
+        return Threshold();
+    case 2:
+        return ThresholdedFlux();
+    case 3:
+        return Range().second - Beat();
+    default:
+        return 0.0;
+    };
 }

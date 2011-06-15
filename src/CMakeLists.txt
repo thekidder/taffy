@@ -34,6 +34,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   averaging_spectrum.cpp
   beat_detector.cpp
   debug_gui.cpp
+  energy_analyzer.cpp
   fft_spectrum.cpp
   fmod_pass_through_adapter.cpp
   fmod_spectrum.cpp
@@ -53,10 +54,12 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
 
 SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
+  analyzer.h
   averaging_spectrum.h
   beat_detector.h
   bounded_queue.h
   debug_gui.h
+  energy_analyzer.h
   fft_spectrum.h
   fmod_pass_through_adapter.h
   fmod_spectrum.h

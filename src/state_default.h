@@ -4,6 +4,7 @@
 #include "beat_detector.h"
 #include "debug_gui.h"
 #include "kiss_spectrum.h"
+#include "energy_analyzer.h"
 #include "fmod_spectrum.h"
 #include "fmod_pass_through_adapter.h"
 #include "geometric_spectrum.h"
@@ -62,6 +63,7 @@ private:
     GraphVisualizer* beat_visualizer_low;
     GraphVisualizer* beat_visualizer_mid;
     GraphVisualizer* beat_visualizer_high;
+    GraphVisualizer* energy_visualizer;
     SpectrumVisualizer* spectrum_visualizer;
     DebugGUI* debug;
 
@@ -85,9 +87,12 @@ private:
 
     PartialSpectrum low, mid, high;
 
+    // analyzers
     BeatDetector beat_detector_low;
     BeatDetector beat_detector_mid;
     BeatDetector beat_detector_high;
+
+    EnergyAnalyzer energy_analyzer;
 };
 
 #endif

@@ -25,14 +25,15 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       top(gamestateStack.FontCache(),
           gamestateStack.ShaderCache(),
           gamestateStack.TextureCache()),
-      debug(0), buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
+      buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
       fmod_spectrum(k_fft_samples, 48000), 
 #ifdef USE_KISS
       kiss_spectrum(k_fft_samples, 48000), 
 #endif
       log_spectrum(fmod_spectrum, 20),
       low(log_spectrum, 0, 5), mid(log_spectrum, 5, 10), high(log_spectrum, 10, 20),
-      beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0)
+      beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
+      energy_analyzer(&log_spectrum)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
     gamestateStack.PackageCache().AddPackage("default_resources.sdp");
@@ -46,6 +47,10 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     distributor.AddListener(
         SORE_Kernel::RESIZE,
         boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
+
+    energy_analyzer.AddSpectrum(&low);
+    energy_analyzer.AddSpectrum(&mid);
+    energy_analyzer.AddSpectrum(&high);
 
     // setup the style
     top.SetStyleName("ix");
@@ -66,21 +71,33 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     visualizers_controls->SetChecked();
     new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), displays, "Beat detectors");
 
-    SORE_GUI::Checkbox* spectrum_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), displays);
+    SORE_GUI::Checkbox* energy_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), displays);
+    energy_controls->SetChecked();
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(20)), displays, "Energy Analyzer");
+
+    SORE_GUI::Checkbox* spectrum_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(40)), displays);
     spectrum_controls->SetChecked();
-    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(20)), displays, "Spectrum");
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit(40)), displays, "Frequency Spectrum");
 
-    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.15, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
-    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.4, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
-    beat_visualizer_high  = new GraphVisualizer(SVec(SUnit(1.0, 0), SUnit(0.2, 0)), SVec(SUnit(0.0, 0), SUnit(0.65, 0)), &top, std::make_pair(0.0f, 30.0f), 4, 500);
+    beat_visualizer_low  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 0)), &top, 
+        beat_detector_low.Range(), beat_detector_low.NumValues(), 500);
+    beat_visualizer_mid  = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 1)), &top, 
+        beat_detector_mid.Range(), beat_detector_mid.NumValues(), 500);
+    beat_visualizer_high = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 2)), &top, 
+        beat_detector_high.Range(), beat_detector_high.NumValues(), 500);
 
-    spectrum_visualizer = new SpectrumVisualizer(SVec(SUnit(1.0, 0), SUnit(0.1, 0)), SVec(SUnit(0.0, 0), SUnit(0.9, 0)), &top, 0);
+    energy_visualizer    = new GraphVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 3)), &top, 
+        energy_analyzer.Range(), energy_analyzer.NumValues(), 500);
+
+    spectrum_visualizer  = new SpectrumVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 4)), &top, 0);
 
     debug = new DebugGUI(renderer, container);
 
     visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_low, _1));
     visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_mid, _1));
     visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, beat_visualizer_high, _1));
+
+    energy_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, energy_visualizer, _1));
 
     spectrum_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, spectrum_visualizer, _1));
 
@@ -131,9 +148,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     fmod_spectrum.SetFMODSystem(system);
 
     spectrum_visualizer->SetSpectrum(&log_spectrum);
-    beat_detector_low.SetSpectrum(&low);
-    beat_detector_mid.SetSpectrum(&mid);
-    beat_detector_high.SetSpectrum(&high);
 
     beat_visualizer_low->SetComment((boost::format("%.2f - %.2f Hz") % low.TotalHz().first % low.TotalHz().second).str());
     beat_visualizer_mid->SetComment((boost::format("%.2f - %.2f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
@@ -159,21 +173,19 @@ void DefaultState::Frame(int elapsed)
     beat_detector_low.Update();
     beat_detector_mid.Update();
     beat_detector_high.Update();
+    energy_analyzer.Update();
 
-    beat_visualizer_low->AddDatum(0, beat_detector_low.Flux());
-    beat_visualizer_low->AddDatum(1, beat_detector_low.Threshold());
-    beat_visualizer_low->AddDatum(2, beat_detector_low.ThresholdedFlux());
-    beat_visualizer_low->AddDatum(3, 30.0f - beat_detector_low.Beat());
+    for(size_t i = 0; i < beat_detector_low.NumValues(); ++i)
+        beat_visualizer_low->AddDatum(i, beat_detector_low.Value(i));
 
-    beat_visualizer_mid->AddDatum(0, beat_detector_mid.Flux());
-    beat_visualizer_mid->AddDatum(1, beat_detector_mid.Threshold());
-    beat_visualizer_mid->AddDatum(2, beat_detector_mid.ThresholdedFlux());
-    beat_visualizer_mid->AddDatum(3, 30.0f - beat_detector_mid.Beat());
+    for(size_t i = 0; i < beat_detector_mid.NumValues(); ++i)
+        beat_visualizer_mid->AddDatum(i, beat_detector_mid.Value(i));
 
-    beat_visualizer_high->AddDatum(0, beat_detector_high.Flux());
-    beat_visualizer_high->AddDatum(1, beat_detector_high.Threshold());
-    beat_visualizer_high->AddDatum(2, beat_detector_high.ThresholdedFlux());
-    beat_visualizer_high->AddDatum(3, 30.0f - beat_detector_high.Beat());
+    for(size_t i = 0; i < beat_detector_high.NumValues(); ++i)
+        beat_visualizer_high->AddDatum(i, beat_detector_high.Value(i));
+
+    for(size_t i = 0; i < energy_analyzer.NumValues(); ++i)
+        energy_visualizer->AddDatum(i, energy_analyzer.Value(i));
 
     // draw gui
     top.Frame(elapsed);
