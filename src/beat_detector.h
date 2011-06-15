@@ -1,6 +1,7 @@
 #ifndef BEAT_DETECTOR_H
 #define BEAT_DETECTOR_H
 
+#include "bounded_queue.h"
 #include "spectrum.h"
 
 #include <list>
@@ -25,7 +26,7 @@ private:
 
     // used in algorithms
     SpectrumSnapshot last_frame;
-    std::list<double> flux_history;
+    Bounded_queue<double> flux_history, threshold_history;
     double last_beat;
 
     // current values

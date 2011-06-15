@@ -72,14 +72,16 @@ private:
     FMOD::System* system;
     FMOD::Sound* sound;
     FMOD::Channel* channel;
+#ifdef USE_KISS
     FMOD::DSP* listener;
+#endif
 
     // spectrums
-    KISS_Spectrum kiss_spectrum;
     FMOD_Spectrum fmod_spectrum;
-
-    GeometricSpectrum kiss_g_spectrum;
-    GeometricSpectrum fmod_g_spectrum;
+#ifdef USE_KISS
+    KISS_Spectrum kiss_spectrum;
+#endif
+    GeometricSpectrum log_spectrum;
 
     PartialSpectrum low, mid, high;
 

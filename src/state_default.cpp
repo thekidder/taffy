@@ -16,7 +16,7 @@
 using SORE_GUI::SVec;
 using SORE_GUI::SUnit;
 
-const int k_fft_samples = 1024;
+const int k_fft_samples = 2048;
 const int k_num_channels = 2;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
@@ -25,9 +25,12 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
           gamestateStack.ShaderCache(),
           gamestateStack.TextureCache()),
       debug(0), buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
-      kiss_spectrum(k_fft_samples, 48000), fmod_spectrum(k_fft_samples, 48000),
-      kiss_g_spectrum(kiss_spectrum, 24), fmod_g_spectrum(fmod_spectrum, 24),
-      low(fmod_g_spectrum, 0, 8), mid(fmod_g_spectrum, 8, 16), high(fmod_g_spectrum, 16, 24),
+      fmod_spectrum(k_fft_samples, 48000), 
+#ifdef USE_KISS
+      kiss_spectrum(k_fft_samples, 48000), 
+#endif
+      log_spectrum(fmod_spectrum, 20),
+      low(log_spectrum, 0, 5), mid(log_spectrum, 5, 10), high(log_spectrum, 10, 20),
       beat_detector_low(0), beat_detector_mid(0), beat_detector_high(0)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
@@ -82,6 +85,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     system->createStream("music.mp3", FMOD_SOFTWARE, 0, &sound);
     system->playSound(FMOD_CHANNEL_FREE, sound, false, &channel);
 
+#ifdef USE_KISS
     {
         buffer.SetCallback(boost::bind(&DefaultState::GotSamples, this, _1, _2, _3));
         SetAdapter(&fmod_adapter);
@@ -96,15 +100,18 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     }
     listener->setBypass(false);
     system->addDSP(listener, 0);
+#endif
 
     int sample_rate;
     system->getSoftwareFormat(&sample_rate, 0, 0, 0, 0, 0);
 
-    kiss_spectrum.SetSampleRate(sample_rate);
     fmod_spectrum.SetSampleRate(sample_rate);
+#ifdef USE_KISS
+    kiss_spectrum.SetSampleRate(sample_rate);
+#endif
     fmod_spectrum.SetFMODSystem(system);
 
-    spectrum_visualizer->SetSpectrum(&fmod_g_spectrum);
+    spectrum_visualizer->SetSpectrum(&log_spectrum);
     beat_detector_low.SetSpectrum(&low);
     beat_detector_mid.SetSpectrum(&mid);
     beat_detector_high.SetSpectrum(&high);
@@ -214,5 +221,7 @@ SORE_Graphics::camera_info DefaultState::GetCamera()
 
 void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 {
+#ifdef USE_KISS
     kiss_spectrum.AddSamples(buffer, length, channels);
+#endif
 }

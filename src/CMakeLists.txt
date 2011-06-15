@@ -55,6 +55,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   app_log.h
   averaging_spectrum.h
   beat_detector.h
+  bounded_queue.h
   debug_gui.h
   fft_spectrum.h
   fmod_pass_through_adapter.h
