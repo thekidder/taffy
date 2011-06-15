@@ -103,19 +103,20 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
     }
     else
     {
-        newState.textures = textures;
+        newState.textures = TextureState();
     }
 
     UniformState uDiff = uniforms.GetDiff(old.uniforms);
-    if(!uDiff.Empty())
-    {
-        newState.commands |= RENDER_CMD_CHANGE_UNIFORMS;
-        newState.uniforms = uDiff;
-    }
-    else
-    {
+    // reset uniforms if they have changed OR if there is a new shader bound
+    if(newState.commands & RENDER_CMD_BIND_SHADER)
         newState.uniforms = uniforms;
-    }
+    else if(!uDiff.Empty())
+        newState.uniforms = uDiff;
+    else
+        newState.uniforms = UniformState();
+
+    if(!newState.uniforms.Empty())
+        newState.commands |= RENDER_CMD_CHANGE_UNIFORMS;
 
     if(old.primitiveType != primitiveType)
     {
