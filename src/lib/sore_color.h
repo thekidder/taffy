@@ -46,7 +46,8 @@ namespace SORE_Graphics
     class SORE_EXPORT Color
     {
     public:
-        Color(float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+        Color(float r, float g, float b, float a = 1.0f);
+        Color(float all = 1.0f);
 
         SORE_Math::Vector4<float> GetColorVector() const;
         const float* GetColor() const;
@@ -65,7 +66,6 @@ namespace SORE_Graphics
 
     Color operator+(const Color& lhs, const Color& rhs);
     Color operator-(const Color& lhs, const Color& rhs);
-
     Color operator*(const Color& lhs, const Color& rhs);
     Color operator/(const Color& lhs, const Color& rhs);
 

@@ -51,6 +51,15 @@ namespace SORE_Graphics
         color[3] = clamp(a, 0.0f, 1.0f);
     }
 
+    Color::Color(float all)
+    {
+        all = clamp(all, 0.0f, 1.0f);
+        color[0] = all;
+        color[1] = all;
+        color[2] = all;
+        color[3] = all;
+    }
+
     const float* Color::GetColor() const
     {
         return color;
