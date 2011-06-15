@@ -14,13 +14,11 @@
 	},
 	"FrameWindow":
 	{
-	    "title_font":   "ix/LiberationSans-Regular.ttf",
 	    "title_size":   24,
 	    "border_sizes": [32, 32, 32, 32]
 	},
 	"RenderStats":
 	{
-	    "font":      "ix/LiberationSans-Regular.ttf",
 	    "text_size": 20
 	}
     }
