@@ -8,8 +8,9 @@
 class FMOD_Spectrum : public FFTSpectrum
 {
 public:
-    FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* system_);
+    FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* system_ = 0);
 
+    void SetFMODSystem(FMOD::System* system_);
     void SetWindowType(FMOD_DSP_FFT_WINDOW window);
     void Update();
 private:

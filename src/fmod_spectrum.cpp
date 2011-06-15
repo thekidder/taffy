@@ -8,6 +8,11 @@ FMOD_Spectrum::FMOD_Spectrum(size_t fft_size, int sample_rate, FMOD::System* sys
 {
 }
 
+void FMOD_Spectrum::SetFMODSystem(FMOD::System* system_)
+{
+    system = system_;
+}
+
 void FMOD_Spectrum::SetWindowType(FMOD_DSP_FFT_WINDOW window)
 {
     window_type = window;
@@ -15,6 +20,9 @@ void FMOD_Spectrum::SetWindowType(FMOD_DSP_FFT_WINDOW window)
 
 void FMOD_Spectrum::Update()
 {
+    if(!system)
+        return;
+
     if(system->getSpectrum(&left_src[0],  NumBuckets(), 0, window_type) != FMOD_OK)
         throw std::runtime_error("Could not get spectrum for left channel");
     if(system->getSpectrum(&right_src[0], NumBuckets(), 1, window_type) != FMOD_OK)
