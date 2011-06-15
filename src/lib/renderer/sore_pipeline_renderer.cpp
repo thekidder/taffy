@@ -78,6 +78,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     ScreenInfo screenInfo;
     screenInfo.width = width;
     screenInfo.height = height;
+    screenInfo.ratio = static_cast<float>(width) / height;
 
     //get current cameras
     camera_table cameraTable;
