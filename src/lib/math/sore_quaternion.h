@@ -47,15 +47,16 @@ namespace SORE_Math
 			class SORE_EXPORT Quaternion
 	{
 		public:
-			Quaternion() : real(static_cast<T>(0.0))
+			Quaternion() : x(T(1.0)), y(T(0.0)), z(T(0.0)), w(T(0.0))
 			{
-				imaginary[0] = 1.0;
 			}
 			
-			void Assign(T r, Vector3<T> i)
+			void Assign(T x_, T y_, T z_, T w_)
 			{
-				imaginary = i;
-				real = r;
+				x = x_;
+                y = y_;
+                z = z_;
+				w = w_;
 			}
 			
 			Quaternion(T rads, Vector3<T> axis) //create from axis and angle
@@ -65,64 +66,78 @@ namespace SORE_Math
 			
 			Quaternion<T>& operator*=(Quaternion<T>& q)
 			{
-				T r = real*q.real - imaginary.dot(q.imaginary);
-				Vector3<T> i = real*q.imaginary + q.real*imaginary + imaginary.cross(q.imaginary);
-				real = r;
-				imaginary = i;
+                Quaternion<T> temp;
+				temp.x = w*q.x - x*q.w - y*q.z - z*q.y;
+                temp.y = w*q.y - x*q.z + y*q.w + z*q.x;
+                temp.z = w*q.z + x*q.y + y*q.x - z*q.w;
+                temp.w = w*q.w + x*q.x - y*q.y + z*q.z;
+
+                *this = temp;
+
+                if(fabs(x*x + y*y + z*z + w*w - T(1.0)) > 0.0001)
+                {
+                    // normalize
+                    T magnitude = sqrt(x*x + y*y + z*z + w*w);
+                    x /= magnitude;
+                    y /= magnitude;
+                    z /= magnitude;
+                    w /= magnitude;
+                }
+
 				return *this;
 			}
 			
 			void Rotate(T rads, Vector3<T> axis)
 			{
 				Quaternion<T> temp = GetRotation(rads, axis);
-				*this *= temp;
+				*this = temp * *this;
 			}
 			
-			Matrix4<T> GetMatrix()
+			Matrix4<T> GetMatrix() const
 			{
 				T values[16];
-				values[ 0] = 1.0f - 2.0f * ( imaginary[1] * imaginary[1] + imaginary[2] * imaginary[2] );
-				values[ 1] = 2.0f * (imaginary[0] * imaginary[1] + imaginary[2] * real);
-				values[ 2] = 2.0f * (imaginary[0] * imaginary[2] - imaginary[1] * real);
-				values[ 3] = 0.0f;
+				values[ 0] = T(1.0) - T(2.0) * ( y * y + z * z );
+				values[ 1] = T(2.0) * (x * y + z * w);
+				values[ 2] = T(2.0) * (x * z - y * w);
+				values[ 3] = T(0.0);
 	
-				values[ 4] = 2.0f * ( imaginary[0] * imaginary[1] - imaginary[2] * real );
-				values[ 5] = 1.0f - 2.0f * ( imaginary[0] * imaginary[0] + imaginary[2] * imaginary[2] );
-				values[ 6] = 2.0f * (imaginary[2] * imaginary[1] + imaginary[0] * real );
-				values[ 7] = 0.0f;
+				values[ 4] = T(2.0) * ( x * y - z * w );
+				values[ 5] = T(1.0) - T(2.0) * ( x * x + z * z );
+				values[ 6] = T(2.0) * (z * y - x * w );
+				values[ 7] = T(0.0);
 
-				values[ 8] = 2.0f * ( imaginary[0] * imaginary[2] + imaginary[1] * real );
-				values[ 9] = 2.0f * ( imaginary[1] * imaginary[2] - imaginary[0] * real );
-				values[10] = 1.0f - 2.0f * ( imaginary[0] * imaginary[0] + imaginary[1] * imaginary[1] );
-				values[11] = 0.0f;
+				values[ 8] = T(2.0) * ( x * z + y * w );
+				values[ 9] = T(2.0) * ( y * z + x * w );
+				values[10] = T(1.0) - T(2.0) * ( x * x + y * y );
+				values[11] = T(0.0);
 
-				values[12] = 0.0f;
-				values[13] = 0.0f;
-				values[14] = 0.0f;
-				values[15] = 1.0f;
+				values[12] = T(0.0);
+				values[13] = T(0.0);
+				values[14] = T(0.0);
+				values[15] = T(1.0);
 
 				return Matrix4<T>(values);
 			}
 			
 			static Quaternion<T> GetRotation(T rads, Vector3<T> axis)
 			{
-				Vector3<T> temp = axis * static_cast<T>(  sin(rads/2.0)  );
-				T r = cos(rads/2.0);
-				Quaternion<T> result;
-				result.Assign(r, temp); 
+				Quaternion result;
+				result.x = axis[0] * sin(rads / T(2.0));
+                result.y = axis[1] * sin(rads / T(2.0));
+                result.z = axis[2] * sin(rads / T(2.0));
+                result.w = cos(rads / T(2.0));
 				return result;
 			}
 		private:
-			T real;
-			Vector3<T> imaginary;
+			T x, y, z, w;
 	};
 	
 	template<typename T>
 			Quaternion<T> operator*(Quaternion<T> q1, Quaternion<T> q2)
 	{
 		Quaternion<T> temp = q1;
-		q1 *= q2;
-		return q1;
+		temp *= q2;
+		return temp;
 	}
 }
 
