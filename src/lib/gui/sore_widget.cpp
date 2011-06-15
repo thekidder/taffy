@@ -191,13 +191,13 @@ namespace SORE_GUI
             bool inPrevWidget = it->InBounds(p.mouse.x, p.mouse.y);
 
             // first send relavent mouseenter/mouseleave events
-            if(inWidget && !inPrevWidget)
+            if(inWidget && !inPrevWidget && e.type != SORE_Kernel::MOUSEENTER)
             {
                 SORE_Kernel::Event mouseEnter;
                 mouseEnter.type = SORE_Kernel::MOUSEENTER;
                 it->PropagateEventHelper(mouseEnter, p);
             }
-            else if(!inWidget && inPrevWidget)
+            else if(!inWidget && inPrevWidget && e.type != SORE_Kernel::MOUSELEAVE)
             {
                 SORE_Kernel::Event mouseLeave;
                 mouseLeave.type = SORE_Kernel::MOUSELEAVE;
@@ -207,8 +207,8 @@ namespace SORE_GUI
             if(inWidget || relative.type == SORE_Kernel::MOUSEENTER
                || relative.type == SORE_Kernel::MOUSELEAVE || it->HasFocus())
             {
-                relative.mouse.x -= it->GetPosition(HORIZONTAL);
-                relative.mouse.y -= it->GetPosition(VERTICAL);
+                relative.mouse.x -= it->GetRelativePosition(HORIZONTAL);
+                relative.mouse.y -= it->GetRelativePosition(VERTICAL);
 
                 bool accepted = it->PropagateEventHelper(relative, p);
 
