@@ -44,14 +44,14 @@
 namespace SORE_Math
 {
 	template<typename T>
-			class SORE_EXPORT Quaternion
+	class SORE_EXPORT Quaternion
 	{
 		public:
 			Quaternion() : x(T(1.0)), y(T(0.0)), z(T(0.0)), w(T(0.0))
 			{
 			}
 			
-			void Assign(T x_, T y_, T z_, T w_)
+			Quaternion(T x_, T y_, T z_, T w_)
 			{
 				x = x_;
                 y = y_;
@@ -59,35 +59,37 @@ namespace SORE_Math
 				w = w_;
 			}
 			
-			Quaternion(T rads, Vector3<T> axis) //create from axis and angle
+			Quaternion(T rads, const Vector3<T>& axis) //create from axis and angle
 			{
 				*this = GetRotation(rads, axis);
 			}
 			
-			Quaternion<T>& operator*=(Quaternion<T>& q)
+			Quaternion<T>& operator*=(const Quaternion<T>& q)
 			{
-                Quaternion<T> temp;
-				temp.x = w*q.x - x*q.w - y*q.z - z*q.y;
-                temp.y = w*q.y - x*q.z + y*q.w + z*q.x;
-                temp.z = w*q.z + x*q.y + y*q.x - z*q.w;
-                temp.w = w*q.w + x*q.x - y*q.y + z*q.z;
+                SORE_Math::Quaternion<T> temp(
+                    w*q.x + x*q.w + y*q.z - z*q.y,
+                    w*q.y + y*q.w + z*q.x - x*q.z,
+                    w*q.z + z*q.w + x*q.y - y*q.x,
+                    w*q.w - x*q.x - y*q.y - z*q.z);
 
                 *this = temp;
+				return *this;
+			}
 
-                if(fabs(x*x + y*y + z*z + w*w - T(1.0)) > 0.0001)
+            void Normalize()
+            {
+                T mag_sq = x*x + y*y + z*z + w*w;
+                if(fabs(mag_sq - T(1.0)) > T(0.0000001))
                 {
-                    // normalize
-                    T magnitude = sqrt(x*x + y*y + z*z + w*w);
+                    T magnitude = sqrt(mag_sq);
                     x /= magnitude;
                     y /= magnitude;
                     z /= magnitude;
                     w /= magnitude;
                 }
-
-				return *this;
-			}
+            }
 			
-			void Rotate(T rads, Vector3<T> axis)
+			void Rotate(T rads, const Vector3<T>& axis)
 			{
 				Quaternion<T> temp = GetRotation(rads, axis);
 				*this = temp * *this;
@@ -95,20 +97,30 @@ namespace SORE_Math
 			
 			Matrix4<T> GetMatrix() const
 			{
+                float x2 = x * x;
+	            float y2 = y * y;
+	            float z2 = z * z;
+	            float xy = x * y;
+	            float xz = x * z;
+	            float yz = y * z;
+	            float wx = w * x;
+	            float wy = w * y;
+	            float wz = w * z;
+
 				T values[16];
-				values[ 0] = T(1.0) - T(2.0) * ( y * y + z * z );
-				values[ 1] = T(2.0) * (x * y + z * w);
-				values[ 2] = T(2.0) * (x * z - y * w);
+				values[ 0] = T(1.0) - T(2.0) * (y2 + z2);
+				values[ 1] = T(2.0) * (xy - wz);
+				values[ 2] = T(2.0) * (xz + wy);
 				values[ 3] = T(0.0);
 	
-				values[ 4] = T(2.0) * ( x * y - z * w );
-				values[ 5] = T(1.0) - T(2.0) * ( x * x + z * z );
-				values[ 6] = T(2.0) * (z * y - x * w );
+				values[ 4] = T(2.0) * (xy + wz);
+				values[ 5] = T(1.0) - T(2.0) * (x2 + z2);
+				values[ 6] = T(2.0) * (yz - wx);
 				values[ 7] = T(0.0);
 
-				values[ 8] = T(2.0) * ( x * z + y * w );
-				values[ 9] = T(2.0) * ( y * z + x * w );
-				values[10] = T(1.0) - T(2.0) * ( x * x + y * y );
+				values[ 8] = T(2.0) * (xz - wy);
+				values[ 9] = T(2.0) * (yz + wx);
+				values[10] = T(1.0) - T(2.0) * (x2 + y2);
 				values[11] = T(0.0);
 
 				values[12] = T(0.0);
@@ -119,26 +131,30 @@ namespace SORE_Math
 				return Matrix4<T>(values);
 			}
 			
-			static Quaternion<T> GetRotation(T rads, Vector3<T> axis)
+			static Quaternion<T> GetRotation(T rads, const Vector3<T>& axis)
 			{
+                Vector3<T> axis_n = axis.Normalize();
 				Quaternion result;
-				result.x = axis[0] * sin(rads / T(2.0));
-                result.y = axis[1] * sin(rads / T(2.0));
-                result.z = axis[2] * sin(rads / T(2.0));
+				result.x = axis_n[0] * sin(rads / T(2.0));
+                result.y = axis_n[1] * sin(rads / T(2.0));
+                result.z = axis_n[2] * sin(rads / T(2.0));
                 result.w = cos(rads / T(2.0));
 				return result;
 			}
 		private:
 			T x, y, z, w;
 	};
-	
-	template<typename T>
-			Quaternion<T> operator*(Quaternion<T> q1, Quaternion<T> q2)
-	{
-		Quaternion<T> temp = q1;
-		temp *= q2;
-		return temp;
-	}
+
+    template<typename T>
+    Quaternion<T> operator*(const Quaternion<T>& q1, const Quaternion<T>& q2)
+    {
+	    SORE_Math::Quaternion<T> temp = q1;
+        temp *= q2;
+
+        return temp;
+    }
 }
+	
+
 
 #endif

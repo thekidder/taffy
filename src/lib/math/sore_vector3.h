@@ -154,7 +154,7 @@ namespace SORE_Math
             return *this;
         }
 
-        Vector3<T> cross(const Vector3<T>& v)
+        Vector3<T> cross(const Vector3<T>& v) const
         {
             Vector3<T> temp;
             temp[0] = value[1]*v.value[2] - value[2]*v.value[1];
@@ -162,12 +162,12 @@ namespace SORE_Math
             temp[2] = value[0]*v.value[1] - value[1]*v.value[0];
             return temp;
         }
-        double Magnitude()
+        double Magnitude() const
         {
             return sqrt(pow(value[0],2)+pow(value[1],2)+pow(value[2],2));
         }
 
-        Vector3<T> Normalize()
+        Vector3<T> Normalize() const
         {
             double mag = Magnitude();
             Vector3<T> temp(static_cast<T>(value[0]/mag),
