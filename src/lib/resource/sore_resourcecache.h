@@ -35,6 +35,7 @@
 #ifndef SORE_RESOURCECACHE_H
 #define SORE_RESOURCECACHE_H
 
+#include <sore_logger.h>
 #include <sore_resourceproxy.h>
 
 #include <boost/unordered_map.hpp>
@@ -66,10 +67,15 @@ namespace SORE_Resource
         // Check if the container contains a resource with the given key, and if that resource is loaded
         bool Loaded(const Key& key) const;
     private:
+        // We want to gracefully handle resource loading errors - here we
+        // simply catch any exceptions thrown during the loading process
+        // and use the proxy, if loaded. If there is no proxy, we are still
+        // in trouble
+        Asset* LoadHelper(const Key& key);
+
         ResourceLoader loader;
 
         typedef boost::unordered_map<Key, Resource_t> Asset_container_t;
-
         Asset_container_t map;
 
         boost::shared_ptr<Asset> proxyObject;
@@ -87,7 +93,7 @@ namespace SORE_Resource
         if(it == map.end())
         {
             // load the resource
-            Asset* rawResource = loader.Load(key);
+            Asset* rawResource = LoadHelper(key);
             Resource_t resource(new ResourceProxy<Asset>(rawResource, proxyObject));
             map.insert(std::make_pair(key, resource));
             return resource;
@@ -123,7 +129,7 @@ namespace SORE_Resource
             // in the cache, but maybe not loaded
             if(!it->second.Loaded())
             {
-                it->second.Load(loader.Load(key));
+                it->second.Load(LoadHelper(key));
             }
         }
         else
@@ -144,6 +150,22 @@ namespace SORE_Resource
     {
         typename Asset_container_t::const_iterator it = map.find(key);
         return it != map.end() && it->second.Loaded();
+    }
+
+    template<typename Key, typename Asset, typename ResourceLoader>
+    Asset* ResourceCache<Key,Asset,ResourceLoader>::LoadHelper(const Key& key)
+    {
+        try
+        {
+            return loader.Load(key);
+        }
+        catch(...)
+        {
+            // assumes key is convertible to string - works for now; all keys
+            // we are using are paths
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Could not load " + key + "; falling back to proxy if it exists");
+            return 0;
+        }
     }
 }
 
