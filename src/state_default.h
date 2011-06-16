@@ -57,6 +57,9 @@ private:
     SORE_Graphics::camera_info GetCamera();
     void GotSamples(float* buffer, unsigned int length, int channels);
 
+    // particle generators
+    void CreateDisc(Particle& p);
+
     SORE_Graphics::PipelineRenderer renderer;
     SORE_Kernel::InputDistributor distributor;
 

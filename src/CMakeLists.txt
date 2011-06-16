@@ -40,6 +40,7 @@ SET(${CMAKE_PROJECT_NAME}_SRCS
   fmod_spectrum.cpp
   geometric_spectrum.cpp
   graph_visualizer.cpp
+  hsv_color.cpp
   kiss_spectrum.cpp
   main.cpp
   partial_spectrum.cpp
@@ -66,6 +67,7 @@ SET(${CMAKE_PROJECT_NAME}_HEADERS
   fmod_spectrum.h
   geometric_spectrum.h
   graph_visualizer.h
+  hsv_color.h
   kiss_spectrum.h
   partial_spectrum.h
   particle_system.h

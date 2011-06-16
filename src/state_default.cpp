@@ -3,6 +3,7 @@
 
 #include "app_log.h"
 #include "fmod_spectrum.h"
+#include "hsv_color.h"
 #include "state_default.h"
 #include "utility.h"
 
@@ -251,7 +252,7 @@ void DefaultState::Frame(int elapsed)
     float beat = static_cast<float>(beat_detector_low.Beat());
     int bass_particles = static_cast<int>(beat * 100.0f);
     bass_particles = std::min(k_num_particles, bass_particles);
-    particles.AddParticles(&CreateDisc, bass_particles);
+    particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
 
     particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 }
@@ -292,7 +293,7 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             channel->setPaused(paused);
             return true;
         case SORE_Kernel::Key::SSYM_d:
-            particles.AddParticles(&CreateDisc, 1200);
+            particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), 1200);
             return true;
         default:
             break;
@@ -359,7 +360,7 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 #endif
 }
 
-void CreateDisc(Particle& p)
+void DefaultState::CreateDisc(Particle& p)
 {
     float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
     float dist = SORE_Utility::getRandomMinMax(0.0f, 0.05f);
@@ -380,7 +381,8 @@ void CreateDisc(Particle& p)
     p.xa = -p.xv / 100.0f;
     p.za = -p.zv / 100.0f;
 
-    p.color = SORE_Graphics::White;
+    HSVColor c(static_cast<float>(energy_analyzer.Energy(0) / 30.0f), 0.8f, 1.0f, 0.8f);
+    p.color = c.RGBColor();
     p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.085f);
 
     p.lifetime = 0.0f;
