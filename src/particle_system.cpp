@@ -89,7 +89,7 @@ void ParticleSystem::Clear()
 
 void ParticleSystem::AddParticles(boost::function<void (Particle&)> create_callback, size_t num_particles)
 {
-    assert(num_particles < particles.size());
+    assert(num_particles <= particles.size());
 
     Particles_t::iterator it = particles.end() - num_particles;
     for(it; it != particles.end(); ++it)

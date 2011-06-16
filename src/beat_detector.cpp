@@ -10,7 +10,8 @@ const double k_default_threshold_value = 1.5;
 
 BeatDetector::BeatDetector(Spectrum* spectrum_)
     : spectrum(spectrum_), last_frame(0),
-      flux_history(k_history_size), threshold_history(k_history_size)
+      flux_history(k_history_size), threshold_history(k_history_size),
+      last_beat(0.0), flux(0.0), threshold(0.0), thresholded_flux(0.0), beat(0.0)
 {
 }
 

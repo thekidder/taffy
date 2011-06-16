@@ -20,6 +20,7 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
+const int k_num_particles = 5000;
 
 void CreateDisc(Particle& p);
 
@@ -37,7 +38,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       low(log_spectrum, 0, 5), mid(log_spectrum, 5, 10), high(log_spectrum, 10, 20),
       beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
       energy_analyzer(&log_spectrum),
-      rotating(false), particles(8000), paused(false),
+      rotating(false), particles(k_num_particles), paused(false),
       imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
@@ -247,8 +248,9 @@ void DefaultState::Frame(int elapsed)
     imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
 
     // do the magic
-    float beat = beat_detector_low.Beat();
+    float beat = static_cast<float>(beat_detector_low.Beat());
     int bass_particles = static_cast<int>(beat * 100.0f);
+    bass_particles = std::min(k_num_particles, bass_particles);
     particles.AddParticles(&CreateDisc, bass_particles);
 
     particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
@@ -287,6 +289,7 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             return true;
         case SORE_Kernel::Key::SSYM_p:
             paused = !paused;
+            channel->setPaused(paused);
             return true;
         case SORE_Kernel::Key::SSYM_d:
             particles.AddParticles(&CreateDisc, 1200);
