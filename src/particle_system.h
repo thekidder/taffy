@@ -26,6 +26,8 @@ struct Particle
     float lifetime;
 
     SORE_Graphics::Color color, colorChange;
+
+    float camera_depth;
 };
 
 class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
@@ -43,6 +45,7 @@ public:
     void AddParticles(boost::function<void (Particle&)> create_callback, size_t num_particles);
     void Update(int elapsed);
     void SetSize(float size);
+    void SetView(const SORE_Math::Matrix4<float>& view);
 
     bool OnResize(const SORE_Kernel::Event& e);
 
@@ -69,6 +72,10 @@ private:
     SORE_Graphics::VBO vbo;
 
     float half_width;
+    float size_multiplier;
+    int num_to_render;
+
+    SORE_Math::Matrix4<float> view_matrix;
 };
 
 #endif

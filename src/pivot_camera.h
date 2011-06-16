@@ -10,9 +10,12 @@ public:
     PivotCamera();
 
     void Rotate(float x, float y);
+    void Zoom(float amount);
+
     SORE_Math::Matrix4<float> Matrix() const;
 private:
     float x_rads, y_rads;
+    float dist;
 };
 
 #endif

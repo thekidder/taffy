@@ -21,7 +21,7 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles = 5000;
+const int k_num_particles = 10000;
 
 void CreateDisc(Particle& p);
 
@@ -189,6 +189,21 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
 	glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
+    imm_mode.Start();
+    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
+    imm_mode.SetKeywords("game");
+
+    // draw some axes
+    const float AXIS_LENGTH = 1.5f;
+
+    imm_mode.SetColor(SORE_Graphics::Green);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f, 0.0f);
+    imm_mode.SetColor(SORE_Graphics::Red);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
+    imm_mode.SetColor(SORE_Graphics::Blue);
+    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
+
 }
 
 DefaultState::~DefaultState()
@@ -204,7 +219,11 @@ bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
 
 void DefaultState::Frame(int elapsed)
 {
+    // even when paused, update fmod and take care of the GUI
     system->update();
+    
+    // draw gui
+    top.Frame(elapsed);
 
     if(paused)
         return;
@@ -230,27 +249,9 @@ void DefaultState::Frame(int elapsed)
 
     particles.Update(elapsed);
 
-    // draw gui
-    top.Frame(elapsed);
-
-    imm_mode.Start();
-    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
-    imm_mode.SetKeywords("game");
-
-    // draw some axes
-
-    const float AXIS_LENGTH = 1.5f;
-
-    imm_mode.SetColor(SORE_Graphics::Green);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f, 0.0f);
-    imm_mode.SetColor(SORE_Graphics::Red);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
-    imm_mode.SetColor(SORE_Graphics::Blue);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
-
     // do the magic
     float beat = static_cast<float>(beat_detector_low.Beat());
-    int bass_particles = static_cast<int>(beat * 100.0f);
+    int bass_particles = static_cast<int>(beat * 200.0f);
     bass_particles = std::min(k_num_particles, bass_particles);
     particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
 
@@ -317,8 +318,16 @@ bool DefaultState::HandleMouse(const SORE_Kernel::Event& e)
             y *= 4 * static_cast<float>(M_PI);
 
             camera.Rotate(x, y);
+            SORE_Math::Matrix4<float> view = camera.Matrix();
+            particles.SetView(view);
             return true;
         }
+        break;
+    case SORE_Kernel::MOUSEWHEELDOWN:
+        camera.Zoom(-1.0f);
+        break;
+    case SORE_Kernel::MOUSEWHEELUP:
+        camera.Zoom(1.0f);
         break;
     case SORE_Kernel::MOUSEBUTTONDOWN:
         rotating = true;
@@ -363,9 +372,9 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 void DefaultState::CreateDisc(Particle& p)
 {
     float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-    float dist = SORE_Utility::getRandomMinMax(0.0f, 0.05f);
+    float dist = SORE_Utility::getRandomMinMax(0.05f, 0.2f);
 
-    p.size = 0.2f;
+    p.size = energy_analyzer.Energy(0) / 10.0f;
 
     p.x = cos(angle) * dist;
     p.y = SORE_Utility::getRandomMinMax(-0.02f, 0.02f);
@@ -383,7 +392,7 @@ void DefaultState::CreateDisc(Particle& p)
 
     HSVColor c(static_cast<float>(energy_analyzer.Energy(0) / 30.0f), 0.8f, 1.0f, 0.8f);
     p.color = c.RGBColor();
-    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.085f);
+    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
 
     p.lifetime = 0.0f;
 }

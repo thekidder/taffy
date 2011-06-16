@@ -1,5 +1,4 @@
 //uniform sampler2D position;
-uniform float pointSize;
 uniform float halfWidth;
 uniform mat4 transform;
 
@@ -13,6 +12,6 @@ void main()
 	//vec4 texel = vec4(texture2D(position, tex).xyz, 1.0);
 	gl_Position = gl_ModelViewProjectionMatrix * transform * gl_Vertex;
     float C = gl_ProjectionMatrix[0] * halfWidth;
-	gl_PointSize = pointSize / (sqrt(1.0 / (C * C)) * gl_Position.z);
+	gl_PointSize = gl_Normal.x / (sqrt(1.0 / (C * C)) * gl_Position.z);
     color = gl_Color;
 }
