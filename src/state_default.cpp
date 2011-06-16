@@ -90,7 +90,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     SORE_GUI::Checkbox* beats_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit()), controls_container);
     beats_controls->SetChecked();
-    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), controls_container, "Beat detectors");
+    new SORE_GUI::TextWidget(SUnit(16), SVec(SUnit(26), SUnit()), controls_container, "Beat Detectors");
 
     SORE_GUI::Checkbox* energy_controls = new SORE_GUI::Checkbox(SUnit(16), SVec(SUnit(5), SUnit(20)), controls_container);
     energy_controls->SetChecked();
