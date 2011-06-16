@@ -49,7 +49,7 @@ namespace SORE_GUI
         Checkbox(SUnit size, SVec position, Widget* parent = NULL);
 
         bool Checked() const { return isChecked; }
-        void SetChecked(bool isChecked_ = true) { isChecked = isChecked_; }
+        void SetChecked(bool isChecked_ = true);
         boost::signals::connection ConnectChecked(const boost::function<void (bool)>& c);
     private:
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);

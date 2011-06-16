@@ -56,6 +56,12 @@ SORE_GUI::Checkbox::Checkbox(SUnit size, SVec position, Widget* parent)
         static_cast<float>(Style()["Checkbox"]["tex_coords_checked"][3u].asDouble()));
 }
 
+void SORE_GUI::Checkbox::SetChecked(bool isChecked_)
+{
+    isChecked = isChecked_;
+    checkedSignal(isChecked);
+}
+
 boost::signals::connection SORE_GUI::Checkbox::ConnectChecked(const boost::function<void (bool)>& c)
 {
     return checkedSignal.connect(c);
