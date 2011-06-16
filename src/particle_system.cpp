@@ -17,7 +17,7 @@ ParticleSystem::ParticleSystem(
     SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(0, 0, GL_POINTS));
     SORE_Graphics::TransformationPtr trans(new SORE_Math::Matrix4<float>());
 
-    geometry.push_back(SORE_Graphics::Renderable(g, s, trans, SORE_Graphics::BLEND_SUBTRACTIVE));
+    geometry.push_back(SORE_Graphics::Renderable(g, s, trans, SORE_Graphics::BLEND_ADDITIVE));
 
     geometry.front().AddTexture("texture", texture);
     geometry.front().AddKeyword("game");
