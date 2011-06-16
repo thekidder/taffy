@@ -100,11 +100,10 @@ SORE_Kernel::Event SORE_Kernel::TranslateEvent(const sf::Event& sfmlEvent)
         }
         break;
     case sf::Event::MouseWheelMoved:
-        event.type = MOUSEBUTTONDOWN;
         if(sfmlEvent.MouseWheel.Delta > 0)
-            event.mouse.buttonState = MOUSE_WHEELUP;
+            event.type = MOUSEWHEELDOWN;
         else
-            event.mouse.buttonState = MOUSE_WHEELDOWN;
+            event.type = MOUSEWHEELUP;
         break;
     case sf::Event::KeyPressed:
         // keysyms are designed to map directly to SDL keysyms

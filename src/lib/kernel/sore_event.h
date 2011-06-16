@@ -41,37 +41,37 @@ namespace SORE_Kernel
 {
     enum Event_type_t
     {
-        NOEVENT         = 0x000,
-        MOUSEMOVE       = 0x001,
-        MOUSEBUTTONDOWN = 0x002,
-        MOUSEBUTTONUP   = 0x004,
-        MOUSECLICK      = 0x008,
-        KEYDOWN         = 0x010,
-        KEYUP           = 0x020,
-        KEYCLICK        = 0x040,
-        TEXTENTERED     = 0x080,
+        NOEVENT         = 0x0000,
+        MOUSEMOVE       = 0x0001,
+        MOUSEBUTTONDOWN = 0x0002,
+        MOUSEBUTTONUP   = 0x0004,
+        MOUSECLICK      = 0x0008,
+        MOUSEWHEELUP    = 0x0010,
+        MOUSEWHEELDOWN  = 0x0020,
+        KEYDOWN         = 0x0040,
+        KEYUP           = 0x0080,
+        KEYCLICK        = 0x0100,
+        TEXTENTERED     = 0x0200,
 
         //used for SORE_GUI
-        MOUSEENTER      = 0x100,
-        MOUSELEAVE      = 0x200,
+        MOUSEENTER      = 0x0400,
+        MOUSELEAVE      = 0x0800,
 
         //resize is called when the actual screen is resized by *any* method
-        RESIZE          = 0x400,
-        QUIT            = 0x800,
+        RESIZE          = 0x1000,
+        QUIT            = 0x2000,
 
         INPUT_ALL       = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP
-        | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK | MOUSEENTER | MOUSELEAVE,
+        | MOUSECLICK | KEYDOWN | KEYUP | KEYCLICK | MOUSEENTER | MOUSELEAVE | MOUSEWHEELUP | MOUSEWHEELDOWN,
 
-        INPUT_ALLMOUSE  = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | MOUSEENTER | MOUSELEAVE
+        INPUT_ALLMOUSE  = MOUSEMOVE | MOUSEBUTTONDOWN | MOUSEBUTTONUP | MOUSECLICK | MOUSEENTER | MOUSELEAVE | MOUSEWHEELUP | MOUSEWHEELDOWN
     };
 
     enum Mouse_button_t
     {
         MOUSE_BUTTON1   = 0x01,
         MOUSE_BUTTON2   = 0x02,
-        MOUSE_BUTTON3   = 0x04,
-        MOUSE_WHEELDOWN = 0x08,
-        MOUSE_WHEELUP   = 0x10,
+        MOUSE_BUTTON3   = 0x04
     };
 
     struct MouseInfo
