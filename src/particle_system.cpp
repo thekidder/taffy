@@ -2,8 +2,17 @@
 
 #include <sore_sprite.h>
 
-ParticleSystem::ParticleSystem(SORE_Resource::Texture2DPtr t, SORE_Resource::GLSLShaderPtr s)
-    : vbo(SORE_Graphics::STREAM, true, true, false), texture(t), shader(s)
+#include <cassert>
+
+bool operator<(const Particle& one, const Particle& two);
+
+ParticleSystem::ParticleSystem(
+    size_t num_particles,
+    SORE_Resource::Texture2DPtr t, 
+    SORE_Resource::GLSLShaderPtr s)
+    : particles(num_particles),
+      texture(t), shader(s),
+      vbo(SORE_Graphics::STREAM, true, true, false)
 {
     SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(0, 0, GL_POINTS));
     SORE_Graphics::TransformationPtr trans(new SORE_Math::Matrix4<float>());
@@ -68,15 +77,23 @@ bool ParticleSystem::Contains(SORE_Graphics::GeometryChunkPtr gc)
     return gc == geometry.front().GetGeometryChunk();
 }
 
-void ParticleSystem::ClearParticles()
+void ParticleSystem::SetSize(float size)
+{
+    particles.front().size = size;
+}
+
+void ParticleSystem::Clear()
 {
     particles.clear();
 }
 
-void ParticleSystem::AddParticle(const Particle& p)
+void ParticleSystem::AddParticles(boost::function<void (Particle&)> create_callback, size_t num_particles)
 {
-    if(particles.size() < 65535)
-        particles.push_back(p);
+    assert(num_particles < particles.size());
+
+    Particles_t::iterator it = particles.end() - num_particles;
+    for(it; it != particles.end(); ++it)
+        create_callback(*it);
 }
 
 void ParticleSystem::UpdateGeometry()
@@ -106,6 +123,8 @@ void ParticleSystem::UpdateGeometry()
 
 void ParticleSystem::Update(int elapsed)
 {
+    std::sort(particles.begin(), particles.end());
+
     float seconds = elapsed / 1000.0f;
 
     for(Particles_t::iterator it = particles.begin(); it != particles.end(); ++it)
@@ -132,4 +151,9 @@ bool ParticleSystem::OnResize(const SORE_Kernel::Event& e)
         return true;
     }
     return false;
+}
+
+bool operator<(const Particle& one, const Particle& two)
+{
+    return one.lifetime < two.lifetime;
 }

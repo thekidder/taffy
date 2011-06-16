@@ -12,6 +12,7 @@
 #include <boost/bind.hpp>
 #include <fmod.hpp>
 
+#include <algorithm>
 #include <cassert>
 
 using SORE_GUI::SVec;
@@ -19,6 +20,8 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
+
+void CreateDisc(Particle& p);
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
@@ -34,7 +37,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       low(log_spectrum, 0, 5), mid(log_spectrum, 5, 10), high(log_spectrum, 10, 20),
       beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
       energy_analyzer(&log_spectrum),
-      rotating(false), paused(false),
+      rotating(false), particles(8000), paused(false),
       imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
@@ -121,6 +124,8 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     spectrum_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, spectrum_visualizer, _1));
 
+    visualizers_controls->SetChecked(false);
+
     renderer.AddGeometryProvider(&particles);
     renderer.AddGeometryProvider(top.GetGeometryProvider());
     renderer.AddGeometryProvider(&imm_mode);
@@ -175,7 +180,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     beat_visualizer_mid->SetComment((boost::format("%.1f - %.1f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
     beat_visualizer_high->SetComment((boost::format("%.1f - %.1f Hz") % high.TotalHz().first % high.TotalHz().second).str());
 
-    
     particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
     particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
 
@@ -224,27 +228,6 @@ void DefaultState::Frame(int elapsed)
 
     particles.Update(elapsed);
 
-    for(int i = 0; i < 100; ++i)
-    {
-        Particle p(0.0f, 0.0f, 0.0f, 0.05f);
-
-        SORE_Math::Vector3<float> velocity(
-            SORE_Utility::getRandomMinMax(-0.1f, 0.1f),
-            SORE_Utility::getRandomMinMax(-0.1f, 0.1f),
-            SORE_Utility::getRandomMinMax(-0.1f, 0.1f));
-
-        velocity = velocity.Normalize();
-        velocity *= SORE_Utility::getRandomMinMax(-0.1f, 0.1f);
-        //p.ya = -0.1f;
-        p.xv = velocity[0];
-        p.yv = velocity[1];
-        p.zv = velocity[2];
-        p.color = SORE_Graphics::White;
-        p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.03f);
-
-        particles.AddParticle(p);
-    }
-
     // draw gui
     top.Frame(elapsed);
 
@@ -262,6 +245,13 @@ void DefaultState::Frame(int elapsed)
     imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
     imm_mode.SetColor(SORE_Graphics::Blue);
     imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
+
+    // do the magic
+    float beat = beat_detector_low.Beat();
+    int bass_particles = static_cast<int>(beat * 100.0f);
+    particles.AddParticles(&CreateDisc, bass_particles);
+
+    particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 }
 
 void DefaultState::Render()
@@ -297,6 +287,9 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             return true;
         case SORE_Kernel::Key::SSYM_p:
             paused = !paused;
+            return true;
+        case SORE_Kernel::Key::SSYM_d:
+            particles.AddParticles(&CreateDisc, 1200);
             return true;
         default:
             break;
@@ -361,4 +354,31 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 #ifdef USE_KISS
     kiss_spectrum.AddSamples(buffer, length, channels);
 #endif
+}
+
+void CreateDisc(Particle& p)
+{
+    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+    float dist = SORE_Utility::getRandomMinMax(0.0f, 0.05f);
+
+    p.size = 0.2f;
+
+    p.x = cos(angle) * dist;
+    p.y = SORE_Utility::getRandomMinMax(-0.02f, 0.02f);
+    p.z = sin(angle) * dist;
+
+    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+    float speed = SORE_Utility::getRandomMinMax(0.1f, 1.6f);
+
+    p.xv = cos(angle) * speed;
+    p.yv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
+    p.zv = sin(angle) * speed;
+
+    p.xa = -p.xv / 100.0f;
+    p.za = -p.zv / 100.0f;
+
+    p.color = SORE_Graphics::White;
+    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, -0.085f);
+
+    p.lifetime = 0.0f;
 }
