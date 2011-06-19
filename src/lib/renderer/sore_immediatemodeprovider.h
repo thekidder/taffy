@@ -41,6 +41,7 @@
 #include <sore_glslshader.h>
 #include <sore_batchingbuffermanager.h>
 #include <sore_texture2d.h>
+#include <sore_uniformstate.h>
 
 #include <boost/unordered_map.hpp>
 
@@ -58,6 +59,13 @@ namespace SORE_Graphics
         void SetBlendMode(SORE_Graphics::blend_mode blend_mode);
         void SetPrimitiveType(GLenum type);
         void SetKeywords(const std::string& keywords_);
+
+        void SetUniform(const std::string& name, int i);
+        void SetUniform(const std::string& name, float f);
+        void SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v);
+        void SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v);
+        void SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v);
+        void SetUniform(const std::string& name, const SORE_Math::Matrix4<float>& m);
 
         void Start();
 
@@ -96,6 +104,7 @@ namespace SORE_Graphics
         GLenum current_primitive_type;
         std::pair<float, float> current_texcoords;
         std::string keywords;
+        UniformState currentUniforms;
 
         std::vector<SORE_Graphics::vertex> vertices;
         std::vector<unsigned short> indices;

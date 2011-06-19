@@ -99,6 +99,36 @@ void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
     current_primitive_type = type;
 }
 
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, int i)
+{
+    currentUniforms.SetVariable(name, i);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, float f)
+{
+    currentUniforms.SetVariable(name, f);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v)
+{
+    currentUniforms.SetVariable(name, v);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v)
+{
+    currentUniforms.SetVariable(name, v);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v)
+{
+    currentUniforms.SetVariable(name, v);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Matrix4<float>& m)
+{
+    currentUniforms.SetVariable(name, m);
+}
+
 void SORE_Graphics::ImmediateModeProvider::Start()
 {
     buffer_manager.Clear();
@@ -279,6 +309,8 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     Renderable r(geometry, current_shader, current_transform, current_blend_mode);
     if(current_texture)
         r.AddTexture("texture", current_texture);
+
+    r.Uniforms() = currentUniforms;
 
     std::set<std::string> keyword_list;
 
