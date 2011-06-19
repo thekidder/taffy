@@ -272,7 +272,7 @@ namespace SORE_Math
     template<typename T>
             Vector3<T> operator*(const Matrix4<T>& m, const Vector3<T>& v)
     {
-        Vector4<T> temp(v[0], v[1], static_cast<T>(1), static_cast<T>(1));
+        Vector4<T> temp(v[0], v[1], v[2], static_cast<T>(1));
         temp = m * temp;
         Vector3<T> result(temp[0], temp[1], temp[2]);
         return result;
