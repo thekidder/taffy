@@ -94,7 +94,7 @@ void SORE_Graphics::UniformState::SetVariable(
 void SORE_Graphics::UniformState::SetVariable(
     std::string name, SORE_Math::Vector3<float> v)
 {
-    uniforms[name].type = VEC2;
+    uniforms[name].type = VEC3;
     uniforms[name].v3 = v;
 }
 
