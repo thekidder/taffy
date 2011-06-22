@@ -42,18 +42,6 @@
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
 {
     boost::shared_ptr<Pipe> root(new NullPipe());
-    Pipe* sorter = new SortingPipe();
-
-    Pipe* guiPipe = new FilterPipe(KeywordFilter("gui"));
-    guiPipe->AddChildPipe(new RenderPipe("gui"));
-
-    Pipe* gamePipe = new FilterPipe(KeywordFilter("game"));
-    gamePipe->AddChildPipe(new RenderPipe("normal"));
-
-    root->AddChildPipe(sorter);
-    sorter->AddChildPipe(gamePipe);
-    sorter->AddChildPipe(guiPipe);
-
     pipeline = root;
 }
 
@@ -96,7 +84,6 @@ void SORE_Graphics::PipelineRenderer::Render()
 
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     pipeline->Setup();
     pipeline->Render(cameraTable, renderables, renderQueue, &bufferManager);
@@ -134,6 +121,11 @@ bool SORE_Graphics::PipelineRenderer::OnResize(const SORE_Kernel::Event& e)
         return true;
     }
     return false;
+}
+
+boost::shared_ptr<SORE_Graphics::Pipe>& SORE_Graphics::PipelineRenderer::RootPipe()
+{
+    return pipeline;
 }
 
 void SORE_Graphics::PipelineRenderer::CalculateFPS()

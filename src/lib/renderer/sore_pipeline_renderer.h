@@ -63,6 +63,9 @@ namespace SORE_Graphics
         virtual bool OnResize(const SORE_Kernel::Event& e);
 
         virtual void Render();
+
+        // expose the root pipe for the user to modify
+        boost::shared_ptr<Pipe>& RootPipe();
     private:
         //call once per frame to keep fps numbers up to date
         void CalculateFPS();

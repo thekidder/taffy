@@ -168,18 +168,12 @@ namespace SORE_Kernel
 
     int Screen::InitializeGL()
     {
-        /* Enable smooth shading */
-        glShadeModel( GL_SMOOTH );
-        /* Set the background black */
-        glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
         /* Depth buffer setup */
         glClearDepth( 1.0f );
         /* Enables Depth Testing */
         glEnable( GL_DEPTH_TEST );
         /* The Type Of Depth Test To Do */
         glDepthFunc( GL_LEQUAL );
-        /* Really Nice Perspective Calculations */
-        glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
         glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST);
         InitExtensions();
 #ifdef WIN32
@@ -235,22 +229,19 @@ namespace SORE_Kernel
         ENGINE_LOG(SORE_Logging::LVL_INFO,
                    boost::format("Maximum texture size: %dx%d")
                    % maxTextureSize % maxTextureSize);
-        int maxTextureUnits;
         int maxFragmentTextureImageUnits;
         int maxVertexTextureImageUnits;
         int maxCombinedTextureImageUnits;
-        glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxTextureUnits);
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxFragmentTextureImageUnits);
         glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
                       &maxVertexTextureImageUnits);
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
                       &maxCombinedTextureImageUnits);
         ENGINE_LOG(SORE_Logging::LVL_INFO,
-                   boost::format("Maximum (complete) texture units: %d\n"
-                                 "Maximum fragment texture units: %d\n"
+                   boost::format("Maximum fragment texture units: %d\n"
                                  "Maximum vertex texture units: %d\n"
                                  "Maximum combined texture units: %d")
-                   % maxTextureUnits % maxFragmentTextureImageUnits
+                   % maxFragmentTextureImageUnits
                    % maxVertexTextureImageUnits % maxCombinedTextureImageUnits);
         int maxMRT;
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &maxMRT);

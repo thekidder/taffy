@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_PIPELINEITEM_H
-#define SORE_PIPELINEITEM_H
+#ifndef SORE_PIPE_H
+#define SORE_PIPE_H
 
 #include <string>
 #include <vector>
