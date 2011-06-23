@@ -40,6 +40,12 @@ SORE_Graphics::RenderBatch::RenderBatch()
 {
 }
 
+SORE_Graphics::RenderBatch::RenderBatch(const RenderState& state)
+    : geometry(0), numberIndices(0),
+      indexOffset(0), bind(false), state(state)
+{
+}
+
 SORE_Graphics::RenderBatch::RenderBatch(
     const geometry_entry& geometry,
     const RenderState& state, bool bindVBO)

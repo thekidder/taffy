@@ -35,12 +35,12 @@
 #include <sore_logger.h>
 #include <sore_renderstate.h>
 
-SORE_Graphics::RenderState::RenderState() : commands(0)
+SORE_Graphics::RenderState::RenderState() : commands(0), renderbuffer(0)
 {
 }
 
 SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
-  : commands(0)
+  : commands(0), renderbuffer(0)
 {
     commands |= RENDER_CMD_CHANGE_CAMERA;
     camera = cam;
@@ -79,6 +79,8 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
     newState.camera = camera;
     newState.blend = blend;
     newState.shader = shader;
+    newState.renderbuffer = renderbuffer;
+    newState.colorbufferIndex = colorbufferIndex;
 
     if(old.camera != camera)
     {
@@ -123,6 +125,11 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
         newState.commands |= RENDER_CMD_CHANGE_PRIMITIVE;
     }
 
+    if(old.renderbuffer != renderbuffer)
+    {
+        newState.commands |= RENDER_CMD_CHANGE_FBO;
+    }
+
     return newState;
 }
 
@@ -155,7 +162,7 @@ void SORE_Graphics::RenderState::Apply() const
             break;
         case BLEND_SUBTRACTIVE:
         default: //treat unknown type as subtractive by default
-            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_DEPTH_TEST);
             blendSFactor = GL_SRC_ALPHA;
             blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
             break;
@@ -174,6 +181,27 @@ void SORE_Graphics::RenderState::Apply() const
     {
         uniforms.Bind(shader);
     }
+    if(commands & RENDER_CMD_CHANGE_FBO)
+    {
+        if(!renderbuffer)
+        {
+            FBO::Unbind();
+        }
+        else
+        {
+            renderbuffer->Bind();
+            if(colorbufferIndex >= 0)
+                renderbuffer->SelectBuffer(static_cast<unsigned int>(colorbufferIndex));
+        }
+    }
+}
+
+void SORE_Graphics::RenderState::SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_)
+{
+    renderbuffer = renderbuffer_;
+    colorbufferIndex = colorbufferIndex_;
+
+    commands |= RENDER_CMD_CHANGE_FBO;
 }
 
 void SORE_Graphics::RenderState::ChangeProjectionMatrix(

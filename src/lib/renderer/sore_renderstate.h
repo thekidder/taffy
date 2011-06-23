@@ -36,6 +36,7 @@
 #define SORE_RENDERERSTATE_H
 
 #include <sore_camera.h>
+#include <sore_fbo.h>
 #include <sore_renderable.h>
 
 namespace SORE_Graphics
@@ -43,24 +44,37 @@ namespace SORE_Graphics
     class RenderState
     {
     public:
-        //create an empty RenderState
+        // create an empty RenderState
         RenderState();
-        //set up state for rendering a single renderable
+        // set up state for rendering a single renderable
         RenderState(const Renderable& r, camera_info cam);
 
-        //create state based upon the differences between a previous state
-        //and a renderable
+        // create state based upon the differences between a previous state
+        // and a renderable
         RenderState Difference(const RenderState& old) const;
+        
+        // returns true if there is no state to apply
         bool Empty() const;
+        // apply the current state
         void Apply() const;
+
+        // change this renderstate:
+        // set the renderbuffer to render to
+        // colorbuffer is the index of the color buffer to select - if this is
+        // -1, no color buffer
+        void SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_ = -1);
     private:
-        const static unsigned int RENDER_CMD_NONE              = 0;
-        const static unsigned int RENDER_CMD_CHANGE_CAMERA     = 1;
-        const static unsigned int RENDER_CMD_CHANGE_BLEND_MODE = 2;
-        const static unsigned int RENDER_CMD_BIND_SHADER       = 4;
-        const static unsigned int RENDER_CMD_BIND_TEXTURE      = 8;
-        const static unsigned int RENDER_CMD_CHANGE_UNIFORMS   = 16;
-        const static unsigned int RENDER_CMD_CHANGE_PRIMITIVE  = 32;
+        enum Render_cmd_e
+        {
+            RENDER_CMD_NONE              = 0,
+            RENDER_CMD_CHANGE_CAMERA     = 1,
+            RENDER_CMD_CHANGE_BLEND_MODE = 2,
+            RENDER_CMD_BIND_SHADER       = 4,
+            RENDER_CMD_BIND_TEXTURE      = 8,
+            RENDER_CMD_CHANGE_UNIFORMS   = 16,
+            RENDER_CMD_CHANGE_PRIMITIVE  = 32,
+            RENDER_CMD_CHANGE_FBO        = 64
+        };
 
         void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera) const;
         void ChangeProjectionMatrix(const ProjectionInfo& proj) const;
@@ -75,6 +89,9 @@ namespace SORE_Graphics
         blend_mode blend;
 
         GLenum primitiveType;
+
+        FBO* renderbuffer;
+        int colorbufferIndex;
     };
 }
 

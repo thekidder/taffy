@@ -67,15 +67,17 @@ namespace SORE_Graphics
     public:
         // creates a no-op batch
         RenderBatch();
-        //sets command to either NONE or BIND_VBO
+        // create a batch that does nothing but set the state
+        RenderBatch(const RenderState& state);
+        // sets command to either NONE or BIND_VBO
         RenderBatch(const geometry_entry& geometry,
                     const RenderState& state, bool bindVBO = false);
 
         void AddIndices(unsigned int numIndices);
-        //returns number of polygons rendered
+        // returns number of polygons rendered
         unsigned int Render();
 
-        void EndDraw() const; //call at end of frame
+        void EndDraw() const; // call at end of frame
     private:
         GraphicsArray* geometry;
         unsigned int numberIndices;

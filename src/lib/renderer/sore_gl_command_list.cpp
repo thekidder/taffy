@@ -34,9 +34,15 @@
 
 #include <sore_gl_command_list.h>
 
+SORE_Graphics::GLCommandList::GLCommandList() : renderbuffer(0), colorbufferIndex(-1)
+{
+}
+
 void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geometry_entry& geometry, const camera_info& cam)
 {
     RenderState state(r, cam);
+    // apply current renderbuffer
+    state.SetRenderbuffer(renderbuffer, colorbufferIndex);
     state = state.Difference(currentState);
 
     if(currentGeometry.geometry != geometry.geometry || commandList.back().type == COMMAND)
@@ -73,15 +79,23 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
 
 void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command)
 {
+    // if we add a command, make sure to push the current state first
+    // e.x, when we issue a clear command, we want to make sure the current
+    // FBO is bound
+    currentState.SetRenderbuffer(renderbuffer, colorbufferIndex);
+    commandList.push_back(RenderBatch(currentState));
+
     commandList.push_back(command);
+}
+
+void SORE_Graphics::GLCommandList::SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_)
+{
+    renderbuffer = renderbuffer_;
+    colorbufferIndex = colorbufferIndex_;
 }
 
 void SORE_Graphics::GLCommandList::Render()
 {
-    //ENGINE_LOG(
-    //    SORE_Logging::LVL_INFO,
-    //    "End frame");
-
     numPolygons = 0;
     numDrawCalls = 0;
 
@@ -122,6 +136,12 @@ void SORE_Graphics::GLCommandList::ApplyRenderCommand(Render_command_t command)
     {
     case CLEAR_DEPTH_BUFFER:
         glClear(GL_DEPTH_BUFFER_BIT);
+        break;
+    case CLEAR_COLOR_BUFFER:
+        glClear(GL_COLOR_BUFFER_BIT);
+        break;
+    case CLEAR_COLOR_AND_DEPTH_BUFFERS:
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         break;
     default:
         break;

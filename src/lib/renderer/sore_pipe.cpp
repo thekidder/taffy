@@ -44,46 +44,50 @@ void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)
     children.push_back(child);
 }
 
-void SORE_Graphics::Pipe::Setup()
+void SORE_Graphics::Pipe::Setup(Renderbuffer_map_t& renderBuffers)
 {
-    doSetup();
+    doSetup(renderBuffers);
 
     pipe_vector::iterator i;
     for(i = children.begin(); i != children.end(); ++i)
     {
-        i->Setup();
+        i->Setup(renderBuffers);
     }
 }
 
 void SORE_Graphics::Pipe::Render
 (
     const camera_table& cameras,
+    Renderbuffer_map_t& renderbuffers,
     render_list& list,
     GLCommandList& renderQueue,
     BufferManager* bm
 )
 {
-    render_list& newList = doRender(cameras, list, renderQueue, bm);
+    render_list& newList = beginRender(cameras, renderbuffers, list, renderQueue, bm);
 
     pipe_vector::iterator i;
     for(i = children.begin(); i != children.end(); ++i)
     {
-        i->Render(cameras, newList, renderQueue, bm);
+        i->Render(cameras, renderbuffers, newList, renderQueue, bm);
     }
+
+    finishRender(cameras, renderbuffers, list, renderQueue, bm);
 }
 
 SORE_Graphics::SortingPipe::SortingPipe(sorting_predicate comp) : comparator(comp)
 {
 }
 
-void SORE_Graphics::SortingPipe::doSetup()
+void SORE_Graphics::SortingPipe::doSetup(Renderbuffer_map_t& renderBuffers)
 {
     sortedList.clear();
 }
 
-SORE_Graphics::render_list& SORE_Graphics::SortingPipe::doRender
+SORE_Graphics::render_list& SORE_Graphics::SortingPipe::beginRender
 (
     const camera_table& cameras,
+    Renderbuffer_map_t& renderbuffers,
     render_list& list,
     GLCommandList& renderQueue,
     BufferManager* bm
@@ -110,13 +114,10 @@ bool SORE_Graphics::KeywordFilter::operator()(const Renderable& r) const
     return r.HasKeyword(keyword);
 }
 
-void SORE_Graphics::NullPipe::doSetup()
-{
-}
-
-SORE_Graphics::render_list& SORE_Graphics::NullPipe::doRender
+SORE_Graphics::render_list& SORE_Graphics::NullPipe::beginRender
 (
     const camera_table& cameras,
+    Renderbuffer_map_t& renderbuffers,
     render_list& list,
     GLCommandList& renderQueue,
     BufferManager* bm
@@ -130,13 +131,10 @@ SORE_Graphics::RenderPipe::RenderPipe(const std::string& cameraName) : camera(ca
 {
 }
 
-void SORE_Graphics::RenderPipe::doSetup()
-{
-}
-
-SORE_Graphics::render_list& SORE_Graphics::RenderPipe::doRender
+SORE_Graphics::render_list& SORE_Graphics::RenderPipe::beginRender
 (
     const camera_table& cameras,
+    Renderbuffer_map_t& renderBuffers,
     render_list& list,
     GLCommandList& renderQueue,
     BufferManager* bm
@@ -162,14 +160,15 @@ SORE_Graphics::FilterPipe::FilterPipe(filter_predicate filterFunction) : filter(
 {
 }
 
-void SORE_Graphics::FilterPipe::doSetup()
+void SORE_Graphics::FilterPipe::doSetup(Renderbuffer_map_t& renderBuffers)
 {
     newList.clear();
 }
 
-SORE_Graphics::render_list& SORE_Graphics::FilterPipe::doRender
+SORE_Graphics::render_list& SORE_Graphics::FilterPipe::beginRender
 (
     const camera_table& cameras,
+    Renderbuffer_map_t& renderBuffers,
     render_list& list,
     GLCommandList& renderQueue,
     BufferManager* bm

@@ -39,6 +39,8 @@
 
 namespace SORE_Graphics
 {
+    bool FBO::bound = false;
+
     FBO::FBO(unsigned int w, unsigned int h, bool depthBuffer, unsigned int colorBuffers)
         : width(w), height(h), depth(depthBuffer), numColorBuffers(colorBuffers), colorBuffers(0)
     {
@@ -68,12 +70,17 @@ namespace SORE_Graphics
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
         glPushAttrib(GL_VIEWPORT_BIT);
         glViewport(0, 0, width, height);
+
+        bound = true;
     }
 
     void FBO::Unbind()
     {
-        glPopAttrib();
+        if(bound)
+            glPopAttrib();
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        bound = false;
     }
 
     void FBO::BindBuffer(unsigned int buf)

@@ -35,21 +35,23 @@
 #ifndef SORE_PIPE_H
 #define SORE_PIPE_H
 
-#include <string>
-#include <vector>
+#include <sore_buffermanager.h>
+#include <sore_camera.h>
+#include <sore_dll.h>
+#include <sore_fbo.h>
+#include <sore_gl_command_list.h>
+#include <sore_renderable.h>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/unordered_map.hpp>
 
-#include <sore_buffermanager.h>
-#include <sore_camera.h>
-#include <sore_dll.h>
-#include <sore_gl_command_list.h>
-#include <sore_renderable.h>
+#include <string>
+#include <vector>
 
 namespace SORE_Graphics
 {
     typedef std::vector<Renderable> render_list;
+    typedef boost::unordered_map<std::string, FBO*> Renderbuffer_map_t;
 
     class SORE_EXPORT Pipe
     {
@@ -64,9 +66,10 @@ namespace SORE_Graphics
         */
         void AddChildPipe(Pipe* pipe);
 
-        void Setup();
+        void Setup(Renderbuffer_map_t& renderBuffers);
         void Render(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm);
@@ -74,12 +77,19 @@ namespace SORE_Graphics
         /*
           Virtual setup/render functions to be implemented by Pipe implementations
         */
-        virtual void doSetup() {}
-        virtual render_list& doRender(
+        virtual void doSetup(Renderbuffer_map_t& renderBuffers) {}
+        virtual render_list& beginRender(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm) { return list; }
+        virtual void finishRender(
+            const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
+            render_list& list,
+            GLCommandList& renderQueue,
+            BufferManager* bm) {}
     private:
         typedef boost::ptr_vector<Pipe> pipe_vector;
         pipe_vector children;
@@ -97,9 +107,9 @@ namespace SORE_Graphics
     {
     public:
     protected:
-        virtual void doSetup();
-        virtual render_list& doRender(
+        virtual render_list& beginRender(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm);
@@ -110,9 +120,9 @@ namespace SORE_Graphics
     public:
         RenderPipe(const std::string& cameraName);
     protected:
-        virtual void doSetup();
-        virtual render_list& doRender(
+        virtual render_list& beginRender(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm);
@@ -132,9 +142,10 @@ namespace SORE_Graphics
     public:
         SortingPipe(sorting_predicate comp = renderableSort);
     protected:
-        virtual void doSetup();
-        virtual render_list& doRender(
+        virtual void doSetup(Renderbuffer_map_t& renderBuffers);
+        virtual render_list& beginRender(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm);
@@ -165,9 +176,10 @@ namespace SORE_Graphics
     public:
         FilterPipe(filter_predicate filterFunction);
     protected:
-        virtual void doSetup();
-        virtual render_list& doRender(
+        virtual void doSetup(Renderbuffer_map_t& renderBuffers);
+        virtual render_list& beginRender(
             const camera_table& cameras,
+            Renderbuffer_map_t& renderbuffers,
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm);

@@ -56,8 +56,8 @@ namespace SORE_Graphics
         void Bind();
         //draw to a buffer
         void SelectBuffer(unsigned int buf);
-        //unbind this FBOs
-        void Unbind();
+        //unbind all FBOs
+        static void Unbind();
 
     private:
         void CreateBuffers();
@@ -70,6 +70,10 @@ namespace SORE_Graphics
 
         unsigned int numColorBuffers;
         GLuint* colorBuffers;
+
+        // ugly hack to keep track of whether or not a buffer is bound, and we
+        // need to glPopAttrib when we unbind
+        static bool bound;
     };
 }
 

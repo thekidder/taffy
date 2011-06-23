@@ -32,12 +32,14 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <boost/foreach.hpp>
 
 #include <sore_aggregatebuffermanager.h>
+#include <sore_fbo.h>
 #include <sore_gl_command_list.h>
 #include <sore_pipeline_renderer.h>
 #include <sore_timing.h>
+
+#include <boost/foreach.hpp>
 
 SORE_Graphics::PipelineRenderer::PipelineRenderer()
 {
@@ -54,7 +56,7 @@ void SORE_Graphics::PipelineRenderer::Render()
 
     AggregateBufferManager bufferManager;
 
-    //collect geometry
+    // collect geometry
     render_list renderables;
     BOOST_FOREACH(GeometryProvider* gp, geometry)
     {
@@ -68,7 +70,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     screenInfo.height = height;
     screenInfo.ratio = static_cast<float>(width) / height;
 
-    //get current cameras
+    // get current cameras
     camera_table cameraTable;
     typedef std::pair<std::string, camera_callback> cam;
     BOOST_FOREACH(cam c, cameras)
@@ -77,20 +79,23 @@ void SORE_Graphics::PipelineRenderer::Render()
         cameraTable[c.first].projection = SetupProjection(cameraTable[c.first].projection, screenInfo);
     }
 
+    // setup render buffers map
+    Renderbuffer_map_t renderbuffers;
+
     GLCommandList renderQueue;
 
-    //render using current pipeline
+    // render using current pipeline
     glEnable(GL_BLEND);
 
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    pipeline->Setup();
-    pipeline->Render(cameraTable, renderables, renderQueue, &bufferManager);
+    pipeline->Setup(renderbuffers);
+    pipeline->Render(cameraTable, renderbuffers, renderables, renderQueue, &bufferManager);
 
     renderQueue.Render();
 
-    //collect rendering stats
+    // collect rendering stats
     numPolys = renderQueue.NumPolygons();
     numDrawCalls = renderQueue.NumDrawCalls();
 

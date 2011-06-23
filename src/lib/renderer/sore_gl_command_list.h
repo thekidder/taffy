@@ -59,11 +59,15 @@ namespace SORE_Graphics
     class SORE_EXPORT GLCommandList
     {
     public:
+        GLCommandList();
+
         void AddRenderable(
             const Renderable& r,
             const geometry_entry& geometry,
             const camera_info& cam);
         void AddCommand(Render_command_t command);
+
+        void SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_ = -1);
 
         void Render();
 
@@ -90,6 +94,7 @@ namespace SORE_Graphics
                 command = c;
             }
             Render_command_type_t type;
+
             RenderBatch batch;
             Render_command_t command;
         };
@@ -98,6 +103,10 @@ namespace SORE_Graphics
         RenderState currentState;
         geometry_entry currentGeometry;
         SORE_Math::Matrix4<float> currentTransform;
+
+        // keep track of current render target
+        FBO* renderbuffer;
+        int colorbufferIndex;
 
         //command list
         std::vector<Command> commandList;

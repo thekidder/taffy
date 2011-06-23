@@ -35,11 +35,6 @@
 #ifndef SORE_PIPELINE_RENDERER_H
 #define SORE_PIPELINE_RENDERER_H
 
-#include <stack>
-#include <vector>
-
-#include <boost/shared_ptr.hpp>
-
 #include <sore_buffermanager.h>
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
@@ -47,6 +42,12 @@
 #include <sore_renderer.h>
 #include <sore_screeninfo.h>
 #include <sore_util.h>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
+
+#include <stack>
+#include <vector>
 
 namespace SORE_Graphics
 {
