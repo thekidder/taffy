@@ -44,9 +44,14 @@ namespace SORE_Resource
 {
     Texture2D::Texture2D(const void* data, GLint internalFormat,
                          GLenum format, unsigned int width, unsigned int height)
-        : handle(0)
+        : handle(0), external(false)
     {
         LoadFromData(data, internalFormat, format, width, height);
+    }
+
+    Texture2D::Texture2D(GLuint handle_)
+        : handle(handle_), external(true), w(0), h(0)
+    {
     }
 
     Texture2D::~Texture2D()
@@ -162,7 +167,8 @@ namespace SORE_Resource
 
     void Texture2D::Unload()
     {
-        glDeleteTextures(1, &handle);
+        if(!external)
+            glDeleteTextures(1, &handle);
         handle = 0;
     }
 

@@ -48,7 +48,7 @@ namespace SORE_GUI
 
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
-        SetTexture(bg);
+        //SetTexture(bg);
     }
 
     SliderWidget::~SliderWidget()

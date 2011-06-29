@@ -15,7 +15,6 @@ set(SORE_RENDERER_SRCS
     renderer/sore_renderable.cpp 
     renderer/sore_renderstate.cpp 
     renderer/sore_simplebuffermanager.cpp
-    renderer/sore_sprite.cpp
     renderer/sore_texturestate.cpp
     renderer/sore_uniformstate.cpp 
     renderer/sore_vbo.cpp
@@ -41,7 +40,6 @@ set(SORE_RENDERER_HEADERS
     renderer/sore_renderer.h
     renderer/sore_renderstate.h
     renderer/sore_simplebuffermanager.h
-    renderer/sore_sprite.h
     renderer/sore_texturestate.h
     renderer/sore_uniformstate.h
     renderer/sore_vbo.h

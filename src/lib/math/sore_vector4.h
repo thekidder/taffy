@@ -32,12 +32,12 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef _SORE_VECTOR4_H_
-#define _SORE_VECTOR4_H_
-
-#include <cassert>
+#ifndef SORE_VECTOR4_H
+#define SORE_VECTOR4_H
 
 #include <sore_vector3.h>
+
+#include <cassert>
 
 namespace SORE_Math
 {

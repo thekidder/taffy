@@ -58,6 +58,8 @@ SORE_GUI::Checkbox::Checkbox(SUnit size, SVec position, Widget* parent)
 
 void SORE_GUI::Checkbox::SetChecked(bool isChecked_)
 {
+    if(isChecked == isChecked_)
+        return;
     isChecked = isChecked_;
     checkedSignal(isChecked);
 }

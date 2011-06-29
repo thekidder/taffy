@@ -41,14 +41,15 @@
 #pragma warning( disable : 4251 )
 #endif
 
-#include <vector>
-#include <map>
-#include <cstdio>
-#include <string>
+
+#include <sore_dll.h>
 
 #include <boost/format.hpp>
 
-#include <sore_dll.h>
+#include <cstdio>
+#include <map>
+#include <string>
+#include <vector>
 
 #ifndef _WIN32
 #define ENGINE_LOG(lvl, format) SORE_Logging::sore_log.Log(lvl, __LINE__, __PRETTY_FUNCTION__, __FILE__, format)

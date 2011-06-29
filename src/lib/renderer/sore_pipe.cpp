@@ -148,7 +148,7 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::beginRender
 
     const camera_info& cam = cameras.find(camera)->second;
 
-    BOOST_FOREACH(Renderable r, list)
+    BOOST_FOREACH(const Renderable& r, list)
     {
         renderQueue.AddRenderable(r, bm->LookupGC(r.GetGeometryChunk()), cam);
     }

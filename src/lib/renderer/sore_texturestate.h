@@ -35,33 +35,77 @@
 #ifndef SORE_TEXTURESTATE_H
 #define SORE_TEXTURESTATE_H
 
-#include <map>
-#include <string>
-
-#include <boost/functional/hash.hpp>
-
 #include <sore_dll.h>
 #include <sore_glslshader.h>
 #include <sore_texture2d.h>
+
+#include <boost/functional/hash.hpp>
+
+#include <map>
+#include <set>
+#include <string>
 
 namespace SORE_Graphics
 {
     class SORE_EXPORT TextureState
     {
     public:
+        struct TextureObject
+        {
+            TextureObject(const std::string& s = "") : ready(false), name(s) {}
+            TextureObject(const std::string& s, SORE_Resource::Texture2DPtr t) 
+                : ready(t), name(s), texture(t) {}
+            TextureObject(SORE_Resource::Texture2DPtr t) : ready(t), texture(t) {}
+
+            bool ready;
+            std::string name;
+            SORE_Resource::Texture2DPtr texture;
+        };
+
+        struct TextureObjectComparator
+        {
+            bool operator()(const TextureObject& one, const TextureObject& two) const
+            {
+                if(one.ready && !two.ready)
+                    return true;
+                else if(two.ready && !one.ready)
+                    return false;
+                else if(one.ready && two.ready)
+                    return one.texture->Handle() < two.texture->Handle();
+                else
+                    return one.name < two.name;
+            }
+        };
+
+        TextureState();
+
         void Bind(SORE_Resource::GLSLShaderPtr s) const;
 
-        void AddTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr tex);
+        void AddTexture(const std::string& samplerName, const TextureObject& texture);
+        void SetTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr tex);
 
-        bool Empty() const; //returns true if there are no uniforms
+        // returns true if there are no textures
+        bool Empty() const; 
+        // returns true if all texture names have textures bound to them
+        bool Ready() const { return unreadyTextures.empty(); }
+
+        typedef std::map<std::string, std::string> Unready_texture_map_t;
+        const Unready_texture_map_t& UnreadyTextures() const { return unreadyTextures; }
+
         std::size_t GetSortKey() const;
 
-        //returns all textures in this not in o
+        // returns all textures in this not in o
         TextureState GetDiff(const TextureState& o) const;
     private:
-        std::map<std::string, SORE_Resource::Texture2DPtr> textures;
+        void ComputeHash();
+
+        typedef std::map<std::string, TextureObject, TextureObjectComparator> Texture_map_t;
+        Texture_map_t textures;
 
         std::size_t cachedHash;
+
+
+        Unready_texture_map_t unreadyTextures;
     };
 
     typedef boost::shared_ptr<TextureState> TextureStatePtr;

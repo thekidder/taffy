@@ -44,15 +44,14 @@
 
 SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader)
     : current_texture(default_texture), current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
-    current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES)
+    current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES), halfWidth(512.0f)
 {
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetTexture(SORE_Resource::Texture2DPtr texture)
+void SORE_Graphics::ImmediateModeProvider::SetTexture(const SORE_Graphics::TextureState::TextureObject& texture)
 {
-    if(current_texture && texture && texture == current_texture)
-        return;
-    if(!current_texture && !texture)
+    TextureState::TextureObjectComparator comp;
+    if(!comp(texture, current_texture) && !comp(current_texture, texture))
         return;
     CreateRenderableFromData();
     current_texture = texture;
@@ -91,14 +90,6 @@ void SORE_Graphics::ImmediateModeProvider::SetBlendMode(SORE_Graphics::blend_mod
     current_blend_mode = blend_mode;
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
-{
-    if(type == current_primitive_type)
-        return;
-    CreateRenderableFromData();
-    current_primitive_type = type;
-}
-
 void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, int i)
 {
     currentUniforms.SetVariable(name, i);
@@ -127,6 +118,22 @@ void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, c
 void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Matrix4<float>& m)
 {
     currentUniforms.SetVariable(name, m);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
+{
+    if(type == current_primitive_type)
+        return;
+    CreateRenderableFromData();
+    current_primitive_type = type;
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords_)
+{
+    if(keywords != keywords_)
+        CreateRenderableFromData();
+
+    keywords = keywords_;
 }
 
 void SORE_Graphics::ImmediateModeProvider::Start()
@@ -183,6 +190,17 @@ void SORE_Graphics::ImmediateModeProvider::DrawLine(
     indices.push_back(current_index + 1);
 }
 
+void SORE_Graphics::ImmediateModeProvider::DrawPoint(
+    float x1, float y1, float z1, float size)
+{
+    unsigned short current_index = SetupDraw(GL_POINTS);
+
+    SetUniform("halfWidth", halfWidth);
+    AddVertex(x1, y1, z1);
+    vertices.back().normx = size;
+    indices.push_back(current_index);
+}
+
 void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z, SORE_Resource::FontPtr face, unsigned int height, const std::string& string)
 {
     SetupDraw(GL_TRIANGLES);
@@ -192,7 +210,7 @@ void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z,
     {
         const SORE_Resource::CharInfo& char_info = face->GetCharacter(height, *it);
 
-        if(char_info.texture)
+        if(char_info.texture.texture)
         {
             vertex temp[4];
             const vertex* src = char_info.vertices;
@@ -245,18 +263,20 @@ std::vector<SORE_Graphics::Renderable>::iterator SORE_Graphics::ImmediateModePro
     return renderables.end();
 }
 
+bool SORE_Graphics::ImmediateModeProvider::OnResize(const SORE_Kernel::Event& e)
+{
+    if(e.type == SORE_Kernel::RESIZE)
+    {
+        halfWidth = e.resize.w / 2.0f;
+        return true;
+    }
+    return false;
+}
+
 void SORE_Graphics::ImmediateModeProvider::SetTexCoords(float i, float j)
 {
     current_texcoords.first = i;
     current_texcoords.second = j;
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords_)
-{
-    if(keywords != keywords_)
-        CreateRenderableFromData();
-
-    keywords = keywords_;
 }
 
 void SORE_Graphics::ImmediateModeProvider::AddVertex(float x, float y, float z)
@@ -307,8 +327,7 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
 
     Renderable r(geometry, current_shader, current_transform, current_blend_mode);
-    if(current_texture)
-        r.AddTexture("texture", current_texture);
+    r.AddTexture("texture", current_texture);
 
     r.Uniforms() = currentUniforms;
 

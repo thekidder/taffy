@@ -38,9 +38,15 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_NAME} DESTINATION .)
 SET(
   DEFAULT_RESOURCES_SRCS 
   Fonts/default.ttf
+
   Shaders/default.shad 
   Shaders/default_fragment.glsl
   Shaders/default_vertex.glsl
+
+  Shaders/point_sprite.shad 
+  Shaders/point_sprite_fragment.glsl
+  Shaders/point_sprite_vertex.glsl
+
   Textures/default.tga)
 
 SET(OUTPUT_NAME default_resources.sdp)

@@ -32,17 +32,14 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef  SORE_MATH_H
-#define  SORE_MATH_H
+#ifndef SORE_MATH_H
+#define SORE_MATH_H
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
+#include <sore_matrix4x4.h>
+#include <sore_quaternion.h>
 #include <sore_vector2.h>
 #include <sore_vector3.h>
 #include <sore_vector4.h>
-#include <sore_matrix4x4.h>
-#include <sore_quaternion.h>
 
 namespace SORE_Math
 {

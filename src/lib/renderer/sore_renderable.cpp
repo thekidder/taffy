@@ -36,8 +36,6 @@
 
 SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
 {
-    textures = TextureStatePtr(new TextureState());
-    uniforms = UniformStatePtr(new UniformState());
 }
 
 SORE_Graphics::Renderable::Renderable(
@@ -46,9 +44,6 @@ SORE_Graphics::Renderable::Renderable(
     : geometry(g), shader(s), transformation(trans),
       blending(b), cachedDepth(0.0f), sortKey(0)
 {
-    textures = TextureStatePtr(new TextureState());
-    uniforms = UniformStatePtr(new UniformState());
-
     CalculateDepth();
     CalculateSortKey();
 }
@@ -76,15 +71,28 @@ SORE_Resource::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
 }
 
 void SORE_Graphics::Renderable::AddTexture(
-    const std::string& samplerName, SORE_Resource::Texture2DPtr t)
+    const std::string& samplerName, 
+    const TextureState::TextureObject& texture)
 {
-    textures->AddTexture(samplerName, t);
+    textures.AddTexture(samplerName, texture);
     CalculateSortKey();
 }
 
-const SORE_Graphics::TextureState& SORE_Graphics::Renderable::GetTextures() const
+void SORE_Graphics::Renderable::SetTexture(
+    const std::string& samplerName, 
+    SORE_Resource::Texture2DPtr texture)
 {
-    return *textures;
+    textures.SetTexture(samplerName, texture);
+}
+
+const SORE_Graphics::TextureState& SORE_Graphics::Renderable::Textures() const
+{
+    return textures;
+}
+
+SORE_Graphics::TextureState& SORE_Graphics::Renderable::Textures()
+{
+    return textures;
 }
 
 void SORE_Graphics::Renderable::MulitplyTransform(TransformationPtr t)
@@ -119,12 +127,12 @@ SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
 
 SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms()
 {
-    return *uniforms;
+    return uniforms;
 }
 
 const SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms() const
 {
-    return *uniforms;
+    return uniforms;
 }
 
 int SORE_Graphics::Renderable::GetSortKey() const
@@ -176,7 +184,7 @@ void SORE_Graphics::Renderable::CalculateSortKey() const
     sortKey |= (depth & 0xFFF) << (keyLen - 2 - 3 - 12);
     if(shader)
         sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
-    sortKey |= ((textures->GetSortKey() % 512)); //9 bits for texture
+    sortKey |= ((textures.GetSortKey() % 512)); //9 bits for texture
 }
 
 

@@ -35,7 +35,6 @@
 #include <sore_geometry.h>
 #include <sore_glslshader_loader.h>
 #include <sore_logger.h>
-#include <sore_sprite.h>
 #include <sore_framewidget.h>
 #include <sore_texture2d_loader.h>
 
@@ -45,7 +44,11 @@ namespace SORE_GUI
         : Widget(s, p, parent_), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
-        texture = textureCache.Get(Style()["FrameWidget"]["texture"].asString());
+        std::string textureName = Style()["FrameWidget"]["texture"].asString();
+
+        texture = SORE_Graphics::TextureState::TextureObject(
+            textureName,
+            textureCache.Get(textureName));
         shader = shaderCache.Get(Style()["FrameWidget"]["shader"].asString());
     }
 
@@ -77,7 +80,7 @@ namespace SORE_GUI
         };
     }
 
-    void FrameWidget::SetTexture(SORE_Resource::Texture2DPtr tex)
+    void FrameWidget::SetTexture(const SORE_Graphics::TextureState::TextureObject& tex)
     {
         texture = tex;
     }

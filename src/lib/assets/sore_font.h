@@ -45,7 +45,7 @@
 #include <sore_assettypes.h>
 #include <sore_matrix4x4.h>
 #include <sore_geometrychunk.h>
-#include <sore_texture2d.h>
+#include <sore_texturestate.h>
 
 //freetype
 #include <ft2build.h>
@@ -67,9 +67,9 @@ namespace SORE_Resource
 
     struct CharInfo
     {
-        // two ways to draw: draw the given Renderable, or construct one using vertices and texture
+        // construct a renderable using the given vertices and texture
         SORE_Graphics::vertex vertices[4];
-        Texture2DPtr texture;
+        SORE_Graphics::TextureState::TextureObject texture;
         float advance;
     };
 

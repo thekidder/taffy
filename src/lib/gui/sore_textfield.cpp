@@ -35,7 +35,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include <sore_geometry.h>
-#include <sore_sprite.h>
 #include <sore_timing.h>
 #include <sore_textfield.h>
 
@@ -49,7 +48,7 @@ namespace SORE_GUI
         styleDir += StyleName() + "/";
 
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
-        SetTexture(texture);
+        //SetTexture(texture);
         //SetShader(shad);
 
         float height = GetSize(VERTICAL) - 16.0f;

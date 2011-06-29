@@ -34,29 +34,51 @@
 
 #include <sore_texturestate.h>
 
+SORE_Graphics::TextureState::TextureState() : cachedHash(0)
+{
+}
+
 void SORE_Graphics::TextureState::Bind(SORE_Resource::GLSLShaderPtr s) const
 {
-    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
+    Texture_map_t::const_iterator it;
     int i;
-    for(i = 0,it = textures.begin(); it!= textures.end(); ++it,++i)
+    for(i = 0,it = textures.begin(); it != textures.end(); ++it)
     {
-        it->second->Bind(s, it->first, i);
+        if(it->second.ready)
+        {
+            it->second.texture->Bind(s, it->first, i);
+            ++i;
+        }
     }
 }
 
 void SORE_Graphics::TextureState::AddTexture(
-    const std::string& samplerName, SORE_Resource::Texture2DPtr tex)
+    const std::string& samplerName, 
+    const TextureObject& texture)
 {
-    textures[samplerName] = tex;
-    cachedHash = 0;
-    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
-    for(it = textures.begin(); it != textures.end(); ++it)
+    textures[samplerName] = texture;
+    
+    ComputeHash();
+
+    if(!texture.ready)
+        unreadyTextures.insert(std::make_pair(samplerName, texture.name));
+}
+
+void SORE_Graphics::TextureState::SetTexture(
+    const std::string& samplerName, 
+    SORE_Resource::Texture2DPtr tex)
+{
+    Texture_map_t::iterator it = textures.find(samplerName);
+    if(it != textures.end())
     {
-        if(it->second)
-        {
-            boost::hash_combine(cachedHash, it->second->GetHandle());
-        }
+        it->second.ready = true;
+        it->second.texture = tex;
     }
+
+    ComputeHash();
+
+    if(unreadyTextures.find(samplerName) != unreadyTextures.end())
+        unreadyTextures.erase(samplerName);
 }
 
 bool SORE_Graphics::TextureState::Empty() const
@@ -73,18 +95,52 @@ SORE_Graphics::TextureState SORE_Graphics::TextureState::GetDiff(
     const TextureState& o) const
 {
     TextureState r;
-    std::map<std::string, SORE_Resource::Texture2DPtr>::const_iterator it;
-    for(it = textures.begin(); it != textures.end(); ++it)
+    Texture_map_t::const_iterator it;
+    int index_this = 0;
+    for(it = textures.begin(); it != textures.end(); ++it, ++index_this)
     {
         if(o.textures.find(it->first) == o.textures.end())
         {
             r.AddTexture(it->first, it->second);
             continue;
         }
-        const SORE_Resource::Texture2DPtr& t = o.textures.find(it->first)->second;
-        const SORE_Resource::Texture2DPtr& t2 = it->second;
-        if(t != t2)
+        // the texture exists in the both states, need to check which texture
+        // unit it is bound to
+        // FIXME: we should clean this up so this case is more efficient. We don't
+        // always need to rebind, we just need a way to keep track of which texture
+        // unit we bind what to
+        else
+        {
+            Texture_map_t::const_iterator jt;
+            int index_o;
+            for(index_o = 0, jt = o.textures.begin(); jt->first != it->first; ++jt, ++index_o);
+
+            if(index_this != index_o)
+                r.AddTexture(it->first, it->second);
+        }
+
+        TextureObjectComparator comp;
+
+        const TextureObject& t = o.textures.find(it->first)->second;
+        const TextureObject& t2 = it->second;
+        // if the two textures are unequal, add to the difference
+        if(comp(t, t2) || comp(t2, t))
+        {
             r.AddTexture(it->first, it->second);
+        }
     }
     return r;
+}
+
+void SORE_Graphics::TextureState::ComputeHash()
+{
+    cachedHash = 0;
+    Texture_map_t::const_iterator it;
+    for(it = textures.begin(); it != textures.end(); ++it)
+    {
+        if(it->second.ready)
+            boost::hash_combine(cachedHash, it->second.texture->Handle());
+        else
+            boost::hash_combine(cachedHash, it->second.name);
+    }
 }

@@ -84,6 +84,7 @@ namespace SORE_GUI
         if(e.type == SORE_Kernel::RESIZE)
         {
             UpdateResolution(e.resize.w, e.resize.h);
+            imm_mode.OnResize(e);
             return true;
         }
         return false;

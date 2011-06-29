@@ -32,8 +32,8 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef _SORE_VECTOR3_H_
-#define _SORE_VECTOR3_H_
+#ifndef SORE_VECTOR3_H
+#define SORE_VECTOR3_H
 
 #include <cassert>
 

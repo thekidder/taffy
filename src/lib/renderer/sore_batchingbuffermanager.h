@@ -71,7 +71,7 @@ namespace SORE_Graphics
     private:
          struct geometry_buffer
          {
-             geometry_buffer(geometry_type type) : buffer(type, true, true, false) {}
+             geometry_buffer(geometry_type type) : buffer(type, true, true, true) {}
 
              GraphicsArrayClass buffer;
              bool needsRebuild;

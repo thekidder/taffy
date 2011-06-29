@@ -59,6 +59,8 @@ namespace SORE_Graphics
         //unbind all FBOs
         static void Unbind();
 
+        unsigned int Handle() const;
+
     private:
         void CreateBuffers();
         void DestroyBuffers();

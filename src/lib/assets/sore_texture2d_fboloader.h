@@ -32,83 +32,23 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_sprite.h>
+#ifndef SORE_TEXTURE2D_FBOLOADER_H
+#define SORE_TEXTURE2D_FBOLOADER_H
 
-SORE_Graphics::Renderable SORE_Graphics::MakeSprite(
-        SORE_Math::Rect<float> bounds,
-        SORE_Math::Rect<float> texCoords,
-        float z,
-        SORE_Resource::Texture2DPtr texture,
-        SORE_Resource::GLSLShaderPtr shader,
-        blend_mode b)
+#include <sore_pipe.h>
+
+namespace SORE_Resource
 {
-    GeometryChunkPtr g(new GeometryChunk(4, 6, GL_TRIANGLES));
-    unsigned short* const indices = g->GetIndices();
-    vertex* const vertices = g->GetVertices();
+    class Texture2DFBOLoader
+    {
+    public:
+        Texture2DFBOLoader(const SORE_Graphics::Renderbuffer_map_t& renderbuffers_);
 
-    indices[0] = 0;
-    indices[1] = 1;
-    indices[2] = 2;
-    indices[3] = 2;
-    indices[4] = 1;
-    indices[5] = 3;
-
-    vertices[0].x = bounds.topLeft[0];
-    vertices[0].y = bounds.topLeft[1];
-    vertices[0].z = z;
-    vertices[0].tex0i = texCoords.topLeft[0];
-    vertices[0].tex0j = texCoords.topLeft[1];
-
-    vertices[1].x = bounds.topLeft[0];
-    vertices[1].y = bounds.bottomRight[1];
-    vertices[1].z = z;
-    vertices[1].tex0i = texCoords.topLeft[0];
-    vertices[1].tex0j = texCoords.bottomRight[1];
-
-    vertices[2].x = bounds.bottomRight[0];
-    vertices[2].y = bounds.topLeft[1];
-    vertices[2].z = z;
-    vertices[2].tex0i = texCoords.bottomRight[0];
-    vertices[2].tex0j = texCoords.topLeft[1];
-
-    vertices[3].x = bounds.bottomRight[0];
-    vertices[3].y = bounds.bottomRight[1];
-    vertices[3].z = z;
-    vertices[3].tex0i = texCoords.bottomRight[0];
-    vertices[3].tex0j = texCoords.bottomRight[1];
-
-    g->SetColor(White);
-
-    TransformationPtr transformation(new SORE_Math::Matrix4<float>());
-    Renderable r(g, shader, transformation, b);
-    if(texture)
-        r.AddTexture("texture", texture);
-    return r;
+        Texture2D* LoadProxy();
+        Texture2D* Load(const std::string& name);
+    private:
+        const SORE_Graphics::Renderbuffer_map_t& renderbuffers;
+    };
 }
 
-SORE_Graphics::Renderable SORE_Graphics::MakePointSprite(
-        SORE_Math::Vector3<float> position,
-        float size,
-        SORE_Resource::Texture2DPtr texture,
-        SORE_Resource::GLSLShaderPtr shader,
-        blend_mode b)
-{
-    GeometryChunkPtr g(new GeometryChunk(1, 1, GL_POINTS));
-    unsigned short* const indices = g->GetIndices();
-    vertex* const vertices = g->GetVertices();
-
-    indices[0] = 0;
-
-    vertices[0].x = position[0];
-    vertices[0].y = position[1];
-    vertices[0].z = position[2];
-   
-    g->SetColor(White);
-
-    TransformationPtr transformation(new SORE_Math::Matrix4<float>());
-    Renderable r(g, shader, transformation, b);
-    if(texture)
-        r.AddTexture("texture", texture);
-    r.Uniforms().SetVariable("pointSize", size);
-    return r;
-}
+#endif

@@ -63,7 +63,7 @@ namespace SORE_GUI
 
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
-        SetTexture(normal);
+        //SetTexture(normal);
         //SetShader(shad);
     }
 
@@ -121,15 +121,15 @@ namespace SORE_GUI
         if(e.type == SORE_Kernel::MOUSEENTER)
         {
             inArea = true;
-            if(!pressed)
-                SetTexture(hover);
+            /*if(!pressed)
+                SetTexture(hover);*/
             return true;
         }
         else if(e.type == SORE_Kernel::MOUSELEAVE)
         {
             inArea = false;
-            if(!pressed)
-                SetTexture(normal);
+            //if(!pressed)
+            //    SetTexture(normal);
             return true;
         }
         else if(e.type == SORE_Kernel::MOUSEBUTTONDOWN)
@@ -137,7 +137,7 @@ namespace SORE_GUI
             pressed = true;
             /*t->SetTransform(t->GetTransform() *
                             SORE_Math::Matrix4<float>::GetTranslation(2.0, 2.0, 0.0f));*/
-            SetTexture(active);
+            //SetTexture(active);
             return true;
         }
         else if(e.type == SORE_Kernel::MOUSEBUTTONUP)
@@ -146,10 +146,10 @@ namespace SORE_GUI
             //t->SetTransform(t->GetTransform() *
             //                SORE_Math::Matrix4<float>::GetTranslation(-2.0f,
             //                                                          -2.0f, 0.0f));
-            if(inArea)
-                SetTexture(hover);
-            else
-                SetTexture(normal);
+            //if(inArea)
+            //    SetTexture(hover);
+            //else
+            //    SetTexture(normal);
             onRelease();
             return true;
         }

@@ -35,12 +35,13 @@
 #ifndef SORE_IMMEDIATE_MODE_PROVIDER_H
 #define SORE_IMMEDIATE_MODE_PROVIDER_H
 
+#include <sore_event.h>
 #include <sore_font.h>
 #include <sore_geometry.h>
 #include <sore_geometryprovider.h>
 #include <sore_glslshader.h>
 #include <sore_batchingbuffermanager.h>
-#include <sore_texture2d.h>
+#include <sore_texturestate.h>
 #include <sore_uniformstate.h>
 
 #include <boost/unordered_map.hpp>
@@ -52,7 +53,7 @@ namespace SORE_Graphics
     public:
         ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader);
 
-        void SetTexture(SORE_Resource::Texture2DPtr texture);
+        void SetTexture(const SORE_Graphics::TextureState::TextureObject& texture);
         void SetShader(SORE_Resource::GLSLShaderPtr shader);
         void SetColor(SORE_Graphics::Color color);
         void SetTransform(SORE_Graphics::TransformationPtr transform);
@@ -78,6 +79,8 @@ namespace SORE_Graphics
         void DrawLine(
             float x1, float y1, float z1,
             float x2, float y2, float z2);
+        void DrawPoint(
+            float x1, float y1, float z1, float size);
         void DrawString(float x, float y, float z, SORE_Resource::FontPtr face, unsigned int height, const std::string& string);
 
         // geometry provider interface
@@ -86,6 +89,8 @@ namespace SORE_Graphics
         std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
         SORE_Graphics::BufferManager* GetBufferManager() { return &buffer_manager; }
+
+        bool OnResize(const SORE_Kernel::Event& e);
     private:
         void SetTexCoords(float i, float j);
         void AddVertex(float x, float y, float z);
@@ -96,7 +101,7 @@ namespace SORE_Graphics
         // flush the current vertex/index cache to a new renderable and start a new cache
         void CreateRenderableFromData();
 
-        SORE_Resource::Texture2DPtr current_texture;
+        TextureState::TextureObject current_texture;
         SORE_Resource::GLSLShaderPtr current_shader;
         SORE_Graphics::Color current_color;
         SORE_Graphics::TransformationPtr current_transform;
@@ -111,6 +116,8 @@ namespace SORE_Graphics
 
         SORE_Graphics::BatchingBufferManager buffer_manager;
         std::vector<SORE_Graphics::Renderable> renderables;
+
+        float halfWidth;
     };
 }
 

@@ -35,7 +35,6 @@
 #include <sore_geometry.h>
 #include <sore_dropdown.h>
 #include <sore_logger.h>
-#include <sore_sprite.h>
 
 namespace SORE_GUI
 {
@@ -53,7 +52,7 @@ namespace SORE_GUI
         SORE_Math::Rect<float> arrowSize(0.0f,
             static_cast<float>(textHeight), 0.0f,
             static_cast<float>(textHeight));
-        arrowChunk = SORE_Graphics::MakeSprite(
+        /*arrowChunk = SORE_Graphics::MakeSprite(
             arrowSize,
             SORE_Math::Rect<float>(0.0f, 1.0f, 0.0f, 1.0f),
             0.0f,
@@ -63,7 +62,7 @@ namespace SORE_GUI
         UpdatePosition();
         SetBorderSizes(16.0f, 16.0f, 16.0f, 16.0f);
         SetTexture(normal);
-        SetShader(shad);
+        SetShader(shad);*/
     }
 
     Dropdown::~Dropdown()
@@ -255,17 +254,17 @@ namespace SORE_GUI
 
     void Dropdown::ChangeTexture()
     {
-        if(HasFocus())
+        /*if(HasFocus())
             SetTexture(active);
         else if(inArea)
             SetTexture(hover);
         else
-            SetTexture(normal);
+            SetTexture(normal);*/
     }
 
     void Dropdown::FocusLost()
     {
-        SetTexture(normal);
+        //SetTexture(normal);
         SetSize(originalSize);
     }
 

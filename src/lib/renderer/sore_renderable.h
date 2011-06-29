@@ -71,8 +71,11 @@ namespace SORE_Graphics
         void SetShader(SORE_Resource::GLSLShaderPtr s);
         SORE_Resource::GLSLShaderPtr GetShader() const;
 
-        void AddTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr t);
-        const TextureState& GetTextures() const;
+        void AddTexture(const std::string& samplerName, const TextureState::TextureObject& texture);
+        void SetTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr texture);
+
+        const TextureState& Textures() const;
+        TextureState& Textures();
 
         void MulitplyTransform(TransformationPtr t);
         void SetTransform(TransformationPtr t);
@@ -97,10 +100,10 @@ namespace SORE_Graphics
 
         GeometryChunkPtr geometry;
         SORE_Resource::GLSLShaderPtr shader;
-        TextureStatePtr textures;
+        TextureState textures;
         TransformationPtr transformation;
         blend_mode blending;
-        UniformStatePtr uniforms;
+        UniformState uniforms;
 
         mutable float cachedDepth;
         mutable int sortKey;

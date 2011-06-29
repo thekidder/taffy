@@ -32,15 +32,14 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef _SORE_MATRIX4X4_H_
-#define _SORE_MATRIX4X4_H_
+#ifndef SORE_MATRIX4X4_H
+#define SORE_MATRIX4X4_H
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
+#include <sore_math_defines.h>
 #include <sore_vector2.h>
 #include <sore_vector3.h>
 #include <sore_vector4.h>
+
 
 namespace SORE_Math
 {
@@ -227,12 +226,106 @@ namespace SORE_Math
                 return temp;
             }
 
+            static Matrix4<T> GetTranslation(const Vector3<T>& t)
+            {
+                Matrix4<T> temp;
+                temp.value[12] = t[0];
+                temp.value[13] = t[1];
+                temp.value[14] = t[2];
+                return temp;
+            }
+
             static Matrix4<T> GetScale(T x, T y, T z)
             {
                 Matrix4<T> temp;
                 temp.value[0 ] = x;
                 temp.value[5 ] = y;
                 temp.value[10] = z;
+                return temp;
+            }
+
+            static Matrix4<T> GetScale(const Vector3<T>& s)
+            {
+                Matrix4<T> temp;
+                temp.value[0 ] = s[0];
+                temp.value[5 ] = s[1];
+                temp.value[10] = s[2];
+                return temp;
+            }
+
+            static Matrix4<T> GetLookat(
+                const Vector3<T>& eye,
+                const Vector3<T>& center,
+                const Vector3<T>& up)
+            {
+                Vector3<T> forward = center - eye;
+                forward = forward.Normalize();
+                Vector3<T> up_ = up.Normalize();
+                Vector3<T> side = forward.cross(up_);
+                up_ = side.cross(forward);
+
+                Matrix4<T> temp;
+                temp.value[0 ] = side[0];
+                temp.value[4 ] = side[1];
+                temp.value[8 ] = side[2];
+                temp.value[12] = T(0.0);
+
+                temp.value[1 ] = up_[0];
+                temp.value[5 ] = up_[1];
+                temp.value[9 ] = up_[2];
+                temp.value[13] = T(0.0);
+
+                temp.value[2 ] = -forward[0];
+                temp.value[6 ] = -forward[1];
+                temp.value[10] = -forward[2];
+                temp.value[14] = T(0.0);
+
+                temp.value[3 ] = T(0.0);
+                temp.value[7 ] = T(0.0);
+                temp.value[11] = T(0.0);
+                temp.value[15] = T(1.0);
+
+                temp *= GetTranslation(-eye);
+
+                return temp;
+            }
+
+            static Matrix4<T> GetPerspective(T fovy, T aspectRatio, T znear, T zfar)
+            {
+                T ymax = znear * tanf(fovy * T(kPi) / T(360.0));
+                T xmax = ymax * aspectRatio;
+
+                return GetFrustum(-xmax, xmax, -ymax, ymax, znear, zfar);
+            }
+
+            static Matrix4<T> GetFrustum(T left, T right, T bottom, T top, T znear, T zfar)
+            {
+                T dist = T(2.0) * znear;
+                T width = right - left;
+                T height = top - bottom;
+                T depth = zfar - znear;
+
+                Matrix4<T> temp;
+                temp.value[0 ] = dist / width;
+                temp.value[1 ] = T(0.0);
+                temp.value[2 ] = T(0.0);
+                temp.value[3 ] = T(0.0);
+
+                temp.value[4 ] = T(0.0);
+                temp.value[5 ] = dist / height;
+                temp.value[6 ] = T(0.0);
+                temp.value[7 ] = T(0.0);
+
+                temp.value[8 ] = (right + left) / width;
+                temp.value[9 ] = (top + bottom) / height;
+                temp.value[10] = (-zfar - znear) / depth;
+                temp.value[11] = T(-1.0);
+
+                temp.value[12] = T(0.0);
+                temp.value[13] = T(0.0);
+                temp.value[14] = (-dist * zfar) / depth;
+                temp.value[15] = T(0.0);
+
                 return temp;
             }
 

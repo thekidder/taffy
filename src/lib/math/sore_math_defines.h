@@ -32,31 +32,15 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_SPRITE_H
-#define SORE_SPRITE_H
+#ifndef SORE_MATH_DEFINES_H
+#define SORE_MATH_DEFINES_H
 
-#include <sore_geometry.h>
-#include <sore_dll.h>
-#include <sore_renderable.h>
-
-namespace SORE_Graphics
+namespace SORE_Math
 {
-    const static SORE_Math::Rect<float> defaultTexCoords(0.0f, 1.0f, 0.0f, 1.0f);
+    const double kPi    = 3.14159265358979323846264338327950288419716939;
+    const double kPiTwo = kPi / 2.0;
 
-    Renderable SORE_EXPORT MakeSprite(
-        SORE_Math::Rect<float> bounds,
-        SORE_Math::Rect<float> texCoords,
-        float z,
-        SORE_Resource::Texture2DPtr texture,
-        SORE_Resource::GLSLShaderPtr shader,
-        blend_mode b = BLEND_SUBTRACTIVE);
-
-    Renderable SORE_EXPORT MakePointSprite(
-        SORE_Math::Vector3<float> position,
-        float size,
-        SORE_Resource::Texture2DPtr texture,
-        SORE_Resource::GLSLShaderPtr shader,
-        blend_mode b = BLEND_SUBTRACTIVE);
+    const double kE     = 2.71828182845904523536028747135266249775724709;
 }
 
 #endif

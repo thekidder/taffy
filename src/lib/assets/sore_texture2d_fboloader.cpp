@@ -32,38 +32,23 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_FRAMEWIDGET_H
-#define SORE_FRAMEWIDGET_H
+#include <sore_texture2d_fboloader.h>
 
-#include <sore_texturestate.h>
-#include <sore_glslshader.h>
-#include <sore_widget.h>
-
-namespace SORE_GUI
+SORE_Resource::Texture2DFBOLoader::Texture2DFBOLoader(const SORE_Graphics::Renderbuffer_map_t& renderbuffers_)
+    : renderbuffers(renderbuffers_)
 {
-    enum size_mode {SCALE_ALL, SCALE_CENTER};
-
-    class SORE_EXPORT FrameWidget : public Widget
-    {
-    public:
-        FrameWidget(SVec s, SVec p, size_mode m, Widget* parent_ = NULL);
-    protected:
-        void SetBorderSizes(float l, float r, float t, float b);
-        void SetTexture(const SORE_Graphics::TextureState::TextureObject& tex);
-        void SetShader(SORE_Resource::GLSLShaderPtr shad);
-
-        void RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode);
-    private:
-        virtual bool ProcessEvents(const SORE_Kernel::Event& e) = 0;
-        virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode) = 0;
-
-        size_mode mode;
-
-        SORE_Graphics::TextureState::TextureObject texture;
-        SORE_Resource::GLSLShaderPtr shader;
-
-        float leftBorder, rightBorder, topBorder, bottomBorder;
-    };
 }
 
-#endif
+SORE_Resource::Texture2D* SORE_Resource::Texture2DFBOLoader::LoadProxy()
+{
+    return 0;
+}
+
+SORE_Resource::Texture2D* SORE_Resource::Texture2DFBOLoader::Load(const std::string& name)
+{
+    SORE_Graphics::Renderbuffer_map_t::const_iterator it = renderbuffers.find(name);
+    if(it == renderbuffers.end())
+        return 0;
+
+    return new Texture2D(it->second->Handle());
+}

@@ -54,10 +54,10 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
         shader = r.GetShader();
     }
 
-    if(!r.GetTextures().Empty())
+    if(!r.Textures().Empty())
     {
         commands |= RENDER_CMD_BIND_TEXTURE;
-        textures = r.GetTextures();
+        textures = r.Textures();
     }
 
     UniformState copy = r.Uniforms();

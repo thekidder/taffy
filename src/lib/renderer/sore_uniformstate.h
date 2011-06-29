@@ -35,9 +35,6 @@
 #ifndef SORE_UNIFORMSTATE_H
 #define SORE_UNIFORMSTATE_H
 
-#include <map>
-#include <string>
-
 #include <sore_assettypes.h>
 #include <sore_dll.h>
 #include <sore_vector2.h>
@@ -45,6 +42,9 @@
 #include <sore_vector4.h>
 #include <sore_matrix4x4.h>
 #include <sore_glslshader.h>
+
+#include <map>
+#include <string>
 
 namespace SORE_Graphics
 {

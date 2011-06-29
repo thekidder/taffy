@@ -49,6 +49,7 @@ namespace SORE_Resource
     public:
         Texture2D(const void* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
+        Texture2D(GLuint handle_);
         ~Texture2D();
 
         void LoadFromData(const void* data, GLint internalFormat,
@@ -60,7 +61,7 @@ namespace SORE_Resource
             unsigned int textureSlot) const;
 
         void SaveTGA(const char* filename);
-        unsigned int GetHandle() const { return handle; }
+        unsigned int Handle() const { return handle; }
         bool Loaded() const { return handle != 0; }
 
         bool operator<(const Texture2D& o) const;
@@ -69,6 +70,8 @@ namespace SORE_Resource
         void Unload();
 
         GLuint handle;
+        // external textures are not deleted when the object is destroyed
+        bool external;
 
         unsigned int w, h;
     };

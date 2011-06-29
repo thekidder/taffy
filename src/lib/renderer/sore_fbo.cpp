@@ -125,11 +125,18 @@ namespace SORE_Graphics
 
         if(depth)
         {
-            glGenRenderbuffersEXT(1, &depthBuffer);
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthBuffer);
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, width, height);
+            glGenTextures(1, &depthBuffer);
+            glBindTexture(GL_TEXTURE_2D, depthBuffer);
 
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthBuffer);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+	        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+
+            glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depthBuffer, 0);
         }
         if(numColorBuffers)
             glGenTextures(numColorBuffers, colorBuffers);
@@ -177,5 +184,13 @@ namespace SORE_Graphics
         glDeleteTextures(numColorBuffers, colorBuffers);
         fbo = depthBuffer = 0;
         memset(colorBuffers, 0, numColorBuffers*sizeof(GLuint));
+    }
+    
+    unsigned int FBO::Handle() const
+    {
+        if(depth)
+            return depthBuffer;
+        else if(numColorBuffers)
+            return colorBuffers[0];
     }
 }
