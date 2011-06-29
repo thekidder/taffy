@@ -47,6 +47,8 @@ public:
     void SetSize(float size);
     void SetView(const SORE_Math::Matrix4<float>& view);
 
+    SORE_Graphics::UniformState& Uniforms() { return geometry.front().Uniforms(); }
+
     bool OnResize(const SORE_Kernel::Event& e);
 
     // renderer stuff interfaces

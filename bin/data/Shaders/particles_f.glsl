@@ -1,12 +1,12 @@
-//uniform sampler2D color;
 uniform sampler2D texture;
+uniform float lightIntensity;
 
-varying vec2 tex;
 varying vec4 color;
+varying float shadow;
 
 void main()
 {
-	//vec4 pColor = vec4(texture2D(color, tex).rgb, 1.0);
+
 	vec4 texel = texture2D(texture, gl_TexCoord[0].st);
-	gl_FragColor = color*texel;
+	gl_FragColor = shadow * texel;
 }

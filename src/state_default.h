@@ -55,10 +55,12 @@ private:
     void Quit();
 
     SORE_Graphics::camera_info GetCamera();
+    SORE_Graphics::camera_info GetLightCamera();
     void GotSamples(float* buffer, unsigned int length, int channels);
 
     // particle generators
     void CreateDisc(Particle& p);
+    void CreateExplosion(Particle& p);
 
     SORE_Graphics::PipelineRenderer renderer;
     SORE_Kernel::InputDistributor distributor;
@@ -103,13 +105,18 @@ private:
     bool rotating;
 
     // visualizer
+    SORE_Math::Vector3f lightPos;
+
     ParticleSystem particles;
+    ParticleSystem stars;
 
     bool paused;
 
     SORE_Graphics::ImmediateModeProvider imm_mode;
 
     int width, height;
+
+    float lightT;
 };
 
 #endif

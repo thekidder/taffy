@@ -1,0 +1,5 @@
+[Vertex]
+data/Shaders/particles_shadowmap_v.glsl
+
+[Fragment]
+data/Shaders/particles_shadowmap_f.glsl
