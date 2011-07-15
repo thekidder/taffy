@@ -56,7 +56,7 @@ void SORE_Graphics::UniformState::Bind(SORE_Resource::GLSLShaderPtr s) const
             s->SetUniform3f(it->first,
                             it->second.v3.GetValue()[0],
                             it->second.v3.GetValue()[1],
-                            it->second.v2.GetValue()[2]);
+                            it->second.v3.GetValue()[2]);
             break;
         case VEC4:
             s->SetUniform4f(it->first,
