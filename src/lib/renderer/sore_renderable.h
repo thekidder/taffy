@@ -49,9 +49,9 @@ namespace SORE_Graphics
 {
     enum blend_mode
     {
-        BLEND_OPAQUE,
         BLEND_ADDITIVE,
         BLEND_SUBTRACTIVE,
+        BLEND_OPAQUE,
         BLEND_UNUSED
     };
 

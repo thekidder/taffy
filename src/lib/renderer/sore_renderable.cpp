@@ -173,14 +173,18 @@ void SORE_Graphics::Renderable::CalculateSortKey() const
     const unsigned int depthBits = 11;
     unsigned int depth;
 
+    int transparent = 0;
+    if(blending == BLEND_SUBTRACTIVE || blending == BLEND_ADDITIVE)
+        transparent = 1;
+
     float z = (1<<depthBits) * cachedDepth;
 
     depth = static_cast<int>(z);
-    if(blending == BLEND_OPAQUE)
+    if(!transparent)
         depth = (1<<depthBits) - depth;
 
     sortKey = 0;
-    sortKey |= (blending << (keyLen - 2 - 3));
+    sortKey |= (transparent << (keyLen - 2 - 3));
     sortKey |= (depth & 0xFFF) << (keyLen - 2 - 3 - 12);
     if(shader)
         sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
