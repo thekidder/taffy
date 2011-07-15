@@ -65,7 +65,7 @@ void SORE_Graphics::GraphicsArray::AddObject(GeometryChunkPtr geometry)
 
         //copy vertices into VBO, taking into account index renumbering
         indices.reserve(indices.size() + geometry->NumIndices());
-        for(unsigned short j=0;j<geometry->NumIndices();++j)
+        for(unsigned int j = 0;j < geometry->NumIndices(); ++j)
         {
             unsigned short index = geometry->GetIndex(j) + oldSize;
             indices.push_back(index);
