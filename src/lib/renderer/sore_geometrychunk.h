@@ -68,17 +68,17 @@ namespace SORE_Graphics
         vertex& GetVertex(unsigned short i);
 
         unsigned short* const GetIndices();
-        unsigned short& GetIndex(unsigned short i);
+        unsigned short& GetIndex(unsigned int i);
 
         GLenum         Type() const;
-        unsigned short NumVertices() const;
-        unsigned short NumIndices() const;
+        unsigned int NumVertices() const;
+        unsigned int NumIndices() const;
 
         GeometryChunk& operator=(const GeometryChunk& o);
     private:
         void Init(const GeometryChunk& o);
 
-        unsigned short numVertices, numIndices;
+        unsigned int numVertices, numIndices;
         vertex* data;
         unsigned short* indices;
         GLenum type;

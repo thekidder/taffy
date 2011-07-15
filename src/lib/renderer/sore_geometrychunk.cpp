@@ -42,9 +42,7 @@ SORE_Graphics::GeometryChunk::GeometryChunk(
     unsigned int nVertices, unsigned int nIndices, GLenum type)
     : numVertices(nVertices), numIndices(nIndices), type(type)
 {
-    if(nIndices > std::numeric_limits<unsigned short>::max())
-        ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many indices in geometry chunk");
-    if(nVertices > std::numeric_limits<unsigned short>::max())
+    if(nVertices - 1 > std::numeric_limits<unsigned short>::max())
         ENGINE_LOG(SORE_Logging::LVL_ERROR, "Too many vertices in geometry chunk");
     if((type == GL_TRIANGLES && nIndices % 3 != 0) ||
         (type == GL_LINES     && nIndices % 2 != 0) ||
@@ -114,12 +112,12 @@ GLenum SORE_Graphics::GeometryChunk::Type() const
     return type;
 }
 
-unsigned short SORE_Graphics::GeometryChunk::NumVertices() const
+unsigned int SORE_Graphics::GeometryChunk::NumVertices() const
 {
     return numVertices;
 }
 
-unsigned short SORE_Graphics::GeometryChunk::NumIndices() const
+unsigned int SORE_Graphics::GeometryChunk::NumIndices() const
 {
     return numIndices;
 }
@@ -129,7 +127,7 @@ unsigned short* const SORE_Graphics::GeometryChunk::GetIndices()
     return indices;
 }
 
-unsigned short& SORE_Graphics::GeometryChunk::GetIndex(unsigned short i)
+unsigned short& SORE_Graphics::GeometryChunk::GetIndex(unsigned int i)
 {
     assert(i < numIndices);
     return indices[i];
