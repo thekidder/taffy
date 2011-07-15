@@ -1,0 +1,5 @@
+[Vertex]
+data/Shaders/point_alphatest_v.glsl
+
+[Fragment]
+data/Shaders/point_alphatest_f.glsl

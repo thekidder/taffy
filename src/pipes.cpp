@@ -3,7 +3,7 @@
 #include <boost/foreach.hpp>
 
 ParticleShadowPipe::ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size)
-    : shader(shader_), shadowmap(shadowmap_size, shadowmap_size, true, 1)
+    : shader(shader_), shadowmap(shadowmap_size, shadowmap_size, true, 0)
 {
 }
 
@@ -25,8 +25,8 @@ SORE_Graphics::render_list& ParticleShadowPipe::beginRender(
     BOOST_FOREACH(SORE_Graphics::Renderable& r, list)
     {
         r.SetShader(shader);
-        r.Uniforms() = SORE_Graphics::UniformState();
-        r.Textures() = SORE_Graphics::TextureState();
+        //r.Uniforms() = SORE_Graphics::UniformState();
+        //r.Textures() = SORE_Graphics::TextureState();
     }
 
     return list;

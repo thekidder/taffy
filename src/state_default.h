@@ -59,8 +59,10 @@ private:
     void GotSamples(float* buffer, unsigned int length, int channels);
 
     // particle generators
-    void CreateDisc(Particle& p);
-    void CreateExplosion(Particle& p);
+    //void CreateDisc(Particle& p);
+    //void CreateExplosion(Particle& p);
+
+    void ParticleCubeSpawner(ParticleSpawn& p);
 
     SORE_Graphics::PipelineRenderer renderer;
     SORE_Kernel::InputDistributor distributor;
@@ -108,7 +110,6 @@ private:
     SORE_Math::Vector3f lightPos;
 
     ParticleSystem particles;
-    ParticleSystem stars;
 
     bool paused;
 

@@ -9,9 +9,9 @@ INSTALL(FILES
   particles_shadowmap_v.glsl
   particles_shadowmap_f.glsl
   
-  point_sprite.shad
-  point_v.glsl
-  point_f.glsl
+  point_sprite_alphatest.shad
+  point_alphatest_v.glsl
+  point_alphatest_f.glsl
   
   untextured.shad
   untextured_fragment.glsl

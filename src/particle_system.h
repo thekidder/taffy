@@ -1,6 +1,8 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
+#include "particle_texture_loader.h"
+
 #include <sore_buffermanager.h>
 #include <sore_color.h>
 #include <sore_event.h>
@@ -9,43 +11,19 @@
 
 #include <vector>
 
-struct Particle
-{
-    Particle(float x_ = 0.0f, float y_ = 0.0f, float z_ = 0.0f, float s_ = 0.0f) 
-        : x(x_), y(y_), z(z_), size(s_), 
-          xv(0.0f), yv(0.0f), zv(0.0f),
-          xa(0.0f), ya(0.0f), za(0.0f),
-          lifetime(0.0f), colorChange(0.0f)
-    {}
-    float x, y, z;
-    float size;
-
-    float xv, yv, zv; // velocity
-    float xa, ya, za; // acceleration
-
-    float lifetime;
-
-    SORE_Graphics::Color color, colorChange;
-
-    float camera_depth;
-};
-
 class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
 {
 public:
     ParticleSystem(
-        size_t num_particles,
+        size_t texture_size_,
         SORE_Resource::Texture2DPtr t = SORE_Resource::Texture2DPtr(), 
         SORE_Resource::GLSLShaderPtr s = SORE_Resource::GLSLShaderPtr());
 
     void SetShader(SORE_Resource::GLSLShaderPtr s);
     void SetTexture(SORE_Resource::Texture2DPtr t);
 
-    void Clear();
-    void AddParticles(boost::function<void (Particle&)> create_callback, size_t num_particles);
+    void AddParticles(Particle_spawn_func_t spawn_func);
     void Update(int elapsed);
-    void SetSize(float size);
-    void SetView(const SORE_Math::Matrix4<float>& view);
 
     SORE_Graphics::UniformState& Uniforms() { return geometry.front().Uniforms(); }
 
@@ -61,11 +39,6 @@ public:
 
     SORE_Graphics::BufferManager* GetBufferManager() { return this; }
 private:
-    void UpdateGeometry();
-
-    typedef std::vector<Particle> Particles_t;
-    Particles_t particles;
-
     SORE_Resource::Texture2DPtr texture;
     SORE_Resource::GLSLShaderPtr shader;
 
@@ -73,11 +46,10 @@ private:
     SORE_Graphics::geometry_entry geometry_lookup;
     SORE_Graphics::VBO vbo;
 
+    size_t texture_size;
     float half_width;
-    float size_multiplier;
-    int num_to_render;
 
-    SORE_Math::Matrix4<float> view_matrix;
+    ParticleState state;
 };
 
 #endif

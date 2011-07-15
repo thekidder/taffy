@@ -26,9 +26,7 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles = 10000;
-
-void CreateDisc(Particle& p);
+const int k_num_particles = 256;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
@@ -45,7 +43,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
       energy_analyzer(&log_spectrum),
       rotating(false), lightPos(0.0f, 20.0f, 0.0f),
-      particles(k_num_particles), stars(k_num_particles / 8), paused(false),
+      particles(k_num_particles), paused(false),
       imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr()), lightT(0.0f)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
@@ -68,9 +66,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     distributor.AddListener(
         SORE_Kernel::RESIZE,
         boost::bind(&ParticleSystem::OnResize, boost::ref(particles), _1));
-    distributor.AddListener(
-        SORE_Kernel::RESIZE,
-        boost::bind(&ParticleSystem::OnResize, boost::ref(stars), _1));
     distributor.AddListener(
         SORE_Kernel::RESIZE,
         boost::bind(&SORE_Graphics::PipelineRenderer::OnResize, boost::ref(renderer), _1));
@@ -141,7 +136,6 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     visualizers_controls->SetChecked(false);
 
     renderer.AddGeometryProvider(&particles);
-    //renderer.AddGeometryProvider(&stars);
     renderer.AddGeometryProvider(top.GetGeometryProvider());
     renderer.AddGeometryProvider(&imm_mode);
 
@@ -203,8 +197,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
     particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
 
-    stars.SetTexture(gamestateStack.TextureCache().Get("star.tga"));
-    stars.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
+    particles.AddParticles(boost::bind(&DefaultState::ParticleCubeSpawner, this, _1));
 
     glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
@@ -258,9 +251,9 @@ void DefaultState::Frame(int elapsed)
 
     lightT += elapsed / 50000.0f;
 
-    lightPos[0] = 20.0f * sin(lightT);
-    lightPos[1] = 20.0f * sin(lightT);
-    lightPos[2] = 20.0f * cos(lightT);
+    lightPos[0] = 6.0f * sin(lightT);
+    lightPos[1] = 6.0f * sin(lightT);
+    lightPos[2] = 6.0f * cos(lightT);
 
     fmod_spectrum.Update();
 
@@ -282,28 +275,24 @@ void DefaultState::Frame(int elapsed)
         energy_visualizer->AddDatum(i, energy_analyzer.Value(i));
 
     particles.Update(elapsed);
-    stars.Update(elapsed);
 
     // do the magic
     float beat = static_cast<float>(beat_detector_low.Beat());
-    int bass_particles = static_cast<int>(beat * 200.0f);
+    int bass_particles = static_cast<int>(beat * 400.0f);
     bass_particles = std::min(k_num_particles, bass_particles);
 
     beat = static_cast<float>(beat_detector_mid.Beat());
     int mid_particles = static_cast<int>(beat * 20.0f);
     mid_particles = std::min(k_num_particles / 8, mid_particles);
 
-    stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
-    particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
+    //stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
+    //particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
 
-    particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
-    stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+    //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+    //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 
     particles.Uniforms().SetVariable("lightPos", lightPos);
-    stars.Uniforms().SetVariable("lightPos", lightPos);
-
     particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
-    stars.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 2.0));
 
     float lightMatRaw[16] = {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -319,12 +308,11 @@ void DefaultState::Frame(int elapsed)
     lightMatrix *= lightCam.viewMatrix;
 
     particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
-    stars.Uniforms().SetVariable("lightMatrix", lightMatrix);
-
-    particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(width, height));
-    stars.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(width, height));
+    particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
 
     imm_mode.Start();
+    imm_mode.SetBlendMode(SORE_Graphics::BLEND_OPAQUE);
+    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
     // draw some axes
     const float AXIS_LENGTH = 1.5f;
 
@@ -335,7 +323,6 @@ void DefaultState::Frame(int elapsed)
     imm_mode.SetColor(SORE_Graphics::Blue);
     imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
 
-    SORE_Resource::GLSLShaderPtr lit = gamestateStack.ShaderCache().Get("untextured_lit.shad");
     imm_mode.SetUniform("lightPos", lightPos);
     imm_mode.SetUniform("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
     
@@ -347,7 +334,7 @@ void DefaultState::Frame(int elapsed)
          100.0f, -3.0f, -100.0f,
          100.0f, -3.0f,  100.0f);
 
-    imm_mode.SetShader(gamestateStack.ShaderCache().Get("point_sprite.shad"));
+    imm_mode.SetShader(gamestateStack.ShaderCache().Get("point_sprite_alphatest.shad"));
     imm_mode.SetColor(SORE_Graphics::White);
     imm_mode.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
     imm_mode.DrawPoint(lightPos[0], lightPos[1], lightPos[2], 2.0f);
@@ -388,9 +375,6 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             paused = !paused;
             channel->setPaused(paused);
             return true;
-        case SORE_Kernel::Key::SSYM_d:
-            particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), 1200);
-            return true;
         default:
             break;
         }
@@ -413,9 +397,6 @@ bool DefaultState::HandleMouse(const SORE_Kernel::Event& e)
             y *= 4 * static_cast<float>(M_PI);
 
             camera.Rotate(x, y);
-            SORE_Math::Matrix4<float> view = camera.Matrix();
-            particles.SetView(view);
-            stars.SetView(view);
             return true;
         }
         break;
@@ -462,7 +443,7 @@ SORE_Graphics::camera_info DefaultState::GetLightCamera()
 {
     SORE_Graphics::ProjectionInfo proj;
     proj.type = SORE_Graphics::PERSPECTIVE;
-    proj.fov = 120.0f;
+    proj.fov = 90.0f;
     proj.znear = 1.0f;
     proj.zfar = 300.0f;
     proj.useScreenRatio = false;
@@ -485,58 +466,67 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 #endif
 }
 
-void DefaultState::CreateDisc(Particle& p)
+//void DefaultState::CreateDisc(Particle& p)
+//{
+//    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+//    float dist = SORE_Utility::getRandomMinMax(0.05f, 20.0f);
+//
+//    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
+//
+//    p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//cos(angle) * dist;
+//    p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//SORE_Utility::getRandomMinMax(-0.02f, 0.02f);
+//    p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//sin(angle) * dist;
+//
+//    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+//    float speed = SORE_Utility::getRandomMinMax(0.01f, 0.016f);
+//
+//    p.xv = cos(angle) * speed;
+//    p.yv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
+//    p.zv = sin(angle) * speed;
+//
+//    p.xa = -p.xv / 100.0f;
+//    p.za = -p.zv / 100.0f;
+//
+//    HSVColor c(static_cast<float>(energy_analyzer.Energy(0) / 30.0f), 0.8f, 1.0f, 0.8f);
+//    p.color = c.RGBColor();
+//    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
+//
+//    p.lifetime = 0.0f;
+//}
+//
+//void DefaultState::CreateExplosion(Particle& p)
+//{
+//    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+//    float dist = SORE_Utility::getRandomMinMax(0.05f, 15.0f);
+//
+//    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
+//
+//    p.x = cos(angle) * dist;
+//    p.z = SORE_Utility::getRandomMinMax(-30.0f, -28.0f);
+//    p.y = sin(angle) * dist * 0.1f + 5.0f;
+//
+//    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
+//    float speed = SORE_Utility::getRandomMinMax(0.2f, 2.6f);
+//
+//    p.xv = cos(angle) * speed;
+//    p.zv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
+//    p.yv = sin(angle) * speed;
+//
+//    p.xa = -p.xv / 100.0f;
+//    p.ya = -0.5f;
+//
+//    HSVColor c(static_cast<float>(energy_analyzer.Energy(3) / 30.0f), 0.8f, 1.0f, 0.8f);
+//    p.color = c.RGBColor();
+//    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
+//
+//    p.lifetime = 0.0f;
+//}
+
+void DefaultState::ParticleCubeSpawner(ParticleSpawn& p)
 {
-    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-    float dist = SORE_Utility::getRandomMinMax(0.05f, 20.0f);
+    p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
+    p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
+    p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
 
-    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
-
-    p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//cos(angle) * dist;
-    p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//SORE_Utility::getRandomMinMax(-0.02f, 0.02f);
-    p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//sin(angle) * dist;
-
-    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-    float speed = SORE_Utility::getRandomMinMax(0.01f, 0.016f);
-
-    p.xv = cos(angle) * speed;
-    p.yv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
-    p.zv = sin(angle) * speed;
-
-    p.xa = -p.xv / 100.0f;
-    p.za = -p.zv / 100.0f;
-
-    HSVColor c(static_cast<float>(energy_analyzer.Energy(0) / 30.0f), 0.8f, 1.0f, 0.8f);
-    p.color = c.RGBColor();
-    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
-
-    p.lifetime = 0.0f;
-}
-
-void DefaultState::CreateExplosion(Particle& p)
-{
-    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-    float dist = SORE_Utility::getRandomMinMax(0.05f, 15.0f);
-
-    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
-
-    p.x = cos(angle) * dist;
-    p.z = SORE_Utility::getRandomMinMax(-30.0f, -28.0f);
-    p.y = sin(angle) * dist * 0.1f + 5.0f;
-
-    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-    float speed = SORE_Utility::getRandomMinMax(0.2f, 2.6f);
-
-    p.xv = cos(angle) * speed;
-    p.zv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
-    p.yv = sin(angle) * speed;
-
-    p.xa = -p.xv / 100.0f;
-    p.ya = -0.5f;
-
-    HSVColor c(static_cast<float>(energy_analyzer.Energy(3) / 30.0f), 0.8f, 1.0f, 0.8f);
-    p.color = c.RGBColor();
-    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
-
-    p.lifetime = 0.0f;
+    p.r = p.g = p.b = p.a = 1.0f;
 }
