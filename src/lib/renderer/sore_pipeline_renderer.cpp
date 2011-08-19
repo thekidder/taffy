@@ -42,7 +42,8 @@
 
 #include <boost/foreach.hpp>
 
-SORE_Graphics::PipelineRenderer::PipelineRenderer()
+SORE_Graphics::PipelineRenderer::PipelineRenderer(SORE_Profiler::Profiler& profiler_)
+    : profiler(profiler_)
 {
     boost::shared_ptr<Pipe> root(new NullPipe());
     pipeline = root;
@@ -58,15 +59,19 @@ SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 
 void SORE_Graphics::PipelineRenderer::Render()
 {
-    AggregateBufferManager bufferManager;
+    SORE_Profiler::Sample s("Renderer", profiler);
 
-    // collect geometry
+    AggregateBufferManager bufferManager;
     render_list renderables;
-    BOOST_FOREACH(GeometryProvider* gp, geometry)
+
     {
-        gp->MakeUpToDate();
-        bufferManager.AddBufferManager(gp->GetBufferManager());
-        std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
+        SORE_Profiler::Sample s("Collect Geometry", profiler);
+        BOOST_FOREACH(GeometryProvider* gp, geometry)
+        {
+            gp->MakeUpToDate();
+            bufferManager.AddBufferManager(gp->GetBufferManager());
+            std::copy(gp->GeometryBegin(), gp->GeometryEnd(), std::back_inserter(renderables));
+        }
     }
 
     ScreenInfo screenInfo;
@@ -89,28 +94,40 @@ void SORE_Graphics::PipelineRenderer::Render()
     GLCommandList renderQueue;
     renderQueue.AddCommand(CLEAR_COLOR_AND_DEPTH_BUFFERS);
 
-    pipeline->Setup(renderbuffers);
-
-    // ensure textures are all ready (bind references to renderbuffers)
-    SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
-
-    BOOST_FOREACH(Renderable& r, renderables)
     {
-        if(!r.Textures().Ready())
+        SORE_Profiler::Sample s("Setup renderbuffers", profiler);
+        pipeline->Setup(renderbuffers);
+    }
+
+    {
+        SORE_Profiler::Sample s("Prepare textures", profiler);
+        // ensure textures are all ready (bind references to renderbuffers)
+        SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
+
+        BOOST_FOREACH(Renderable& r, renderables)
         {
-            TextureState::Unready_texture_map_t textures = r.Textures().UnreadyTextures();
-            BOOST_FOREACH(const TextureState::Unready_texture_map_t::value_type& tex, textures)
+            if(!r.Textures().Ready())
             {
-                SORE_Resource::Texture2D* t = loader.Load(tex.second);
-                if(t)
-                    r.Textures().SetTexture(tex.first, t);
+                TextureState::Unready_texture_map_t textures = r.Textures().UnreadyTextures();
+                BOOST_FOREACH(const TextureState::Unready_texture_map_t::value_type& tex, textures)
+                {
+                    SORE_Resource::Texture2D* t = loader.Load(tex.second);
+                    if(t)
+                        r.Textures().SetTexture(tex.first, t);
+                }
             }
         }
     }
 
-    pipeline->Render(cameraTable, renderbuffers, renderables, renderQueue, &bufferManager);
+    {
+        SORE_Profiler::Sample s("Create command queue", profiler);
+        pipeline->Render(cameraTable, renderbuffers, renderables, renderQueue, &bufferManager);
+    }
 
-    renderQueue.Render();
+    {
+        SORE_Profiler::Sample s("OpenGL render", profiler);
+        renderQueue.Render();
+    }
 
     // collect rendering stats
     numPolys = renderQueue.NumPolygons();

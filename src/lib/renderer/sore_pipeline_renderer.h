@@ -39,6 +39,7 @@
 #include <sore_camera.h>
 #include <sore_geometryprovider.h>
 #include <sore_pipe.h>
+#include <sore_profiler.h>
 #include <sore_renderer.h>
 #include <sore_screeninfo.h>
 #include <sore_util.h>
@@ -54,7 +55,7 @@ namespace SORE_Graphics
     class SORE_EXPORT PipelineRenderer : public Renderer, SORE_Utility::Noncopyable
     {
     public:
-        PipelineRenderer();
+        PipelineRenderer(SORE_Profiler::Profiler& profiler_);
         ~PipelineRenderer();
 
         virtual void ClearGeometryProviders();
@@ -76,6 +77,8 @@ namespace SORE_Graphics
         boost::shared_ptr<Pipe> pipeline;
 
         int width, height;
+
+        SORE_Profiler::Profiler& profiler;
     };
 }
 

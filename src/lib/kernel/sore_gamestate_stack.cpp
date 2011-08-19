@@ -64,6 +64,8 @@ namespace SORE_Game
         kernel.AddTask(999, this);
         // sf::window.Display() should be last call
         kernel.AddTask(1000, &screen);
+        // ...right before we update the profiler saying everything is done
+        kernel.AddTask(1001, &profiler);
     }
 
     void GamestateStack::Frame(int elapsed)

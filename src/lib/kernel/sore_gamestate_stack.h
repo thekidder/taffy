@@ -41,6 +41,7 @@
 #include <sore_glslshader_loader.h>
 #include <sore_inputtask.h>
 #include <sore_resourcecache.h>
+#include <sore_profiler.h>
 #include <sore_screen.h>
 #include <sore_settings.h>
 #include <sore_texture2d_loader.h>
@@ -70,6 +71,7 @@ namespace SORE_Game
         // Accessors
         SORE_Kernel::Screen& Screen() { return screen; }
         SORE_FileIO::PackageCache& PackageCache() { return packageCache; }
+        SORE_Profiler::Profiler& Profiler() { return profiler; }
 
         // global resource caches
         SORE_Resource::Font_cache_t& FontCache() { return fontCache; }
@@ -87,6 +89,7 @@ namespace SORE_Game
         SORE_Kernel::Screen screen;
         SORE_Kernel::InputTask input;
         SORE_FileIO::PackageCache packageCache;
+        SORE_Profiler::Profiler profiler;
 
         // resource caches accessible from gamestates
         SORE_Resource::Font_cache_t fontCache;

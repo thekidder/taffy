@@ -32,56 +32,68 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_PROFILER_H
-#define SORE_PROFILER_H
+#ifndef SORE_SAMPLE_H
+#define SORE_SAMPLE_H
 
-#include "sore_sample.h"
-#include "sore_task.h"
+//MSVC++ template-exporting warning
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+#endif
 
-#include <boost/unordered_map.hpp>
-
-#include <stack>
+#include <limits>
+#include <string>
+#include <vector>
 
 namespace SORE_Profiler
 {
-    class Profiler : public SORE_Kernel::Task
+	class Profiler;
+
+    struct sample_data
     {
-    public:
-        Profiler();
-
-        const char* GetName() const { return "Profiler task"; }
-        void Frame(int elapsed);
-
-        // usually called automatically by Sample constructor
-        void StartSample(const Sample& sample);
-        // usually called automatically by Sample destructor
-        void FinishSample(const Sample& sample);
-
-        // root sample data to analyze
-        // this will be delayed one frame to provide complete information
-        const sample_data* Samples() const;
-    private:
-        void UpdateSample(sample_data& sample, double ms);
-
-        typedef boost::unordered_map<std::string, sample_data> Sample_map_t;
-        struct profiler_data
+        sample_data(const std::string& name_ = "") 
+            : name(name_), current(false), timesRun(0),
+            lastTime(0.0), avgTime(0.0), minTime(std::numeric_limits<double>::max()), maxTime(0.0)
         {
-            
-            Sample_map_t allSamples;
-            sample_data* root;
+        }
 
-            std::stack<sample_data*> openSamples;
-        };
+        std::string name;
+        std::vector<sample_data*> children;
 
-        unsigned int lastFrameStart;
+        // has the sample been added this frame
+        bool current; 
 
-        // use two copies of our state and flip-flop between them. That way we
-        // always have a complete state from last frame we can give to consumers
-        profiler_data data1, data2;
+        unsigned int timesRun;
 
-        profiler_data* current;
-        profiler_data* last;
+        // all times in ms
+        double       lastTime;
+        double       avgTime;
+        double       minTime;
+        double       maxTime;
+		
+    };
+
+    class Sample
+    {
+        public:
+            Sample(const std::string& name_, Profiler& profiler_);
+            ~Sample();
+
+        private:
+            friend class Profiler;
+
+            Profiler& profiler;
+
+            std::string name;
+
+            // in 1/10000 s: default timer resolution
+            unsigned int ticksStart;
+            unsigned int ticksEnd;
     };
 }
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 #endif

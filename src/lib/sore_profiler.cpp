@@ -32,72 +32,91 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include <sore_logger.h>
-#include <sore_profiler.h>
-#include <sore_allgl.h>
-#include <sore_timing.h>
+#include "sore_profiler.h"
+#include "sore_timing.h"
 
-unsigned int SORE_Profiler::Sample::numSamples = 0;
-unsigned int SORE_Profiler::Sample::lastOpened = 0;
-SORE_Profiler::Sample::SampleData SORE_Profiler::Sample::samples[SORE_Profiler::MAX_SAMPLES];
+#include <exception>
 
-namespace SORE_Profiler
+SORE_Profiler::Profiler::Profiler()
+    : current(&data1), last(&data2)
 {
-    Sample::Sample(std::string name)
-    {
-        int currIndex = GetSampleByName(name);
+    lastFrameStart = SORE_Kernel::GetGlobalMS();
 
-        if(currIndex<0)
-        {
-            index = numSamples++;
-            samples[index].name = name;
-            samples[index].timesRun = 0;
-            lastOpened = index;
-            samples[index].intervalCount = 1;
-        }
-        else
-        {
-            index = lastOpened = currIndex;
-            //samples[index].timesRun++;
-            samples[index].intervalCount++;
-        }
-        samples[index].startTime = SORE_Kernel::GetGlobalTicks();
-    }
+    // initialize the root sample
+    current->allSamples[""] = sample_data("");
+    current->root = &current->allSamples[""];
+    current->openSamples.push(&current->allSamples[""]);
+}
 
-    Sample::~Sample()
-    {
-        samples[index].endTime = SORE_Kernel::GetGlobalTicks();
-        samples[index].lastTime = samples[index].endTime - samples[index].startTime;
-        // gcc warning...commenting for now
-        //samples[index].avgTime = (samples[index].avgTime*samples[index].timesRun+(samples[index].lastTime))/(++samples[index].timesRun);
-        samples[index].shortAvgTime+=samples[index].lastTime;
-        if(samples[index].intervalCount%SHORT_INTERVAL==0)
-        {
-            samples[index].intervalCount = 0;
-            samples[index].shortAvgTime/=SHORT_INTERVAL;
-            //ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Average time for sample ID %d: %f", index, samples[index].shortAvgTime);
-        }
-    }
+void SORE_Profiler::Profiler::Frame(int elapsed)
+{
+    // update the root sample to finish this frame
+    unsigned int frameEnd = SORE_Kernel::GetGlobalMS();
+    double ms = static_cast<double>(frameEnd - lastFrameStart);
+    UpdateSample(current->allSamples[""], ms);
 
-    int Sample::GetSampleByName(std::string name)
-    {
-        for(size_t i=0;i<MAX_SAMPLES;i++)
-        {
-            if(samples[i].name==name)
-            {
-                return static_cast<int>(i);
-            }
-        }
-        return -1;
-    }
+    // swap the pointers
+    profiler_data* temp = last;
+    last = current;
+    current = temp;
 
-    void Sample::DisplayAvgTime(int sID)
-    {
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Average time for sample ID %d: %f ms") % sID % (samples[sID].avgTime / 10.0));
-    }
+    // update current with last
+    // (sets our new current frame to the actual last frame)
+    *current = *last;
+    current->root = &current->allSamples[""];
 
-    void Sample::DisplayTime(int sID)
+    // clear out the current frame
+    for(Sample_map_t::iterator i = current->allSamples.begin(); i != current->allSamples.end(); ++i)
     {
-        ENGINE_LOG(SORE_Logging::LVL_DEBUG1, boost::format("Time for sample ID %d: %f ms") % sID % (samples[sID].lastTime / 10.0));
+        i->second.current = false;
+        i->second.children.clear();
     }
+    while(!current->openSamples.empty())
+        current->openSamples.pop();
+    current->openSamples.push(&current->allSamples[""]);
+
+    lastFrameStart = SORE_Kernel::GetGlobalMS();
+}
+
+void SORE_Profiler::Profiler::StartSample(const Sample& sample)
+{
+    Sample_map_t::iterator it = current->allSamples.find(sample.name);
+    if(it == current->allSamples.end())
+    {
+        // create a new sample: this one hasn't been seen before
+        sample_data newSample(sample.name);
+        it = current->allSamples.insert(std::make_pair(sample.name, newSample)).first;
+    }
+    current->openSamples.top()->children.push_back(&it->second);
+    current->openSamples.push(&it->second);
+}
+
+void SORE_Profiler::Profiler::FinishSample(const Sample& sample)
+{
+    Sample_map_t::iterator it = current->allSamples.find(sample.name);
+    if(it == current->allSamples.end())
+    {
+        // TODO: sore exceptions
+        throw std::runtime_error("Unknown sample");
+    }
+    double ms = (sample.ticksEnd - sample.ticksStart) / 10.0;
+    UpdateSample(it->second, ms);
+}
+
+const SORE_Profiler::sample_data* SORE_Profiler::Profiler::Samples() const
+{
+    return last->root;
+}
+
+void SORE_Profiler::Profiler::UpdateSample(sample_data& sample, double ms)
+{
+    sample.avgTime = (sample.avgTime * sample.timesRun + ms) / (sample.timesRun + 1);
+    sample.lastTime = ms;
+    sample.maxTime = std::max(sample.maxTime, ms);
+    sample.minTime = std::min(sample.minTime, ms);
+
+    ++sample.timesRun;
+    sample.current = true;
+
+    current->openSamples.pop();
 }

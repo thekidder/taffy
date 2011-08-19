@@ -32,56 +32,22 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_PROFILER_H
-#define SORE_PROFILER_H
-
-#include "sore_sample.h"
-#include "sore_task.h"
-
-#include <boost/unordered_map.hpp>
-
-#include <stack>
+#include <sore_profiler.h>
+#include <sore_sample.h>
+#include <sore_timing.h>
 
 namespace SORE_Profiler
 {
-    class Profiler : public SORE_Kernel::Task
+    Sample::Sample(const std::string& name_, Profiler& profiler_)
+        : name(name_), profiler(profiler_)
     {
-    public:
-        Profiler();
+        ticksStart = SORE_Kernel::GetGlobalTicks();
+        profiler.StartSample(*this);
+    }
 
-        const char* GetName() const { return "Profiler task"; }
-        void Frame(int elapsed);
-
-        // usually called automatically by Sample constructor
-        void StartSample(const Sample& sample);
-        // usually called automatically by Sample destructor
-        void FinishSample(const Sample& sample);
-
-        // root sample data to analyze
-        // this will be delayed one frame to provide complete information
-        const sample_data* Samples() const;
-    private:
-        void UpdateSample(sample_data& sample, double ms);
-
-        typedef boost::unordered_map<std::string, sample_data> Sample_map_t;
-        struct profiler_data
-        {
-            
-            Sample_map_t allSamples;
-            sample_data* root;
-
-            std::stack<sample_data*> openSamples;
-        };
-
-        unsigned int lastFrameStart;
-
-        // use two copies of our state and flip-flop between them. That way we
-        // always have a complete state from last frame we can give to consumers
-        profiler_data data1, data2;
-
-        profiler_data* current;
-        profiler_data* last;
-    };
+    Sample::~Sample()
+    {
+        ticksEnd = SORE_Kernel::GetGlobalTicks();
+        profiler.FinishSample(*this);
+    }
 }
-
-#endif
