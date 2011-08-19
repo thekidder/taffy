@@ -30,6 +30,7 @@ const int k_num_particles = 256;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
+      renderer(gamestateStack.Profiler()),
       top(gamestateStack.FontCache(),
           gamestateStack.ShaderCache(),
           gamestateStack.TextureCache()),
@@ -527,6 +528,10 @@ void DefaultState::ParticleCubeSpawner(ParticleSpawn& p)
     p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
     p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
     p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
+
+    p.xv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.yv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.zv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
 
     p.r = p.g = p.b = p.a = 1.0f;
 }
