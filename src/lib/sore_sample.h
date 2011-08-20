@@ -49,13 +49,30 @@ namespace SORE_Profiler
 {
 	class Profiler;
 
+    struct timing_sample
+    {
+        timing_sample() 
+            : timesRun(0), 
+            lastTime(0.0), totalTime(0.0),
+            avgTime(0.0), minTime(std::numeric_limits<double>::max()), maxTime(0.0)
+        {}
+
+        unsigned int timesRun;
+
+        // all times in ms
+        double       lastTime;
+        double       totalTime;
+
+        double       avgTime;
+        double       minTime;
+        double       maxTime;
+    };
+
     struct sample_data
     {
         sample_data(const std::string& name_ = "") 
-            : name(name_), current(false), timesRun(0),
-            lastTime(0.0), avgTime(0.0), minTime(std::numeric_limits<double>::max()), maxTime(0.0)
-        {
-        }
+            : name(name_), current(false)
+        {}
 
         std::string name;
         std::vector<sample_data*> children;
@@ -63,14 +80,8 @@ namespace SORE_Profiler
         // has the sample been added this frame
         bool current; 
 
-        unsigned int timesRun;
-
-        // all times in ms
-        double       lastTime;
-        double       avgTime;
-        double       minTime;
-        double       maxTime;
-		
+        timing_sample total;
+        timing_sample last;
     };
 
     class Sample

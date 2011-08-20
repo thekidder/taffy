@@ -40,7 +40,7 @@
 
 #include <boost/unordered_map.hpp>
 
-#include <stack>
+#include <deque>
 
 namespace SORE_Profiler
 {
@@ -62,6 +62,11 @@ namespace SORE_Profiler
         const sample_data* Samples() const;
     private:
         void UpdateSample(sample_data& sample, double ms);
+        // the fully qualified sample name includes the entire call stack of the sample tree
+        // this makes sure we create 2 samples for functions called in different places in the call stack
+        std::string FullyQualifiedName(const Sample& sample);
+        // return the FQN of the sample on the top of the stack
+        std::string FullyQualifiedName();
 
         typedef boost::unordered_map<std::string, sample_data> Sample_map_t;
         struct profiler_data
@@ -70,7 +75,7 @@ namespace SORE_Profiler
             Sample_map_t allSamples;
             sample_data* root;
 
-            std::stack<sample_data*> openSamples;
+            std::deque<sample_data*> openSamples;
         };
 
         unsigned int lastFrameStart;
