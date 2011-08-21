@@ -35,6 +35,8 @@
 #include <boost/foreach.hpp>
 
 #include <sore_logger.h>
+#include <sore_profiler.h>
+#include <sore_sample.h>
 #include <sore_topwidget.h>
 
 namespace SORE_GUI
@@ -42,10 +44,12 @@ namespace SORE_GUI
     TopWidget::TopWidget(
         SORE_Resource::Font_cache_t& fontCache,
         SORE_Resource::Shader_cache_t& shaderCache,
-        SORE_Resource::Texture_cache_t& textureCache)
+        SORE_Resource::Texture_cache_t& textureCache,
+        SORE_Profiler::Profiler* profiler_)
         : Widget(fontCache, shaderCache, textureCache,
         // bogus initial size until we receive a resize event
         SVec(SUnit(400), SUnit(400)), SVec(), NULL),
+        profiler(profiler_),
         imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
     {
     }
@@ -70,6 +74,8 @@ namespace SORE_GUI
 
     void TopWidget::Frame(int elapsed)
     {
+        PROFILE_BLOCK("GUI Update", profiler);
+
         imm_mode.Start();
         imm_mode.SetKeywords("gui");
         Widget::Frame(elapsed, imm_mode);

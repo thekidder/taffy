@@ -41,6 +41,11 @@
 #include <sore_event.h>
 #include <sore_widget.h>
 
+namespace SORE_Profiler
+{
+    class Profiler;
+}
+
 namespace SORE_GUI
 {
     class SORE_EXPORT TopWidget : public Widget
@@ -49,7 +54,8 @@ namespace SORE_GUI
         TopWidget(
             SORE_Resource::Font_cache_t& fontCache,
             SORE_Resource::Shader_cache_t& shaderCache,
-            SORE_Resource::Texture_cache_t& textureCache);
+            SORE_Resource::Texture_cache_t& textureCache,
+            SORE_Profiler::Profiler* profiler_ = 0);
 
         virtual SORE_Graphics::GeometryProvider* GetGeometryProvider() { return &imm_mode; }
 
@@ -60,6 +66,8 @@ namespace SORE_GUI
         void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(const SORE_Kernel::Event& e);
         void UpdateResolution(unsigned int w, unsigned int h);
+
+        SORE_Profiler::Profiler* profiler;
 
         SORE_Graphics::ImmediateModeProvider imm_mode;
     };
