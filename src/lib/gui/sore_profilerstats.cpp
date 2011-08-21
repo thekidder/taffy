@@ -32,9 +32,12 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#include "sore_profiler.h"
-#include "sore_profilerstats.h"
-#include "sore_textwidget.h"
+#include <sore_font.h>
+#include <sore_profiler.h>
+#include <sore_profilerstats.h>
+#include <sore_textwidget.h>
+
+#include <boost/format.hpp>
 
 SORE_GUI::ProfilerStats::ProfilerStats(SVec s, SVec p, SORE_Profiler::Profiler& profiler_, Widget *parent)
     : FrameWindow(s, p, "Profiler Stats", parent), profiler(profiler_)
@@ -77,10 +80,11 @@ int SORE_GUI::ProfilerStats::RenderSample(
         totalTime = sample->total.lastTime;
 
     const unsigned int TEXT_WIDTH = 200;
-    unsigned int width = content->GetSize(SORE_GUI::HORIZONTAL) - TEXT_WIDTH;
+    const unsigned int TIME_WIDTH = 60;
+    unsigned int width = content->GetSize(SORE_GUI::HORIZONTAL) - (TEXT_WIDTH + TIME_WIDTH);
 
     new TextWidget(16, SVec(10, height), content, GetSpaces(treeLevel * 2) + sample->name);
-    float x1 = static_cast<float>(TEXT_WIDTH);
+    float x1 = static_cast<float>(TEXT_WIDTH + TIME_WIDTH);
     float x2 = x1 + static_cast<float>(sample->total.lastTime / totalTime) * static_cast<float>(width);
     float y1 = static_cast<float>(height + 1);
     float y2 = y1 + 16.0f;
@@ -94,6 +98,10 @@ int SORE_GUI::ProfilerStats::RenderSample(
         x1, y2, 0.0f,
         x2, y1, 0.0f,
         x2, y2, 0.0f);
+
+    std::string ms = (boost::format("%.1f ms") % sample->last.lastTime).str();
+    TextWidget* t = new TextWidget(16, SVec((int)TEXT_WIDTH, height), content, ms);
+    //if(x2 - x1 > SORE_Font::
 
     height += 18;
 
