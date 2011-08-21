@@ -99,22 +99,19 @@ void SORE_Graphics::PipelineRenderer::Render()
         pipeline->Setup(renderbuffers);
     }
 
-    {
-        PROFILE_BLOCK("Prepare textures", profiler);
-        // ensure textures are all ready (bind references to renderbuffers)
-        SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
+    // ensure textures are all ready (bind references to renderbuffers)
+    SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
 
-        BOOST_FOREACH(Renderable& r, renderables)
+    BOOST_FOREACH(Renderable& r, renderables)
+    {
+        if(!r.Textures().Ready())
         {
-            if(!r.Textures().Ready())
+            TextureState::Unready_texture_map_t textures = r.Textures().UnreadyTextures();
+            BOOST_FOREACH(const TextureState::Unready_texture_map_t::value_type& tex, textures)
             {
-                TextureState::Unready_texture_map_t textures = r.Textures().UnreadyTextures();
-                BOOST_FOREACH(const TextureState::Unready_texture_map_t::value_type& tex, textures)
-                {
-                    SORE_Resource::Texture2D* t = loader.Load(tex.second);
-                    if(t)
-                        r.Textures().SetTexture(tex.first, t);
-                }
+                SORE_Resource::Texture2D* t = loader.Load(tex.second);
+                if(t)
+                    r.Textures().SetTexture(tex.first, t);
             }
         }
     }
