@@ -38,16 +38,22 @@
 
 namespace SORE_Profiler
 {
-    Sample::Sample(const std::string& name_, Profiler& profiler_)
+    Sample::Sample(const std::string& name_, Profiler* profiler_)
         : name(name_), profiler(profiler_)
     {
-        ticksStart = SORE_Kernel::GetGlobalTicks();
-        profiler.StartSample(*this);
+        if(profiler)
+        {
+            ticksStart = SORE_Kernel::GetGlobalTicks();
+            profiler->StartSample(*this);
+        }
     }
 
     Sample::~Sample()
     {
-        ticksEnd = SORE_Kernel::GetGlobalTicks();
-        profiler.FinishSample(*this);
+        if(profiler)
+        {
+            ticksEnd = SORE_Kernel::GetGlobalTicks();
+            profiler->FinishSample(*this);
+        }
     }
 }

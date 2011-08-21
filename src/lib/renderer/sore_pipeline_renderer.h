@@ -55,7 +55,7 @@ namespace SORE_Graphics
     class SORE_EXPORT PipelineRenderer : public Renderer, SORE_Utility::Noncopyable
     {
     public:
-        PipelineRenderer(SORE_Profiler::Profiler& profiler_);
+        PipelineRenderer(SORE_Profiler::Profiler* profiler_);
         ~PipelineRenderer();
 
         virtual void ClearGeometryProviders();
@@ -78,7 +78,7 @@ namespace SORE_Graphics
 
         int width, height;
 
-        SORE_Profiler::Profiler& profiler;
+        SORE_Profiler::Profiler* profiler;
     };
 }
 

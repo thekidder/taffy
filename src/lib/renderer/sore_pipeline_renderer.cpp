@@ -42,7 +42,7 @@
 
 #include <boost/foreach.hpp>
 
-SORE_Graphics::PipelineRenderer::PipelineRenderer(SORE_Profiler::Profiler& profiler_)
+SORE_Graphics::PipelineRenderer::PipelineRenderer(SORE_Profiler::Profiler* profiler_)
     : profiler(profiler_)
 {
     boost::shared_ptr<Pipe> root(new NullPipe());
@@ -59,13 +59,13 @@ SORE_Graphics::PipelineRenderer::~PipelineRenderer()
 
 void SORE_Graphics::PipelineRenderer::Render()
 {
-    SORE_Profiler::Sample s("Renderer", profiler);
+    PROFILE_BLOCK("Renderer", profiler);
 
     AggregateBufferManager bufferManager;
     render_list renderables;
 
     {
-        SORE_Profiler::Sample s("Collect Geometry", profiler);
+        PROFILE_BLOCK("Collect Geometry", profiler);
         BOOST_FOREACH(GeometryProvider* gp, geometry)
         {
             gp->MakeUpToDate();
@@ -95,12 +95,12 @@ void SORE_Graphics::PipelineRenderer::Render()
     renderQueue.AddCommand(CLEAR_COLOR_AND_DEPTH_BUFFERS);
 
     {
-        SORE_Profiler::Sample s("Setup renderbuffers", profiler);
+        PROFILE_BLOCK("Setup renderbuffers", profiler);
         pipeline->Setup(renderbuffers);
     }
 
     {
-        SORE_Profiler::Sample s("Prepare textures", profiler);
+        PROFILE_BLOCK("Prepare textures", profiler);
         // ensure textures are all ready (bind references to renderbuffers)
         SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
 
@@ -120,12 +120,12 @@ void SORE_Graphics::PipelineRenderer::Render()
     }
 
     {
-        SORE_Profiler::Sample s("Create command queue", profiler);
+        PROFILE_BLOCK("Create command queue", profiler);
         pipeline->Render(cameraTable, renderbuffers, renderables, renderQueue, &bufferManager);
     }
 
     {
-        SORE_Profiler::Sample s("OpenGL render", profiler);
+        PROFILE_BLOCK("OpenGL render", profiler);
         renderQueue.Render();
     }
 

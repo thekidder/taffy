@@ -71,7 +71,9 @@ namespace SORE_Game
         // Accessors
         SORE_Kernel::Screen& Screen() { return screen; }
         SORE_FileIO::PackageCache& PackageCache() { return packageCache; }
-        SORE_Profiler::Profiler& Profiler() { return profiler; }
+
+        // can return null here to disable profiling
+        SORE_Profiler::Profiler* Profiler() { return &profiler; }
 
         // global resource caches
         SORE_Resource::Font_cache_t& FontCache() { return fontCache; }

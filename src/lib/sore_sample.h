@@ -45,6 +45,9 @@
 #include <string>
 #include <vector>
 
+// undef this to disable profiling
+#define PROFILE_BLOCK(name, profiler) SORE_Profiler::Sample s(name, profiler);
+
 namespace SORE_Profiler
 {
 	class Profiler;
@@ -87,13 +90,13 @@ namespace SORE_Profiler
     class Sample
     {
         public:
-            Sample(const std::string& name_, Profiler& profiler_);
+            Sample(const std::string& name_, Profiler* profiler_);
             ~Sample();
 
         private:
             friend class Profiler;
 
-            Profiler& profiler;
+            Profiler* profiler;
 
             std::string name;
 
