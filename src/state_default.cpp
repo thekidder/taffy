@@ -1,7 +1,6 @@
 // strcpy and MSVC++
 #define _CRT_SECURE_NO_WARNINGS
 
-
 #include "app_log.h"
 #include <sore_matrix4x4.h>
 #include "fmod_spectrum.h"
@@ -11,8 +10,8 @@
 #include "state_default.h"
 #include "utility.h"
 
-
 #include <sore_checkbox.h>
+#include <sore_sample.h>
 #include <sore_util.h>
 
 #include <boost/bind.hpp>
@@ -26,7 +25,7 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles = 256;
+const int k_num_particles = 1024;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
@@ -242,6 +241,7 @@ bool DefaultState::OnEvent(const SORE_Kernel::Event& e)
 
 void DefaultState::Frame(int elapsed)
 {
+    PROFILE_BLOCK("All Logic", gamestateStack.Profiler());
     // even when paused, update fmod and take care of the GUI
     system->update();
     
@@ -257,12 +257,15 @@ void DefaultState::Frame(int elapsed)
     lightPos[1] = 6.0f * sin(lightT);
     lightPos[2] = 6.0f * cos(lightT);
 
-    fmod_spectrum.Update();
+    {
+        PROFILE_BLOCK("Music analysis algorithms", gamestateStack.Profiler());
+        fmod_spectrum.Update();
 
-    beat_detector_low.Update();
-    beat_detector_mid.Update();
-    beat_detector_high.Update();
-    energy_analyzer.Update();
+        beat_detector_low.Update();
+        beat_detector_mid.Update();
+        beat_detector_high.Update();
+        energy_analyzer.Update();
+    }
 
     for(size_t i = 0; i < beat_detector_low.NumValues(); ++i)
         beat_visualizer_low->AddDatum(i, beat_detector_low.Value(i));
@@ -276,70 +279,77 @@ void DefaultState::Frame(int elapsed)
     for(size_t i = 0; i < energy_analyzer.NumValues(); ++i)
         energy_visualizer->AddDatum(i, energy_analyzer.Value(i));
 
-    particles.Update(elapsed);
+    {
+        PROFILE_BLOCK("Particle updating", gamestateStack.Profiler());
 
-    // do the magic
-    float beat = static_cast<float>(beat_detector_low.Beat());
-    int bass_particles = static_cast<int>(beat * 400.0f);
-    bass_particles = std::min(k_num_particles, bass_particles);
+        particles.Update(elapsed);
 
-    beat = static_cast<float>(beat_detector_mid.Beat());
-    int mid_particles = static_cast<int>(beat * 20.0f);
-    mid_particles = std::min(k_num_particles / 8, mid_particles);
+        // do the magic
+        float beat = static_cast<float>(beat_detector_low.Beat());
+        int bass_particles = static_cast<int>(beat * 400.0f);
+        bass_particles = std::min(k_num_particles, bass_particles);
 
-    //stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
-    //particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
+        beat = static_cast<float>(beat_detector_mid.Beat());
+        int mid_particles = static_cast<int>(beat * 20.0f);
+        mid_particles = std::min(k_num_particles / 8, mid_particles);
 
-    //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
-    //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+        //stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
+        //particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
 
-    particles.Uniforms().SetVariable("lightPos", lightPos);
-    particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
+        //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+        //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 
-    float lightMatRaw[16] = {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f
-    };
-    SORE_Math::Matrix4<float> lightMatrix(lightMatRaw);
-    SORE_Graphics::camera_info lightCam = GetLightCamera();
-    lightMatrix *= SORE_Math::Matrix4<float>::GetPerspective(
-        lightCam.projection.fov, 1.0f, 
-        lightCam.projection.znear, lightCam.projection.zfar);
-    lightMatrix *= lightCam.viewMatrix;
+        particles.Uniforms().SetVariable("lightPos", lightPos);
+        particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
 
-    particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
-    particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
+        float lightMatRaw[16] = {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f
+        };
+        SORE_Math::Matrix4<float> lightMatrix(lightMatRaw);
+        SORE_Graphics::camera_info lightCam = GetLightCamera();
+        lightMatrix *= SORE_Math::Matrix4<float>::GetPerspective(
+            lightCam.projection.fov, 1.0f, 
+            lightCam.projection.znear, lightCam.projection.zfar);
+        lightMatrix *= lightCam.viewMatrix;
 
-    imm_mode.Start();
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_OPAQUE);
-    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
-    // draw some axes
-    const float AXIS_LENGTH = 1.5f;
+        particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
+        particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
+    }
 
-    imm_mode.SetColor(SORE_Graphics::Green);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f, 0.0f);
-    imm_mode.SetColor(SORE_Graphics::Red);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
-    imm_mode.SetColor(SORE_Graphics::Blue);
-    imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
+    {
+        PROFILE_BLOCK("Immediate mode drawing", gamestateStack.Profiler());
+        imm_mode.Start();
+        imm_mode.SetBlendMode(SORE_Graphics::BLEND_OPAQUE);
+        imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
+        // draw some axes
+        const float AXIS_LENGTH = 1.5f;
 
-    imm_mode.SetUniform("lightPos", lightPos);
-    imm_mode.SetUniform("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
+        imm_mode.SetColor(SORE_Graphics::Green);
+        imm_mode.DrawLine(0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f, 0.0f);
+        imm_mode.SetColor(SORE_Graphics::Red);
+        imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH, 0.0f);
+        imm_mode.SetColor(SORE_Graphics::Blue);
+        imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
+
+        imm_mode.SetUniform("lightPos", lightPos);
+        imm_mode.SetUniform("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
     
-    imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured_lit.shad"));
-    imm_mode.SetColor(SORE_Graphics::Grey);
-    imm_mode.DrawQuad(
-        -100.0f, -3.0f, -100.0f,
-        -100.0f, -3.0f,  100.0f,
-         100.0f, -3.0f, -100.0f,
-         100.0f, -3.0f,  100.0f);
+        imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured_lit.shad"));
+        imm_mode.SetColor(SORE_Graphics::Grey);
+        imm_mode.DrawQuad(
+            -100.0f, -3.0f, -100.0f,
+            -100.0f, -3.0f,  100.0f,
+             100.0f, -3.0f, -100.0f,
+             100.0f, -3.0f,  100.0f);
 
-    imm_mode.SetShader(gamestateStack.ShaderCache().Get("point_sprite_alphatest.shad"));
-    imm_mode.SetColor(SORE_Graphics::White);
-    imm_mode.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
-    imm_mode.DrawPoint(lightPos[0], lightPos[1], lightPos[2], 2.0f);
+        imm_mode.SetShader(gamestateStack.ShaderCache().Get("point_sprite_alphatest.shad"));
+        imm_mode.SetColor(SORE_Graphics::White);
+        imm_mode.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
+        imm_mode.DrawPoint(lightPos[0], lightPos[1], lightPos[2], 2.0f);
+    }
 }
 
 void DefaultState::Render()
