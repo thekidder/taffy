@@ -1,9 +1,11 @@
 #include "pipes.h"
 
+#include <sore_sample.h>
+
 #include <boost/foreach.hpp>
 
-ParticleShadowPipe::ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size)
-    : shader(shader_), shadowmap(shadowmap_size, shadowmap_size, true, 0)
+ParticleShadowPipe::ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size, SORE_Profiler::Profiler* profiler)
+    : Pipe(profiler), shader(shader_), shadowmap(shadowmap_size, shadowmap_size, true, 0)
 {
 }
 
@@ -19,6 +21,8 @@ SORE_Graphics::render_list& ParticleShadowPipe::beginRender(
     SORE_Graphics::GLCommandList& renderQueue,
     SORE_Graphics::BufferManager* bm)
 {
+    PROFILE_BLOCK("Particle shadow pipe", profiler);
+
     renderQueue.SetRenderbuffer(&shadowmap);
     renderQueue.AddCommand(SORE_Graphics::CLEAR_DEPTH_BUFFER);
 

@@ -209,16 +209,16 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     imm_mode.SetKeywords("game");
 
     // set up render pipeline
-    SORE_Graphics::Pipe* sorter = new SORE_Graphics::SortingPipe();
+    SORE_Graphics::Pipe* sorter = new SORE_Graphics::SortingPipe(SORE_Graphics::renderableSort, gamestateStack.Profiler());
 
-    SORE_Graphics::Pipe* guiPipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("gui"));
+    SORE_Graphics::Pipe* guiPipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("gui"), gamestateStack.Profiler());
     guiPipe->AddChildPipe(new SORE_Graphics::RenderPipe("gui"));
 
-    SORE_Graphics::Pipe* gamePipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("game"));
+    SORE_Graphics::Pipe* gamePipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("game"), gamestateStack.Profiler());
     gamePipe->AddChildPipe(new SORE_Graphics::RenderPipe("normal"));
 
-    SORE_Graphics::Pipe* particlePipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("particle"));
-    SORE_Graphics::Pipe* shadowPipe = new ParticleShadowPipe(gamestateStack.ShaderCache().Get("particles_shadowmap.shad"), 512);
+    SORE_Graphics::Pipe* particlePipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("particle"), gamestateStack.Profiler());
+    SORE_Graphics::Pipe* shadowPipe = new ParticleShadowPipe(gamestateStack.ShaderCache().Get("particles_shadowmap.shad"), 512, gamestateStack.Profiler());
     particlePipe->AddChildPipe(shadowPipe);
     shadowPipe->AddChildPipe(new SORE_Graphics::RenderPipe("light"));
 

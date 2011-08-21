@@ -5,10 +5,15 @@
 #include <sore_glslshader.h>
 #include <sore_pipe.h>
 
+namespace SORE_Profiler
+{
+    class Profiler;
+}
+
 class ParticleShadowPipe : public SORE_Graphics::Pipe
 {
 public:
-    ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size);
+    ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size, SORE_Profiler::Profiler* profiler);
 protected:
     virtual void doSetup(SORE_Graphics::Renderbuffer_map_t& renderbuffers);
     virtual SORE_Graphics::render_list& beginRender(
