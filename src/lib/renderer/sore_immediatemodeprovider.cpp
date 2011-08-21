@@ -36,25 +36,38 @@
 #define _SCL_SECURE_NO_WARNINGS
 
 #include <sore_immediatemodeprovider.h>
+#include <sore_glslshader.h>
 
 #include <algorithm>
 #include <set>
 #include <iterator>
 #include <sstream>
 
-SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader)
-    : current_texture(default_texture), current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
+SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::GLSLShaderPtr default_shader)
+    : current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
     current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES), halfWidth(512.0f)
 {
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetTexture(const SORE_Graphics::TextureState::TextureObject& texture)
 {
+    if(texture.name.empty())
+        SetTexture("texture", texture);
+    else
+        SetTexture(texture.name, texture);
+}
+
+void SORE_Graphics::ImmediateModeProvider::SetTexture(const std::string& samplerName, const SORE_Graphics::TextureState::TextureObject& texture)
+{
     TextureState::TextureObjectComparator comp;
-    if(!comp(texture, current_texture) && !comp(current_texture, texture))
-        return;
-    CreateRenderableFromData();
-    current_texture = texture;
+    boost::unordered_map<std::string, TextureState::TextureObject>::iterator it = current_textures.find(samplerName);
+    if(it != current_textures.end() && (comp(texture, it->second) || comp(it->second, texture)))
+    {
+        CreateRenderableFromData();
+    }
+    if(it != current_textures.end())
+        current_textures.erase(it);
+    current_textures.insert(std::make_pair(samplerName, texture));
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Resource::GLSLShaderPtr shader)
@@ -130,9 +143,9 @@ void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
 
 void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords_)
 {
-    if(keywords != keywords_)
-        CreateRenderableFromData();
-
+    if(keywords == keywords_)
+        return;
+    CreateRenderableFromData();
     keywords = keywords_;
 }
 
@@ -228,7 +241,7 @@ void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z,
                 temp[i].z = z;
             }
 
-            SetTexture(char_info.texture);
+            SetTexture("texture", char_info.texture);
             unsigned short current_index = vertices.size();
             AddVertex(temp[0]);
             AddVertex(temp[1]);
@@ -327,7 +340,11 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
 
     Renderable r(geometry, current_shader, current_transform, current_blend_mode);
-    r.AddTexture("texture", current_texture);
+    boost::unordered_map<std::string, TextureState::TextureObject>::iterator it;
+    for(it = current_textures.begin(); it != current_textures.end(); ++it)
+    {
+        r.AddTexture(it->first, it->second);
+    }
 
     r.Uniforms() = currentUniforms;
 

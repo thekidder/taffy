@@ -37,6 +37,9 @@
 
 #include <sore_allgl.h>
 #include <sore_dll.h>
+#include <sore_assettypes.h>
+
+#include <vector>
 
 namespace SORE_Graphics
 {
@@ -44,6 +47,9 @@ namespace SORE_Graphics
     {
     public:
         FBO(unsigned int w, unsigned int h, bool depthBuffer = true, unsigned int colorBuffers = 1);
+        // generate FBO from existing texture(s)
+        FBO(SORE_Resource::Texture2DPtr texture);
+        FBO(const std::vector<SORE_Resource::Texture2DPtr>& textures);
         ~FBO();
 
         void Resize(unsigned int w, unsigned int h);
@@ -54,24 +60,25 @@ namespace SORE_Graphics
         void BindBuffers(unsigned int num);
         //Bind FBO: should be called before calling the next function
         void Bind();
-        //draw to a buffer
-        void SelectBuffer(unsigned int buf);
+        //draw to the buffer(s)
+        void Draw();
         //unbind all FBOs
         static void Unbind();
 
         unsigned int Handle() const;
 
     private:
-        void CreateBuffers();
+        void CreateBuffers(unsigned int numColorBuffers);
+        void CreateTextures(unsigned int numColorBuffers);
         void DestroyBuffers();
 
         unsigned int width, height;
         bool depth;
 
-        GLuint fbo, depthBuffer;
+        GLuint fbo;
 
-        unsigned int numColorBuffers;
-        GLuint* colorBuffers;
+        SORE_Resource::Texture2DPtr depthBuffer;
+        std::vector<SORE_Resource::Texture2DPtr> colorBuffers;
 
         // ugly hack to keep track of whether or not a buffer is bound, and we
         // need to glPopAttrib when we unbind

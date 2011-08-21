@@ -67,7 +67,7 @@ namespace SORE_Graphics
             const camera_info& cam);
         void AddCommand(Render_command_t command);
 
-        void SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_ = -1);
+        void SetRenderbuffer(FBO* const renderbuffer_);
 
         void Render();
 
@@ -106,7 +106,6 @@ namespace SORE_Graphics
 
         // keep track of current render target
         FBO* renderbuffer;
-        int colorbufferIndex;
 
         //command list
         std::vector<Command> commandList;

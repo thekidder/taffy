@@ -51,9 +51,10 @@ namespace SORE_Graphics
     class ImmediateModeProvider : public SORE_Graphics::GeometryProvider
     {
     public:
-        ImmediateModeProvider(SORE_Resource::Texture2DPtr default_texture, SORE_Resource::GLSLShaderPtr default_shader);
+        ImmediateModeProvider(SORE_Resource::GLSLShaderPtr default_shader);
 
         void SetTexture(const SORE_Graphics::TextureState::TextureObject& texture);
+        void SetTexture(const std::string& samplerName, const SORE_Graphics::TextureState::TextureObject& texture);
         void SetShader(SORE_Resource::GLSLShaderPtr shader);
         void SetColor(SORE_Graphics::Color color);
         void SetTransform(SORE_Graphics::TransformationPtr transform);
@@ -101,7 +102,7 @@ namespace SORE_Graphics
         // flush the current vertex/index cache to a new renderable and start a new cache
         void CreateRenderableFromData();
 
-        TextureState::TextureObject current_texture;
+        boost::unordered_map<std::string, TextureState::TextureObject> current_textures;
         SORE_Resource::GLSLShaderPtr current_shader;
         SORE_Graphics::Color current_color;
         SORE_Graphics::TransformationPtr current_transform;

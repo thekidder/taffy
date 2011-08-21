@@ -34,6 +34,7 @@
 
 #include <sore_fbo.h>
 #include <sore_logger.h>
+#include <sore_texture2d.h>
 
 #include <cstring> // memset
 
@@ -42,27 +43,43 @@ namespace SORE_Graphics
     bool FBO::bound = false;
 
     FBO::FBO(unsigned int w, unsigned int h, bool depthBuffer, unsigned int colorBuffers)
-        : width(w), height(h), depth(depthBuffer), numColorBuffers(colorBuffers), colorBuffers(0)
+        : width(w), height(h), depth(depthBuffer)
     {
-        if(numColorBuffers)
+        CreateBuffers(colorBuffers);
+    }
+
+    FBO::FBO(SORE_Resource::Texture2DPtr texture)
+        : width(texture->Width()), height(texture->Height()), depth(false)
+    {
+        colorBuffers.push_back(texture);
+        CreateBuffers(1);
+    }
+
+    FBO::FBO(const std::vector<SORE_Resource::Texture2DPtr>& textures)
+        : width(0), height(0), depth(false)
+    {
+        if(textures.size() > 0)
         {
-            this->colorBuffers = new GLuint[numColorBuffers];
+            width = textures.back()->Width();
+            height = textures.back()->Height();
         }
-        CreateBuffers();
+
+        colorBuffers = textures;
+        CreateBuffers(colorBuffers.size());
     }
 
     FBO::~FBO()
     {
         DestroyBuffers();
-        delete[] colorBuffers;
     }
 
     void FBO::Resize(unsigned int w, unsigned int h)
     {
         width = w;
         height = h;
+        unsigned int numColorBuffers = colorBuffers.size();
         DestroyBuffers();
-        CreateBuffers();
+        CreateBuffers(numColorBuffers);
     }
 
     void FBO::Bind()
@@ -85,72 +102,51 @@ namespace SORE_Graphics
 
     void FBO::BindBuffer(unsigned int buf)
     {
-        if(buf >= numColorBuffers)
+        if(buf >= colorBuffers.size())
         {
             ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Attempted to bind non existent buffer (%d)") % buf);
             return;
         }
-        glBindTexture(GL_TEXTURE_2D, colorBuffers[buf]);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[buf]->Handle());
     }
 
     void FBO::BindBuffers(unsigned int num)
     {
-        if(num > numColorBuffers)
+        if(num > colorBuffers.size())
         {
             ENGINE_LOG(SORE_Logging::LVL_WARNING, boost::format("Attempted to bind more buffers than exist (%d)") % num);
-            num = numColorBuffers;
+            num = colorBuffers.size();
         }
-        for(unsigned int i=0;i<num;++i)
+        for(unsigned int i=0; i<num; ++i)
         {
             glActiveTexture(GL_TEXTURE0+i);
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
+            glBindTexture(GL_TEXTURE_2D, colorBuffers[i]->Handle());
         }
     }
 
-    void FBO::SelectBuffer(unsigned int buf)
+    void FBO::Draw()
     {
-        if(buf >= numColorBuffers)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, boost::format("Attempted to select non existent buffer (%d)") % buf);
-            return;
-        }
-        glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT + buf);
+        static GLenum buffers[] = {
+            GL_COLOR_ATTACHMENT0_EXT,
+            GL_COLOR_ATTACHMENT1_EXT,
+            GL_COLOR_ATTACHMENT2_EXT,
+            GL_COLOR_ATTACHMENT3_EXT,
+            GL_COLOR_ATTACHMENT4_EXT,
+            GL_COLOR_ATTACHMENT5_EXT,
+            GL_COLOR_ATTACHMENT6_EXT,
+            GL_COLOR_ATTACHMENT7_EXT
+        };
+        if(colorBuffers.size())
+            glDrawBuffers(colorBuffers.size(), buffers);
     }
 
-    void FBO::CreateBuffers()
+    void FBO::CreateBuffers(unsigned int numColorBuffers)
     {
         glGenFramebuffersEXT(1, &fbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 
-        if(depth)
-        {
-            glGenTextures(1, &depthBuffer);
-            glBindTexture(GL_TEXTURE_2D, depthBuffer);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-            glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depthBuffer, 0);
-        }
-        if(numColorBuffers)
-            glGenTextures(numColorBuffers, colorBuffers);
-        for(unsigned int i=0;i<numColorBuffers;++i)
-        {
-            glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i, GL_TEXTURE_2D, colorBuffers[i], 0);
-        }
+        CreateTextures(numColorBuffers);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -175,22 +171,51 @@ namespace SORE_Graphics
         }
     }
 
+    void FBO::CreateTextures(unsigned int numColorBuffers)
+    {
+        if(depth)
+        {
+            if(!depthBuffer)
+            {
+                depthBuffer = new SORE_Resource::Texture2D(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, width, height);
+                depthBuffer->MinFilter(GL_NEAREST);
+                depthBuffer->MagFilter(GL_NEAREST);
+            }
+
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depthBuffer->Handle(), 0);
+        }
+
+        if(colorBuffers.size() != numColorBuffers)
+        {
+            colorBuffers.clear();
+            for(unsigned int i=0;i<numColorBuffers;++i)
+            {
+                SORE_Resource::Texture2DPtr t = new SORE_Resource::Texture2D(GL_RGBA8, GL_RGBA, width, height);
+                colorBuffers.push_back(t);
+            }
+        }
+        for(size_t i = 0; i < colorBuffers.size(); ++i)
+        {
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i, GL_TEXTURE_2D, colorBuffers[i]->Handle(), 0);
+        }
+    }
+
     void FBO::DestroyBuffers()
     {
         if(fbo)
             glDeleteFramebuffersEXT(1, &fbo);
-        if(depth && depthBuffer)
-            glDeleteRenderbuffersEXT(1, &depthBuffer);
-        glDeleteTextures(numColorBuffers, colorBuffers);
-        fbo = depthBuffer = 0;
-        memset(colorBuffers, 0, numColorBuffers*sizeof(GLuint));
+        fbo = 0;
+        depthBuffer = SORE_Resource::Texture2DPtr();
+        colorBuffers.clear();
     }
     
     unsigned int FBO::Handle() const
     {
         if(depth)
-            return depthBuffer;
-        else if(numColorBuffers)
-            return colorBuffers[0];
+            return depthBuffer->Handle();
+        else if(colorBuffers.size())
+            return colorBuffers[0]->Handle();
+        else
+            return 0;
     }
 }

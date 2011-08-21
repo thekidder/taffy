@@ -91,6 +91,8 @@ std::size_t SORE_Graphics::TextureState::GetSortKey() const
     return cachedHash;
 }
 
+// This function is only valid if the shader is constant
+// You always need to bind textures on shader change
 SORE_Graphics::TextureState SORE_Graphics::TextureState::GetDiff(
     const TextureState& o) const
 {

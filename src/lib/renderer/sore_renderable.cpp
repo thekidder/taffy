@@ -83,6 +83,7 @@ void SORE_Graphics::Renderable::SetTexture(
     SORE_Resource::Texture2DPtr texture)
 {
     textures.SetTexture(samplerName, texture);
+    CalculateSortKey();
 }
 
 const SORE_Graphics::TextureState& SORE_Graphics::Renderable::Textures() const

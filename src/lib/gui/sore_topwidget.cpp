@@ -50,7 +50,7 @@ namespace SORE_GUI
         // bogus initial size until we receive a resize event
         SVec(SUnit(400), SUnit(400)), SVec(), NULL),
         profiler(profiler_),
-        imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr())  
+        imm_mode(SORE_Resource::GLSLShaderPtr())  
     {
     }
 

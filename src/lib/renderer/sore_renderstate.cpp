@@ -80,7 +80,6 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
     newState.blend = blend;
     newState.shader = shader;
     newState.renderbuffer = renderbuffer;
-    newState.colorbufferIndex = colorbufferIndex;
 
     if(old.camera != camera)
     {
@@ -92,12 +91,18 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
         newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
     }
 
-    if(!old.shader || old.shader != shader)
+    if(shader && (!old.shader || old.shader != shader))
     {
         newState.commands |= RENDER_CMD_BIND_SHADER;
     }
+    
+    // ALWAYS rebind full texture state if the shader changes
+    TextureState tDiff;
+    if(newState.commands & RENDER_CMD_BIND_SHADER)
+        tDiff = textures;
+    else
+        tDiff = textures.GetDiff(old.textures);
 
-    TextureState tDiff = textures.GetDiff(old.textures);
     if(!tDiff.Empty())
     {
         newState.commands |= RENDER_CMD_BIND_TEXTURE;
@@ -190,16 +195,14 @@ void SORE_Graphics::RenderState::Apply() const
         else
         {
             renderbuffer->Bind();
-            if(colorbufferIndex >= 0)
-                renderbuffer->SelectBuffer(static_cast<unsigned int>(colorbufferIndex));
+            renderbuffer->Draw();
         }
     }
 }
 
-void SORE_Graphics::RenderState::SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_)
+void SORE_Graphics::RenderState::SetRenderbuffer(FBO* const renderbuffer_)
 {
     renderbuffer = renderbuffer_;
-    colorbufferIndex = colorbufferIndex_;
 
     commands |= RENDER_CMD_CHANGE_FBO;
 }

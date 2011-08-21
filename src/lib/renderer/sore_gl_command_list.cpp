@@ -34,7 +34,7 @@
 
 #include <sore_gl_command_list.h>
 
-SORE_Graphics::GLCommandList::GLCommandList() : renderbuffer(0), colorbufferIndex(-1)
+SORE_Graphics::GLCommandList::GLCommandList() : renderbuffer(0)
 {
 }
 
@@ -42,7 +42,7 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
 {
     RenderState state(r, cam);
     // apply current renderbuffer
-    state.SetRenderbuffer(renderbuffer, colorbufferIndex);
+    state.SetRenderbuffer(renderbuffer);
     state = state.Difference(currentState);
 
     if(currentGeometry.geometry != geometry.geometry || commandList.back().type == COMMAND)
@@ -82,16 +82,15 @@ void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command)
     // if we add a command, make sure to push the current state first
     // e.x, when we issue a clear command, we want to make sure the current
     // FBO is bound
-    currentState.SetRenderbuffer(renderbuffer, colorbufferIndex);
+    currentState.SetRenderbuffer(renderbuffer);
     commandList.push_back(RenderBatch(currentState));
 
     commandList.push_back(command);
 }
 
-void SORE_Graphics::GLCommandList::SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_)
+void SORE_Graphics::GLCommandList::SetRenderbuffer(FBO* const renderbuffer_)
 {
     renderbuffer = renderbuffer_;
-    colorbufferIndex = colorbufferIndex_;
 }
 
 void SORE_Graphics::GLCommandList::Render()

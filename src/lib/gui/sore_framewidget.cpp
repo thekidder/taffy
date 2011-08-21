@@ -94,7 +94,7 @@ namespace SORE_GUI
     void FrameWidget::RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
         imm_mode.SetShader(shader);
-        imm_mode.SetTexture(texture);
+        imm_mode.SetTexture("texture", texture);
         imm_mode.SetColor(SORE_Graphics::White);
         imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
         imm_mode.SetTransform(

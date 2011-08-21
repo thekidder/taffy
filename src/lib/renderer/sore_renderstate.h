@@ -62,7 +62,7 @@ namespace SORE_Graphics
         // set the renderbuffer to render to
         // colorbuffer is the index of the color buffer to select - if this is
         // -1, no color buffer
-        void SetRenderbuffer(FBO* const renderbuffer_, int colorbufferIndex_ = -1);
+        void SetRenderbuffer(FBO* const renderbuffer_);
     private:
         enum Render_cmd_e
         {
@@ -91,7 +91,6 @@ namespace SORE_Graphics
         GLenum primitiveType;
 
         FBO* renderbuffer;
-        int colorbufferIndex;
     };
 }
 
