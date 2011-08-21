@@ -122,7 +122,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     spectrum_visualizer  = new SpectrumVisualizer(SVec(SUnit(1.0), SUnit(0.175)), SVec(SUnit(), SUnit(0.0125 + 0.2 * 4)), displays, 0);
 
-    debug = new DebugGUI(renderer, container);
+    debug = new DebugGUI(renderer, gamestateStack.Profiler(), container);
 
     visualizers_controls->ConnectChecked(boost::bind(&SORE_GUI::Widget::SetVisible, displays, _1));
 
