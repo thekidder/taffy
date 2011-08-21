@@ -49,6 +49,12 @@ namespace SORE_Resource
         LoadFromData(data, internalFormat, format, width, height);
     }
 
+    Texture2D::Texture2D(GLint internalFormat, GLenum format, unsigned int width, unsigned int height)
+        : handle(0), external(false)
+    {
+        LoadFromData(0, internalFormat, format, width, height);
+    }
+
     Texture2D::Texture2D(GLuint handle_)
         : handle(handle_), external(true), w(0), h(0)
     {
@@ -111,17 +117,10 @@ namespace SORE_Resource
         glGenTextures(1, &handle);
         glBindTexture(GL_TEXTURE_2D, handle);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
         GLenum type = GL_UNSIGNED_BYTE;
         //interpret data as unsigned bytes unless a float format is specified
-        const int NUM_FLOAT_FORMATS = 12;
-        GLint floatFormats[NUM_FLOAT_FORMATS] = {
+        const int NUM_FLOAT_FORMATS = 13;
+        GLint floatFormats[] = {
             GL_RGBA32F_ARB,
             GL_RGB32F_ARB,
             GL_ALPHA32F_ARB,
@@ -133,7 +132,8 @@ namespace SORE_Resource
             GL_ALPHA16F_ARB,
             GL_INTENSITY16F_ARB,
             GL_LUMINANCE16F_ARB,
-            GL_LUMINANCE_ALPHA16F_ARB
+            GL_LUMINANCE_ALPHA16F_ARB,
+            GL_DEPTH_COMPONENT
         };
         for(int i = 0; i < NUM_FLOAT_FORMATS; ++i)
         {
@@ -143,6 +143,11 @@ namespace SORE_Resource
         glTexImage2D( GL_TEXTURE_2D, 0, internalFormat, width,
                       height, 0, format,
                       type, data);
+
+        // setup sensible defaults
+        ClampTexture(true);
+        MinFilter(GL_LINEAR);
+        MagFilter(GL_LINEAR);
     }
 
     bool Texture2D::operator<(const Texture2D& o) const
@@ -163,6 +168,39 @@ namespace SORE_Resource
         shader->SetUniform1i(sampleName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, handle);
+    }
+
+    void Texture2D::ClampTexture(bool clamp)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, handle);
+
+        if(clamp)
+        {
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
+        else
+        {
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        }
+    }
+
+    void Texture2D::MinFilter(GLint filter)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, handle);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    }
+
+    void Texture2D::MagFilter(GLint filter)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, handle);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     }
 
     void Texture2D::Unload()

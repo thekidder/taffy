@@ -49,6 +49,7 @@ namespace SORE_Resource
     public:
         Texture2D(const void* data, GLint internalFormat,
                   GLenum format, unsigned int width, unsigned int height);
+        Texture2D(GLint internalFormat, GLenum format, unsigned int width, unsigned int height);
         Texture2D(GLuint handle_);
         ~Texture2D();
 
@@ -59,6 +60,15 @@ namespace SORE_Resource
             GLSLShaderPtr shader,
             const std::string& sampleName,
             unsigned int textureSlot) const;
+
+        // filtering options
+        // when set to true, clamps texture. otherwise repeats
+        void ClampTexture(bool clamp);
+        void MinFilter(GLint filter);
+        void MagFilter(GLint filter);
+
+        unsigned int Width() const { return w; }
+        unsigned int Height() const { return h; }
 
         void SaveTGA(const char* filename);
         unsigned int Handle() const { return handle; }
