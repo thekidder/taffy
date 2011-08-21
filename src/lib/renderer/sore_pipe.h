@@ -48,6 +48,11 @@
 #include <string>
 #include <vector>
 
+namespace SORE_Profiler
+{
+    class Profiler;
+}
+
 namespace SORE_Graphics
 {
     typedef std::vector<Renderable> render_list;
@@ -56,6 +61,7 @@ namespace SORE_Graphics
     class SORE_EXPORT Pipe
     {
     public:
+        Pipe(SORE_Profiler::Profiler* p = 0);
         virtual ~Pipe() {}
 
         /*
@@ -90,6 +96,8 @@ namespace SORE_Graphics
             render_list& list,
             GLCommandList& renderQueue,
             BufferManager* bm) {}
+
+        SORE_Profiler::Profiler* profiler;
     private:
         typedef boost::ptr_vector<Pipe> pipe_vector;
         pipe_vector children;
@@ -106,6 +114,7 @@ namespace SORE_Graphics
     class SORE_EXPORT NullPipe: public Pipe
     {
     public:
+        NullPipe(SORE_Profiler::Profiler* p = 0);
     protected:
         virtual render_list& beginRender(
             const camera_table& cameras,
@@ -118,7 +127,7 @@ namespace SORE_Graphics
     class SORE_EXPORT RenderPipe: public Pipe
     {
     public:
-        RenderPipe(const std::string& cameraName);
+        RenderPipe(const std::string& cameraName, SORE_Profiler::Profiler* p = 0);
     protected:
         virtual render_list& beginRender(
             const camera_table& cameras,
@@ -140,7 +149,7 @@ namespace SORE_Graphics
     class SORE_EXPORT SortingPipe : public Pipe
     {
     public:
-        SortingPipe(sorting_predicate comp = renderableSort);
+        SortingPipe(sorting_predicate comp = renderableSort, SORE_Profiler::Profiler* p = 0);
     protected:
         virtual void doSetup(Renderbuffer_map_t& renderBuffers);
         virtual render_list& beginRender(
@@ -174,7 +183,7 @@ namespace SORE_Graphics
     class SORE_EXPORT FilterPipe: public Pipe
     {
     public:
-        FilterPipe(filter_predicate filterFunction);
+        FilterPipe(filter_predicate filterFunction, SORE_Profiler::Profiler* p = 0);
     protected:
         virtual void doSetup(Renderbuffer_map_t& renderBuffers);
         virtual render_list& beginRender(

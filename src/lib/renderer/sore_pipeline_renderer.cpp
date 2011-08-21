@@ -95,7 +95,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     renderQueue.AddCommand(CLEAR_COLOR_AND_DEPTH_BUFFERS);
 
     {
-        PROFILE_BLOCK("Setup renderbuffers", profiler);
+        PROFILE_BLOCK("Setup pipeline", profiler);
         pipeline->Setup(renderbuffers);
     }
 
@@ -117,7 +117,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     }
 
     {
-        PROFILE_BLOCK("Create command queue", profiler);
+        PROFILE_BLOCK("Render pipeline", profiler);
         pipeline->Render(cameraTable, renderbuffers, renderables, renderQueue, &bufferManager);
     }
 

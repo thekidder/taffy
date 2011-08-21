@@ -34,10 +34,15 @@
 
 #include <sore_logger.h>
 #include <sore_pipe.h>
+#include <sore_sample.h>
 
 #include <boost/foreach.hpp>
 
 #include <stdexcept>
+
+SORE_Graphics::Pipe::Pipe(SORE_Profiler::Profiler* p) : profiler(p)
+{
+}
 
 void SORE_Graphics::Pipe::AddChildPipe(Pipe* child)
 {
@@ -75,7 +80,11 @@ void SORE_Graphics::Pipe::Render
     finishRender(cameras, renderbuffers, list, renderQueue, bm);
 }
 
-SORE_Graphics::SortingPipe::SortingPipe(sorting_predicate comp) : comparator(comp)
+SORE_Graphics::NullPipe::NullPipe(SORE_Profiler::Profiler* p) : Pipe(p)
+{
+}
+
+SORE_Graphics::SortingPipe::SortingPipe(sorting_predicate comp, SORE_Profiler::Profiler* p) : Pipe(p), comparator(comp)
 {
 }
 
@@ -93,6 +102,8 @@ SORE_Graphics::render_list& SORE_Graphics::SortingPipe::beginRender
     BufferManager* bm
 )
 {
+    PROFILE_BLOCK("Sorting pipe", profiler);
+
     sortedList = list;
 
     std::sort(sortedList.begin(), sortedList.end(), comparator);
@@ -127,7 +138,8 @@ SORE_Graphics::render_list& SORE_Graphics::NullPipe::beginRender
 }
 
 
-SORE_Graphics::RenderPipe::RenderPipe(const std::string& cameraName) : camera(cameraName)
+SORE_Graphics::RenderPipe::RenderPipe(const std::string& cameraName, SORE_Profiler::Profiler* p) 
+    : Pipe(p), camera(cameraName)
 {
 }
 
@@ -140,6 +152,8 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::beginRender
     BufferManager* bm
 )
 {
+    PROFILE_BLOCK("Render pipe", profiler);
+
     if(cameras.find(camera) == cameras.end())
     {
         // TODO: FIXME: sore exceptions
@@ -156,7 +170,8 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::beginRender
     return list;
 }
 
-SORE_Graphics::FilterPipe::FilterPipe(filter_predicate filterFunction) : filter(filterFunction)
+SORE_Graphics::FilterPipe::FilterPipe(filter_predicate filterFunction, SORE_Profiler::Profiler* p) 
+    : Pipe(p), filter(filterFunction)
 {
 }
 
@@ -174,6 +189,8 @@ SORE_Graphics::render_list& SORE_Graphics::FilterPipe::beginRender
     BufferManager* bm
 )
 {
+    PROFILE_BLOCK("Filter pipe", profiler);
+
     BOOST_FOREACH(Renderable r, list)
     {
         if(filter(r))
