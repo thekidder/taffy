@@ -19,7 +19,8 @@ ParticleSystem::ParticleSystem(
       texture_size_height(texture_size_h),
       vbo(SORE_Graphics::STATIC, true, true, true),
       current(&state1), last(&state2),
-      texture_cache(texture_cache_), shader_cache(shader_cache_)
+      texture_cache(texture_cache_), shader_cache(shader_cache_),
+      time_since_update(0)
 {
     size_t num_particles = texture_size_width * texture_size_height;
 
@@ -148,7 +149,7 @@ void ParticleSystem::AddParticles(Particle_spawn_func_t spawn_func)
 
 void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
 {
-    //APP_LOG(SORE_Logging::LVL_INFO, "ParticleSystem::Update");
+    time_since_update += elapsed;
     if(updatePipe->Swap())
     {
         imm_mode.SetKeywords("particle_update");
@@ -156,6 +157,7 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
         imm_mode.SetTexture("positions", current->positions);
         imm_mode.SetTexture("colors", current->colors);
         imm_mode.SetTexture("velocities", current->velocities);
+        imm_mode.SetUniform("elapsed", time_since_update / 1000.0f);
 
         imm_mode.DrawQuad(
             0.0f, 0.0f, 0.0f,
@@ -164,6 +166,8 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
             1.0f, 1.0f, 0.0f);
 
         std::swap(current, last);
+
+        time_since_update = 0;
     }
 }
 

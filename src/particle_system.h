@@ -65,6 +65,8 @@ private:
 
     SORE_Resource::Texture_cache_t& texture_cache;
     SORE_Resource::Shader_cache_t& shader_cache;
+
+    int time_since_update;
 };
 
 #endif
