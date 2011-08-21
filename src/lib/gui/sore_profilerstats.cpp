@@ -102,7 +102,7 @@ int SORE_GUI::ProfilerStats::RenderSample(
         x2, y1, 0.0f,
         x2, y2, 0.0f);
 
-    std::string ms = (boost::format("%.1f ms") % sample->last.lastTime).str();
+    std::string ms = (boost::format("%.1f ms") % sample->total.lastTime).str();
     TextWidget* t = new TextWidget(16, SVec((int)TEXT_WIDTH, height), content, ms);
     //if(x2 - x1 > SORE_Font::
 
