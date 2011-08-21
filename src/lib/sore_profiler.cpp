@@ -45,6 +45,7 @@ SORE_Profiler::Profiler::Profiler()
     // initialize the root sample
     current->allSamples["root"] = sample_data("root");
     current->root = &current->allSamples["root"];
+    last->root = 0;
     current->openSamples.push_back(&current->allSamples["root"]);
 }
 
