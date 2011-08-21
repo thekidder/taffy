@@ -83,9 +83,12 @@ int SORE_GUI::ProfilerStats::RenderSample(
     const unsigned int TIME_WIDTH = 60;
     unsigned int width = content->GetSize(SORE_GUI::HORIZONTAL) - (TEXT_WIDTH + TIME_WIDTH);
 
+    float bar_width = static_cast<float>(sample->total.lastTime / totalTime);
+    bar_width = std::min(bar_width, 1.0f);
+
     new TextWidget(16, SVec(10, height), content, GetSpaces(treeLevel * 2) + sample->name);
     float x1 = static_cast<float>(TEXT_WIDTH + TIME_WIDTH);
-    float x2 = x1 + static_cast<float>(sample->total.lastTime / totalTime) * static_cast<float>(width);
+    float x2 = x1 + bar_width * static_cast<float>(width);
     float y1 = static_cast<float>(height + 1);
     float y2 = y1 + 16.0f;
     imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
