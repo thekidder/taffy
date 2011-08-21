@@ -105,7 +105,6 @@ SORE_Graphics::render_list& SORE_Graphics::SortingPipe::beginRender
     PROFILE_BLOCK("Sorting pipe", profiler);
 
     sortedList = list;
-
     std::sort(sortedList.begin(), sortedList.end(), comparator);
 
     return sortedList;
