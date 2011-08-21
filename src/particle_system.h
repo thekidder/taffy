@@ -2,28 +2,36 @@
 #define PARTICLE_SYSTEM_H
 
 #include "particle_texture_loader.h"
+#include "pipes.h"
 
+#include <sore_assettypes.h>
 #include <sore_buffermanager.h>
 #include <sore_color.h>
 #include <sore_event.h>
 #include <sore_geometryprovider.h>
+#include <sore_immediatemodeprovider.h>
 #include <sore_vbo.h>
 
 #include <vector>
+
+namespace SORE_Profiler
+{
+    class Profiler;
+}
 
 class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
 {
 public:
     ParticleSystem(
-        size_t texture_size_,
-        SORE_Resource::Texture2DPtr t = SORE_Resource::Texture2DPtr(), 
-        SORE_Resource::GLSLShaderPtr s = SORE_Resource::GLSLShaderPtr());
+        Particle_spawn_func_t spawn_func,
+        size_t texture_size_w, size_t texture_size_h,
+        SORE_Resource::Texture_cache_t& texture_cache,
+        SORE_Resource::Shader_cache_t& shader_cache);
 
-    void SetShader(SORE_Resource::GLSLShaderPtr s);
-    void SetTexture(SORE_Resource::Texture2DPtr t);
+    ParticleUpdatePipe* GetUpdatePipe();
+    SORE_Graphics::camera_info GetUpdateCamera();
 
-    void AddParticles(Particle_spawn_func_t spawn_func);
-    void Update(int elapsed);
+    void Update(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
 
     SORE_Graphics::UniformState& Uniforms() { return geometry.front().Uniforms(); }
 
@@ -39,17 +47,24 @@ public:
 
     SORE_Graphics::BufferManager* GetBufferManager() { return this; }
 private:
-    SORE_Resource::Texture2DPtr texture;
-    SORE_Resource::GLSLShaderPtr shader;
+    void AddParticles(Particle_spawn_func_t spawn_func);
+
+    SORE_Resource::GLSLShaderPtr update_shader;
 
     std::vector<SORE_Graphics::Renderable> geometry;
     SORE_Graphics::geometry_entry geometry_lookup;
     SORE_Graphics::VBO vbo;
 
-    size_t texture_size;
+    size_t texture_size_width, texture_size_height;
     float half_width;
 
-    ParticleState state;
+    ParticleState state1, state2;
+    ParticleState* current, *last;
+
+    ParticleUpdatePipe* updatePipe;
+
+    SORE_Resource::Texture_cache_t& texture_cache;
+    SORE_Resource::Shader_cache_t& shader_cache;
 };
 
 #endif

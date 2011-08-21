@@ -25,7 +25,8 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles = 1024;
+const int k_num_particles_width  = 256;
+const int k_num_particles_height = 256;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
@@ -44,8 +45,12 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       beat_detector_low(&low), beat_detector_mid(&mid), beat_detector_high(&high),
       energy_analyzer(&log_spectrum),
       rotating(false), lightPos(0.0f, 20.0f, 0.0f),
-      particles(k_num_particles), paused(false),
-      imm_mode(SORE_Resource::Texture2DPtr(), SORE_Resource::GLSLShaderPtr()), lightT(0.0f)
+      particles(
+      boost::bind(&DefaultState::ParticleCubeSpawner, this, _1),
+      k_num_particles_width, k_num_particles_height, 
+      gamestateStack.TextureCache(), gamestateStack.ShaderCache()), 
+      paused(false),
+      imm_mode(SORE_Resource::GLSLShaderPtr()), lightT(0.0f)
 {
     gamestateStack.PackageCache().AddPackage("ix_style.sdp");
     gamestateStack.PackageCache().AddPackage("default_resources.sdp");
@@ -152,10 +157,15 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
         &DefaultState::GetLightCamera,
         this);
 
+    SORE_Graphics::camera_callback particleUpdateCam = boost::bind(
+        &ParticleSystem::GetUpdateCamera,
+        boost::ref(particles));
+
     SORE_Graphics::camera_callback_table cameras;
     cameras["gui"] = guiCam;
     cameras["normal"] = normalCam;
     cameras["light"] = lightCam;
+    cameras["particle_update"] = particleUpdateCam;
     renderer.SetCameraTable(cameras);
 
     FMOD::System_Create(&system);
@@ -195,10 +205,10 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     beat_visualizer_mid->SetComment((boost::format("%.1f - %.1f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
     beat_visualizer_high->SetComment((boost::format("%.1f - %.1f Hz") % high.TotalHz().first % high.TotalHz().second).str());
 
-    particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
-    particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
+    //particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
+    //particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
 
-    particles.AddParticles(boost::bind(&DefaultState::ParticleCubeSpawner, this, _1));
+    //particles.AddParticles(boost::bind(&DefaultState::ParticleCubeSpawner, this, _1));
 
     glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
@@ -221,11 +231,16 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     particlePipe->AddChildPipe(shadowPipe);
     shadowPipe->AddChildPipe(new SORE_Graphics::RenderPipe("light"));
 
+    SORE_Graphics::Pipe* particleUpdatePipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("particle_update"), gamestateStack.Profiler());
+    SORE_Graphics::Pipe* updatePipe = particles.GetUpdatePipe();
+    particleUpdatePipe->AddChildPipe(updatePipe);
+    updatePipe->AddChildPipe(new SORE_Graphics::RenderPipe("particle_update"));
+
     renderer.RootPipe()->AddChildPipe(sorter);
     sorter->AddChildPipe(particlePipe);
     sorter->AddChildPipe(gamePipe);
     sorter->AddChildPipe(guiPipe);
-
+    sorter->AddChildPipe(particleUpdatePipe);
 }
 
 DefaultState::~DefaultState()
@@ -280,48 +295,9 @@ void DefaultState::Frame(int elapsed)
         energy_visualizer->AddDatum(i, energy_analyzer.Value(i));
 
     {
-        PROFILE_BLOCK("Particle updating", gamestateStack.Profiler());
-
-        particles.Update(elapsed);
-
-        // do the magic
-        float beat = static_cast<float>(beat_detector_low.Beat());
-        int bass_particles = static_cast<int>(beat * 400.0f);
-        bass_particles = std::min(k_num_particles, bass_particles);
-
-        beat = static_cast<float>(beat_detector_mid.Beat());
-        int mid_particles = static_cast<int>(beat * 20.0f);
-        mid_particles = std::min(k_num_particles / 8, mid_particles);
-
-        //stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
-        //particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
-
-        //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
-        //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
-
-        particles.Uniforms().SetVariable("lightPos", lightPos);
-        particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
-
-        float lightMatRaw[16] = {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.5f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f
-        };
-        SORE_Math::Matrix4<float> lightMatrix(lightMatRaw);
-        SORE_Graphics::camera_info lightCam = GetLightCamera();
-        lightMatrix *= SORE_Math::Matrix4<float>::GetPerspective(
-            lightCam.projection.fov, 1.0f, 
-            lightCam.projection.znear, lightCam.projection.zfar);
-        lightMatrix *= lightCam.viewMatrix;
-
-        particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
-        particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
-    }
-
-    {
         PROFILE_BLOCK("Immediate mode drawing", gamestateStack.Profiler());
         imm_mode.Start();
+        imm_mode.SetKeywords("game");
         imm_mode.SetBlendMode(SORE_Graphics::BLEND_OPAQUE);
         imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured.shad"));
         // draw some axes
@@ -350,6 +326,47 @@ void DefaultState::Frame(int elapsed)
         imm_mode.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
         imm_mode.DrawPoint(lightPos[0], lightPos[1], lightPos[2], 2.0f);
     }
+
+    {
+        PROFILE_BLOCK("Particle updating", gamestateStack.Profiler());
+
+        particles.Update(elapsed, imm_mode);
+
+        // do the magic
+        float beat = static_cast<float>(beat_detector_low.Beat());
+        int bass_particles = static_cast<int>(beat * 400.0f);
+        //bass_particles = std::min(k_num_particles, bass_particles);
+
+        beat = static_cast<float>(beat_detector_mid.Beat());
+        int mid_particles = static_cast<int>(beat * 20.0f);
+        //mid_particles = std::min(k_num_particles / 8, mid_particles);
+
+        //stars.AddParticles(boost::bind(&DefaultState::CreateExplosion, this, _1), mid_particles);
+        //particles.AddParticles(boost::bind(&DefaultState::CreateDisc, this, _1), bass_particles);
+
+        //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+        //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
+
+        particles.Uniforms().SetVariable("lightPos", lightPos);
+        particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
+
+        float lightMatRaw[16] = {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f
+        };
+        SORE_Math::Matrix4<float> lightMatrix(lightMatRaw);
+        SORE_Graphics::camera_info lightCam = GetLightCamera();
+        lightMatrix *= SORE_Math::Matrix4<float>::GetPerspective(
+            lightCam.projection.fov, 1.0f, 
+            lightCam.projection.znear, lightCam.projection.zfar);
+        lightMatrix *= lightCam.viewMatrix;
+
+        particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
+        particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
+    }
+
 }
 
 void DefaultState::Render()

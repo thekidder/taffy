@@ -13,5 +13,5 @@ void main()
     color = gl_Color;
 
     lightTransformed = (transform * vec4(lightPos, 1.0)).xyz;
-    position = transform * gl_Vertex;
+    position = (transform * gl_Vertex).xyz;
 }

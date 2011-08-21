@@ -25,11 +25,11 @@ typedef boost::function<void (ParticleSpawn&)> Particle_spawn_func_t;
 class ParticleTextureLoader
 {
 public:
-    ParticleTextureLoader(size_t texture_size_);
+    ParticleTextureLoader(size_t texture_size_w, size_t texture_size_h);
 
     ParticleState Load(const Particle_spawn_func_t& spawn_func);
 private:
-    size_t texture_size;
+    size_t texture_size_width, texture_size_height;
 };
 
 #endif

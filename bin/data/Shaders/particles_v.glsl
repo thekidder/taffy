@@ -4,12 +4,12 @@ uniform mat4 lightMatrix;
 uniform vec3 lightPos;
 uniform float lightIntensity;
 uniform vec2 screenSize;
+
 uniform sampler2D shadowMap;
 uniform sampler2D colors;
 uniform sampler2D positions;
 
 varying vec4 color;
-varying float shadow;
 
 void main() 
 {
@@ -18,7 +18,7 @@ void main()
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	gl_Position = gl_ModelViewProjectionMatrix * transform * particlePosition;
-    float C = gl_ProjectionMatrix[0] * halfWidth;
+    float C = (gl_ProjectionMatrix[0] * halfWidth).x;
 	gl_PointSize = gl_Normal.x / (sqrt(1.0 / (C * C)) * gl_Position.z);
     color = texture2D(colors, vec2(gl_Position.x, gl_Position.y)).rgba;
 
@@ -32,17 +32,17 @@ void main()
 	shadowCoordinateWdivide.z += 0.0005;
     */
 
-    shadow = 1.0;
+    float shadow = 1.0;
 
     float distanceFromLight;
 
-    const int kernel_size = 3;
-    const float shadow_increment = 2.0 / ((kernel_size * 2 + 1) * (kernel_size * 2 + 1));
+    const float kernel_size = 3.0;
+    const float shadow_increment = 2.0 / ((kernel_size * 2.0 + 1.0) * (kernel_size * 2.0 + 1.0));
     if(shadowCoord.w > 0.0)
     {
-        for(int i = -kernel_size; i <= kernel_size; ++i)
+        for(float i = -kernel_size; i <= kernel_size; i+=1.0)
         {
-            for(int j = -kernel_size; j <= kernel_size; ++j)
+            for(float j = -kernel_size; j <= kernel_size; j+=1.0)
             {
                 distanceFromLight = texture2D(
                     shadowMap,
@@ -60,7 +60,7 @@ void main()
     //shadow = 1.0;
 
     vec3 lightTransformed = (transform * vec4(lightPos, 1.0)).xyz;
-    vec3 position = transform * gl_Vertex;
+    vec3 position = (transform * gl_Vertex).xyz;
 
     vec3 diff = lightTransformed - position;
     float dist = sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
@@ -70,4 +70,5 @@ void main()
     float c = 0.002;
 
     shadow *= lightIntensity / (a + b * dist + c * dist * dist);
+    color *= vec4(shadow);
 }

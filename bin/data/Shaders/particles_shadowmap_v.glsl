@@ -7,5 +7,5 @@ void main()
     vec4 position = vec4(texture2D(positions, tex).xyz, 1.0);
 
 	gl_Position = gl_ModelViewProjectionMatrix * transform * position;
-	gl_PointSize = 1.0f;
+	gl_PointSize = 1.0;
 }
