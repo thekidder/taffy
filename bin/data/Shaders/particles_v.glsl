@@ -20,7 +20,7 @@ void main()
 	gl_Position = gl_ModelViewProjectionMatrix * transform * particlePosition;
     float C = (gl_ProjectionMatrix[0] * halfWidth).x;
 	gl_PointSize = gl_Normal.x / (sqrt(1.0 / (C * C)) * gl_Position.z);
-    color = texture2D(colors, vec2(gl_Position.x, gl_Position.y)).rgba;
+    color = texture2D(colors, tex);
 
     vec4 shadowCoord = lightMatrix * particlePosition;
 
