@@ -134,15 +134,6 @@ const SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms() const
 {
     return uniforms;
 }
-
-int SORE_Graphics::Renderable::GetSortKey() const
-{
-    CalculateDepth();
-    CalculateSortKey();
-
-    return sortKey;
-}
-
 void SORE_Graphics::Renderable::SetProjection(const ProjectionInfo& pi)
 {
     proj = pi;

@@ -87,7 +87,7 @@ namespace SORE_Graphics
         UniformState& Uniforms();
         const UniformState& Uniforms() const;
 
-        int GetSortKey() const;
+        int GetSortKey() const { return sortKey; }
 
         void SetProjection(const ProjectionInfo& pi);
 
