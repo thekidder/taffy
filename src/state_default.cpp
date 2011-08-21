@@ -33,7 +33,8 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
       renderer(gamestateStack.Profiler()),
       top(gamestateStack.FontCache(),
           gamestateStack.ShaderCache(),
-          gamestateStack.TextureCache()),
+          gamestateStack.TextureCache(),
+          gamestateStack.Profiler()),
       buffer(k_fft_samples * k_num_channels, k_num_channels), fmod_adapter(buffer),
       fmod_spectrum(k_fft_samples, 48000), 
 #ifdef USE_KISS
