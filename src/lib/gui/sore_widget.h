@@ -49,6 +49,7 @@
 #include <sore_dll.h>
 #include <sore_event.h>
 #include <sore_fileio.h>
+#include <sore_glslshader_loader.h>
 #include <sore_immediatemodeprovider.h>
 #include <sore_matrix4x4.h>
 #include <sore_units.h>
@@ -90,6 +91,11 @@ namespace SORE_GUI
         void LoadStyle(SORE_FileIO::InFile& file);
 
         void SetVisible(bool visible = true);
+
+        void RemoveChild(Widget* c);
+        void RemoveChildren();
+
+        const SORE_Math::Matrix4<float>& GetPositionMatrix() const;
     protected:
         // perform all logic updates and render
         void Frame(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode); 
@@ -109,7 +115,7 @@ namespace SORE_GUI
         //translate an SVec into pixels
         int GetPixels(unit_type type, SUnit unit) const;
         float GetLayer() const; //used for child widgets to determine their layer
-        const SORE_Math::Matrix4<float>& GetPositionMatrix() const;
+        
 
         void ClearFocus();
         float GetTopLayer();
@@ -133,7 +139,6 @@ namespace SORE_GUI
         virtual void FocusLost() {}
         bool PropagateEventHelper(const SORE_Kernel::Event& e, const SORE_Kernel::Event& p);
         void AddChild(Widget* c);
-        void RemoveChild(Widget* c);
         void UpdatePositionMatrix();
 
         SORE_Kernel::Event prev;

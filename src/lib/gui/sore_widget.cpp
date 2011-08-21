@@ -86,7 +86,7 @@ namespace SORE_GUI
         if(HasFocus())
             ClearFocus();
 
-        children.clear();
+        RemoveChildren();
     }
 
 
@@ -374,6 +374,11 @@ namespace SORE_GUI
                 children.erase(it);
             }
         }
+    }
+
+    void Widget::RemoveChildren()
+    {
+        children.clear();
     }
 
     void Widget::SetStyleName(const std::string& style_)
