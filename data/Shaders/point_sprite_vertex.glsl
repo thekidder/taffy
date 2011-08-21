@@ -5,7 +5,7 @@ varying vec4 color;
 
 void main() 
 {
-    float C = gl_ProjectionMatrix[0] * halfWidth;
+    float C = (gl_ProjectionMatrix[0] * halfWidth).x;
     color = gl_Color;
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
