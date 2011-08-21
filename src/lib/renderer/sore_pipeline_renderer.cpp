@@ -124,6 +124,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     {
         PROFILE_BLOCK("OpenGL render", profiler);
         renderQueue.Render();
+        glFinish();
     }
 
     // collect rendering stats
