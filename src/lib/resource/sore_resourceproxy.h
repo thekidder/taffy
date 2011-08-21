@@ -210,24 +210,40 @@ namespace SORE_Resource
     template<typename T>
     T* ResourceProxyWrapper<T>::operator->()
     {
+#ifdef DEBUG
+        if(!*this)
+            throw std::runtime_error("Called -> on null resource");
+#endif
         return get();
     }
 
     template<typename T>
     const T* ResourceProxyWrapper<T>::operator->() const
     {
+#ifdef DEBUG
+        if(!*this)
+            throw std::runtime_error("Called -> on null resource");
+#endif
         return get();
     }
 
     template<typename T>
     T& ResourceProxyWrapper<T>::operator*()
     {
+#ifdef DEBUG
+        if(!*this)
+            throw std::runtime_error("Called * on null resource");
+#endif
         return *(ptr.get()->get());
     }
 
     template<typename T>
     const T& ResourceProxyWrapper<T>::operator*() const
     {
+#ifdef DEBUG
+        if(!*this)
+            throw std::runtime_error("Called * on null resource");
+#endif
         return *(ptr.get()->get());
     }
     
