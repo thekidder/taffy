@@ -121,8 +121,7 @@ void SORE_Profiler::Profiler::StartSample(const Sample& sample)
         current->openSamples.back()->children.push_back(&it->second);
     }
 
-    if(current->openSamples.back()->name != it->second.name)
-        current->openSamples.push_back(&it->second);
+    current->openSamples.push_back(&it->second);
 }
 
 void SORE_Profiler::Profiler::FinishSample(const Sample& sample)
