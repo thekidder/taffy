@@ -43,7 +43,7 @@
 namespace SORE_GUI
 {
     RenderStats::RenderStats(SORE_Graphics::Renderer& r,
-                             SORE_GUI::Widget *parent)
+                             Widget *parent)
     : FrameWindow(SVec(SUnit(200), SUnit(180)),
                   SVec(SUnit(10), SUnit(10)),
                   "Renderer Stats", parent),
@@ -52,15 +52,15 @@ namespace SORE_GUI
     {
         int textHeight = static_cast<int>(Style()["RenderStats"]["text_size"].asInt());
         SUnit height(0.0, textHeight);
-        fpsLabel   = new SORE_GUI::TextWidget(height, SVec(SUnit(5), SUnit(0)), this, "FPS:");
-        drawsLabel = new SORE_GUI::TextWidget(height, SVec(SUnit(5), SUnit(textHeight)), this, "Draw Calls:"),
-        polysLabel = new SORE_GUI::TextWidget(height, SVec(SUnit(5), SUnit(textHeight*2)), this, "Polygons:"),
-        msLabel    = new SORE_GUI::TextWidget(height, SVec(SUnit(5), SUnit(textHeight*3)), this, "Milliseconds"),
+        fpsLabel   = new TextWidget(height, SVec(SUnit(5), SUnit(0)), this, "FPS:");
+        drawsLabel = new TextWidget(height, SVec(SUnit(5), SUnit(textHeight)), this, "Draw Calls:"),
+        polysLabel = new TextWidget(height, SVec(SUnit(5), SUnit(textHeight*2)), this, "Polygons:"),
+        msLabel    = new TextWidget(height, SVec(SUnit(5), SUnit(textHeight*3)), this, "Milliseconds"),
 
-        fps        = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0)), this);
-        draws      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight)), this);
-        polys      = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight*2)), this);
-        ms         = new SORE_GUI::TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight*3)), this);
+        fps        = new TextWidget(height, SVec(SUnit(1.0, -60), SUnit(0)), this);
+        draws      = new TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight)), this);
+        polys      = new TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight*2)), this);
+        ms         = new TextWidget(height, SVec(SUnit(1.0, -60), SUnit(textHeight*3)), this);
     }
 
     void RenderStats::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
