@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem(
     SORE_Resource::GLSLShaderPtr s)
     : texture_size(texture_size_),
       texture(t), shader(s),
-      vbo(SORE_Graphics::STREAM, true, true, true)
+      vbo(SORE_Graphics::STATIC, true, true, true)
 {
     size_t num_particles = texture_size * texture_size;
 

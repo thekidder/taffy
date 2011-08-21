@@ -9,12 +9,14 @@
 struct ParticleSpawn
 {
     float x, y, z;
+    float xv, yv, zv;
     float r, g, b, a;
 };
 
 struct ParticleState
 {
     SORE_Resource::Texture2DPtr positions;
+    SORE_Resource::Texture2DPtr velocities;
     SORE_Resource::Texture2DPtr colors;
 };
 
