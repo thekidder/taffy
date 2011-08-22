@@ -25,7 +25,7 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles_width  = 256;
+const int k_num_particles_width  = 512;
 const int k_num_particles_height = 256;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
@@ -282,6 +282,8 @@ void DefaultState::Frame(int elapsed)
         energy_analyzer.Update();
     }
 
+    float lightIntensity = 2.0f;//static_cast<float>(energy_analyzer.Energy(0) / 10.0);
+
     for(size_t i = 0; i < beat_detector_low.NumValues(); ++i)
         beat_visualizer_low->AddDatum(i, beat_detector_low.Value(i));
 
@@ -311,7 +313,7 @@ void DefaultState::Frame(int elapsed)
         imm_mode.DrawLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AXIS_LENGTH);
 
         imm_mode.SetUniform("lightPos", lightPos);
-        imm_mode.SetUniform("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
+        imm_mode.SetUniform("lightIntensity", lightIntensity);
     
         imm_mode.SetShader(gamestateStack.ShaderCache().Get("untextured_lit.shad"));
         imm_mode.SetColor(SORE_Graphics::Grey);
@@ -348,7 +350,7 @@ void DefaultState::Frame(int elapsed)
         //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 
         particles.Uniforms().SetVariable("lightPos", lightPos);
-        particles.Uniforms().SetVariable("lightIntensity", static_cast<float>(energy_analyzer.Energy(0) / 10.0));
+        particles.Uniforms().SetVariable("lightIntensity", lightIntensity);
 
         float lightMatRaw[16] = {
             0.5f, 0.0f, 0.0f, 0.0f,

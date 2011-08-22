@@ -17,48 +17,39 @@ ParticleSystem::ParticleSystem(
     SORE_Resource::Shader_cache_t& shader_cache_)
     : texture_size_width(texture_size_w),
       texture_size_height(texture_size_h),
-      vbo(SORE_Graphics::STATIC, true, false, false),
       current(&state1), last(&state2),
       texture_cache(texture_cache_), shader_cache(shader_cache_),
       time_since_update(0), time_since_spawn_update(0)
 {
     size_t num_particles = texture_size_width * texture_size_height;
-
-    SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(num_particles, num_particles, GL_POINTS));
-    SORE_Graphics::TransformationPtr trans(new SORE_Math::Matrix4<float>());
-
-    unsigned short* const indices = g->GetIndices();
-    SORE_Graphics::vertex* const vertices = g->GetVertices();
-
-    for(size_t i = 0; i < texture_size_width; ++i)
+    size_t constructed = 0;
+    while(num_particles > 0)
     {
-        for(size_t j = 0; j < texture_size_height; ++j)
+        size_t gc_particles = std::min(static_cast<size_t>(std::numeric_limits<unsigned short>::max()) + 1, num_particles);
+        num_particles -= gc_particles;
+
+        SORE_Graphics::GeometryChunkPtr g(new SORE_Graphics::GeometryChunk(gc_particles, gc_particles, GL_POINTS));
+        SORE_Graphics::TransformationPtr trans(new SORE_Math::Matrix4<float>());
+
+        unsigned short* const indices = g->GetIndices();
+        SORE_Graphics::vertex* const vertices = g->GetVertices();
+
+        for(size_t j = 0; j < gc_particles; ++j, ++constructed)
         {
-            indices [j * texture_size_width + i] = j * texture_size_width + i;
-            vertices[j * texture_size_width + i].tex0i = i / static_cast<float>(texture_size_width);
-            vertices[j * texture_size_width + i].tex0j = j / static_cast<float>(texture_size_height);
+            float h = static_cast<float>(constructed / texture_size_width);
+            float w = static_cast<float>(constructed % texture_size_width);
+            indices [j] = j;
+            vertices[j].tex0i = w / texture_size_width;
+            vertices[j].tex0j = h / texture_size_height;
         }
+        buffers.GeometryAdded(g, SORE_Graphics::STATIC);
+        geometry.push_back(SORE_Graphics::Renderable(g, SORE_Resource::GLSLShaderPtr(), trans, SORE_Graphics::BLEND_OPAQUE));
+        geometry.back().AddTexture("shadowMap", SORE_Graphics::TextureState::TextureObject("particle-shadowmap"));
+        geometry.back().AddKeyword("game");
+        geometry.back().AddKeyword("particle");
+        geometry.back().AddTexture("texture", texture_cache.Get("particle.tga"));
+        geometry.back().SetShader(shader_cache.Get("particles.shad"));
     }
-
-    geometry.push_back(SORE_Graphics::Renderable(g, SORE_Resource::GLSLShaderPtr(), trans, SORE_Graphics::BLEND_OPAQUE));
-
-    geometry.front().AddTexture("shadowMap", SORE_Graphics::TextureState::TextureObject("particle-shadowmap"));
-    geometry.front().AddKeyword("game");
-    geometry.front().AddKeyword("particle");
-
-    vbo.Clear();
-    vbo.AddObject(geometry.front().GetGeometryChunk());
-    vbo.Build();
-
-    geometry_lookup.geometry = &vbo;
-    geometry_lookup.offset = 0;
-    geometry_lookup.indices = geometry.front().GetGeometryChunk()->NumIndices();
-    geometry_lookup.vertices = geometry.front().GetGeometryChunk()->NumVertices();
-    geometry_lookup.type = geometry.front().GetGeometryChunk()->Type();
-
-    update_shader = shader_cache.Get("particles_update.shad");
-
-    geometry.front().AddTexture("texture", texture_cache.Get("particle.tga"));
 
     AddParticles(spawn_func);
 
@@ -73,6 +64,7 @@ ParticleSystem::ParticleSystem(
     lastVec.push_back(last->data);
 
     updatePipe = new ParticleUpdatePipe(currentVec, lastVec, 0);
+    update_shader = shader_cache.Get("particles_update.shad");
 }
 
 ParticleUpdatePipe* ParticleSystem::GetUpdatePipe()
@@ -94,14 +86,6 @@ SORE_Graphics::camera_info ParticleSystem::GetUpdateCamera()
     return cam;
 }
 
-void ParticleSystem::MakeUpToDate()
-{
-    geometry.front().SetShader(shader_cache.Get("particles.shad"));
-
-    geometry.front().AddTexture("colors", current->colors);
-    geometry.front().AddTexture("positions", current->positions);
-}
-
 std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryBegin()
 {
     return geometry.begin();
@@ -110,16 +94,6 @@ std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryBegin()
 std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryEnd()
 {
     return geometry.end();
-}
-
-SORE_Graphics::geometry_entry ParticleSystem::LookupGC(SORE_Graphics::GeometryChunkPtr gc)
-{
-    return geometry_lookup;
-}
-
-bool ParticleSystem::Contains(SORE_Graphics::GeometryChunkPtr gc)
-{
-    return gc == geometry.front().GetGeometryChunk();
 }
 
 void NullSpawner(ParticleSpawn& p)
@@ -142,6 +116,13 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
     time_since_spawn_update += elapsed;
     if(updatePipe->Swap())
     {
+        for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
+        {
+            
+            it->AddTexture("colors", current->colors);
+            it->AddTexture("positions", current->positions);
+        }
+
         imm_mode.SetKeywords("particle_update");
         imm_mode.SetShader(update_shader);
         imm_mode.SetTexture("positions", current->positions);

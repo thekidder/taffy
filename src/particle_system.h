@@ -10,7 +10,7 @@
 #include <sore_event.h>
 #include <sore_geometryprovider.h>
 #include <sore_immediatemodeprovider.h>
-#include <sore_vbo.h>
+#include <sore_simplebuffermanager.h>
 
 #include <vector>
 
@@ -19,7 +19,7 @@ namespace SORE_Profiler
     class Profiler;
 }
 
-class ParticleSystem : public SORE_Graphics::GeometryProvider, SORE_Graphics::BufferManager
+class ParticleSystem : public SORE_Graphics::GeometryProvider
 {
 public:
     ParticleSystem(
@@ -38,22 +38,18 @@ public:
     bool OnResize(const SORE_Kernel::Event& e);
 
     // renderer stuff interfaces
-    void MakeUpToDate();
+    void MakeUpToDate() { buffers.MakeUpToDate(); }
     std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
     std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
-    SORE_Graphics::geometry_entry LookupGC(SORE_Graphics::GeometryChunkPtr gc);
-    bool Contains(SORE_Graphics::GeometryChunkPtr gc);
-
-    SORE_Graphics::BufferManager* GetBufferManager() { return this; }
+    SORE_Graphics::BufferManager* GetBufferManager() { return &buffers; }
 private:
     void AddParticles(Particle_spawn_func_t spawn_func);
 
     SORE_Resource::GLSLShaderPtr update_shader;
 
     std::vector<SORE_Graphics::Renderable> geometry;
-    SORE_Graphics::geometry_entry geometry_lookup;
-    SORE_Graphics::VBO vbo;
+    SORE_Graphics::SimpleBufferManager buffers;
 
     size_t texture_size_width, texture_size_height;
     float half_width;
