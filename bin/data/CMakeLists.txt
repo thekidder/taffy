@@ -3,5 +3,4 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 ADD_SUBDIRECTORY(Textures)
 ADD_SUBDIRECTORY(Shaders)
 
-INSTALL(FILES ix_style.sdp default_resources.sdp DESTINATION .)
 INSTALL(FILES app.ico app.bmp DESTINATION data/)
