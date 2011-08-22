@@ -109,9 +109,9 @@ float cnoise(vec3 P)
 vec3 spawn_pos(float t, float seed)
 {
     return vec3(
-        16.0 * (cnoise(vec3(t / 2.0, seed, 246.123))),
+        16.0 * (cnoise(vec3(seed, t / 2.0, 246.123))),
         16.0 * (cnoise(vec3(t / 2.0, seed, 569761.12))),
-        16.0 * (cnoise(vec3(t / 2.0, seed, 90896145697.123)))) + vec3(0.0, 5.0, 0.0);
+        16.0 * (cnoise(vec3(90896145697.123, seed, t / 2.0)))) + vec3(0.0, 5.0, 0.0);
 }
 
 void main()

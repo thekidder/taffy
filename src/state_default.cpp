@@ -409,6 +409,9 @@ bool DefaultState::HandleKeyboard(const SORE_Kernel::Event& e)
             paused = !paused;
             channel->setPaused(paused);
             return true;
+        case SORE_Kernel::Key::SSYM_s:
+            //gamestateStack.ShaderCache().
+            return true;
         default:
             break;
         }
