@@ -14,7 +14,7 @@ void main()
     vec4 color    = texture2D(colors, tex);
     vec4 dataVec  = texture2D(data, tex);
 
-    gl_FragData[0] = position + vec4(elapsed) * dataVec;
-    gl_FragData[1] = color;
+    gl_FragData[0] = vec4(position.xyz + vec3(elapsed) * dataVec.xyz, position.w);
+    gl_FragData[1] = vec4(color.rgb, color.a - elapsed * dataVec.w);
     gl_FragData[2] = dataVec;
 }

@@ -10,6 +10,7 @@ uniform sampler2D colors;
 uniform sampler2D positions;
 
 varying vec4 color;
+varying float alive;
 
 void main() 
 {
@@ -21,6 +22,14 @@ void main()
     float C = (gl_ProjectionMatrix[0] * halfWidth).x;
 	gl_PointSize = particlePosition.w / (sqrt(1.0 / (C * C)) * gl_Position.z);
     color = texture2D(colors, tex);
+
+    alive = 1.0;
+    if(color.a < 0.0)
+    {
+        // lifetime is < 0, discard
+        alive = 0.0;
+        return;
+    }
 
     vec4 shadowCoord = lightMatrix * particlePosition;
 
