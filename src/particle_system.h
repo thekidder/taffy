@@ -58,7 +58,7 @@ private:
     size_t texture_size_width, texture_size_height;
     float half_width;
 
-    ParticleState state1, state2;
+    ParticleState state1, state2, spawns;
     ParticleState* current, *last;
 
     ParticleUpdatePipe* updatePipe;
@@ -66,7 +66,8 @@ private:
     SORE_Resource::Texture_cache_t& texture_cache;
     SORE_Resource::Shader_cache_t& shader_cache;
 
-    int time_since_update;
+    Particle_spawn_func_t spawn_func;
+    int time_since_update, time_since_spawn_update;
 };
 
 #endif

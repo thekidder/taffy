@@ -26,7 +26,10 @@ DebugGUI::DebugGUI(
 {
     renderStats = new gui::RenderStats(r, this);
     if(p)
-        profilerStats = new gui::ProfilerStats(gui::SVec(600, 400), gui::SVec(10, 220), *p, this);
+    {
+        profilerStats = new gui::ProfilerStats(gui::SVec(600, 300), gui::SVec(10, 220), *p, this);
+        profilerStats->SetPosition(gui::SVec(gui::SUnit(), gui::SUnit(1.0, -profilerStats->GetSize(gui::VERTICAL) - 10)));
+    }
     version = new gui::TextWidget(gui::SUnit(24), gui::SVec(gui::SUnit(1.0), gui::SUnit()), this, GetVersionString());
     version->SetPosition(gui::SVec(gui::SUnit(1.0, -version->GetSize(gui::HORIZONTAL)), gui::SUnit()));
 }
