@@ -79,10 +79,6 @@ namespace SORE_Graphics
 
         SORE_Resource::Texture2DPtr depthBuffer;
         std::vector<SORE_Resource::Texture2DPtr> colorBuffers;
-
-        // ugly hack to keep track of whether or not a buffer is bound, and we
-        // need to glPopAttrib when we unbind
-        static bool bound;
     };
 }
 

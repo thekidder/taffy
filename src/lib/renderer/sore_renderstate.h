@@ -60,9 +60,8 @@ namespace SORE_Graphics
 
         // change this renderstate:
         // set the renderbuffer to render to
-        // colorbuffer is the index of the color buffer to select - if this is
-        // -1, no color buffer
         void SetRenderbuffer(FBO* const renderbuffer_);
+        const FBO* Renderbuffer() { return renderbuffer; }
     private:
         enum Render_cmd_e
         {

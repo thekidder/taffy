@@ -48,7 +48,13 @@ namespace SORE_Graphics
     {
         CLEAR_COLOR_BUFFER,
         CLEAR_DEPTH_BUFFER,
-        CLEAR_COLOR_AND_DEPTH_BUFFERS
+        CLEAR_COLOR_AND_DEPTH_BUFFERS,
+        SET_VIEWPORT
+    };
+
+    struct render_command_data
+    {
+        int d0, d1;
     };
 
     /*
@@ -59,13 +65,13 @@ namespace SORE_Graphics
     class SORE_EXPORT GLCommandList
     {
     public:
-        GLCommandList();
+        GLCommandList(int w, int h);
 
         void AddRenderable(
             const Renderable& r,
             const geometry_entry& geometry,
             const camera_info& cam);
-        void AddCommand(Render_command_t command);
+        void AddCommand(Render_command_t command, render_command_data data = render_command_data());
 
         void SetRenderbuffer(FBO* const renderbuffer_);
 
@@ -74,7 +80,7 @@ namespace SORE_Graphics
         unsigned int NumPolygons() const;
         unsigned int NumDrawCalls() const;
     private:
-        void ApplyRenderCommand(Render_command_t command);
+        void ApplyRenderCommand(Render_command_t command, render_command_data data);
 
         enum Render_command_type_t
         {
@@ -88,21 +94,26 @@ namespace SORE_Graphics
                 type = RENDER;
                 batch = b;
             }
-            Command(Render_command_t c)
+            Command(Render_command_t c, render_command_data d)
             {
                 type = COMMAND;
                 command = c;
+                data = d;
             }
             Render_command_type_t type;
 
             RenderBatch batch;
             Render_command_t command;
+            render_command_data data;
         };
 
         //current state
         RenderState currentState;
         geometry_entry currentGeometry;
         SORE_Math::Matrix4<float> currentTransform;
+
+        // screen dimensions
+        int width, height;
 
         // keep track of current render target
         FBO* renderbuffer;

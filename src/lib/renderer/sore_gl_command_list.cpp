@@ -34,7 +34,8 @@
 
 #include <sore_gl_command_list.h>
 
-SORE_Graphics::GLCommandList::GLCommandList() : renderbuffer(0)
+SORE_Graphics::GLCommandList::GLCommandList(int w, int h)
+    : renderbuffer(0), width(w), height(h)
 {
 }
 
@@ -44,6 +45,14 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
     // apply current renderbuffer
     state.SetRenderbuffer(renderbuffer);
     state = state.Difference(currentState);
+
+    if(!state.Renderbuffer() && currentState.Renderbuffer())
+    {
+        render_command_data data;
+        data.d0 = width;
+        data.d1 = height;
+        commandList.push_back(Command(SET_VIEWPORT, data));
+    }
 
     if(currentGeometry.geometry != geometry.geometry || commandList.back().type == COMMAND)
     {
@@ -77,7 +86,7 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
     currentTransform = *r.GetTransform();
 }
 
-void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command)
+void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command, render_command_data data)
 {
     // if we add a command, make sure to push the current state first
     // e.x, when we issue a clear command, we want to make sure the current
@@ -85,7 +94,7 @@ void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command)
     currentState.SetRenderbuffer(renderbuffer);
     commandList.push_back(RenderBatch(currentState));
 
-    commandList.push_back(command);
+    commandList.push_back(Command(command, data));
 }
 
 void SORE_Graphics::GLCommandList::SetRenderbuffer(FBO* const renderbuffer_)
@@ -110,7 +119,7 @@ void SORE_Graphics::GLCommandList::Render()
         }
         else
         {
-            ApplyRenderCommand(it->command);
+            ApplyRenderCommand(it->command, it->data);
         }
     }
     if(lastRendered)
@@ -129,7 +138,7 @@ unsigned int SORE_Graphics::GLCommandList::NumDrawCalls() const
     return numDrawCalls;
 }
 
-void SORE_Graphics::GLCommandList::ApplyRenderCommand(Render_command_t command)
+void SORE_Graphics::GLCommandList::ApplyRenderCommand(Render_command_t command, render_command_data data)
 {
     switch(command)
     {
@@ -141,6 +150,9 @@ void SORE_Graphics::GLCommandList::ApplyRenderCommand(Render_command_t command)
         break;
     case CLEAR_COLOR_AND_DEPTH_BUFFERS:
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        break;
+    case SET_VIEWPORT:
+        glViewport(0, 0, data.d0, data.d1);
         break;
     default:
         break;

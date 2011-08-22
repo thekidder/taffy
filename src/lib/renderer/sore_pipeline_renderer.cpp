@@ -32,6 +32,9 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+// uncomment to enable correct profiling results of opengl render calls
+// does result in performance hit
+// #define OPENGL_PROFILE
 
 #include <sore_aggregatebuffermanager.h>
 #include <sore_fbo.h>
@@ -91,9 +94,8 @@ void SORE_Graphics::PipelineRenderer::Render()
     // setup render buffers map
     Renderbuffer_map_t renderbuffers;
 
-    GLCommandList renderQueue;
+    GLCommandList renderQueue(width, height);
     renderQueue.AddCommand(CLEAR_COLOR_AND_DEPTH_BUFFERS);
-
     {
         PROFILE_BLOCK("Setup pipeline", profiler);
         pipeline->Setup(renderbuffers);
@@ -127,6 +129,7 @@ void SORE_Graphics::PipelineRenderer::Render()
 #ifdef OPENGL_PROFILE
         glFinish();
 #endif
+        FBO::Unbind();
     }
 
     // collect rendering stats
