@@ -56,19 +56,11 @@ void SORE_GUI::ProfilerStats::UpdateAndRender(int elapsed, SORE_Graphics::Immedi
         RenderSample(imm_mode, sample);
 }
 
-std::string GetSpaces(int num)
-{
-    std::string spaces;
-    for(int i = 0; i < num; ++i)
-        spaces += ' ';
-    return spaces;
-}
-
 struct SampleTimeComparator
 {
     bool operator()(const SORE_Profiler::sample_data* one, const SORE_Profiler::sample_data* two) const
     {
-        return one->last.lastTime > two->last.lastTime;
+        return one->total.lastTime > two->total.lastTime;
     }
 };
 
@@ -86,7 +78,7 @@ int SORE_GUI::ProfilerStats::RenderSample(
     float bar_width = static_cast<float>(sample->total.lastTime / totalTime);
     bar_width = std::min(bar_width, 1.0f);
 
-    new TextWidget(16, SVec(10, height), content, GetSpaces(treeLevel * 2) + sample->name);
+    new TextWidget(16, SVec(10 + treeLevel * 4, height), content, sample->name);
     float x1 = static_cast<float>(TEXT_WIDTH + TIME_WIDTH);
     float x2 = x1 + bar_width * static_cast<float>(width);
     float y1 = static_cast<float>(height + 1);
@@ -104,7 +96,6 @@ int SORE_GUI::ProfilerStats::RenderSample(
 
     std::string ms = (boost::format("%.1f ms") % sample->total.lastTime).str();
     TextWidget* t = new TextWidget(16, SVec((int)TEXT_WIDTH, height), content, ms);
-    //if(x2 - x1 > SORE_Font::
 
     height += 18;
 
