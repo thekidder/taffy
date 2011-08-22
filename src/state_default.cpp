@@ -556,13 +556,15 @@ void DefaultState::ParticleCubeSpawner(ParticleSpawn& p)
     p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
     p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
     p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
-
-    p.xv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
-    p.yv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
-    p.zv = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.size = SORE_Utility::getRandomMinMax(0.1f, 0.3f);
 
     p.r = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
     p.g = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
     p.b = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
-    p.a = 1.0f;
+    p.lifetime = 1.0f;
+
+    p.data0 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.data1 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.data2 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.data3 = 0.0f;
 }

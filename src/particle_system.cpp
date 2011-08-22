@@ -17,7 +17,7 @@ ParticleSystem::ParticleSystem(
     SORE_Resource::Shader_cache_t& shader_cache_)
     : texture_size_width(texture_size_w),
       texture_size_height(texture_size_h),
-      vbo(SORE_Graphics::STATIC, true, true, true),
+      vbo(SORE_Graphics::STATIC, true, false, false),
       current(&state1), last(&state2),
       texture_cache(texture_cache_), shader_cache(shader_cache_),
       time_since_update(0)
@@ -37,7 +37,6 @@ ParticleSystem::ParticleSystem(
             indices [j * texture_size_width + i] = j * texture_size_width + i;
             vertices[j * texture_size_width + i].tex0i = i / static_cast<float>(texture_size_width);
             vertices[j * texture_size_width + i].tex0j = j / static_cast<float>(texture_size_height);
-            vertices[j * texture_size_width + i].normx = 0.2f; // particle size is stored in normal.x
         }
     }
 
@@ -60,19 +59,18 @@ ParticleSystem::ParticleSystem(
     update_shader = shader_cache.Get("particles_update.shad");
 
     geometry.front().AddTexture("texture", texture_cache.Get("particle.tga"));
-    //geometry.front().SetShader(shader_cache.Get("particles.shad"));
 
     AddParticles(spawn_func);
 
     std::vector<SORE_Resource::Texture2DPtr> currentVec;
     currentVec.push_back(current->positions);
     currentVec.push_back(current->colors);
-    currentVec.push_back(current->velocities);
+    currentVec.push_back(current->data);
 
     std::vector<SORE_Resource::Texture2DPtr> lastVec;
     lastVec.push_back(last->positions);
     lastVec.push_back(last->colors);
-    lastVec.push_back(last->velocities);
+    lastVec.push_back(last->data);
 
     updatePipe = new ParticleUpdatePipe(currentVec, lastVec, 0);
 }
@@ -98,13 +96,10 @@ SORE_Graphics::camera_info ParticleSystem::GetUpdateCamera()
 
 void ParticleSystem::MakeUpToDate()
 {
-    //APP_LOG(SORE_Logging::LVL_INFO, "ParticleSystem::MakeUpToDate");
-    //geometry.front().AddTexture("texture", texture_cache.Get("particle.tga"));
     geometry.front().SetShader(shader_cache.Get("particles.shad"));
 
     geometry.front().AddTexture("colors", current->colors);
     geometry.front().AddTexture("positions", current->positions);
-    //geometry.front().AddTexture("velocities", current->velocities);
 }
 
 std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryBegin()
@@ -129,15 +124,6 @@ bool ParticleSystem::Contains(SORE_Graphics::GeometryChunkPtr gc)
 
 void NullSpawner(ParticleSpawn& p)
 {
-    p.x = 0.0f;
-    p.y = 0.0f;
-    p.z = 0.0f;
-
-    p.xv = 0.0f;
-    p.yv = 0.0f;
-    p.zv = 0.0f;
-
-    p.r = p.g = p.b = p.a = 0.0f;
 }
 
 void ParticleSystem::AddParticles(Particle_spawn_func_t spawn_func)
@@ -156,7 +142,7 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
         imm_mode.SetShader(update_shader);
         imm_mode.SetTexture("positions", current->positions);
         imm_mode.SetTexture("colors", current->colors);
-        imm_mode.SetTexture("velocities", current->velocities);
+        imm_mode.SetTexture("data", current->data);
         imm_mode.SetUniform("elapsed", time_since_update / 1000.0f);
 
         imm_mode.DrawQuad(

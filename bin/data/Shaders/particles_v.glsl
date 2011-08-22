@@ -14,12 +14,12 @@ varying vec4 color;
 void main() 
 {
 	vec2 tex = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
-    vec4 particlePosition = vec4(texture2D(positions, tex).xyz, 1.0);
+    vec4 particlePosition = texture2D(positions, tex);
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * transform * particlePosition;
+	gl_Position = gl_ModelViewProjectionMatrix * transform * vec4(particlePosition.xyz, 1.0);
     float C = (gl_ProjectionMatrix[0] * halfWidth).x;
-	gl_PointSize = gl_Normal.x / (sqrt(1.0 / (C * C)) * gl_Position.z);
+	gl_PointSize = particlePosition.w / (sqrt(1.0 / (C * C)) * gl_Position.z);
     color = texture2D(colors, tex);
 
     vec4 shadowCoord = lightMatrix * particlePosition;
