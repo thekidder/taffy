@@ -25,8 +25,8 @@ using SORE_GUI::SUnit;
 
 const int k_fft_samples = 2048;
 const int k_num_channels = 2;
-const int k_num_particles_width  = 512;
-const int k_num_particles_height = 256;
+const int k_num_particles_width  = 1024;
+const int k_num_particles_height = 512;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack, 20), // run every 20 milliseconds
@@ -205,10 +205,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     beat_visualizer_mid->SetComment((boost::format("%.1f - %.1f Hz") % mid.TotalHz().first % mid.TotalHz().second).str());
     beat_visualizer_high->SetComment((boost::format("%.1f - %.1f Hz") % high.TotalHz().first % high.TotalHz().second).str());
 
-    //particles.SetTexture(gamestateStack.TextureCache().Get("particle.tga"));
-    //particles.SetShader(gamestateStack.ShaderCache().Get("particles.shad"));
-
-    //particles.AddParticles(boost::bind(&DefaultState::ParticleCubeSpawner, this, _1));
+    particles.SetEmitter(gamestateStack.ShaderCache().Get("particles_emitter.shad"));
 
     glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
@@ -236,10 +233,16 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     particleUpdatePipe->AddChildPipe(updatePipe);
     updatePipe->AddChildPipe(new SORE_Graphics::RenderPipe("particle_update"));
 
+    SORE_Graphics::Pipe* particleEmitterPipe = new SORE_Graphics::FilterPipe(SORE_Graphics::KeywordFilter("particle_emitter"), gamestateStack.Profiler());
+    SORE_Graphics::Pipe* emitterPipe = particles.GetEmitterPipe();
+    particleEmitterPipe->AddChildPipe(emitterPipe);
+    emitterPipe->AddChildPipe(new SORE_Graphics::RenderPipe("particle_update"));
+
     renderer.RootPipe()->AddChildPipe(sorter);
     sorter->AddChildPipe(particlePipe);
     sorter->AddChildPipe(gamePipe);
     sorter->AddChildPipe(guiPipe);
+    sorter->AddChildPipe(particleEmitterPipe);
     sorter->AddChildPipe(particleUpdatePipe);
 }
 
@@ -266,11 +269,11 @@ void DefaultState::Frame(int elapsed)
     if(paused)
         return;
 
-    lightT += elapsed / 50000.0f;
+    //lightT += elapsed / 50000.0f;
 
-    lightPos[0] = 6.0f * sin(lightT);
-    lightPos[1] = 6.0f * sin(lightT);
-    lightPos[2] = 6.0f * cos(lightT);
+    //lightPos[0] = 6.0f * sin(lightT);
+    //lightPos[1] = 6.0f * sin(lightT);
+    //lightPos[2] = 6.0f * cos(lightT);
 
     {
         PROFILE_BLOCK("Music analysis algorithms", gamestateStack.Profiler());
@@ -282,7 +285,7 @@ void DefaultState::Frame(int elapsed)
         energy_analyzer.Update();
     }
 
-    float lightIntensity = 2.0f;//static_cast<float>(energy_analyzer.Energy(0) / 10.0);
+    float lightIntensity = 4.0f;//static_cast<float>(energy_analyzer.Energy(0) / 10.0);
 
     for(size_t i = 0; i < beat_detector_low.NumValues(); ++i)
         beat_visualizer_low->AddDatum(i, beat_detector_low.Value(i));
@@ -349,8 +352,8 @@ void DefaultState::Frame(int elapsed)
         //particles.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
         //stars.SetSize(static_cast<float>(energy_analyzer.Energy(0)) * 0.01f);
 
-        particles.Uniforms().SetVariable("lightPos", lightPos);
-        particles.Uniforms().SetVariable("lightIntensity", lightIntensity);
+        particles.SetUniform("lightPos", lightPos);
+        particles.SetUniform("lightIntensity", lightIntensity);
 
         float lightMatRaw[16] = {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -365,8 +368,8 @@ void DefaultState::Frame(int elapsed)
             lightCam.projection.znear, lightCam.projection.zfar);
         lightMatrix *= lightCam.viewMatrix;
 
-        particles.Uniforms().SetVariable("lightMatrix", lightMatrix);
-        particles.Uniforms().SetVariable("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
+        particles.SetUniform("lightMatrix", lightMatrix);
+        particles.SetUniform("screenSize", SORE_Math::Vector2<float>(static_cast<float>(width), static_cast<float>(height)));
     }
 
 }
@@ -497,76 +500,21 @@ void DefaultState::GotSamples(float* buffer, unsigned int length, int channels)
 #endif
 }
 
-//void DefaultState::CreateDisc(Particle& p)
-//{
-//    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-//    float dist = SORE_Utility::getRandomMinMax(0.05f, 20.0f);
-//
-//    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
-//
-//    p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//cos(angle) * dist;
-//    p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//SORE_Utility::getRandomMinMax(-0.02f, 0.02f);
-//    p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);//sin(angle) * dist;
-//
-//    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-//    float speed = SORE_Utility::getRandomMinMax(0.01f, 0.016f);
-//
-//    p.xv = cos(angle) * speed;
-//    p.yv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
-//    p.zv = sin(angle) * speed;
-//
-//    p.xa = -p.xv / 100.0f;
-//    p.za = -p.zv / 100.0f;
-//
-//    HSVColor c(static_cast<float>(energy_analyzer.Energy(0) / 30.0f), 0.8f, 1.0f, 0.8f);
-//    p.color = c.RGBColor();
-//    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
-//
-//    p.lifetime = 0.0f;
-//}
-//
-//void DefaultState::CreateExplosion(Particle& p)
-//{
-//    float angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-//    float dist = SORE_Utility::getRandomMinMax(0.05f, 15.0f);
-//
-//    p.size = static_cast<float>(energy_analyzer.Energy(0) / 10.0);
-//
-//    p.x = cos(angle) * dist;
-//    p.z = SORE_Utility::getRandomMinMax(-30.0f, -28.0f);
-//    p.y = sin(angle) * dist * 0.1f + 5.0f;
-//
-//    angle = SORE_Utility::getRandomMinMax(0.0f, static_cast<float>(2 * M_PI));
-//    float speed = SORE_Utility::getRandomMinMax(0.2f, 2.6f);
-//
-//    p.xv = cos(angle) * speed;
-//    p.zv = SORE_Utility::getRandomMinMax(-0.004f, 0.004f);
-//    p.yv = sin(angle) * speed;
-//
-//    p.xa = -p.xv / 100.0f;
-//    p.ya = -0.5f;
-//
-//    HSVColor c(static_cast<float>(energy_analyzer.Energy(3) / 30.0f), 0.8f, 1.0f, 0.8f);
-//    p.color = c.RGBColor();
-//    p.colorChange = SORE_Graphics::Color(0.0f, 0.0f, 0.0f, SORE_Utility::getRandomMinMax(-0.05f, -0.2f));
-//
-//    p.lifetime = 0.0f;
-//}
-
 void DefaultState::ParticleCubeSpawner(ParticleSpawn& p)
 {
-    p.x = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
-    p.y = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
-    p.z = SORE_Utility::getRandomMinMax(-5.0f, 5.0f);
+    p.x = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.y = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.z = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
     p.size = SORE_Utility::getRandomMinMax(0.1f, 0.3f);
 
-    p.r = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
-    p.g = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
-    p.b = SORE_Utility::getRandomMinMax(-1.0f, 1.0f);
+    p.r = SORE_Utility::getRandomMinMax(0.0f, 120.0f); // h
+    p.r = std::min(60.0f, p.r);
+    p.g = SORE_Utility::getRandomMinMax(0.5f, 1.0f); // s
+    p.b = SORE_Utility::getRandomMinMax(0.5f, 1.0f); // v
     p.lifetime = 1.0f;
 
-    p.data0 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f); // velocity: x
-    p.data1 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f); // y
-    p.data2 = SORE_Utility::getRandomMinMax(-1.0f, 1.0f); // z
+    p.data0 = SORE_Utility::getRandomMinMax(-0.5f, 0.5f); // velocity: x
+    p.data1 = SORE_Utility::getRandomMinMax(-0.5f, 0.5f); // y
+    p.data2 = SORE_Utility::getRandomMinMax(-0.5f, 0.5f); // z
     p.data3 = SORE_Utility::getRandomMinMax(0.005f, 0.02f); //decay
 }

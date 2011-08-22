@@ -19,8 +19,8 @@ void main()
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	gl_Position = gl_ModelViewProjectionMatrix * transform * vec4(particlePosition.xyz, 1.0);
-    float C = (gl_ProjectionMatrix[0] * halfWidth).x;
-	gl_PointSize = particlePosition.w / (sqrt(1.0 / (C * C)) * gl_Position.z);
+    float Cc = (gl_ProjectionMatrix[0] * halfWidth).x;
+	gl_PointSize = particlePosition.w / (sqrt(1.0 / (Cc * Cc)) * gl_Position.z);
     color = texture2D(colors, tex);
 
     alive = 1.0;
@@ -30,6 +30,38 @@ void main()
         alive = 0.0;
         return;
     }
+
+    // convert color from HSV to RGB
+    vec3 rgb = vec3(0.0, 0.0, 0.0);
+    float h_prime = color.r / 60.0;
+    float C = color.b * color.g;
+    float X = C * (1.0 - abs(mod(h_prime, 2.0) - 1.0));
+    if(0.0 <= h_prime && h_prime < 1.0)
+    {
+        rgb = vec3(C, X, 0.0);
+    }
+    else if(1.0 <= h_prime && h_prime < 2.0)
+    {
+        rgb = vec3(X, C, 0.0);
+    }
+    else if(2.0 <= h_prime && h_prime < 3.0)
+    {
+        rgb = vec3(0.0, C, X);
+    }
+    else if(3.0 <= h_prime && h_prime < 4.0)
+    {
+        rgb = vec3(0.0, X, C);
+    }
+    else if(4.0 <= h_prime && h_prime < 5.0)
+    {
+        rgb = vec3(X, 0.0, C);
+    }
+    else if(5.0 <= h_prime && h_prime < 6.0)
+    {
+        rgb = vec3(C, 0.0, X);
+    }
+    rgb += vec3(color.b - C);
+    color = vec4(rgb, color.a);
 
     vec4 shadowCoord = lightMatrix * particlePosition;
 

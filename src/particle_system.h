@@ -29,11 +29,20 @@ public:
         SORE_Resource::Shader_cache_t& shader_cache);
 
     ParticleUpdatePipe* GetUpdatePipe();
+    ParticleEmitterPipe* GetEmitterPipe();
     SORE_Graphics::camera_info GetUpdateCamera();
 
+    void SetEmitter(SORE_Resource::GLSLShaderPtr shader);
     void Update(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
 
-    SORE_Graphics::UniformState& Uniforms() { return geometry.front().Uniforms(); }
+    template<typename T>
+    void SetUniform(const std::string& name, const T& v)
+    {
+        for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
+        {
+            it->Uniforms().SetVariable(name, v);
+        }
+    }
 
     bool OnResize(const SORE_Kernel::Event& e);
 
@@ -44,9 +53,7 @@ public:
 
     SORE_Graphics::BufferManager* GetBufferManager() { return &buffers; }
 private:
-    void AddParticles(Particle_spawn_func_t spawn_func);
-
-    SORE_Resource::GLSLShaderPtr update_shader;
+    SORE_Resource::GLSLShaderPtr update_shader, emitter_shader;
 
     std::vector<SORE_Graphics::Renderable> geometry;
     SORE_Graphics::SimpleBufferManager buffers;
@@ -57,13 +64,15 @@ private:
     ParticleState state1, state2, spawns;
     ParticleState* current, *last;
 
-    ParticleUpdatePipe* updatePipe;
+    ParticleUpdatePipe* update_pipe;
+    ParticleEmitterPipe* emitter_pipe;
 
     SORE_Resource::Texture_cache_t& texture_cache;
     SORE_Resource::Shader_cache_t& shader_cache;
 
-    Particle_spawn_func_t spawn_func;
     int time_since_update, time_since_spawn_update;
+    float last_emit_time;
+    float seed;
 };
 
 #endif

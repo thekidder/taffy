@@ -19,8 +19,11 @@ void main()
 
     if(color.a > 0.0)
     {
-        gl_FragData[0] = vec4(position.xyz + vec3(elapsed) * dataVec.xyz, position.w);
-        gl_FragData[1] = vec4(color.rgb * vec3(1.0 - dataVec.w * 0.1), color.a - elapsed * dataVec.w);
+        vec3 new_color = color.rgb - vec3(0.0, elapsed * dataVec.w * 2.0, elapsed * dataVec.w * 2.0);
+        new_color = max(new_color, vec3(0.0, 0.0, 0.1));
+
+        gl_FragData[0] = vec4(position.xyz + vec3(elapsed) * dataVec.xyz, position.w - 0.2 * dataVec.w * elapsed);
+        gl_FragData[1] = vec4(new_color.rgb, color.a - elapsed * dataVec.w);
         gl_FragData[2] = dataVec;
     }
     else

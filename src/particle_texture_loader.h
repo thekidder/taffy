@@ -28,7 +28,7 @@ class ParticleTextureLoader
 public:
     ParticleTextureLoader(size_t texture_size_w, size_t texture_size_h);
 
-    ParticleState Load(const Particle_spawn_func_t& spawn_func);
+    ParticleState Create();
 private:
     size_t texture_size_width, texture_size_height;
 };

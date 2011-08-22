@@ -85,6 +85,7 @@ SORE_Graphics::render_list& ParticleUpdatePipe::beginRender(
 
     APP_LOG(SORE_Logging::LVL_INFO, "Render");
 
+    APP_LOG(SORE_Logging::LVL_INFO, boost::format("render into %p") % current);
     renderQueue.SetRenderbuffer(current);
     started = false;
 
@@ -92,6 +93,51 @@ SORE_Graphics::render_list& ParticleUpdatePipe::beginRender(
 }
 
 void ParticleUpdatePipe::finishRender(
+    const SORE_Graphics::camera_table& cameras,
+    SORE_Graphics::Renderbuffer_map_t& renderbuffers,
+    SORE_Graphics::render_list& list,
+    SORE_Graphics::GLCommandList& renderQueue,
+    SORE_Graphics::BufferManager* bm)
+{
+    renderQueue.SetRenderbuffer(0);
+}
+
+ParticleEmitterPipe::ParticleEmitterPipe(
+    const std::vector<SORE_Resource::Texture2DPtr>& spawnTextures,
+    SORE_Profiler::Profiler* profiler)
+    : Pipe(profiler), spawning(false),
+    spawn(spawnTextures)
+{
+}
+
+void ParticleEmitterPipe::Spawn()
+{
+    spawning = true;
+}
+
+void ParticleEmitterPipe::doSetup(SORE_Graphics::Renderbuffer_map_t& renderbuffers)
+{
+}
+
+SORE_Graphics::render_list& ParticleEmitterPipe::beginRender(
+    const SORE_Graphics::camera_table& cameras,
+    SORE_Graphics::Renderbuffer_map_t& renderbuffers,
+    SORE_Graphics::render_list& list,
+    SORE_Graphics::GLCommandList& renderQueue,
+    SORE_Graphics::BufferManager* bm)
+{
+    PROFILE_BLOCK("Particle emitter pipe", profiler);
+
+    if(!spawning)
+        return empty;
+
+    renderQueue.SetRenderbuffer(&spawn);
+    spawning = false;
+
+    return list;
+}
+
+void ParticleEmitterPipe::finishRender(
     const SORE_Graphics::camera_table& cameras,
     SORE_Graphics::Renderbuffer_map_t& renderbuffers,
     SORE_Graphics::render_list& list,

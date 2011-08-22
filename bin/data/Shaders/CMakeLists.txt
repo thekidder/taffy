@@ -12,6 +12,9 @@ INSTALL(FILES
   particles_update.shad
   particles_update_v.glsl
   particles_update_f.glsl
+
+  particles_emitter.shad
+  particles_emitter_f.glsl
   
   point_sprite_alphatest.shad
   point_alphatest_v.glsl

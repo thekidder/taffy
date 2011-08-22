@@ -67,4 +67,34 @@ private:
     SORE_Graphics::FBO* current, *last;
 };
 
+class ParticleEmitterPipe : public SORE_Graphics::Pipe
+{
+public:
+    ParticleEmitterPipe(
+        const std::vector<SORE_Resource::Texture2DPtr>& spawnTextures,
+        SORE_Profiler::Profiler* profiler);
+
+        void Spawn();
+protected:
+    virtual void doSetup(SORE_Graphics::Renderbuffer_map_t& renderbuffers);
+    virtual SORE_Graphics::render_list& beginRender(
+        const SORE_Graphics::camera_table& cameras,
+        SORE_Graphics::Renderbuffer_map_t& renderbuffers,
+        SORE_Graphics::render_list& list,
+        SORE_Graphics::GLCommandList& renderQueue,
+        SORE_Graphics::BufferManager* bm);
+    virtual void finishRender(
+        const SORE_Graphics::camera_table& cameras,
+        SORE_Graphics::Renderbuffer_map_t& renderbuffers,
+        SORE_Graphics::render_list& list,
+        SORE_Graphics::GLCommandList& renderQueue,
+        SORE_Graphics::BufferManager* bm);
+private:
+    bool spawning;
+
+    SORE_Graphics::render_list empty;
+
+    SORE_Graphics::FBO spawn;
+};
+
 #endif

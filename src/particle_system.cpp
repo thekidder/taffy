@@ -7,6 +7,7 @@
 #include <sore_profiler.h>
 #include <sore_sprite.h>
 #include <sore_texture2d_loader.h>
+#include <sore_timing.h>
 
 #include <cassert>
 
@@ -19,7 +20,7 @@ ParticleSystem::ParticleSystem(
       texture_size_height(texture_size_h),
       current(&state1), last(&state2),
       texture_cache(texture_cache_), shader_cache(shader_cache_),
-      time_since_update(0), time_since_spawn_update(0)
+      time_since_update(10000), time_since_spawn_update(10000), last_emit_time(0.0f)
 {
     size_t num_particles = texture_size_width * texture_size_height;
     size_t constructed = 0;
@@ -51,7 +52,10 @@ ParticleSystem::ParticleSystem(
         geometry.back().SetShader(shader_cache.Get("particles.shad"));
     }
 
-    AddParticles(spawn_func);
+    ParticleTextureLoader loader(texture_size_width, texture_size_height);
+    state1 = loader.Create();
+    state2 = loader.Create();
+    spawns = loader.Create();
 
     std::vector<SORE_Resource::Texture2DPtr> currentVec;
     currentVec.push_back(current->positions);
@@ -63,13 +67,31 @@ ParticleSystem::ParticleSystem(
     lastVec.push_back(last->colors);
     lastVec.push_back(last->data);
 
-    updatePipe = new ParticleUpdatePipe(currentVec, lastVec, 0);
+    std::vector<SORE_Resource::Texture2DPtr> spawnVec;
+    spawnVec.push_back(spawns.positions);
+    spawnVec.push_back(spawns.colors);
+    spawnVec.push_back(spawns.data);
+
+    update_pipe = new ParticleUpdatePipe(currentVec, lastVec, 0);
+    emitter_pipe = new ParticleEmitterPipe(spawnVec, 0);
     update_shader = shader_cache.Get("particles_update.shad");
+
+    seed = time(0) / 397641.6234315f;
+}
+
+void ParticleSystem::SetEmitter(SORE_Resource::GLSLShaderPtr shader)
+{
+    emitter_shader = shader;
 }
 
 ParticleUpdatePipe* ParticleSystem::GetUpdatePipe()
 {
-    return updatePipe;
+    return update_pipe;
+}
+
+ParticleEmitterPipe* ParticleSystem::GetEmitterPipe()
+{
+    return emitter_pipe;
 }
 
 SORE_Graphics::camera_info ParticleSystem::GetUpdateCamera()
@@ -96,29 +118,15 @@ std::vector<SORE_Graphics::Renderable>::iterator ParticleSystem::GeometryEnd()
     return geometry.end();
 }
 
-void NullSpawner(ParticleSpawn& p)
-{
-}
-
-void ParticleSystem::AddParticles(Particle_spawn_func_t spawn_func_)
-{
-    spawn_func = spawn_func_;
-
-    ParticleTextureLoader loader(texture_size_width, texture_size_height);
-    state1 = loader.Load(spawn_func);
-    state2 = loader.Load(spawn_func);
-    spawns = loader.Load(spawn_func);
-}
-
 void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
 {
     time_since_update += elapsed;
     time_since_spawn_update += elapsed;
-    if(updatePipe->Swap())
+    if(update_pipe->Swap())
     {
+        APP_LOG(SORE_Logging::LVL_INFO, boost::format("render from %p") % current);
         for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
         {
-            
             it->AddTexture("colors", current->colors);
             it->AddTexture("positions", current->positions);
         }
@@ -144,12 +152,24 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
 
         time_since_update = 0;
     }
-    if(time_since_spawn_update > 2000)
+    if(time_since_spawn_update >= 40 && emitter_shader)
     {
-        ParticleTextureLoader loader(texture_size_width, texture_size_height);
-        spawns = loader.Load(spawn_func);
+        emitter_pipe->Spawn();
+
+        imm_mode.SetKeywords("particle_emitter");
+        imm_mode.SetShader(emitter_shader);
+        float t = SORE_Kernel::GetGlobalMS() / 1000.0f;
+        imm_mode.SetUniform("seed", seed);
+        imm_mode.SetUniform("t", t);
+        imm_mode.SetUniform("old_t", last_emit_time);
+        imm_mode.DrawQuad(
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f);
 
         time_since_spawn_update = 0;
+        last_emit_time = t;
     }
 }
 
@@ -157,7 +177,10 @@ bool ParticleSystem::OnResize(const SORE_Kernel::Event& e)
 {
     if(e.type == SORE_Kernel::RESIZE)
     {
-        geometry.front().Uniforms().SetVariable("halfWidth", e.resize.w / 2.0f);
+        for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
+        {
+            it->Uniforms().SetVariable("halfWidth", e.resize.w / 2.0f);
+        }
         return true;
     }
     return false;
