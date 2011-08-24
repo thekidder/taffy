@@ -59,6 +59,7 @@ namespace SORE_Resource
         void Unload(const Key& key);
         // Ensure the given resource is loaded
         void Load(const Key& key);
+        void Reload(const Key& key);
 
         // Query the container:
         // Return if the container contains a resource with the given key in the cache.
@@ -137,6 +138,13 @@ namespace SORE_Resource
             // not in our cache, calling Get() will ensure it's loaded and put in the cache
             Get(key);
         }
+    }
+
+    template<typename Key, typename Asset, typename ResourceLoader>
+    void ResourceCache<Key,Asset,ResourceLoader>::Reload(const Key& key)
+    {
+        Unload(key);
+        Load(key);
     }
 
     template<typename Key, typename Asset, typename ResourceLoader>
