@@ -47,11 +47,11 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
 
     commands |= RENDER_CMD_CHANGE_BLEND_MODE;
     blend = r.GetBlendMode();
+    shader = r.GetShader();
 
     if(r.GetShader())
     {
         commands |= RENDER_CMD_BIND_SHADER;
-        shader = r.GetShader();
     }
 
     if(!r.Textures().Empty())
@@ -105,6 +105,8 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
 
     if(!tDiff.Empty())
     {
+        if(!shader)
+            throw std::runtime_error("Trying to bind texture with nonexistent shader");
         newState.commands |= RENDER_CMD_BIND_TEXTURE;
         newState.textures = tDiff;
     }
@@ -118,7 +120,11 @@ SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderSt
     if(newState.commands & RENDER_CMD_BIND_SHADER)
         newState.uniforms = uniforms;
     else if(!uDiff.Empty())
+    {
+        if(!shader)
+            throw std::runtime_error("Trying to bind uniform with nonexistent shader");
         newState.uniforms = uDiff;
+    }
     else
         newState.uniforms = UniformState();
 

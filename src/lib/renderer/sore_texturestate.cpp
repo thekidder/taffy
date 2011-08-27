@@ -46,7 +46,8 @@ void SORE_Graphics::TextureState::Bind(SORE_Resource::GLSLShaderPtr s) const
     {
         if(it->second.ready)
         {
-            it->second.texture->Bind(s, it->first, i);
+            if(s)
+                it->second.texture->Bind(s, it->first, i);
             ++i;
         }
     }
