@@ -83,9 +83,7 @@ SORE_Graphics::render_list& ParticleUpdatePipe::beginRender(
     if(!started)
         return empty;
 
-    APP_LOG(SORE_Logging::LVL_INFO, "Render");
-
-    APP_LOG(SORE_Logging::LVL_INFO, boost::format("render into %p") % current);
+    APP_LOG(SORE_Logging::LVL_INFO, boost::format("RENDER: into %d") % current->Handle());
     renderQueue.SetRenderbuffer(current);
     started = false;
 
@@ -131,7 +129,10 @@ SORE_Graphics::render_list& ParticleEmitterPipe::beginRender(
     if(!spawning)
         return empty;
 
+    APP_LOG(SORE_Logging::LVL_INFO, boost::format("SPAWN"));
+
     renderQueue.SetRenderbuffer(&spawn);
+    renderQueue.AddCommand(SORE_Graphics::CLEAR_COLOR_AND_DEPTH_BUFFERS);
     spawning = false;
 
     return list;

@@ -17,5 +17,15 @@ ParticleState ParticleTextureLoader::Create()
         0, GL_RGBA32F_ARB, GL_RGBA, texture_size_width, texture_size_height);
     s.colors = new SORE_Resource::Texture2D(
         0, GL_RGBA32F_ARB, GL_RGBA, texture_size_width, texture_size_height);
+
+    s.positions->MagFilter(GL_NEAREST);
+    s.positions->MinFilter(GL_NEAREST);
+
+    s.colors->MagFilter(GL_NEAREST);
+    s.colors->MinFilter(GL_NEAREST);
+
+    s.data->MagFilter(GL_NEAREST);
+    s.data->MinFilter(GL_NEAREST);
+
     return s;
 }

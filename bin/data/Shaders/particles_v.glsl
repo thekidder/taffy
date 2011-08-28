@@ -3,13 +3,15 @@ uniform mat4 transform;
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
 uniform float lightIntensity;
-uniform vec2 screenSize;
+uniform float shadowmap_size;
 
 uniform sampler2D shadowMap;
 uniform sampler2D colors;
 uniform sampler2D positions;
 
 varying vec4 color;
+varying float shadow;
+varying float light;
 varying float alive;
 
 void main() 
@@ -31,6 +33,7 @@ void main()
         return;
     }
 
+    float sat = color.g;
     // convert color from HSV to RGB
     vec3 rgb = vec3(0.0, 0.0, 0.0);
     float h_prime = color.r / 60.0;
@@ -63,22 +66,20 @@ void main()
     rgb += vec3(color.b - C);
     color = vec4(rgb, color.a);
 
-    vec4 shadowCoord = lightMatrix * particlePosition;
+    vec4 shadowCoord = lightMatrix * vec4(particlePosition.xyz, 1.0);
 
-    vec2 pixel = vec2(1.0 / screenSize.x, 1.0 / screenSize.y);
+    vec2 pixel = vec2(1.0 / shadowmap_size, 1.0 / shadowmap_size);
 
     vec4 shadowCoordinateWdivide = shadowCoord / shadowCoord.w ;
-	
-	/* Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z += 0.0005;
-    */
+    //shadowCoordinateWdivide.s = 1.0 - shadowCoordinateWdivide.s;	
+	// Used to lower moiré pattern and self-shadowing
+	// shadowCoordinateWdivide.z += 0.0005;
 
-    float shadow = 1.0;
+    shadow = 1.0;
 
     float distanceFromLight;
-
     const float kernel_size = 3.0;
-    const float shadow_increment = 2.0 / ((kernel_size * 2.0 + 1.0) * (kernel_size * 2.0 + 1.0));
+    const float shadow_increment = 0.5 / ((kernel_size * 2.0 + 1.0) * (kernel_size * 2.0 + 1.0));
     if(shadowCoord.w > 0.0)
     {
         for(float i = -kernel_size; i <= kernel_size; i+=1.0)
@@ -87,8 +88,7 @@ void main()
             {
                 distanceFromLight = texture2D(
                     shadowMap,
-                    shadowCoordinateWdivide.st + vec2(i * pixel.x,0.0) + vec2(0.0, j * pixel.y)
-                    ).z;
+                    shadowCoordinateWdivide.st + vec2(i * pixel.x, j * pixel.y)).z;
                 if(distanceFromLight < shadowCoordinateWdivide.z)
                 {
                     shadow -= shadow_increment;
@@ -97,19 +97,19 @@ void main()
         }
     }
 
-    shadow = clamp(shadow, 0.3, 1.0);
+    shadow = clamp(shadow, 0.0, 1.0);
     //shadow = 1.0;
 
-    vec3 lightTransformed = (transform * vec4(lightPos, 1.0)).xyz;
-    vec3 position = (transform * gl_Vertex).xyz;
+    vec3 lightTransformed = lightPos.xyz;
+    vec3 position = particlePosition.xyz;
 
     vec3 diff = lightTransformed - position;
     float dist = sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 
     float a = 1.0;
-    float b = 0.022;
+    float b = 0.002;
     float c = 0.002;
 
-    shadow *= lightIntensity / (a + b * dist + c * dist * dist);
-    color *= vec4(shadow);
+    light = lightIntensity / (a + b * dist + c * dist * dist);
+    light = max(light, 2.0 * sat);
 }

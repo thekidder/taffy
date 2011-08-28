@@ -20,7 +20,8 @@ ParticleSystem::ParticleSystem(
       texture_size_height(texture_size_h),
       current(&state1), last(&state2),
       texture_cache(texture_cache_), shader_cache(shader_cache_),
-      time_since_update(10000), time_since_spawn_update(10000), last_emit_time(0.0f)
+      time_since_update(10000), time_since_spawn_update(10000), last_emit_time(0.0f),
+      spawned(false), updated(false)
 {
     size_t num_particles = texture_size_width * texture_size_height;
     size_t constructed = 0;
@@ -122,9 +123,9 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
 {
     time_since_update += elapsed;
     time_since_spawn_update += elapsed;
-    if(update_pipe->Swap())
+    if(!updated && update_pipe->Swap())
     {
-        APP_LOG(SORE_Logging::LVL_INFO, boost::format("render from %p") % current);
+        APP_LOG(SORE_Logging::LVL_INFO, boost::format("UPDATE: render from %d (%f)") % current->positions->Handle() % (time_since_update / 1000.0f));
         for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
         {
             it->AddTexture("colors", current->colors);
@@ -137,6 +138,7 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
         imm_mode.SetTexture("colors", current->colors);
         imm_mode.SetTexture("data", current->data);
         imm_mode.SetUniform("elapsed", time_since_update / 1000.0f);
+        imm_mode.SetUniform("t", SORE_Kernel::GetGlobalMS() / 1000.0f);
 
         imm_mode.SetTexture("positions_spawn", spawns.positions);
         imm_mode.SetTexture("colors_spawn", spawns.colors);
@@ -151,14 +153,20 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
         std::swap(current, last);
 
         time_since_update = 0;
+
+        updated = true;
     }
-    if(time_since_spawn_update >= 40 && emitter_shader)
+    if(!spawned && time_since_spawn_update >= 80 && emitter_shader)
+    //if(!spawned && emitter_shader)
     {
         emitter_pipe->Spawn();
 
         imm_mode.SetKeywords("particle_emitter");
         imm_mode.SetShader(emitter_shader);
         float t = SORE_Kernel::GetGlobalMS() / 1000.0f;
+
+        APP_LOG(SORE_Logging::LVL_INFO, boost::format("SPAWN (%f, %f)") % t % last_emit_time);
+
         imm_mode.SetUniform("seed", seed);
         imm_mode.SetUniform("t", t);
         imm_mode.SetUniform("old_t", last_emit_time);
@@ -170,6 +178,8 @@ void ParticleSystem::Update(int elapsed, SORE_Graphics::ImmediateModeProvider& i
 
         time_since_spawn_update = 0;
         last_emit_time = t;
+
+        spawned = true;
     }
 }
 

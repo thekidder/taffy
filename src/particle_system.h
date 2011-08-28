@@ -1,6 +1,7 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
+#include "app_log.h"
 #include "particle_texture_loader.h"
 #include "pipes.h"
 
@@ -19,7 +20,7 @@ namespace SORE_Profiler
     class Profiler;
 }
 
-class ParticleSystem : public SORE_Graphics::GeometryProvider
+class ParticleSystem : public SORE_Graphics::GeometryProvider, public SORE_Graphics::BufferManager
 {
 public:
     ParticleSystem(
@@ -47,11 +48,13 @@ public:
     bool OnResize(const SORE_Kernel::Event& e);
 
     // renderer stuff interfaces
-    void MakeUpToDate() { buffers.MakeUpToDate(); }
+    void MakeUpToDate() { APP_LOG(SORE_Logging::LVL_INFO, "MakeUpToDate"); updated = spawned = false; buffers.MakeUpToDate(); }
+    SORE_Graphics::geometry_entry LookupGC(SORE_Graphics::GeometryChunkPtr gc) { return buffers.LookupGC(gc); }
+    bool Contains(SORE_Graphics::GeometryChunkPtr gc) { return buffers.Contains(gc); }
     std::vector<SORE_Graphics::Renderable>::iterator GeometryBegin();
     std::vector<SORE_Graphics::Renderable>::iterator GeometryEnd();
 
-    SORE_Graphics::BufferManager* GetBufferManager() { return &buffers; }
+    SORE_Graphics::BufferManager* GetBufferManager() { return this; }
 private:
     SORE_Resource::GLSLShaderPtr update_shader, emitter_shader;
 
@@ -73,6 +76,8 @@ private:
     int time_since_update, time_since_spawn_update;
     float last_emit_time;
     float seed;
+
+    bool spawned, updated;
 };
 
 #endif
