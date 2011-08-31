@@ -4,12 +4,12 @@ This software makes use of third part libraries. The following is a list of all 
 
 This software makes use of several third-party libraries:
 Boost (http://www.boost.org/): Licensed under the Boost Software License (boost.txt).
-ENet (http://enet.bespin.org/): Licensed under a liberal license (enet.txt)
+ENet (http://enet.bespin.org/): Licensed under a liberal license (enet.txt).
 Fontconfig (http://www.fontconfig.org/wiki/): Licensed under a liberal license (fontconfig.txt).
 FreeType 2 (http://freetype.sourceforge.net/index2.html): Licensed under the FreeType license (see freetype.txt).
 GLEW (http://glew.sourceforge.net/): Licensed under a modified BSD license (see glew.txt) and the MIT license.
-SDL (http://www.libsdl.org/): Licensed under the LGPL 2.1 or greater (see lgpl-2.1.txt).
-SORE: licensed under the LGPL 2.1 or greater (see lgpl-2.1.txt). Contact the author for more information.
-zlib (http://www.zlib.net/): Licensed under a liberal license (see zlib.txt)
+SFML (http://www.sfml-dev.org/): Licensed under the zlib license (see zlib.txt).
+SORE: Licensed under a liberal license (see license.txt).
+zlib (http://www.zlib.net/): Licensed under a liberal license (see zlib.txt).
 
 Copyright 2009 by Adam Kidder <thekidder@gmail.com>
