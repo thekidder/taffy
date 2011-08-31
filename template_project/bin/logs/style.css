@@ -1,0 +1,90 @@
+body
+{
+	font-family: Sans-serif;
+}
+
+a
+{
+	float: left;
+	text-decoration: none;
+}
+
+h3
+{
+}
+
+input
+{
+	margin-left: 15px;
+}
+
+img
+{
+	border: 0;
+}
+
+
+div#controls
+{
+	margin: 5px;
+	margin-bottom: 35px;
+	border: 1px solid #999;
+	padding: 5px;
+}
+
+div.messages > div
+{
+	margin: 10px;
+	border: 1px solid #000;
+}
+
+div.container
+{
+	border: 1px solid #999;
+	padding: 5px;
+	margin: 5px;text-align:left;
+	margin-bottom: 20px;
+}
+
+div.message
+{
+	margin-left: 20px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+small
+{
+	margin-right: 20px;
+}
+
+.critical
+{
+	background-color: #ff0000;
+	font-weight: bold;
+}
+
+.error
+{
+	background-color: #ff0000;
+}
+
+.warning
+{
+	background-color: #ff9000;
+}
+
+.info
+{
+	background-color: #36ea18;
+}
+
+.debug2
+{
+	background-color: #99c4e0;
+}
+
+.debug1
+{
+	background-color: #48a4de;
+}
