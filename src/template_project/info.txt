@@ -1,4 +1,4 @@
-{template} is proprietary software.
+sore_template is free software.
 
 This software makes use of third part libraries. The following is a list of all third-party components used.
 
@@ -12,4 +12,4 @@ SFML (http://www.sfml-dev.org/): Licensed under the zlib license (see zlib.txt).
 SORE: Licensed under a liberal license (see license.txt).
 zlib (http://www.zlib.net/): Licensed under a liberal license (see zlib.txt).
 
-Copyright 2009 by Adam Kidder <thekidder@gmail.com>
+Copyright 2009-2011 by Adam Kidder <thekidder@gmail.com>
