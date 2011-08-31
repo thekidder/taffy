@@ -1,9 +1,8 @@
 #ifndef DEBUG_GUI
 #define DEBUG_GUI
 
-#include <sore_input.h>
-#include <sore_renderer_std.h>
-#include <sore_resource.h>
+#include <sore_profilerstats.h>
+#include <sore_renderer.h>
 #include <sore_renderstats.h>
 
 namespace SORE_GUI
@@ -13,19 +12,14 @@ namespace SORE_GUI
 }
 namespace gui = SORE_GUI;
 
-class DebugGUI
+class DebugGUI : public SORE_GUI::Widget
 {
 public:
-    DebugGUI(SORE_Graphics::IRenderer* r, SORE_Resource::ResourcePool& pool,
-             SORE_Kernel::InputTask& input, gui::Widget* top);
-    ~DebugGUI();
+    DebugGUI(SORE_Graphics::Renderer& r, SORE_Profiler::Profiler* p, gui::Widget* parent);
 
-    void SetVisible(bool visible = true);
-
-    void Frame(int elapsed);
 private:
-    SORE_Graphics::IRenderer* renderer;
     gui::RenderStats* renderStats;
+    gui::ProfilerStats* profilerStats;
     gui::TextWidget* version;
 };
 
