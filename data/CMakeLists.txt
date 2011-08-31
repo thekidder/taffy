@@ -47,6 +47,10 @@ SET(
   Shaders/point_sprite_fragment.glsl
   Shaders/point_sprite_vertex.glsl
 
+  Shaders/untextured.shad
+  Shaders/untextured_fragment.glsl
+  Shaders/untextured_vertex.glsl
+
   Textures/default.tga)
 
 SET(OUTPUT_NAME default_resources.sdp)

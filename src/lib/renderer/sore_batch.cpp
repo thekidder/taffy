@@ -88,6 +88,7 @@ unsigned int SORE_Graphics::RenderBatch::Render()
 
 void SORE_Graphics::RenderBatch::EndDraw() const
 {
-    geometry->EndDraw();
+    if(geometry)
+        geometry->EndDraw();
 }
 
