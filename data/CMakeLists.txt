@@ -49,7 +49,6 @@ SET(
 
   Shaders/untextured.shad
   Shaders/untextured_fragment.glsl
-  Shaders/untextured_vertex.glsl
 
   Textures/default.tga)
 

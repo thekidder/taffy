@@ -42,7 +42,6 @@ SORE_Graphics::RenderState::RenderState() : commands(0), renderbuffer(0)
 SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
   : commands(0), renderbuffer(0)
 {
-    commands |= RENDER_CMD_CHANGE_CAMERA;
     camera = cam;
 
     commands |= RENDER_CMD_CHANGE_BLEND_MODE;
@@ -61,7 +60,9 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
     }
 
     UniformState copy = r.Uniforms();
-    copy.SetVariable("transform", *r.GetTransform());
+    copy.SetVariable("projection", GetProjectionMatrix(cam.projection));
+    copy.SetVariable("view", cam.viewMatrix);
+    copy.SetVariable("model", *r.GetTransform());
 
     if(!copy.Empty())
     {
@@ -76,15 +77,10 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
 SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderState& old) const
 {
     RenderState newState;
-    newState.camera = camera;
     newState.blend = blend;
     newState.shader = shader;
     newState.renderbuffer = renderbuffer;
-
-    if(old.camera != camera)
-    {
-        newState.commands |= RENDER_CMD_CHANGE_CAMERA;
-    }
+    newState.camera = camera;
 
     if(old.blend != blend)
     {
@@ -151,11 +147,8 @@ bool SORE_Graphics::RenderState::Empty() const
 
 void SORE_Graphics::RenderState::Apply() const
 {
-    if(commands & RENDER_CMD_CHANGE_CAMERA)
-    {
-        ChangeProjectionMatrix(camera.projection);
-        ChangeCameraMatrix(camera.viewMatrix);
-    }
+    if(camera.projection.type != NONE)
+        GetProjectionMatrix(camera.projection);
     if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
     {
         unsigned int blendSFactor, blendDFactor;
@@ -213,44 +206,21 @@ void SORE_Graphics::RenderState::SetRenderbuffer(FBO* const renderbuffer_)
     commands |= RENDER_CMD_CHANGE_FBO;
 }
 
-void SORE_Graphics::RenderState::ChangeProjectionMatrix(
+SORE_Math::Matrix4<float> SORE_Graphics::RenderState::GetProjectionMatrix(
     const ProjectionInfo& projection) const
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
     switch(projection.type)
     {
-    case NONE:
-        ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                   "No projection type set, could not initialize projection");
-        break;
     case ORTHO2D:
-        glOrtho(projection.left, projection.right,
-                projection.top, projection.bottom, -1.0f, 1.0f);
-        break;
     case ORTHO:
-        glOrtho(projection.left, projection.right,
-                projection.top, projection.bottom, projection.znear, projection.zfar);
-        break;
+        return SORE_Math::Matrix4<float>::GetOrtho(
+            projection.left, projection.right, projection.bottom, projection.top, projection.znear, projection.zfar);
     case PERSPECTIVE:
-        {
-            gluPerspective(projection.fov, projection.ratio,
-                           projection.znear, projection.zfar );
-            break;
-        }
+        return SORE_Math::Matrix4<float>::GetPerspective(projection.fov, projection.ratio, projection.znear, projection.zfar);
+    case NONE:
     default:
+        // todo: SORE exceptions
+        throw std::runtime_error("No projection type set, could not initialize projection");
         break;
-    }
-    glMatrixMode(GL_MODELVIEW);
-}
-
-void SORE_Graphics::RenderState::ChangeCameraMatrix(
-    const SORE_Math::Matrix4<float>& camera) const
-{
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    if(camera != SORE_Math::Matrix4<float>())
-    {
-        glMultMatrixf(camera.GetData());
     }
 }

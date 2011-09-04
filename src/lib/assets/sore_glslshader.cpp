@@ -152,6 +152,78 @@ namespace SORE_Resource
             ENGINE_LOG(SORE_Logging::LVL_DEBUG1, "Shader program linked OK");
             linked = true;
         }
+
+        PrintInfo();
+    }
+
+    void GLSLShader::PrintInfo()
+    {
+        int numAttributes;
+        int maxAttributeStringLen;
+        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttributes);
+        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeStringLen);
+
+        for(int i = 0; i < numAttributes; ++i)
+        {
+            int attribSize;
+            GLenum type;
+            char* str = new char[maxAttributeStringLen];
+            glGetActiveAttrib(
+                program, i, maxAttributeStringLen, 0, 
+                &attribSize, &type, str);
+
+            char* typeStr;
+            switch(type)
+            {
+            case GL_FLOAT:
+                typeStr = "GL_FLOAT";
+                break;
+            case GL_FLOAT_VEC2:
+                typeStr = "GL_FLOAT_VEC2";
+                break;
+            case GL_FLOAT_VEC3:
+                typeStr = "GL_FLOAT_VEC3";
+                break;
+            case GL_FLOAT_VEC4:
+                typeStr = "GL_FLOAT_VEC4";
+                break;
+            case GL_FLOAT_MAT2:
+                typeStr = "GL_FLOAT_MAT2";
+                break;
+            case GL_FLOAT_MAT3:
+                typeStr = "GL_FLOAT_MAT3";
+                break;
+            case GL_FLOAT_MAT4:
+                typeStr = "GL_FLOAT_MAT4";
+                break;
+            case GL_FLOAT_MAT2x3:
+                typeStr = "GL_FLOAT_MAT2x3";
+                break;
+            case GL_FLOAT_MAT2x4:
+                typeStr = "GL_FLOAT_MAT2x4";
+                break;
+            case GL_FLOAT_MAT3x2:
+                typeStr = "GL_FLOAT_MAT3x2";
+                break;
+            case GL_FLOAT_MAT3x4:
+                typeStr = "GL_FLOAT_MAT3x4";
+                break;
+            case GL_FLOAT_MAT4x2:
+                typeStr = "GL_FLOAT_MAT4x2";
+                break;
+            case GL_FLOAT_MAT4x3:
+                typeStr = "GL_FLOAT_MAT4x3";
+                break;
+            }
+
+
+            ENGINE_LOG(
+                SORE_Logging::LVL_INFO,
+                boost::format(
+                "Program %d: Found attribute %s of type %s and size %d")
+                % program % str % typeStr % attribSize);
+            delete str;
+        }
     }
 
     void GLSLShader::Init()

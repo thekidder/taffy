@@ -49,10 +49,10 @@ namespace SORE_Graphics
         case ORTHO:
             if(pi.useScreenCoords)
             {
-                returnProj.top = static_cast<float>(si.height);
                 returnProj.left = 0;
-                returnProj.bottom = 0;
+                returnProj.top = static_cast<float>(si.height);
                 returnProj.right = static_cast<float>(si.width);
+                returnProj.bottom = 0;
                 returnProj.ratio = si.ratio;
             }
             else if(pi.useScreenRatio)

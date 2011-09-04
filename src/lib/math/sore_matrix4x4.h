@@ -298,6 +298,19 @@ namespace SORE_Math
                 return GetFrustum(-xmax, xmax, -ymax, ymax, znear, zfar);
             }
 
+            static Matrix4<T> GetOrtho(T left, T right, T top, T bottom, T znear, T zfar)
+            {
+                Matrix4<T> result;
+                result.value[0 ] = T(2.0) / (right - left);
+                result.value[5 ] = T(2.0) / (top - bottom);
+                result.value[10] = T(-2.0) / (zfar - znear);
+                result.value[12] = -(right + left) / (right - left);
+                result.value[13] = -(top + bottom) / (top - bottom);
+                result.value[14] = -(zfar + znear) / (zfar - znear);
+
+                return result;
+            }
+
             static Matrix4<T> GetFrustum(T left, T right, T bottom, T top, T znear, T zfar)
             {
                 T dist = T(2.0) * znear;

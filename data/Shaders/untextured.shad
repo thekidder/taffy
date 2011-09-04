@@ -1,5 +1,5 @@
 [Vertex]
-data/Shaders/untextured_vertex.glsl
+data/Shaders/default_vertex.glsl
 
 [Fragment]
 data/Shaders/untextured_fragment.glsl

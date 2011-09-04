@@ -66,25 +66,23 @@ namespace SORE_Graphics
         enum Render_cmd_e
         {
             RENDER_CMD_NONE              = 0,
-            RENDER_CMD_CHANGE_CAMERA     = 1,
-            RENDER_CMD_CHANGE_BLEND_MODE = 2,
-            RENDER_CMD_BIND_SHADER       = 4,
-            RENDER_CMD_BIND_TEXTURE      = 8,
-            RENDER_CMD_CHANGE_UNIFORMS   = 16,
-            RENDER_CMD_CHANGE_PRIMITIVE  = 32,
-            RENDER_CMD_CHANGE_FBO        = 64
+            RENDER_CMD_CHANGE_BLEND_MODE = 1,
+            RENDER_CMD_BIND_SHADER       = 2,
+            RENDER_CMD_BIND_TEXTURE      = 4,
+            RENDER_CMD_CHANGE_UNIFORMS   = 8,
+            RENDER_CMD_CHANGE_PRIMITIVE  = 16,
+            RENDER_CMD_CHANGE_FBO        = 32
         };
 
-        void ChangeCameraMatrix(const SORE_Math::Matrix4<float>& camera) const;
-        void ChangeProjectionMatrix(const ProjectionInfo& proj) const;
+        SORE_Math::Matrix4<float> GetProjectionMatrix(const ProjectionInfo& proj) const;
 
         unsigned int commands;
 
         UniformState uniforms;
         TextureState textures;
+        camera_info camera;
         SORE_Resource::GLSLShaderPtr shader;
 
-        camera_info camera;
         blend_mode blend;
 
         GLenum primitiveType;

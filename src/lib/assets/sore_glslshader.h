@@ -97,6 +97,8 @@ namespace SORE_Resource
         int  AddShader(GLuint type, const char* src);
         GLint GetUniformLocation(std::string name);
 
+        void PrintInfo();
+
         std::vector<GLuint> vertexShaders, fragmentShaders;
         GLuint program;
         bool linked;
