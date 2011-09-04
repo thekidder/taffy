@@ -42,31 +42,22 @@ void SORE_Graphics::UniformState::Bind(SORE_Resource::GLSLShaderPtr s) const
         switch(it->second.type)
         {
         case INT:
-            s->SetUniform1i(it->first, it->second.i);
+            s->SetUniform(it->first, it->second.i);
             break;
         case FLOAT:
-            s->SetUniform1f(it->first, it->second.f);
+            s->SetUniform(it->first, it->second.f);
             break;
         case VEC2:
-            s->SetUniform2f(it->first,
-                            it->second.v2.GetValue()[0],
-                            it->second.v2.GetValue()[1]);
+            s->SetUniform(it->first, 2, it->second.v2.GetValue());
             break;
         case VEC3:
-            s->SetUniform3f(it->first,
-                            it->second.v3.GetValue()[0],
-                            it->second.v3.GetValue()[1],
-                            it->second.v3.GetValue()[2]);
+            s->SetUniform(it->first, 3, it->second.v2.GetValue());
             break;
         case VEC4:
-            s->SetUniform4f(it->first,
-                            it->second.v4.GetValue()[0],
-                            it->second.v4.GetValue()[1],
-                            it->second.v4.GetValue()[2],
-                            it->second.v4.GetValue()[3]);
+            s->SetUniform(it->first, 4, it->second.v2.GetValue());
             break;
         case MAT4:
-            s->SetUniformMatrix4fv(it->first, it->second.m4.GetData());
+            s->SetUniform(it->first, it->second.m4);
             break;
         }
     }

@@ -165,7 +165,7 @@ namespace SORE_Resource
                          unsigned int textureSlot) const
     {
         assert(textureSlot < 8);
-        shader->SetUniform1i(sampleName, textureSlot);
+        shader->SetUniformTexture(sampleName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, handle);
     }

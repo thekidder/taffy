@@ -35,14 +35,19 @@
 #include <sore_glslshader.h>
 #include <sore_graphics.h>
 #include <sore_logger.h>
+#include <sore_texture2d.h>
 
 #include <fstream>
 #include <stdexcept>
+
+// TODO: FIXME: SORE exception support
 
 namespace SORE_Resource
 {
     bool GLSLShader::initCalled = false;
     bool GLSLShader::supported  = false;
+
+    const GLSLShader::glsl_variable_info GLSLShader::none = GLSLShader::glsl_variable_info(-1, GL_NONE, 1);
 
     GLSLShader::GLSLShader()
         : linked(false), program(0)
@@ -153,82 +158,93 @@ namespace SORE_Resource
             linked = true;
         }
 
+        PopulateUniformLocations();
+        PopulateAttributeLocations();
         PrintInfo();
+    }
+
+    const char* GLenumToString(GLenum type)
+    {
+        char* typeStr;
+        switch(type)
+        {
+        case GL_FLOAT:
+            typeStr = "GL_FLOAT";
+            break;
+        case GL_FLOAT_VEC2:
+            typeStr = "GL_FLOAT_VEC2";
+            break;
+        case GL_FLOAT_VEC3:
+            typeStr = "GL_FLOAT_VEC3";
+            break;
+        case GL_FLOAT_VEC4:
+            typeStr = "GL_FLOAT_VEC4";
+            break;
+        case GL_FLOAT_MAT2:
+            typeStr = "GL_FLOAT_MAT2";
+            break;
+        case GL_FLOAT_MAT3:
+            typeStr = "GL_FLOAT_MAT3";
+            break;
+        case GL_FLOAT_MAT4:
+            typeStr = "GL_FLOAT_MAT4";
+            break;
+        case GL_FLOAT_MAT2x3:
+            typeStr = "GL_FLOAT_MAT2x3";
+            break;
+        case GL_FLOAT_MAT2x4:
+            typeStr = "GL_FLOAT_MAT2x4";
+            break;
+        case GL_FLOAT_MAT3x2:
+            typeStr = "GL_FLOAT_MAT3x2";
+            break;
+        case GL_FLOAT_MAT3x4:
+            typeStr = "GL_FLOAT_MAT3x4";
+            break;
+        case GL_FLOAT_MAT4x2:
+            typeStr = "GL_FLOAT_MAT4x2";
+            break;
+        case GL_FLOAT_MAT4x3:
+            typeStr = "GL_FLOAT_MAT4x3";
+            break;
+        case GL_SAMPLER_2D:
+            typeStr = "GL_SAMPLER_2D";
+            break;
+        case GL_NONE:
+            typeStr = "GL_NONE";
+            break;
+        default:
+            typeStr = "invalid type";
+            break;
+        }
+
+        return typeStr;
     }
 
     void GLSLShader::PrintInfo()
     {
-        int numAttributes;
-        int maxAttributeStringLen;
-        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttributes);
-        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeStringLen);
-
-        for(int i = 0; i < numAttributes; ++i)
+        std::map<std::string, glsl_variable_info>::iterator it;
+        for(it = uniforms.begin(); it != uniforms.end(); ++it)
         {
-            int attribSize;
-            GLenum type;
-            char* str = new char[maxAttributeStringLen];
-            glGetActiveAttrib(
-                program, i, maxAttributeStringLen, 0, 
-                &attribSize, &type, str);
-
-            char* typeStr;
-            switch(type)
-            {
-            case GL_FLOAT:
-                typeStr = "GL_FLOAT";
-                break;
-            case GL_FLOAT_VEC2:
-                typeStr = "GL_FLOAT_VEC2";
-                break;
-            case GL_FLOAT_VEC3:
-                typeStr = "GL_FLOAT_VEC3";
-                break;
-            case GL_FLOAT_VEC4:
-                typeStr = "GL_FLOAT_VEC4";
-                break;
-            case GL_FLOAT_MAT2:
-                typeStr = "GL_FLOAT_MAT2";
-                break;
-            case GL_FLOAT_MAT3:
-                typeStr = "GL_FLOAT_MAT3";
-                break;
-            case GL_FLOAT_MAT4:
-                typeStr = "GL_FLOAT_MAT4";
-                break;
-            case GL_FLOAT_MAT2x3:
-                typeStr = "GL_FLOAT_MAT2x3";
-                break;
-            case GL_FLOAT_MAT2x4:
-                typeStr = "GL_FLOAT_MAT2x4";
-                break;
-            case GL_FLOAT_MAT3x2:
-                typeStr = "GL_FLOAT_MAT3x2";
-                break;
-            case GL_FLOAT_MAT3x4:
-                typeStr = "GL_FLOAT_MAT3x4";
-                break;
-            case GL_FLOAT_MAT4x2:
-                typeStr = "GL_FLOAT_MAT4x2";
-                break;
-            case GL_FLOAT_MAT4x3:
-                typeStr = "GL_FLOAT_MAT4x3";
-                break;
-            }
-
-
             ENGINE_LOG(
-                SORE_Logging::LVL_INFO,
+                SORE_Logging::LVL_DEBUG1,
                 boost::format(
-                "Program %d: Found attribute %s of type %s and size %d")
-                % program % str % typeStr % attribSize);
-            delete str;
+                "Program %d: Found uniform '%s' of type %s and size %d at index %d")
+                % program % it->first % GLenumToString(it->second.type) % it->second.size % it->second.index);
+        }
+
+        for(it = attributes.begin(); it != attributes.end(); ++it)
+        {
+            ENGINE_LOG(
+                SORE_Logging::LVL_DEBUG1,
+                boost::format(
+                "Program %d: Found attribute '%s' of type %s and size %d at index %d")
+                % program % it->first % GLenumToString(it->second.type) % it->second.size % it->second.index);
         }
     }
 
     void GLSLShader::Init()
     {
-        // TODO: FIXME: SORE exception support
         if(!initCalled)
             InitShaders();
         if(!ShadersSupported())
@@ -380,144 +396,178 @@ namespace SORE_Resource
         return !(one == two);
     }
 
-    GLint GLSLShader::GetUniformLocation(std::string name)
+    void GLSLShader::SetUniform(const std::string& name, GLint i0)
     {
-        std::map<std::string, GLint>::iterator it;
-        GLint location;
-        if((it=uniforms.find(name))==uniforms.end())
-        {
-            location = glGetUniformLocationARB(program, name.c_str());
-            if(location==-1)
-            {
-                ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                           boost::format("Error getting location of GLSL "
-                                         "uniform '%s'. Variable name probably "
-                                         "does not exist") % name);
-                return -1; //don't insert into uniforms database
-            }
-            uniforms.insert(std::pair<std::string,GLint>(name,location));
-        }
-        else
-            location = it->second;
-        return location;
+        GLint location = GetCheckedIndex(name, GL_INT);
+        if(location != -1)
+            glUniform1iARB(location, i0);
     }
 
-    GLint GLSLShader::GetAttributeLocation(std::string name)
+    void GLSLShader::SetUniform(const std::string& name, GLfloat f0)
     {
-        std::map<std::string, GLint>::iterator it;
-        GLint location;
-        if((it=attributes.find(name))==attributes.end())
-        {
-            location = glGetAttribLocationARB(program, name.c_str());
-            if(location==-1)
-            {
-                ENGINE_LOG
-                    (SORE_Logging::LVL_ERROR,
-                     boost::format("Error getting location of GLSL attribute "
-                                   "'%s'. Variable name probably does not exist")
-                     % name);
-                return -1; //don't insert into uniforms database
-            }
-            attributes.insert(std::pair<std::string,GLint>(name,location));
-        }
-        else
-            location = it->second;
-        return location;
-    }
-
-    void GLSLShader::SetUniform1i(std::string name, GLuint i0)
-    {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
-            glUniform1iARB(location,i0);
-    }
-
-    void GLSLShader::SetUniform1f(std::string name, GLfloat f0)
-    {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
+        GLint location = GetCheckedIndex(name, GL_FLOAT);
+        if(location != -1)
             glUniform1fARB(location,f0);
     }
 
-    void GLSLShader::SetUniform2f(std::string name, GLfloat v0, GLfloat v1)
+    void GLSLShader::SetUniform(const std::string& name, GLfloat v0, GLfloat v1)
     {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
+        GLint location = GetCheckedIndex(name, GL_FLOAT_VEC2);
+        if(location != -1)
             glUniform2fARB(location,v0,v1);
     }
 
-    void GLSLShader::SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2)
+    void GLSLShader::SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2)
     {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
-            glUniform3fARB(location,v0,v1,v2);
+        GLint location = GetCheckedIndex(name, GL_FLOAT_VEC3);
+        if(location != -1)
+            glUniform3fARB(location, v0, v1, v2);
     }
 
-    void GLSLShader::SetUniform4f(std::string name, GLfloat v0, GLfloat v1,
-                                  GLfloat v2, GLfloat v3)
+    void GLSLShader::SetUniform(
+        const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
     {
-        if(!ShadersSupported() || program==0)
-        {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
-        }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
+        GLint location = GetCheckedIndex(name, GL_FLOAT_VEC4);
+        if(location != -1)
             glUniform4fARB(location,v0,v1,v2,v3);
     }
 
-    void GLSLShader::SetUniform1fv(
-        std::string name, unsigned int count, const GLfloat * values)
+    void GLSLShader::SetUniform(
+        const std::string& name, unsigned int count, const GLfloat * values)
     {
-        if(!ShadersSupported() || program==0)
+        GLenum type;
+        switch(count)
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
+        case 1:
+            type = GL_FLOAT;
+            break;
+        case 2:
+            type = GL_FLOAT_VEC2;
+            break;
+        case 3:
+            type = GL_FLOAT_VEC3;
+            break;
+        case 4:
+            type = GL_FLOAT_VEC4;
+            break;
+        case 0:
+        default:
+            throw std::runtime_error("Invalid count setting uniform");
         }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
-        {
+        GLint location = GetCheckedIndex(name, type);
+        if(location != -1)
             glUniform1fvARB(location, count, values);
+    }
+
+    void GLSLShader::SetUniform(
+        const std::string& name, const SORE_Math::Matrix4<float>& matrix)
+    {
+        GLint location = GetCheckedIndex(name, GL_FLOAT_MAT4);
+        if(location != -1)
+            glUniformMatrix4fvARB(location, 1, false, matrix.GetData());
+    }
+
+    void GLSLShader::SetUniformTexture(
+            const std::string& name, GLuint textureSlot)
+    {
+        GLint location = GetCheckedIndex(name, GL_SAMPLER_2D);
+        if(location != -1)
+            glUniform1i(location, textureSlot);
+    }
+
+    const GLSLShader::glsl_variable_info& GLSLShader::GetUniform(const std::string& name)
+    {
+        std::map<std::string, glsl_variable_info>::iterator it;
+        if((it=uniforms.find(name))==uniforms.end())
+        {
+            ENGINE_LOG(
+                SORE_Logging::LVL_ERROR,
+                boost::format("Error getting location of GLSL uniform "
+                              "'%s'. Variable name probably does not exist")
+                     % name);
+            // cache this name in the table to avoid repeating error message
+            uniforms.insert(std::make_pair(name, none));
+            return none;
+        }
+        else
+        {
+            return it->second;
         }
     }
 
-    void GLSLShader::SetUniformMatrix4fv(
-        std::string name, const GLfloat * values)
+    const GLSLShader::glsl_variable_info& GLSLShader::GetAttribute(const std::string& name)
     {
-        if(!ShadersSupported() || program==0)
+        std::map<std::string, glsl_variable_info>::iterator it;
+        if((it=attributes.find(name))==attributes.end())
         {
-            ENGINE_LOG(SORE_Logging::LVL_ERROR, "Object is not initialized properly");
-            return;
+            ENGINE_LOG(
+                SORE_Logging::LVL_ERROR,
+                boost::format("Error getting location of GLSL attribute "
+                              "'%s'. Variable name probably does not exist")
+                     % name);
+            // cache this name in the table to avoid repeating error message
+            attributes.insert(std::make_pair(name, none));
+            return none;
         }
-        GLint location = GetUniformLocation(name);
-        if(location!=-1)
+        else
         {
-            glUniformMatrix4fvARB(location, 1, false, values);
+            return it->second;
         }
     }
 
-    std::string GLSLShader::ProcessFilename(const std::string& filename)
+    void GLSLShader::PopulateUniformLocations()
     {
-        return filename;
+        GLint numUniforms;
+        GLint maxUniformStringLen;
+        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);
+        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformStringLen);
+
+        for(GLint i = 0; i < numUniforms; ++i)
+        {
+            char* name = new char[maxUniformStringLen];
+            GLint size;
+            GLenum type;
+
+            glGetActiveUniform(program, i, maxUniformStringLen, 0, &size, &type, name);
+
+            uniforms.insert(std::make_pair(name, glsl_variable_info(i, type, size)));
+
+            delete name;
+        }
+    }
+
+    void GLSLShader::PopulateAttributeLocations()
+    {
+        GLint numAttributes;
+        GLint maxAttributeStringLen;
+        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttributes);
+        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeStringLen);
+
+        for(GLint i = 0; i < numAttributes; ++i)
+        {
+            char* name = new char[maxAttributeStringLen];
+            GLint size;
+            GLenum type;
+
+            glGetActiveAttrib(program, i, maxAttributeStringLen, 0, &size, &type, name);
+
+            attributes.insert(std::make_pair(name, glsl_variable_info(i, type, size)));
+
+            delete name;
+        }
+    }
+
+    int GLSLShader::GetCheckedIndex(const std::string& name, GLenum type)
+    {
+        if(!ShadersSupported() || !linked || !program)
+        {
+            throw std::runtime_error("Shader is not initialized");
+        }
+        const glsl_variable_info& var = GetUniform(name);
+        // don't check if var.type is none, this means it's an invalid uniform anyways
+        // (and we've already logged an error)
+        if(var.type != GL_NONE && var.type != type)
+            throw std::runtime_error("Setting incorrect uniform type");
+        return var.index;
     }
 } //end of namespace SORE_Graphics

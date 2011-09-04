@@ -42,7 +42,9 @@
 #endif
 
 #include <sore_allgl.h>
+#include <sore_assettypes.h>
 #include <sore_dll.h>
+#include <sore_matrix4x4.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -72,38 +74,57 @@ namespace SORE_Resource
         unsigned int GetHandle() const;
 
         //Uniform operators
-        void SetUniform1i(std::string name, GLuint i0);
-        void SetUniform1f(std::string name, GLfloat f0);
-        void SetUniform2f(std::string name, GLfloat v0, GLfloat v1);
-        void SetUniform3f(std::string name, GLfloat v0, GLfloat v1, GLfloat v2);
-        void SetUniform4f(
-            std::string name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+        void SetUniform(const std::string& name, GLint i0);
+        void SetUniform(const std::string& name, GLfloat f0);
+        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1);
+        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2);
+        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+        void SetUniform(
+            const std::string& name, unsigned int count, const GLfloat* values);
 
-        void SetUniform1fv(
-            std::string name, unsigned int count, const GLfloat* values);
-        void SetUniformMatrix4fv(
-            std::string name, const GLfloat * values);
-
-        GLint GetAttributeLocation(std::string name);
+        void SetUniform(
+            const std::string& name, const SORE_Math::Matrix4<float>& matrix);
+        void SetUniformTexture(
+            const std::string& name, GLuint textureSlot);
 
         //for sorting
         bool operator<(const GLSLShader& o) const;
         bool operator==(const GLSLShader& o) const;
-
-        static std::string ProcessFilename(const std::string& filename);
     private:
+        struct glsl_variable_info
+        {
+            glsl_variable_info(GLuint index_, GLenum type_, GLint size_)
+                : index(index_), type(type_), size(size_)
+            {}
+
+            const GLuint index;
+            const GLenum type;
+            const GLint size;
+        };
+
+        const static glsl_variable_info none;
+
         void Init();
         void Unload();
         int  AddShader(GLuint type, const char* src);
-        GLint GetUniformLocation(std::string name);
+
+        // populate tables of uniform/attribute locations at link time
+        void PopulateUniformLocations();
+        void PopulateAttributeLocations();
+
+        // check that name is of type, and return the uniform index, doing a lot of error checking
+        int GetCheckedIndex(const std::string& name, GLenum type);
+
+        const glsl_variable_info& GetUniform(const std::string& name);
+        const glsl_variable_info& GetAttribute(const std::string& name);
 
         void PrintInfo();
 
         std::vector<GLuint> vertexShaders, fragmentShaders;
         GLuint program;
         bool linked;
-        std::map<std::string,GLint> uniforms;
-        std::map<std::string,GLint> attributes;
+        std::map<std::string, glsl_variable_info> uniforms;
+        std::map<std::string, glsl_variable_info> attributes;
         static bool initCalled;
         static bool supported;
     };
