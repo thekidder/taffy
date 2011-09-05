@@ -33,7 +33,6 @@
  **************************************************************************/
 
 #include <sore_glslshader.h>
-#include <sore_graphics.h>
 #include <sore_logger.h>
 #include <sore_texture2d.h>
 
