@@ -410,61 +410,33 @@ namespace SORE_Resource
             glUniform1fARB(location,f0);
     }
 
-    void GLSLShader::SetUniform(const std::string& name, GLfloat v0, GLfloat v1)
+    void GLSLShader::SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC2);
         if(location != -1)
-            glUniform2fARB(location,v0,v1);
+            glUniform1fvARB(location, 2, v.GetValue());
     }
 
-    void GLSLShader::SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2)
+    void GLSLShader::SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC3);
         if(location != -1)
-            glUniform3fARB(location, v0, v1, v2);
+            glUniform1fvARB(location, 3, v.GetValue());
     }
 
-    void GLSLShader::SetUniform(
-        const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+    void GLSLShader::SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC4);
         if(location != -1)
-            glUniform4fARB(location,v0,v1,v2,v3);
+            glUniform1fvARB(location, 4, v.GetValue());
     }
 
     void GLSLShader::SetUniform(
-        const std::string& name, unsigned int count, const GLfloat * values)
-    {
-        GLenum type;
-        switch(count)
-        {
-        case 1:
-            type = GL_FLOAT;
-            break;
-        case 2:
-            type = GL_FLOAT_VEC2;
-            break;
-        case 3:
-            type = GL_FLOAT_VEC3;
-            break;
-        case 4:
-            type = GL_FLOAT_VEC4;
-            break;
-        case 0:
-        default:
-            throw std::runtime_error("Invalid count setting uniform");
-        }
-        GLint location = GetCheckedIndex(name, type);
-        if(location != -1)
-            glUniform1fvARB(location, count, values);
-    }
-
-    void GLSLShader::SetUniform(
-        const std::string& name, const SORE_Math::Matrix4<float>& matrix)
+        const std::string& name, const SORE_Math::Matrix4<float>& m)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_MAT4);
         if(location != -1)
-            glUniformMatrix4fvARB(location, 1, false, matrix.GetData());
+            glUniformMatrix4fvARB(location, 1, false, m.GetData());
     }
 
     void GLSLShader::SetUniformTexture(

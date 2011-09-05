@@ -76,14 +76,12 @@ namespace SORE_Resource
         //Uniform operators
         void SetUniform(const std::string& name, GLint i0);
         void SetUniform(const std::string& name, GLfloat f0);
-        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1);
-        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2);
-        void SetUniform(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-        void SetUniform(
-            const std::string& name, unsigned int count, const GLfloat* values);
+        void SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v);
+        void SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v);
+        void SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v);
 
         void SetUniform(
-            const std::string& name, const SORE_Math::Matrix4<float>& matrix);
+            const std::string& name, const SORE_Math::Matrix4<float>& m);
         void SetUniformTexture(
             const std::string& name, GLuint textureSlot);
 
