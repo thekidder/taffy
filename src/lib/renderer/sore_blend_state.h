@@ -1,5 +1,5 @@
 /**************************************************************************
- * Copyright 2010 Adam Kidder. All rights reserved.                       *
+ * Copyright 2011 Adam Kidder. All rights reserved.                       *
  *                                                                        *
  * Redistribution and use in source and binary forms, with or without     *
  * modification, are permitted provided that the following conditions     *
@@ -32,61 +32,26 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_UNIFORMSTATE_H
-#define SORE_UNIFORMSTATE_H
+#ifndef SORE_BLEND_STATE_H
+#define SORE_BLEND_STATE_H
 
-#include <sore_assettypes.h>
-#include <sore_dll.h>
-#include <sore_vector2.h>
-#include <sore_vector3.h>
-#include <sore_vector4.h>
-#include <sore_matrix4x4.h>
-#include <sore_glslshader.h>
-
-#include <map>
-#include <string>
+#include <sore_allgl.h>
 
 namespace SORE_Graphics
 {
-    enum uniform_type {INT, FLOAT, VEC2, VEC3, VEC4, MAT4};
-
-    struct uniform_var
+    struct Blend_state
     {
-        uniform_type type;
-
-        int i;
-        float f;
-        SORE_Math::Vector2<float> v2;
-        SORE_Math::Vector3<float> v3;
-        SORE_Math::Vector4<float> v4;
-        SORE_Math::Matrix4<float> m4;
+        bool depthTest;
+        GLenum srcFactor;
+        GLenum dstFactor;
     };
 
-    bool operator==(const uniform_var& one, const uniform_var& two);
-    bool operator!=(const uniform_var& one, const uniform_var& two);
-
-    class SORE_EXPORT UniformState
+    bool operator==(const Blend_state& one, const Blend_state& two)
     {
-    public:
-        void Bind(SORE_Resource::GLSLShaderPtr s) const;
-
-        void SetVariable(const std::string& name, int i);
-        void SetVariable(const std::string& name, float f);
-        void SetVariable(const std::string& name, const SORE_Math::Vector2<float>& v);
-        void SetVariable(const std::string& name, const SORE_Math::Vector3<float>& v);
-        void SetVariable(const std::string& name, const SORE_Math::Vector4<float>& v);
-        void SetVariable(const std::string& name, const SORE_Math::Matrix4<float>& m);
-
-        void SetVariable(const std::string& name, const uniform_var& v);
-
-        bool Empty() const; //returns true if there are no uniforms
-
-        //returns all uniforms in this not in o
-        UniformState GetDiff(const UniformState& o) const;
-    private:
-        std::map<std::string, uniform_var> uniforms;
-    };
-
-    typedef boost::shared_ptr<UniformState> UniformStatePtr;
+        return one.depthTest == two.depthTest &&
+            one.srcFactor == two.srcFactor &&
+            one.dstFactor == two.dstFactor;
+    }
 }
+
 #endif

@@ -63,47 +63,47 @@ void SORE_Graphics::UniformState::Bind(SORE_Resource::GLSLShaderPtr s) const
     }
 }
 
-void SORE_Graphics::UniformState::SetVariable(std::string name, int i)
+void SORE_Graphics::UniformState::SetVariable(const std::string& name, int i)
 {
     uniforms[name].type = INT;
     uniforms[name].i = i;
 }
 
-void SORE_Graphics::UniformState::SetVariable(std::string name, float f)
+void SORE_Graphics::UniformState::SetVariable(const std::string& name, float f)
 {
     uniforms[name].type = FLOAT;
     uniforms[name].f = f;
 }
 
 void SORE_Graphics::UniformState::SetVariable(
-    std::string name, SORE_Math::Vector2<float> v)
+    const std::string& name, const SORE_Math::Vector2<float>& v)
 {
     uniforms[name].type = VEC2;
     uniforms[name].v2 = v;
 }
 
 void SORE_Graphics::UniformState::SetVariable(
-    std::string name, SORE_Math::Vector3<float> v)
+    const std::string& name, const SORE_Math::Vector3<float>& v)
 {
     uniforms[name].type = VEC3;
     uniforms[name].v3 = v;
 }
 
 void SORE_Graphics::UniformState::SetVariable(
-    std::string name, SORE_Math::Vector4<float> v)
+    const std::string& name, const SORE_Math::Vector4<float>& v)
 {
     uniforms[name].type = VEC4;
     uniforms[name].v4 = v;
 }
 
 void SORE_Graphics::UniformState::SetVariable(
-    std::string name, SORE_Math::Matrix4<float> m)
+    const std::string& name, const SORE_Math::Matrix4<float>& m)
 {
     uniforms[name].type = MAT4;
     uniforms[name].m4 = m;
 }
 
-void SORE_Graphics::UniformState::SetVariable(std::string name, uniform_var v)
+void SORE_Graphics::UniformState::SetVariable(const std::string& name, const uniform_var& v)
 {
     switch(v.type)
     {

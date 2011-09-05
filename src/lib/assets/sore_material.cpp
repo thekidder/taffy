@@ -33,3 +33,24 @@
  **************************************************************************/
 
 #include <sore_material.h>
+
+SORE_Resource::Material::Material(
+    const SORE_Graphics::Blend_state& blendState_,
+    const GLSLShaderPtr shader_)
+    : blendState(blendState_), shader(shader_)
+{
+}
+
+SORE_Resource::Material SORE_Resource::Material::GetDiff(const Material& other) const
+{
+    Material m(blendState, shader);
+    m.uniforms = uniforms.GetDiff(other.uniforms);
+    m.textures = textures.GetDiff(other.textures);
+
+    return m;
+}
+
+void SORE_Resource::Material::SetTexture(const std::string& name, const Texture2DPtr texture)
+{
+    textures.SetTexture(name, texture);
+}

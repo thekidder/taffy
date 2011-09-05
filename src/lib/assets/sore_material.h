@@ -35,11 +35,45 @@
 #ifndef SORE_MATERIAL_H
 #define SORE_MATERIAL_H
 
+#include <sore_blend_state.h>
+#include <sore_glslshader.h>
+#include <sore_texture2d.h>
+#include <sore_texturestate.h>
+#include <sore_uniformstate.h>
+
+#include <string>
+
+namespace SORE_Graphics
+{
+    class PipelineRenderer;
+}
+
 namespace SORE_Resource
 {
     class Material
     {
     public:
+        Material(
+            const SORE_Graphics::Blend_state& blendState_,
+            const GLSLShaderPtr shader_);
+
+        Material GetDiff(const Material& other) const;
+
+        template<typename T>
+        void SetUniform(const std::string& name, const T& value)
+        {
+            uniforms.SetVariable(name, value);
+        }
+
+        void SetTexture(const std::string& name, const Texture2DPtr texture);
+    private:
+        friend class SORE_Graphics::PipelineRenderer;
+
+        const SORE_Graphics::Blend_state& blendState;
+        GLSLShaderPtr shader;
+
+        SORE_Graphics::TextureState textures;
+        SORE_Graphics::UniformState uniforms;
     };
 }
 

@@ -26,6 +26,7 @@ set(SORE_RENDERER_HEADERS
     renderer/sore_allgl.h 
     renderer/sore_batch.h
     renderer/sore_batchingbuffermanager.h
+    renderer/sore_blend_state.h
     renderer/sore_buffermanager.h
     renderer/sore_fbo.h
     renderer/sore_geometrychunk.h
