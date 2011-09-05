@@ -48,13 +48,13 @@ void SORE_Graphics::UniformState::Bind(SORE_Resource::GLSLShaderPtr s) const
             s->SetUniform(it->first, it->second.f);
             break;
         case VEC2:
-            s->SetUniform(it->first, 2, it->second.v2.GetValue());
+            s->SetUniform(it->first, it->second.v2);
             break;
         case VEC3:
-            s->SetUniform(it->first, 3, it->second.v2.GetValue());
+            s->SetUniform(it->first, it->second.v3);
             break;
         case VEC4:
-            s->SetUniform(it->first, 4, it->second.v2.GetValue());
+            s->SetUniform(it->first, it->second.v4);
             break;
         case MAT4:
             s->SetUniform(it->first, it->second.m4);

@@ -57,6 +57,7 @@ namespace SORE_Resource
         T* LoadProxy();
     protected:
         SORE_FileIO::InFile* LoadFile(const std::string& path);
+        // does not append base path when opening file
         SORE_FileIO::InFile* LoadFileWithoutBasePath(const std::string& path);
     private:
         SORE_FileIO::PackageCache& packageCache;

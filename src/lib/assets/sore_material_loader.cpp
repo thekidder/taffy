@@ -32,88 +32,20 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
-#ifndef SORE_FONT_H
-#define SORE_FONT_H
+#include <sore_material_loader.h>
 
-//MSVC++ template-exporting warning
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
-#endif
-
-#include <sore_allgl.h>
-#include <sore_assettypes.h>
-#include <sore_matrix4x4.h>
-#include <sore_geometrychunk.h>
-#include <sore_texturestate.h>
-
-//freetype
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include <boost/format.hpp>
-
-namespace SORE_Resource
+SORE_Resource::MaterialLoader::MaterialLoader(
+    GLSLShaderLoader& shaderLoader_,
+    Texture2DLoader& textureLoader_,
+    SORE_FileIO::PackageCache& packageCache_, 
+    const std::string& basePath_,
+    const std::string& proxyName_)
+    : FileResourceLoader<Material>(packageCache_, basePath_, proxyName_),
+    shaderLoader(shaderLoader_), textureLoader(textureLoader_)
 {
-    class SORE_EXPORT FontPaths
-    {
-    public:
-        static std::string GetFontPath(const std::string& name);
-    private:
-        static void InitPaths();
-
-        static std::vector<std::string> fontPaths;
-    };
-
-    struct CharInfo
-    {
-        // construct a renderable using the given vertices and texture
-        SORE_Graphics::vertex vertices[4];
-        SORE_Graphics::TextureState::TextureObject texture;
-        float advance;
-    };
-
-    // NOT thread safe: each thread needs own instance of FT_library
-    class SORE_EXPORT Font : SORE_Utility::Noncopyable
-    {
-    public:
-        Font(FT_Byte* faceData_, size_t length);
-        ~Font();
-
-        void LoadFace(unsigned int height);
-        const CharInfo& GetCharacter(unsigned int height, char c);
-        float Width(unsigned int height, const std::string str);
-
-        bool Loaded() const { return true; }
-    private:
-        struct CharInfoInternal
-        {
-            GLubyte* data;
-            unsigned int height;
-            unsigned int width;
-            float x;
-            float y;
-        };
-
-        void LoadCharacter(char ch, unsigned int h,
-                           CharInfoInternal& info,
-                           unsigned int& width,
-                           unsigned int& height);
-
-        //(height, CharInfo[128])
-        std::map<unsigned int, CharInfo*> characters;
-        std::map<unsigned int, SORE_Resource::Texture2DPtr> textures;
-        static FT_Library library;
-        FT_Face face;
-        std::vector<FT_Byte> faceData;
-        
-        // used so we know when to clean up freetype
-        static int numFonts;
-    };
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-
-#endif
+SORE_Resource::Material* SORE_Resource::MaterialLoader::Load(const std::string& path)
+{
+    return 0;
+}
