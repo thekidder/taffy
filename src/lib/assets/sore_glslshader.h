@@ -61,6 +61,20 @@ namespace SORE_Resource
         static void UnbindShaders();
         static bool ShadersSupported();
 
+        struct glsl_variable_info
+        {
+            glsl_variable_info(GLuint index_, GLenum type_, GLint size_)
+                : index(index_), type(type_), size(size_)
+            {}
+
+            const GLuint index;
+            const GLenum type;
+            const GLint size;
+        };
+
+        typedef std::map<std::string, glsl_variable_info> Uniform_map_t;
+        typedef Uniform_map_t Attribute_map_t;
+
         GLSLShader();
         GLSLShader(const char* vertex, const char* fragment);
         ~GLSLShader();
@@ -73,7 +87,7 @@ namespace SORE_Resource
         bool Loaded() const;
         unsigned int GetHandle() const;
 
-        //Uniform operators
+        // Uniform operators
         void SetUniform(const std::string& name, GLint i0);
         void SetUniform(const std::string& name, GLfloat f0);
         void SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v);
@@ -85,21 +99,14 @@ namespace SORE_Resource
         void SetUniformTexture(
             const std::string& name, GLuint textureSlot);
 
-        //for sorting
+        // get table of active uniforms/attributes
+        const Uniform_map_t& ActiveUniforms() const;
+        const Attribute_map_t& ActiveAttributes() const;
+
+        // for sorting
         bool operator<(const GLSLShader& o) const;
         bool operator==(const GLSLShader& o) const;
     private:
-        struct glsl_variable_info
-        {
-            glsl_variable_info(GLuint index_, GLenum type_, GLint size_)
-                : index(index_), type(type_), size(size_)
-            {}
-
-            const GLuint index;
-            const GLenum type;
-            const GLint size;
-        };
-
         const static glsl_variable_info none;
 
         void Init();
@@ -121,8 +128,8 @@ namespace SORE_Resource
         std::vector<GLuint> vertexShaders, fragmentShaders;
         GLuint program;
         bool linked;
-        std::map<std::string, glsl_variable_info> uniforms;
-        std::map<std::string, glsl_variable_info> attributes;
+        Uniform_map_t uniforms;
+        Attribute_map_t attributes;
         static bool initCalled;
         static bool supported;
     };

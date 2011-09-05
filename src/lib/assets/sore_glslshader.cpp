@@ -447,9 +447,19 @@ namespace SORE_Resource
             glUniform1i(location, textureSlot);
     }
 
+    const GLSLShader::Uniform_map_t& GLSLShader::ActiveUniforms() const
+    {
+        return uniforms;
+    }
+
+    const GLSLShader::Attribute_map_t& GLSLShader::ActiveAttributes() const
+    {
+        return attributes;
+    }
+
     const GLSLShader::glsl_variable_info& GLSLShader::GetUniform(const std::string& name)
     {
-        std::map<std::string, glsl_variable_info>::iterator it;
+        Uniform_map_t::iterator it;
         if((it=uniforms.find(name))==uniforms.end())
         {
             ENGINE_LOG(
@@ -469,7 +479,7 @@ namespace SORE_Resource
 
     const GLSLShader::glsl_variable_info& GLSLShader::GetAttribute(const std::string& name)
     {
-        std::map<std::string, glsl_variable_info>::iterator it;
+        Attribute_map_t::iterator it;
         if((it=attributes.find(name))==attributes.end())
         {
             ENGINE_LOG(
