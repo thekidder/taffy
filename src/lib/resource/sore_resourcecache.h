@@ -54,6 +54,16 @@ namespace SORE_Resource
         // if the asset does not exist in cache, calls the loader to retrieve it
         Resource_t Get(const Key& key);
 
+        // This is to support asset types that rely on non-unique instances
+        // For example, Materials are resources and can be loaded and cached, but should be
+        // copied for most renderables, as they have a lot of unique state (uniforms, etc)
+        // This way we get the benefits of the resourcecache class (customizable loaders,
+        // only read the file once) while allowing non-unique instances
+
+        // Returns a copy of the cached resource given by key. Equivalent to calling Get() and
+        // then invoking the copy constructor. TODO: Unload/Reload work on Cloned resources
+        Resource_t Clone(const Key& key);
+
         // Unloads the given resource. Does not actually remove it from cache; only
         // unloads it from the proxy.
         void Unload(const Key& key);
@@ -83,6 +93,22 @@ namespace SORE_Resource
     };
 
     template<typename Key, typename Asset, typename ResourceLoader>
+    ResourceCache<Key,Asset,ResourceLoader>::ResourceCache(const ResourceLoader& loader_)
+        : loader(loader_)
+    {
+    }
+
+    template<typename Key, typename Asset, typename ResourceLoader>
+    void ResourceCache<Key,Asset,ResourceLoader>::Unload(const Key& key)
+    {
+        typename Asset_container_t::iterator it = map.find(key);
+        if(it != map.end())
+        {
+            it->second.Unload();
+        }
+    }
+
+    template<typename Key, typename Asset, typename ResourceLoader>
     typename ResourceCache<Key,Asset,ResourceLoader>::Resource_t
     ResourceCache<Key,Asset,ResourceLoader>::Get(const Key& key)
     {
@@ -106,19 +132,15 @@ namespace SORE_Resource
     }
 
     template<typename Key, typename Asset, typename ResourceLoader>
-    ResourceCache<Key,Asset,ResourceLoader>::ResourceCache(const ResourceLoader& loader_)
-        : loader(loader_)
+    typename ResourceCache<Key,Asset,ResourceLoader>::Resource_t
+    ResourceCache<Key,Asset,ResourceLoader>::Clone(const Key& key)
     {
-    }
+        Resource_t original = Get(key);
 
-    template<typename Key, typename Asset, typename ResourceLoader>
-    void ResourceCache<Key,Asset,ResourceLoader>::Unload(const Key& key)
-    {
-        typename Asset_container_t::iterator it = map.find(key);
-        if(it != map.end())
-        {
-            it->second.Unload();
-        }
+        // create a new wrapper and proxy
+        Resource_t clone(new ResourceProxy<Asset>(new Asset(&original.get()), proxyObject));
+
+        return clone;
     }
 
     template<typename Key, typename Asset, typename ResourceLoader>
