@@ -44,9 +44,9 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
     RenderState state(r, cam);
     // apply current renderbuffer
     state.SetRenderbuffer(renderbuffer);
-    state = state.Difference(currentState);
+    RenderState difference = state.Difference(currentState);
 
-    if(!state.Renderbuffer() && currentState.Renderbuffer())
+    if(!difference.Renderbuffer() && currentState.Renderbuffer())
     {
         render_command_data data;
         data.d0 = width;
@@ -56,34 +56,19 @@ void SORE_Graphics::GLCommandList::AddRenderable(const Renderable& r, const geom
 
     if(currentGeometry.geometry != geometry.geometry || commandList.back().type == COMMAND)
     {
-        //ENGINE_LOG(
-        //    SORE_Logging::LVL_INFO,
-        //    "adding new batch: new vbo");
-        commandList.push_back(RenderBatch(geometry, state, true));
+        commandList.push_back(RenderBatch(geometry, difference, true));
     }
-    else if(!state.Empty())
+    else if(!difference.Empty())
     {
-        //ENGINE_LOG(
-        //    SORE_Logging::LVL_INFO,
-        //    "adding new batch: state has changed");
-        commandList.push_back(RenderBatch(geometry, state, false));
-    }
-    else if(currentGeometry.offset != (geometry.offset + geometry.indices))
-    {
-        //ENGINE_LOG(
-        //    SORE_Logging::LVL_INFO,
-        //    boost::format("adding new batch: (o = %d, i = %d) old offset = %d, old indices = %d")
-        //    % geometry.offset % geometry.indices % currentGeometry.offset % currentGeometry.indices);
-        commandList.push_back(RenderBatch(geometry, state, false));
+        commandList.push_back(RenderBatch(geometry, difference, false));
     }
     else
     {
-        commandList.back().batch.AddIndices(geometry.indices);
+        commandList.back().batch.AddIndices(geometry);
     }
 
     currentState = state;
     currentGeometry = geometry;
-    currentTransform = *r.GetTransform();
 }
 
 void SORE_Graphics::GLCommandList::AddCommand(Render_command_t command, render_command_data data)

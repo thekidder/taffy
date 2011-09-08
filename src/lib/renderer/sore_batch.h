@@ -42,6 +42,8 @@
 #include <sore_screeninfo.h>
 #include <sore_glslshader.h>
 
+#include <map>
+
 namespace SORE_Graphics
 {
     struct geometry_entry
@@ -73,17 +75,19 @@ namespace SORE_Graphics
         RenderBatch(const geometry_entry& geometry,
                     const RenderState& state, bool bindVBO = false);
 
-        void AddIndices(unsigned int numIndices);
+        void AddIndices(const geometry_entry& geometry);
         // returns number of polygons rendered
         unsigned int Render();
 
         void EndDraw() const; // call at end of frame
     private:
         GraphicsArray* geometry;
-        unsigned int numberIndices;
-        unsigned int indexOffset;
         GLenum type;
         bool bind;
+
+        // (start offset, num indices)
+        typedef std::map<unsigned int, unsigned int> Geometry_ranges_t;
+        Geometry_ranges_t ranges;
 
         RenderState state;
     };
