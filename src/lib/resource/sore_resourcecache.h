@@ -137,8 +137,15 @@ namespace SORE_Resource
     {
         Resource_t original = Get(key);
 
+        Asset* asset;
+        if(original.Loaded())
+            // copy the resource if it exists
+            asset = new Asset(*original.get());
+        else
+            asset = 0;
+
         // create a new wrapper and proxy
-        Resource_t clone(new ResourceProxy<Asset>(new Asset(&original.get()), proxyObject));
+        Resource_t clone(new ResourceProxy<Asset>(asset, proxyObject));
 
         return clone;
     }

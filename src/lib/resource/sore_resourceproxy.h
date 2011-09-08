@@ -98,25 +98,37 @@ namespace SORE_Resource
     template<typename T>
     bool operator==(const ResourceProxyWrapper<T>& one, const ResourceProxyWrapper<T>& two)
     {
+        if(!one.get() && two.get())
+            return false;
+        if(one.get() && !two.get())
+            return false;
+        if(!one.get() && !two.get())
+            return true;
         return *one.get() == *two.get();
     }
 
     template<typename T>
     bool operator!=(const ResourceProxyWrapper<T>& one, const ResourceProxyWrapper<T>& two)
     {
-        return *one.get() != *two.get();
+        return !(one == two);
     }
 
     template<typename T>
     bool operator<(const ResourceProxyWrapper<T>& one, const ResourceProxyWrapper<T>& two)
     {
+        if(!one.get() && two.get())
+            return true;
+        if(one.get() && !two.get())
+            return false;
+        if(!one.get() && !two.get())
+            return false;
         return *one.get() < *two.get();
     }
 
     template<typename T>
     bool operator>(const ResourceProxyWrapper<T>& one, const ResourceProxyWrapper<T>& two)
     {
-        return *one.get() > *two.get();
+        return two < one;
     }
 
     template<typename T>
