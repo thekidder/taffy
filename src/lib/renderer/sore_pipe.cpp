@@ -90,6 +90,7 @@ SORE_Graphics::SortingPipe::SortingPipe(sorting_predicate comp, SORE_Profiler::P
 
 void SORE_Graphics::SortingPipe::doSetup(Renderbuffer_map_t& renderBuffers)
 {
+    PROFILE_BLOCK("Sorting pipe", profiler);
     sortedList.clear();
 }
 
@@ -163,7 +164,15 @@ SORE_Graphics::render_list& SORE_Graphics::RenderPipe::beginRender
 
     BOOST_FOREACH(const Renderable& r, list)
     {
-        renderQueue.AddRenderable(r, bm->LookupGC(r.GetGeometryChunk()), cam);
+        SORE_Graphics::geometry_entry ge;
+        {
+            PROFILE_BLOCK("Look up GC", profiler);
+            ge = bm->LookupGC(r.GetGeometryChunk());
+        }
+        {
+            PROFILE_BLOCK("Add renderables", profiler);
+            renderQueue.AddRenderable(r, ge, cam);
+        }
     }
 
     return list;
@@ -176,6 +185,8 @@ SORE_Graphics::FilterPipe::FilterPipe(filter_predicate filterFunction, SORE_Prof
 
 void SORE_Graphics::FilterPipe::doSetup(Renderbuffer_map_t& renderBuffers)
 {
+    PROFILE_BLOCK("Filter pipe", profiler);
+
     newList.clear();
 }
 
