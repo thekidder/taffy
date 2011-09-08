@@ -35,10 +35,9 @@
 #ifndef SORE_MATERIAL_LOADER_H
 #define SORE_MATERIAL_LOADER_H
 
+#include <sore_assettypes.h>
 #include <sore_fileloader.h>
-#include <sore_glslshader_loader.h>
 #include <sore_material.h>
-#include <sore_texture2d_loader.h>
 
 namespace SORE_Resource
 {
@@ -46,16 +45,16 @@ namespace SORE_Resource
     {
     public:
         MaterialLoader(
-            GLSLShaderLoader& shaderLoader_,
-            Texture2DLoader& textureLoader_,
+            Shader_cache_t& shaderCache_,
+            Texture_cache_t& textureCache_,
             SORE_FileIO::PackageCache& packageCache_, 
             const std::string& basePath_ = "data/Materials/",
             const std::string& proxyName_ = "default.json");
 
         virtual Material* Load(const std::string& path);
     private:
-        GLSLShaderLoader& shaderLoader;
-        Texture2DLoader& textureLoader;
+        Shader_cache_t& shaderCache;
+        Texture_cache_t& textureCache;
 
     };
 }

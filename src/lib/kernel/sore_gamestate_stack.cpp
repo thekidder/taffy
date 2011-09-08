@@ -57,6 +57,7 @@ namespace SORE_Game
         fontCache(SORE_Resource::FontLoader(packageCache)),
         textureCache(SORE_Resource::Texture2DLoader(packageCache)),
         shaderCache(SORE_Resource::GLSLShaderLoader(packageCache)),
+        materialCache(SORE_Resource::MaterialLoader(shaderCache, textureCache, packageCache)),
         popFlag(false)
     {
         kernel.AddTask(10, &input);

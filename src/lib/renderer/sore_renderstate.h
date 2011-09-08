@@ -35,9 +35,13 @@
 #ifndef SORE_RENDERERSTATE_H
 #define SORE_RENDERERSTATE_H
 
+#include <sore_blend_state.h>
 #include <sore_camera.h>
 #include <sore_fbo.h>
+#include <sore_glslshader.h>
 #include <sore_renderable.h>
+#include <sore_texturestate.h>
+#include <sore_uniformstate.h>
 
 namespace SORE_Graphics
 {
@@ -83,7 +87,7 @@ namespace SORE_Graphics
         camera_info camera;
         SORE_Resource::GLSLShaderPtr shader;
 
-        blend_mode blend;
+        Blend_state blendState;
 
         GLenum primitiveType;
 

@@ -40,6 +40,7 @@
 #include <sore_dll.h>
 #include <sore_batch.h>
 #include <sore_matrix4x4.h>
+#include <sore_profiler.h>
 #include <sore_renderstate.h>
 
 namespace SORE_Graphics
@@ -110,7 +111,6 @@ namespace SORE_Graphics
         //current state
         RenderState currentState;
         geometry_entry currentGeometry;
-        SORE_Math::Matrix4<float> currentTransform;
 
         // screen dimensions
         int width, height;

@@ -32,20 +32,65 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_glslshader_loader.h>
 #include <sore_material_loader.h>
+#include <sore_texture2d_loader.h>
+
+#include <json/json.h>
+
+#include <string>
 
 SORE_Resource::MaterialLoader::MaterialLoader(
-    GLSLShaderLoader& shaderLoader_,
-    Texture2DLoader& textureLoader_,
+    Shader_cache_t& shaderCache_,
+    Texture_cache_t& textureCache_,
     SORE_FileIO::PackageCache& packageCache_, 
     const std::string& basePath_,
     const std::string& proxyName_)
     : FileResourceLoader<Material>(packageCache_, basePath_, proxyName_),
-    shaderLoader(shaderLoader_), textureLoader(textureLoader_)
+    shaderCache(shaderCache_), textureCache(textureCache_)
 {
 }
 
 SORE_Resource::Material* SORE_Resource::MaterialLoader::Load(const std::string& path)
 {
-    return 0;
+    SORE_FileIO::InFile* in = LoadFile(path);
+    if(!in->strm().good())
+    {
+        delete in;
+        //TODO: FIXME: sore exception handling
+        throw std::runtime_error("Could not load material from '" + path + "'");
+    }
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(in->strm(), root, false);
+    delete in;
+
+    std::string blendMode = root["blend"].asString();
+
+    SORE_Graphics::Blend_state blendState;
+    if(blendMode == "subtractive")
+    {
+        blendState.depthTest = true;
+        blendState.srcFactor = GL_SRC_ALPHA;
+        blendState.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+    }
+    else if(blendMode == "additive")
+    {
+        blendState.depthTest = false;
+        blendState.srcFactor = GL_SRC_ALPHA;
+        blendState.dstFactor = GL_DST_ALPHA;
+    }
+    // default is opaque
+    else
+    {
+        blendState.depthTest = true;
+        blendState.srcFactor = GL_ONE;
+        blendState.dstFactor = GL_ZERO;
+    }
+
+    GLSLShaderPtr shader = shaderCache.Get(root["shader"].asString());
+
+    Material* material = new Material(blendState, shader);
+
+    return material;
 }

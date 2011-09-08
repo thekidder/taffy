@@ -43,41 +43,35 @@
 #include <iterator>
 #include <sstream>
 
-SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider(SORE_Resource::GLSLShaderPtr default_shader)
-    : current_shader(default_shader), current_transform(new SORE_Math::Matrix4<float>()),
-    current_blend_mode(SORE_Graphics::BLEND_ADDITIVE), current_primitive_type(GL_TRIANGLES), halfWidth(512.0f)
+SORE_Graphics::ImmediateModeProvider::ImmediateModeProvider()
+    : current_transform(new SORE_Math::Matrix4<float>()),
+    current_primitive_type(GL_TRIANGLES), halfWidth(512.0f)
 {
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetTexture(const SORE_Graphics::TextureState::TextureObject& texture)
-{
-    if(texture.name.empty())
-        SetTexture("texture", texture);
-    else
-        SetTexture(texture.name, texture);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetTexture(const std::string& samplerName, const SORE_Graphics::TextureState::TextureObject& texture)
+void SORE_Graphics::ImmediateModeProvider::SetTexture(const std::string& samplerName, const SORE_Resource::Texture2DPtr texture)
 {
     TextureState::TextureObjectComparator comp;
-    boost::unordered_map<std::string, TextureState::TextureObject>::iterator it = current_textures.find(samplerName);
-    if(it != current_textures.end() && (comp(texture, it->second) || comp(it->second, texture)))
+    if(current_material->Textures().Contains(samplerName))
     {
-        CreateRenderableFromData();
+        // if a texture with the same name is already bound and is different than the one we're trying to bind
+        const TextureState::TextureObject& textureObject = current_material->Textures().Get(samplerName);
+        if(comp(texture, textureObject) || comp(textureObject, texture))
+        {
+            // we need to create a new renderable from the current state and then set the texture
+            CreateRenderableFromData();
+        }
     }
-    if(it != current_textures.end())
-        current_textures.erase(it);
-    current_textures.insert(std::make_pair(samplerName, texture));
+
+    current_material->SetTexture(samplerName, texture);
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetShader(SORE_Resource::GLSLShaderPtr shader)
+void SORE_Graphics::ImmediateModeProvider::SetMaterial(SORE_Resource::MaterialPtr material)
 {
-    if(current_shader && shader && shader == current_shader)
-        return;
-    if(!current_shader && !shader)
+    if(material == current_material)
         return;
     CreateRenderableFromData();
-    current_shader = shader;
+    current_material = material;
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
@@ -85,7 +79,7 @@ void SORE_Graphics::ImmediateModeProvider::SetColor(SORE_Graphics::Color color)
     current_color = color;
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::TransformationPtr transform)
+void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::MatrixPtr transform)
 {
     if(current_transform && transform && transform == current_transform)
         return;
@@ -93,44 +87,6 @@ void SORE_Graphics::ImmediateModeProvider::SetTransform(SORE_Graphics::Transform
         return;
     CreateRenderableFromData();
     current_transform = transform;
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetBlendMode(SORE_Graphics::blend_mode blend_mode)
-{
-    if(blend_mode == current_blend_mode)
-        return;
-    CreateRenderableFromData();
-    current_blend_mode = blend_mode;
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, int i)
-{
-    currentUniforms.SetVariable(name, i);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, float f)
-{
-    currentUniforms.SetVariable(name, f);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v)
-{
-    currentUniforms.SetVariable(name, v);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v)
-{
-    currentUniforms.SetVariable(name, v);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v)
-{
-    currentUniforms.SetVariable(name, v);
-}
-
-void SORE_Graphics::ImmediateModeProvider::SetUniform(const std::string& name, const SORE_Math::Matrix4<float>& m)
-{
-    currentUniforms.SetVariable(name, m);
 }
 
 void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
@@ -141,12 +97,12 @@ void SORE_Graphics::ImmediateModeProvider::SetPrimitiveType(GLenum type)
     current_primitive_type = type;
 }
 
-void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords_)
+void SORE_Graphics::ImmediateModeProvider::SetKeywords(const std::string& keywords)
 {
-    if(keywords == keywords_)
+    if(current_keywords == keywords)
         return;
     CreateRenderableFromData();
-    keywords = keywords_;
+    current_keywords = keywords;
 }
 
 void SORE_Graphics::ImmediateModeProvider::Start()
@@ -223,7 +179,7 @@ void SORE_Graphics::ImmediateModeProvider::DrawString(float x, float y, float z,
     {
         const SORE_Resource::CharInfo& char_info = face->GetCharacter(height, *it);
 
-        if(char_info.texture.texture)
+        if(char_info.texture)
         {
             vertex temp[4];
             const vertex* src = char_info.vertices;
@@ -339,18 +295,10 @@ void SORE_Graphics::ImmediateModeProvider::CreateRenderableFromData()
     std::copy(vertices.begin(), vertices.end(), geometry->GetVertices());
     std::copy(indices.begin(),  indices.end(),  geometry->GetIndices());
 
-    Renderable r(geometry, current_shader, current_transform, current_blend_mode);
-    boost::unordered_map<std::string, TextureState::TextureObject>::iterator it;
-    for(it = current_textures.begin(); it != current_textures.end(); ++it)
-    {
-        r.AddTexture(it->first, it->second);
-    }
-
-    r.Uniforms() = currentUniforms;
+    Renderable r(geometry, current_transform, current_material);
 
     std::set<std::string> keyword_list;
-
-    std::istringstream iss(keywords);
+    std::istringstream iss(current_keywords);
     std::copy(
         std::istream_iterator<std::string>(iss),
         std::istream_iterator<std::string>(),

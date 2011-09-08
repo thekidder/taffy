@@ -67,7 +67,7 @@ namespace SORE_Resource
                 : index(index_), type(type_), size(size_)
             {}
 
-            const GLuint index;
+            const GLint index;
             const GLenum type;
             const GLint size;
         };

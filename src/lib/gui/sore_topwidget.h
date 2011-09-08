@@ -53,7 +53,7 @@ namespace SORE_GUI
     public:
         TopWidget(
             SORE_Resource::Font_cache_t& fontCache,
-            SORE_Resource::Shader_cache_t& shaderCache,
+            SORE_Resource::Material_cache_t& materialCache,
             SORE_Resource::Texture_cache_t& textureCache,
             SORE_Profiler::Profiler* profiler_ = 0);
 

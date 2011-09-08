@@ -45,7 +45,7 @@
 #include <sore_assettypes.h>
 #include <sore_matrix4x4.h>
 #include <sore_geometrychunk.h>
-#include <sore_texturestate.h>
+#include <sore_texture2d.h>
 
 //freetype
 #include <ft2build.h>
@@ -69,7 +69,7 @@ namespace SORE_Resource
     {
         // construct a renderable using the given vertices and texture
         SORE_Graphics::vertex vertices[4];
-        SORE_Graphics::TextureState::TextureObject texture;
+        SORE_Resource::Texture2DPtr texture;
         float advance;
     };
 

@@ -33,7 +33,8 @@
  **************************************************************************/
 
 #include <sore_font_loader.h>
-#include <sore_glslshader_loader.h>
+#include <sore_material.h>
+#include <sore_material_loader.h>
 #include <sore_textwidget.h>
 
 namespace SORE_GUI
@@ -45,7 +46,7 @@ namespace SORE_GUI
         : Widget(SVec(SUnit(), height), p, parent), color(c)
     {
         face = fontCache.Get(Style()["TextWidget"]["font"].asString());
-        shader = shaderCache.Get(Style()["TextWidget"]["shader"].asString());
+        material = materialCache.Clone(Style()["TextWidget"]["material"].asString());
 
         SetText(t);
     }
@@ -65,10 +66,9 @@ namespace SORE_GUI
     void TextWidget::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
         unsigned int h = static_cast<unsigned int>(GetSize(VERTICAL));
-        imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
+        imm_mode.SetMaterial(material);
+        imm_mode.SetTransform(SORE_Graphics::MatrixPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
         imm_mode.SetColor(color);
-        imm_mode.SetShader(shader);
-        imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
         imm_mode.DrawString(0.0f, 0.0f, 0.0f, face, h, text);
     }
 

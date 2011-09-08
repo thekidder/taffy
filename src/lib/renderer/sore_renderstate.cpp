@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_logger.h>
+#include <sore_material.h>
 #include <sore_renderstate.h>
 
 SORE_Graphics::RenderState::RenderState() : commands(0), renderbuffer(0)
@@ -45,24 +46,24 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
     camera = cam;
 
     commands |= RENDER_CMD_CHANGE_BLEND_MODE;
-    blend = r.GetBlendMode();
-    shader = r.GetShader();
+    blendState = r.material->blendState;
+    shader = r.material->shader;
 
-    if(r.GetShader())
+    if(shader)
     {
         commands |= RENDER_CMD_BIND_SHADER;
     }
 
-    if(!r.Textures().Empty())
+    textures = r.material->textures;
+    if(!textures.Empty())
     {
         commands |= RENDER_CMD_BIND_TEXTURE;
-        textures = r.Textures();
     }
 
-    UniformState copy = r.Uniforms();
+    UniformState copy = r.material->uniforms;
     copy.SetVariable("projection", GetProjectionMatrix(cam.projection));
     copy.SetVariable("view", cam.viewMatrix);
-    copy.SetVariable("model", *r.GetTransform());
+    copy.SetVariable("model", *r.GetModelMatrix());
 
     if(!copy.Empty())
     {
@@ -70,19 +71,20 @@ SORE_Graphics::RenderState::RenderState(const Renderable& r, camera_info cam)
         uniforms = copy;
     }
 
-    primitiveType = r.GetGeometryChunk()->Type();
+    primitiveType = r.geometry->Type();
     commands |= RENDER_CMD_CHANGE_PRIMITIVE;
 }
 
 SORE_Graphics::RenderState SORE_Graphics::RenderState::Difference(const RenderState& old) const
 {
     RenderState newState;
-    newState.blend = blend;
+    newState.blendState = blendState;
     newState.shader = shader;
     newState.renderbuffer = renderbuffer;
     newState.camera = camera;
+    newState.primitiveType = primitiveType;
 
-    if(old.blend != blend)
+    if(old.blendState != blendState)
     {
         newState.commands |= RENDER_CMD_CHANGE_BLEND_MODE;
     }
@@ -151,27 +153,11 @@ void SORE_Graphics::RenderState::Apply() const
         GetProjectionMatrix(camera.projection);
     if(commands & RENDER_CMD_CHANGE_BLEND_MODE)
     {
-        unsigned int blendSFactor, blendDFactor;
-        switch(blend)
-        {
-        case BLEND_OPAQUE:
+        if(blendState.depthTest)
             glEnable(GL_DEPTH_TEST);
-            blendSFactor = GL_ONE;
-            blendDFactor = GL_ZERO;
-            break;
-        case BLEND_ADDITIVE:
+        else
             glDisable(GL_DEPTH_TEST);
-            blendSFactor = GL_SRC_ALPHA;
-            blendDFactor = GL_DST_ALPHA;
-            break;
-        case BLEND_SUBTRACTIVE:
-        default: //treat unknown type as subtractive by default
-            glEnable(GL_DEPTH_TEST);
-            blendSFactor = GL_SRC_ALPHA;
-            blendDFactor = GL_ONE_MINUS_SRC_ALPHA;
-            break;
-        }
-        glBlendFunc(blendSFactor, blendDFactor);
+        glBlendFunc(blendState.srcFactor, blendState.dstFactor);
     }
     if(commands & RENDER_CMD_BIND_SHADER)
     {

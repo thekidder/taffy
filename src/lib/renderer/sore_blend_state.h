@@ -46,11 +46,27 @@ namespace SORE_Graphics
         GLenum dstFactor;
     };
 
-    bool operator==(const Blend_state& one, const Blend_state& two)
+    inline bool operator==(const Blend_state& one, const Blend_state& two)
     {
         return one.depthTest == two.depthTest &&
             one.srcFactor == two.srcFactor &&
             one.dstFactor == two.dstFactor;
+    }
+
+    inline bool operator!=(const Blend_state& one, const Blend_state& two)
+    {
+        return !(one == two);
+    }
+
+    inline bool operator<(const Blend_state& one, const Blend_state& two)
+    {
+        if(one.depthTest && !two.depthTest)
+            return true;
+        if(one.srcFactor < two.srcFactor)
+            return true;
+        if(one.dstFactor < two.dstFactor)
+            return true;
+        return false;
     }
 }
 

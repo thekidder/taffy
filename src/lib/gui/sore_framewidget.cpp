@@ -33,9 +33,9 @@
  **************************************************************************/
 
 #include <sore_geometry.h>
-#include <sore_glslshader_loader.h>
 #include <sore_logger.h>
 #include <sore_framewidget.h>
+#include <sore_material_loader.h>
 #include <sore_texture2d_loader.h>
 
 namespace SORE_GUI
@@ -44,12 +44,9 @@ namespace SORE_GUI
         : Widget(s, p, parent_), mode(m), leftBorder(16),
           rightBorder(16), topBorder(16), bottomBorder(16)
     {
-        std::string textureName = Style()["FrameWidget"]["texture"].asString();
-
-        texture = SORE_Graphics::TextureState::TextureObject(
-            textureName,
-            textureCache.Get(textureName));
-        shader = shaderCache.Get(Style()["FrameWidget"]["shader"].asString());
+        texture = textureCache.Get(Style()["FrameWidget"]["texture"].asString());
+        material = materialCache.Clone(Style()["FrameWidget"]["material"].asString());
+        material->SetTexture("texture", texture);
     }
 
     void FrameWidget::SetBorderSizes(float l, float r, float t, float b)
@@ -74,31 +71,30 @@ namespace SORE_GUI
             break;
         }
         default:
-            ENGINE_LOG(SORE_Logging::LVL_ERROR,
-                       "Unknown sizing mode selected for FrameWidget");
+            ENGINE_LOG(
+                SORE_Logging::LVL_ERROR,
+                "Unknown sizing mode selected for FrameWidget");
             break;
         };
     }
 
-    void FrameWidget::SetTexture(const SORE_Graphics::TextureState::TextureObject& tex)
+    void FrameWidget::SetTexture(const SORE_Resource::Texture2DPtr& texture_)
     {
-        texture = tex;
+        texture = texture_;
     }
 
-    void FrameWidget::SetShader(SORE_Resource::GLSLShaderPtr shad)
+    void FrameWidget::SetMaterial(SORE_Resource::MaterialPtr material_)
     {
-        shader = shad;
+        material = material_;
     }
 
 
     void FrameWidget::RenderFrame(SORE_Graphics::ImmediateModeProvider& imm_mode)
     {
-        imm_mode.SetShader(shader);
-        imm_mode.SetTexture("texture", texture);
+        imm_mode.SetMaterial(material);
         imm_mode.SetColor(SORE_Graphics::White);
-        imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
         imm_mode.SetTransform(
-            SORE_Graphics::TransformationPtr(
+            SORE_Graphics::MatrixPtr(
                     new SORE_Math::Matrix4<float>(
                         GetPositionMatrix())));
 

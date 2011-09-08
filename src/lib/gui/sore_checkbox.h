@@ -35,6 +35,7 @@
 #ifndef SORE_CHECKBOX_H
 #define SORE_CHECKBOX_H
 
+#include <sore_assettypes.h>
 #include <sore_geometry.h>
 #include <sore_widget.h>
 
@@ -55,7 +56,7 @@ namespace SORE_GUI
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         virtual bool ProcessEvents(const SORE_Kernel::Event& e);
 
-        SORE_Resource::GLSLShaderPtr shader;
+        SORE_Resource::MaterialPtr material;
         SORE_Resource::Texture2DPtr normal, checked;
 
         SORE_Math::Rect<float> texcoords, texcoordsChecked;

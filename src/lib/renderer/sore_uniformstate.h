@@ -83,6 +83,8 @@ namespace SORE_Graphics
 
         //returns all uniforms in this not in o
         UniformState GetDiff(const UniformState& o) const;
+
+        bool operator==(const UniformState& o) const { return uniforms == o.uniforms; }
     private:
         std::map<std::string, uniform_var> uniforms;
     };

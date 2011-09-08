@@ -104,7 +104,7 @@ void SORE_Graphics::PipelineRenderer::Render()
     // ensure textures are all ready (bind references to renderbuffers)
     SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
 
-    BOOST_FOREACH(Renderable& r, renderables)
+    /*BOOST_FOREACH(Renderable& r, renderables)
     {
         if(!r.Textures().Ready())
         {
@@ -116,7 +116,7 @@ void SORE_Graphics::PipelineRenderer::Render()
                     r.Textures().SetTexture(tex.first, t);
             }
         }
-    }
+    }*/
 
     {
         PROFILE_BLOCK("Render pipeline", profiler);

@@ -40,6 +40,7 @@
 #include <sore_gamestate.h>
 #include <sore_glslshader_loader.h>
 #include <sore_inputtask.h>
+#include <sore_material_loader.h>
 #include <sore_resourcecache.h>
 #include <sore_profiler.h>
 #include <sore_screen.h>
@@ -77,6 +78,7 @@ namespace SORE_Game
 
         // global resource caches
         SORE_Resource::Font_cache_t& FontCache() { return fontCache; }
+        SORE_Resource::Material_cache_t& MaterialCache() { return materialCache; }
         SORE_Resource::Shader_cache_t& ShaderCache() { return shaderCache; }
         SORE_Resource::Texture_cache_t& TextureCache() { return textureCache; }
     private:
@@ -97,6 +99,7 @@ namespace SORE_Game
         SORE_Resource::Font_cache_t fontCache;
         SORE_Resource::Shader_cache_t shaderCache;
         SORE_Resource::Texture_cache_t textureCache;
+        SORE_Resource::Material_cache_t materialCache;
 
         typedef std::vector<std::pair<SORE_Kernel::task_ref, Gamestate*> > State_stack_t;
         State_stack_t states;

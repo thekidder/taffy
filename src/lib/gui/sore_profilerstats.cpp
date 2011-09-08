@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_font.h>
+#include <sore_material_loader.h>
 #include <sore_profiler.h>
 #include <sore_profilerstats.h>
 #include <sore_textwidget.h>
@@ -43,6 +44,7 @@ SORE_GUI::ProfilerStats::ProfilerStats(SVec s, SVec p, SORE_Profiler::Profiler& 
     : FrameWindow(s, p, "Profiler Stats", parent), profiler(profiler_)
 {
     content = new Widget(SVec(1.0, 1.0), SVec(0, 0), this);
+    material = materialCache.Clone(Style()["ProfilerStats"]["material"].asString());
 }
 
 void SORE_GUI::ProfilerStats::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
@@ -83,11 +85,9 @@ int SORE_GUI::ProfilerStats::RenderSample(
     float x2 = x1 + bar_width * static_cast<float>(width);
     float y1 = static_cast<float>(height + 1);
     float y2 = y1 + 16.0f;
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
-    imm_mode.SetShader(shaderCache.Get("untextured.shad"));
-    imm_mode.SetTexture(SORE_Resource::Texture2DPtr());
+    imm_mode.SetMaterial(material);
     imm_mode.SetColor(SORE_Graphics::White);
-    imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(content->GetPositionMatrix())));
+    imm_mode.SetTransform(SORE_Graphics::MatrixPtr(new SORE_Math::Matrix4<float>(content->GetPositionMatrix())));
     imm_mode.DrawQuad(
         x1, y1, 0.0f,
         x1, y2, 0.0f,

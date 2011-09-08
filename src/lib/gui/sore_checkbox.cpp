@@ -33,13 +33,13 @@
  **************************************************************************/
 
 #include <sore_checkbox.h>
-#include <sore_glslshader_loader.h>
+#include <sore_material_loader.h>
 #include <sore_texture2d_loader.h>
 
 SORE_GUI::Checkbox::Checkbox(SUnit size, SVec position, Widget* parent)
     : Widget(SVec(size, size), position, parent), isChecked(false)
 {
-    shader = shaderCache.Get(Style()["Checkbox"]["shader"].asString());
+    material = materialCache.Clone(Style()["Checkbox"]["material"].asString());
     normal = textureCache.Get(Style()["Checkbox"]["texture"].asString());
     checked = textureCache.Get(Style()["Checkbox"]["texture_checked"].asString());
 
@@ -71,23 +71,22 @@ boost::signals::connection SORE_GUI::Checkbox::ConnectChecked(const boost::funct
 
 void SORE_GUI::Checkbox::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode)
 {
-    imm_mode.SetShader(shader);
+    imm_mode.SetMaterial(material);
     imm_mode.SetColor(SORE_Graphics::White);
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.SetTransform(
-        SORE_Graphics::TransformationPtr(
+        SORE_Graphics::MatrixPtr(
                 new SORE_Math::Matrix4<float>(
                     GetPositionMatrix())));
 
     SORE_Math::Rect<float> coords;
     if(!isChecked)
     {
-        imm_mode.SetTexture(normal);
+        imm_mode.SetTexture("texture", normal);
         coords = texcoords;
     }
     else
     {
-        imm_mode.SetTexture(checked);
+        imm_mode.SetTexture("texture", checked);
         coords = texcoordsChecked;
     }
 

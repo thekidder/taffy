@@ -60,6 +60,11 @@ namespace SORE_Graphics
             bool ready;
             std::string name;
             SORE_Resource::Texture2DPtr texture;
+
+            bool operator==(const TextureObject& o) const
+            {
+                return ready == o.ready && name == o.name && texture == o.texture;
+            }
         };
 
         struct TextureObjectComparator
@@ -89,6 +94,9 @@ namespace SORE_Graphics
         // returns true if all texture names have textures bound to them
         bool Ready() const { return unreadyTextures.empty(); }
 
+        bool Contains(const std::string& name) const { return textures.find(name) != textures.end(); }
+        const TextureObject& Get(const std::string& name) const { return textures.find(name)->second; }
+
         typedef std::map<std::string, std::string> Unready_texture_map_t;
         const Unready_texture_map_t& UnreadyTextures() const { return unreadyTextures; }
 
@@ -96,6 +104,8 @@ namespace SORE_Graphics
 
         // returns all textures in this not in o
         TextureState GetDiff(const TextureState& o) const;
+
+        bool operator==(const TextureState& o) const { return textures == o.textures; }
     private:
         void ComputeHash();
 

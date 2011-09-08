@@ -75,6 +75,10 @@ void SORE_Graphics::TextureState::SetTexture(
         it->second.ready = true;
         it->second.texture = tex;
     }
+    else
+    {
+        AddTexture(samplerName, tex);
+    }
 
     ComputeHash();
 

@@ -54,3 +54,22 @@ void SORE_Resource::Material::SetTexture(const std::string& name, const Texture2
 {
     textures.SetTexture(name, texture);
 }
+
+bool SORE_Resource::Material::operator==(const Material& other) const
+{
+    return shader == other.shader && blendState == other.blendState
+        && uniforms == other.uniforms && textures == other.textures;
+}
+
+bool SORE_Resource::Material::operator<(const Material& other) const
+{
+    SORE_Graphics::UniformState uniformDiff = uniforms.GetDiff(other.uniforms);
+    SORE_Graphics::TextureState textureDiff = textures.GetDiff(other.textures);
+    if(shader < other.shader)
+        return true;
+    if(blendState < other.blendState)
+        return true;
+    if(textures.GetSortKey() < other.textures.GetSortKey())
+        return true;
+    return false;
+}

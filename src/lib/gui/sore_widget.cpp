@@ -40,7 +40,7 @@
 namespace SORE_GUI
 {
     Widget::Widget(SVec size_, SVec position_, Widget* parent_)
-        : fontCache(parent_->fontCache), shaderCache(parent_->shaderCache), textureCache(parent_->textureCache),
+        : fontCache(parent_->fontCache), materialCache(parent_->materialCache), textureCache(parent_->textureCache),
         position(position_), size(size_), parent(parent_), 
         focus(0), oldFocus(0), highestLayer(0.0f), 
         style(parent->style), styleConfig(parent->styleConfig), isVisible(true)
@@ -57,11 +57,11 @@ namespace SORE_GUI
 
     Widget::Widget(
             SORE_Resource::Font_cache_t& fontCache_,
-            SORE_Resource::Shader_cache_t& shaderCache_,
+            SORE_Resource::Material_cache_t& materialCache_,
             SORE_Resource::Texture_cache_t& textureCache_,
             SVec size_, SVec position_, 
             Widget* parent_)
-        : fontCache(fontCache_), shaderCache(shaderCache_), textureCache(textureCache_),
+        : fontCache(fontCache_), materialCache(materialCache_), textureCache(textureCache_),
         position(position_), size(size_), parent(parent_), 
         focus(0), oldFocus(0), highestLayer(0.0f), isVisible(true)
     {

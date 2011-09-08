@@ -43,14 +43,13 @@ namespace SORE_GUI
 {
     TopWidget::TopWidget(
         SORE_Resource::Font_cache_t& fontCache,
-        SORE_Resource::Shader_cache_t& shaderCache,
+        SORE_Resource::Material_cache_t& materialCache,
         SORE_Resource::Texture_cache_t& textureCache,
         SORE_Profiler::Profiler* profiler_)
-        : Widget(fontCache, shaderCache, textureCache,
+        : Widget(fontCache, materialCache, textureCache,
         // bogus initial size until we receive a resize event
         SVec(SUnit(400), SUnit(400)), SVec(), NULL),
-        profiler(profiler_),
-        imm_mode(SORE_Resource::GLSLShaderPtr())  
+        profiler(profiler_)
     {
     }
 

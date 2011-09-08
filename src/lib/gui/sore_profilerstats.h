@@ -56,6 +56,7 @@ namespace SORE_GUI
             SORE_Graphics::ImmediateModeProvider& imm_mode,
             const SORE_Profiler::sample_data* sample, double totalTime = 0.0f, int treeLevel = 0, int height = 0);
 
+        SORE_Resource::MaterialPtr material;
         SORE_Profiler::Profiler& profiler;
 
         Widget* content;

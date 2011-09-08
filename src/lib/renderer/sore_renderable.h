@@ -35,80 +35,56 @@
 #ifndef SORE_RENDERABLE_H
 #define SORE_RENDERABLE_H
 
+#include <sore_assettypes.h>
+#include <sore_matrix4x4.h>
+#include <sore_geometrychunk.h>
+#include <sore_screeninfo.h>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
 
-#include <sore_matrix4x4.h>
-#include <sore_geometrychunk.h>
-#include <sore_texturestate.h>
-#include <sore_screeninfo.h>
-#include <sore_glslshader.h>
-#include <sore_uniformstate.h>
-
 namespace SORE_Graphics
 {
-    enum blend_mode
-    {
-        BLEND_ADDITIVE,
-        BLEND_SUBTRACTIVE,
-        BLEND_OPAQUE,
-        BLEND_UNUSED
-    };
+    class RenderState;
 
-    typedef unsigned long long int64;
-    typedef boost::shared_ptr<SORE_Math::Matrix4<float> > TransformationPtr;
+    typedef unsigned long long uint64;
+    typedef boost::shared_ptr<SORE_Math::Matrix4<float> > MatrixPtr;
 
     class SORE_EXPORT Renderable
     {
     public:
-        Renderable();
-        Renderable(GeometryChunkPtr g, SORE_Resource::GLSLShaderPtr s, TransformationPtr trans,
-            blend_mode b);
+        //Renderable();
+        Renderable(GeometryChunkPtr geometry_, MatrixPtr modelMatrix_, SORE_Resource::MaterialPtr material_);
 
-        void SetGeometryChunk(GeometryChunkPtr g);
-        GeometryChunkPtr GetGeometryChunk() const;
-
-        void SetShader(SORE_Resource::GLSLShaderPtr s);
-        SORE_Resource::GLSLShaderPtr GetShader() const;
-
-        void AddTexture(const std::string& samplerName, const TextureState::TextureObject& texture);
         void SetTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr texture);
+        template<typename T>
+        void SetUniform(const std::string& name, const T& value)
+        {
+            material.SetUniform(name, value);
+        }
 
-        const TextureState& Textures() const;
-        TextureState& Textures();
+        const GeometryChunkPtr GetGeometryChunk() const { return geometry; }
 
-        void MulitplyTransform(TransformationPtr t);
-        void SetTransform(TransformationPtr t);
-        TransformationPtr GetTransform() const;
-
-        void SetBlendMode(blend_mode b);
-        blend_mode GetBlendMode() const;
-
-        UniformState& Uniforms();
-        const UniformState& Uniforms() const;
+        MatrixPtr GetModelMatrix() { return modelMatrix; }
+        const MatrixPtr GetModelMatrix() const { return modelMatrix; }
 
         int GetSortKey() const { return sortKey; }
 
-        void SetProjection(const ProjectionInfo& pi);
-
         void ClearKeywords();
         void AddKeyword(const std::string& keyword);
-        bool HasKeyword(const std::string& keyword) const;
+        bool HasKeyword(const std::string& keyword) const { return keywords.find(keyword) != keywords.end(); }
     private:
+        friend class SORE_Graphics::RenderState;
+
         void CalculateDepth() const;
         void CalculateSortKey() const;
 
         GeometryChunkPtr geometry;
-        SORE_Resource::GLSLShaderPtr shader;
-        TextureState textures;
-        TransformationPtr transformation;
-        blend_mode blending;
-        UniformState uniforms;
+        MatrixPtr modelMatrix;
+        SORE_Resource::MaterialPtr material;
 
         mutable float cachedDepth;
         mutable int sortKey;
-
-        ProjectionInfo proj;
 
         boost::unordered_set<std::string> keywords;
     };

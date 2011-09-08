@@ -32,49 +32,21 @@
  * Adam Kidder.                                                           *
  **************************************************************************/
 
+#include <sore_material.h>
 #include <sore_renderable.h>
 
-SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
-{
-}
+//SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
+//{
+//}
 
 SORE_Graphics::Renderable::Renderable(
-    GeometryChunkPtr g, SORE_Resource::GLSLShaderPtr s, TransformationPtr trans,
-    blend_mode b)
-    : geometry(g), shader(s), transformation(trans),
-      blending(b), cachedDepth(0.0f), sortKey(0)
+    GeometryChunkPtr geometry_, 
+    MatrixPtr modelMatrix_, 
+    SORE_Resource::MaterialPtr material_)
+    : geometry(geometry_), modelMatrix(modelMatrix_), material(material_),
+      cachedDepth(0.0f), sortKey(0)
 {
     CalculateDepth();
-    CalculateSortKey();
-}
-
-void SORE_Graphics::Renderable::SetGeometryChunk(GeometryChunkPtr g)
-{
-    geometry = g;
-    CalculateDepth();
-}
-
-SORE_Graphics::GeometryChunkPtr SORE_Graphics::Renderable::GetGeometryChunk() const
-{
-    return geometry;
-}
-
-void SORE_Graphics::Renderable::SetShader(SORE_Resource::GLSLShaderPtr s)
-{
-    shader = s;
-    CalculateSortKey();
-}
-
-SORE_Resource::GLSLShaderPtr SORE_Graphics::Renderable::GetShader() const
-{
-    return shader;
-}
-
-void SORE_Graphics::Renderable::AddTexture(
-    const std::string& samplerName, 
-    const TextureState::TextureObject& texture)
-{
-    textures.AddTexture(samplerName, texture);
     CalculateSortKey();
 }
 
@@ -82,62 +54,7 @@ void SORE_Graphics::Renderable::SetTexture(
     const std::string& samplerName, 
     SORE_Resource::Texture2DPtr texture)
 {
-    textures.SetTexture(samplerName, texture);
-    CalculateSortKey();
-}
-
-const SORE_Graphics::TextureState& SORE_Graphics::Renderable::Textures() const
-{
-    return textures;
-}
-
-SORE_Graphics::TextureState& SORE_Graphics::Renderable::Textures()
-{
-    return textures;
-}
-
-void SORE_Graphics::Renderable::MulitplyTransform(TransformationPtr t)
-{
-    *transformation *= *t;
-    CalculateDepth();
-    CalculateSortKey();
-}
-
-void SORE_Graphics::Renderable::SetTransform(TransformationPtr t)
-{
-    transformation = t;
-    CalculateDepth();
-    CalculateSortKey();
-}
-
-SORE_Graphics::TransformationPtr SORE_Graphics::Renderable::GetTransform() const
-{
-    return transformation;
-}
-
-void SORE_Graphics::Renderable::SetBlendMode(blend_mode b)
-{
-    blending = b;
-    CalculateSortKey();
-}
-
-SORE_Graphics::blend_mode SORE_Graphics::Renderable::GetBlendMode() const
-{
-    return blending;
-}
-
-SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms()
-{
-    return uniforms;
-}
-
-const SORE_Graphics::UniformState& SORE_Graphics::Renderable::Uniforms() const
-{
-    return uniforms;
-}
-void SORE_Graphics::Renderable::SetProjection(const ProjectionInfo& pi)
-{
-    proj = pi;
+    material->SetTexture(samplerName, texture);
     CalculateSortKey();
 }
 
@@ -152,7 +69,7 @@ void SORE_Graphics::Renderable::CalculateDepth() const
             geometry->GetVertex(i).y,
             geometry->GetVertex(i).z,
             1.0f);
-        pos = *transformation * pos;
+        pos = *GetModelMatrix() * pos;
         if(pos[2] < minZ)
             minZ = pos[2];
     }
@@ -161,26 +78,19 @@ void SORE_Graphics::Renderable::CalculateDepth() const
 
 void SORE_Graphics::Renderable::CalculateSortKey() const
 {
-    const unsigned int keyLen = 32;
-    const unsigned int depthBits = 11;
-    unsigned int depth;
+    const unsigned int keyLen = 64;
+    const unsigned int depthBits = 32;
+    uint64 depth;
 
-    int transparent = 0;
-    if(blending == BLEND_SUBTRACTIVE || blending == BLEND_ADDITIVE)
-        transparent = 1;
+    double z = (static_cast<uint64>(1)<<depthBits) * cachedDepth;
 
-    float z = (1<<depthBits) * cachedDepth;
-
-    depth = static_cast<int>(z);
-    if(!transparent)
-        depth = (1<<depthBits) - depth;
+    depth = static_cast<uint64>(z);
 
     sortKey = 0;
-    sortKey |= (transparent << (keyLen - 2 - 3));
-    sortKey |= (depth & 0xFFF) << (keyLen - 2 - 3 - 12);
-    if(shader)
-        sortKey |= (shader->GetHandle() << (keyLen - 2 - 3 - 12 - 6));
-    sortKey |= ((textures.GetSortKey() % 512)); //9 bits for texture
+    sortKey |= (depth & 0xFFFFFFFF) << 32;
+    if(material->shader)
+        sortKey |= (static_cast<uint64>((material->shader->GetHandle() % 65536)) << 16);
+    sortKey |= ((material->textures.GetSortKey() % 65536)); //16 bits for texture
 }
 
 
@@ -192,11 +102,6 @@ void SORE_Graphics::Renderable::ClearKeywords()
 void SORE_Graphics::Renderable::AddKeyword(const std::string& keyword)
 {
     keywords.insert(keyword);
-}
-
-bool SORE_Graphics::Renderable::HasKeyword(const std::string& keyword) const
-{
-    return !(keywords.find(keyword) == keywords.end());
 }
 
 bool SORE_Graphics::operator<(const SORE_Graphics::Renderable& one,

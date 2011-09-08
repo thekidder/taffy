@@ -46,6 +46,8 @@
 namespace SORE_Graphics
 {
     class PipelineRenderer;
+    class Renderable;
+    class RenderState;
 }
 
 namespace SORE_Resource
@@ -65,16 +67,28 @@ namespace SORE_Resource
             uniforms.SetVariable(name, value);
         }
 
-        void SetTexture(const std::string& name, const Texture2DPtr texture);
-    private:
-        friend class SORE_Graphics::PipelineRenderer;
+        // need to refactor out this interface
+        bool Loaded() const { return true; }
 
-        const SORE_Graphics::Blend_state& blendState;
+        void SetTexture(const std::string& name, const Texture2DPtr texture);
+        const SORE_Graphics::TextureState& Textures() const { return textures; }
+
+        bool operator==(const Material& other) const;
+        bool operator<(const Material& other) const;
+    private:
+        // let the rendering pipeline access our internals
+        friend class SORE_Graphics::PipelineRenderer;
+        friend class SORE_Graphics::Renderable;
+        friend class SORE_Graphics::RenderState;
+
+        SORE_Graphics::Blend_state blendState;
         GLSLShaderPtr shader;
 
         SORE_Graphics::TextureState textures;
         SORE_Graphics::UniformState uniforms;
     };
+
+    inline bool operator!=(const Material& one, const Material& two) { return !(one == two); }
 }
 
 #endif

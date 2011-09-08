@@ -39,6 +39,9 @@ SET(
   DEFAULT_RESOURCES_SRCS 
   Fonts/default.ttf
 
+  Materials/default.json
+  Materials/untextured.json
+
   Shaders/default.shad 
   Shaders/default_fragment.glsl
   Shaders/default_vertex.glsl

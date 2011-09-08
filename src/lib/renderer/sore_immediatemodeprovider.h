@@ -35,12 +35,13 @@
 #ifndef SORE_IMMEDIATE_MODE_PROVIDER_H
 #define SORE_IMMEDIATE_MODE_PROVIDER_H
 
+#include <sore_batchingbuffermanager.h>
 #include <sore_event.h>
 #include <sore_font.h>
 #include <sore_geometry.h>
 #include <sore_geometryprovider.h>
 #include <sore_glslshader.h>
-#include <sore_batchingbuffermanager.h>
+#include <sore_material.h>
 #include <sore_texturestate.h>
 #include <sore_uniformstate.h>
 
@@ -51,23 +52,21 @@ namespace SORE_Graphics
     class ImmediateModeProvider : public SORE_Graphics::GeometryProvider
     {
     public:
-        ImmediateModeProvider(SORE_Resource::GLSLShaderPtr default_shader);
+        ImmediateModeProvider();
 
-        void SetTexture(const SORE_Graphics::TextureState::TextureObject& texture);
-        void SetTexture(const std::string& samplerName, const SORE_Graphics::TextureState::TextureObject& texture);
-        void SetShader(SORE_Resource::GLSLShaderPtr shader);
+        void SetTexture(const std::string& samplerName, const SORE_Resource::Texture2DPtr texture);
+        template<typename T>
+        void SetUniform(const std::string& name, const T& value)
+        {
+            current_material->SetUniform(name, value);
+        }
+
+        void SetMaterial(SORE_Resource::MaterialPtr material);
+
+        void SetTransform(SORE_Graphics::MatrixPtr transform);
         void SetColor(SORE_Graphics::Color color);
-        void SetTransform(SORE_Graphics::TransformationPtr transform);
-        void SetBlendMode(SORE_Graphics::blend_mode blend_mode);
         void SetPrimitiveType(GLenum type);
-        void SetKeywords(const std::string& keywords_);
-
-        void SetUniform(const std::string& name, int i);
-        void SetUniform(const std::string& name, float f);
-        void SetUniform(const std::string& name, const SORE_Math::Vector2<float>& v);
-        void SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v);
-        void SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v);
-        void SetUniform(const std::string& name, const SORE_Math::Matrix4<float>& m);
+        void SetKeywords(const std::string& keywords);
 
         void Start();
 
@@ -102,15 +101,13 @@ namespace SORE_Graphics
         // flush the current vertex/index cache to a new renderable and start a new cache
         void CreateRenderableFromData();
 
-        boost::unordered_map<std::string, TextureState::TextureObject> current_textures;
-        SORE_Resource::GLSLShaderPtr current_shader;
+        SORE_Resource::MaterialPtr current_material;
+
         SORE_Graphics::Color current_color;
-        SORE_Graphics::TransformationPtr current_transform;
-        SORE_Graphics::blend_mode current_blend_mode;
+        SORE_Graphics::MatrixPtr current_transform;
         GLenum current_primitive_type;
         std::pair<float, float> current_texcoords;
-        std::string keywords;
-        UniformState currentUniforms;
+        std::string current_keywords;
 
         std::vector<SORE_Graphics::vertex> vertices;
         std::vector<unsigned short> indices;

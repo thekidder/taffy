@@ -66,7 +66,7 @@ namespace SORE_GUI
         Widget(SVec size_, SVec position_, Widget* parent_);
         Widget(
             SORE_Resource::Font_cache_t& fontCache_,
-            SORE_Resource::Shader_cache_t& shaderCache_,
+            SORE_Resource::Material_cache_t& materialCache_,
             SORE_Resource::Texture_cache_t& textureCache_,
             SVec size_, SVec position_, 
             Widget* parent_ = NULL);
@@ -123,7 +123,7 @@ namespace SORE_GUI
         const Json::Value& Style() { return styleConfig[style]; }
 
         SORE_Resource::Font_cache_t& fontCache;
-        SORE_Resource::Shader_cache_t& shaderCache;
+        SORE_Resource::Material_cache_t& materialCache;
         SORE_Resource::Texture_cache_t& textureCache;
     private:
         //these events are preprocessed: mouse coordinates are relative to the widget,

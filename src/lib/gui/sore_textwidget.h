@@ -36,7 +36,6 @@
 #define SORE_TEXTWIDGET_H
 
 #include <sore_assettypes.h>
-#include <sore_glslshader.h>
 #include <sore_widget.h>
 
 namespace SORE_GUI
@@ -55,7 +54,7 @@ namespace SORE_GUI
         virtual void UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
         bool ProcessEvents(const SORE_Kernel::Event& e);
 
-        SORE_Resource::GLSLShaderPtr shader;
+        SORE_Resource::MaterialPtr material;
         SORE_Resource::FontPtr face;
         SORE_Graphics::Color color;
 

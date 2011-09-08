@@ -4,7 +4,7 @@
         "TextWidget":
         {
             "font":   "ix/LiberationSans-Regular.ttf",
-            "shader": "default.shad"
+            "material": "default.json"
 	},
 	"Checkbox":
 	{
@@ -14,13 +14,13 @@
 	    "texture_checked":    "ix/checkbox_checked.tga",
 	    "tex_coords_checked": [0.0, 1.0, 0.0, 1.0],
 
-    	    "shader":             "default.shad"
+    	    "material":           "default.json"
 	},
 	"FrameWidget":
 	{
     	    "texture":      "ix/frame.tga",
 	    "tex_coords":   [0.0, 1.0, 0.0, 1.0],
-    	    "shader":       "default.shad"
+    	    "material":     "default.json"
 	},
 	"FrameWindow":
 	{
@@ -30,6 +30,10 @@
 	"RenderStats":
 	{
 	    "text_size": 20
+	},
+	"ProfilerStats":
+	{
+	    "material": "untextured.json"
 	}
     }
 }

@@ -206,9 +206,7 @@ void SORE_Resource::Font::LoadFace(unsigned int height)
                 static_cast<float>(buffers[i].height));
             SORE_Math::Rect<float> texCoords(xMin, xMax, yMin, yMax);
 
-            characters[height][i].texture.name = (boost::format("font_%p_%d") % face % height).str();
-            characters[height][i].texture.texture = textures[height];
-            characters[height][i].texture.ready = true;
+            characters[height][i].texture = textures[height];
 
             characters[height][i].vertices[0].x     = buffers[i].x;
             characters[height][i].vertices[0].y     = buffers[i].y;

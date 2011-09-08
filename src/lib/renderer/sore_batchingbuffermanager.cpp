@@ -70,16 +70,18 @@ bool SORE_Graphics::BatchingBufferManager::Contains(GeometryChunkPtr gc)
 
 SORE_Graphics::geometry_entry SORE_Graphics::BatchingBufferManager::LookupGC(GeometryChunkPtr gc)
 {
-    if(!Contains(gc))
+    boost::unordered_map<GeometryChunkPtr, geometry_buffer*>::iterator it;
+    if((it = geometryMapping.find(gc)) == geometryMapping.end())
     {
         throw SORE_Error::Error("Could not find geometry chunk ");
     }
-    geometry_buffer* gb = geometryMapping[gc];
-    if(gb->geometryChunkLookup.find(gc) == gb->geometryChunkLookup.end())
+    geometry_buffer* gb = it->second;
+    geometry_buffer::Geometry_map_t::iterator chunkLookup;
+    if((chunkLookup = gb->geometryChunkLookup.find(gc)) == gb->geometryChunkLookup.end())
     {
         throw SORE_Error::Error("Could not look up geometry chunk ");
     }
-    return gb->geometryChunkLookup[gc];
+    return chunkLookup->second;
 }
 
 void SORE_Graphics::BatchingBufferManager::MakeUpToDate()
@@ -184,7 +186,7 @@ SORE_Graphics::BatchingBufferManager::geometry_buffer* SORE_Graphics::BatchingBu
 {
     std::vector<geometry_buffer*>& heap = heaps[type];
     geometry_buffer* current = heap.size() ? heap.back() : 0;
-    if(heap.size() == 0 || !current->buffer.HasRoomFor(r.GetGeometryChunk()->NumIndices(), r.GetGeometryChunk()->NumVertices()))
+    if(!current || !current->buffer.HasRoomFor(r.GetGeometryChunk()->NumIndices(), r.GetGeometryChunk()->NumVertices()))
     {
         current = new geometry_buffer(type);
         heap.push_back(current);
