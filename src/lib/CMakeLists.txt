@@ -97,8 +97,6 @@ set(SORE_SRCS
   sore_logginginit.cpp
   sore_profiler.cpp
   sore_sample.cpp
-  sore_scenegraph.cpp
-  sore_scenenode.cpp
   sore_screeninfo.cpp
   sore_settings.cpp
   sore_util.cpp)
@@ -116,8 +114,6 @@ set(SORE_HEADERS
   sore_noncopyable.h
   sore_profiler.h
   sore_sample.h
-  sore_scenegraph.h
-  sore_scenenode.h
   sore_screeninfo.h
   sore_settings.h
   sore_util.h) 
