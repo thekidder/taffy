@@ -79,6 +79,13 @@ int SORE_GUI::ProfilerStats::RenderSample(
 
     float bar_width = static_cast<float>(sample->total.lastTime / totalTime);
     bar_width = std::min(bar_width, 1.0f);
+    float children_time = 0.0;
+    for(std::vector<SORE_Profiler::sample_data*>::const_iterator it = sample->children.begin(); it != sample->children.end(); ++it)
+    {
+        children_time += static_cast<float>((*it)->total.lastTime);
+    }
+    float children_bar_width = static_cast<float>(children_time / totalTime);
+    children_bar_width = std::min(children_bar_width, 1.0f);
 
     new TextWidget(16, SVec(10 + treeLevel * 4, height), content, sample->name);
     float x1 = static_cast<float>(TEXT_WIDTH + TIME_WIDTH);
@@ -93,6 +100,15 @@ int SORE_GUI::ProfilerStats::RenderSample(
         x1, y2, 0.0f,
         x2, y1, 0.0f,
         x2, y2, 0.0f);
+
+    x2 = x1 + children_bar_width * static_cast<float>(width);
+    imm_mode.SetColor(SORE_Graphics::Green);
+
+    imm_mode.DrawQuad(
+        x1, y1, LAYER_SEPARATION / 2.0f,
+        x1, y2, LAYER_SEPARATION / 2.0f,
+        x2, y1, LAYER_SEPARATION / 2.0f,
+        x2, y2, LAYER_SEPARATION / 2.0f);
 
     std::string ms = (boost::format("%.1f ms") % sample->total.lastTime).str();
     TextWidget* t = new TextWidget(16, SVec((int)TEXT_WIDTH, height), content, ms);
