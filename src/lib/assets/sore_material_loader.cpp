@@ -33,6 +33,7 @@
  **************************************************************************/
 
 #include <sore_glslshader_loader.h>
+#include <sore_logger.h>
 #include <sore_material_loader.h>
 #include <sore_texture2d_loader.h>
 
@@ -91,6 +92,30 @@ SORE_Resource::Material* SORE_Resource::MaterialLoader::Load(const std::string& 
     GLSLShaderPtr shader = shaderCache.Get(root["shader"].asString());
 
     Material* material = new Material(blendState, shader);
+
+    // set default uniforms
+    Json::Value::Members uniforms = root["uniforms"].getMemberNames();
+    for(Json::Value::Members::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
+    {
+        const std::string& name = *it;
+        const Json::Value& value = root["uniforms"][name];
+
+        SORE_Resource::GLSLShader::Uniform_map_t::const_iterator uniform = shader->ActiveUniforms().find(name);
+        if(uniform == shader->ActiveUniforms().end())
+        {
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, path + ": failed to set uniform " + name + ": shader has no uniform of that name");
+            continue;
+        }
+
+        switch(uniform->second.type)
+        {
+        case GL_SAMPLER_2D:
+            material->SetTexture(name, textureCache.Get(value.asString()));
+            break;
+        default:
+            ENGINE_LOG(SORE_Logging::LVL_ERROR, path + ": failed to set uniform " + name + ": unknown type");
+        }
+    }
 
     return material;
 }

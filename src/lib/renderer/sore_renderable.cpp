@@ -35,10 +35,6 @@
 #include <sore_material.h>
 #include <sore_renderable.h>
 
-//SORE_Graphics::Renderable::Renderable() : cachedDepth(0.0f), sortKey(0)
-//{
-//}
-
 SORE_Graphics::Renderable::Renderable(
     GeometryChunkPtr geometry_, 
     MatrixPtr modelMatrix_, 
@@ -48,6 +44,14 @@ SORE_Graphics::Renderable::Renderable(
 {
     CalculateDepth();
     CalculateSortKey();
+}
+
+SORE_Graphics::Renderable::Renderable(
+    const Renderable& r, 
+    SORE_Resource::MaterialPtr material_)
+    : geometry(r.geometry), modelMatrix(r.modelMatrix), material(material_),
+    cachedDepth(r.cachedDepth), sortKey(r.sortKey), keywords(r.keywords)
+{
 }
 
 void SORE_Graphics::Renderable::SetTexture(

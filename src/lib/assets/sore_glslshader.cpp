@@ -46,16 +46,14 @@ namespace SORE_Resource
     bool GLSLShader::initCalled = false;
     bool GLSLShader::supported  = false;
 
-    const GLSLShader::glsl_variable_info GLSLShader::none = GLSLShader::glsl_variable_info(-1, GL_NONE, 1);
-
     GLSLShader::GLSLShader()
-        : linked(false), program(0)
+        : none(-1, GL_NONE, 1), linked(false), program(0)
     {
         Init();
     }
 
     GLSLShader::GLSLShader(const char* vertex, const char* fragment)
-        : linked(false), program(0)
+        : none(-1, GL_NONE, 1), linked(false), program(0)
     {
         Init();
 
@@ -413,21 +411,21 @@ namespace SORE_Resource
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC2);
         if(location != -1)
-            glUniform1fvARB(location, 2, v.GetValue());
+            glUniform2fvARB(location, 1, v.GetValue());
     }
 
     void GLSLShader::SetUniform(const std::string& name, const SORE_Math::Vector3<float>& v)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC3);
         if(location != -1)
-            glUniform1fvARB(location, 3, v.GetValue());
+            glUniform3fvARB(location, 1, v.GetValue());
     }
 
     void GLSLShader::SetUniform(const std::string& name, const SORE_Math::Vector4<float>& v)
     {
         GLint location = GetCheckedIndex(name, GL_FLOAT_VEC4);
         if(location != -1)
-            glUniform1fvARB(location, 4, v.GetValue());
+            glUniform4fvARB(location, 1, v.GetValue());
     }
 
     void GLSLShader::SetUniform(
@@ -456,7 +454,7 @@ namespace SORE_Resource
         return attributes;
     }
 
-    const GLSLShader::glsl_variable_info& GLSLShader::GetUniform(const std::string& name)
+    GLSLShader::glsl_variable_info& GLSLShader::GetUniform(const std::string& name)
     {
         Uniform_map_t::iterator it;
         if((it=uniforms.find(name))==uniforms.end())
@@ -476,7 +474,7 @@ namespace SORE_Resource
         }
     }
 
-    const GLSLShader::glsl_variable_info& GLSLShader::GetAttribute(const std::string& name)
+    GLSLShader::glsl_variable_info& GLSLShader::GetAttribute(const std::string& name)
     {
         Attribute_map_t::iterator it;
         if((it=attributes.find(name))==attributes.end())
@@ -544,11 +542,13 @@ namespace SORE_Resource
         {
             throw std::runtime_error("Shader is not initialized");
         }
-        const glsl_variable_info& var = GetUniform(name);
+        glsl_variable_info& var = GetUniform(name);
         // don't check if var.type is none, this means it's an invalid uniform anyways
         // (and we've already logged an error)
         if(var.type != GL_NONE && var.type != type)
             throw std::runtime_error("Setting incorrect uniform type");
+        if(var.index != -1)
+            var.bound = true;
         return var.index;
     }
 } //end of namespace SORE_Graphics

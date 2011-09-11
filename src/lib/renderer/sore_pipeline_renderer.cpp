@@ -34,11 +34,13 @@
 
 // uncomment to enable correct profiling results of opengl render calls
 // does result in performance hit
-// #define OPENGL_PROFILE
+#define OPENGL_PROFILE
 
 #include <sore_aggregatebuffermanager.h>
 #include <sore_fbo.h>
 #include <sore_gl_command_list.h>
+#include <sore_glslshader.h>
+#include <sore_material.h>
 #include <sore_pipeline_renderer.h>
 #include <sore_texture2d_fboloader.h>
 #include <sore_timing.h>
@@ -104,19 +106,19 @@ void SORE_Graphics::PipelineRenderer::Render()
     // ensure textures are all ready (bind references to renderbuffers)
     SORE_Resource::Texture2DFBOLoader loader(renderbuffers);
 
-    /*BOOST_FOREACH(Renderable& r, renderables)
+    BOOST_FOREACH(Renderable& r, renderables)
     {
-        if(!r.Textures().Ready())
+        typedef std::pair<std::string, SORE_Resource::GLSLShader::glsl_variable_info> variable_info;
+        BOOST_FOREACH(const variable_info& var, r.GetMaterial()->GetShader()->ActiveUniforms())
         {
-            TextureState::Unready_texture_map_t textures = r.Textures().UnreadyTextures();
-            BOOST_FOREACH(const TextureState::Unready_texture_map_t::value_type& tex, textures)
+            if(!var.second.bound)
             {
-                SORE_Resource::Texture2D* t = loader.Load(tex.second);
-                if(t)
-                    r.Textures().SetTexture(tex.first, t);
+                SORE_Resource::Texture2D* tex = loader.Load(var.first);
+                if(tex)
+                    r.SetTexture(var.first, tex);
             }
         }
-    }*/
+    }
 
     {
         PROFILE_BLOCK("Render pipeline", profiler);

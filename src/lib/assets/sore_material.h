@@ -73,6 +73,8 @@ namespace SORE_Resource
         void SetTexture(const std::string& name, const Texture2DPtr texture);
         const SORE_Graphics::TextureState& Textures() const { return textures; }
 
+        const GLSLShaderPtr GetShader() const { return shader; }
+
         bool operator==(const Material& other) const;
         bool operator<(const Material& other) const;
     private:

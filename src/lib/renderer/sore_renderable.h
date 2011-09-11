@@ -53,17 +53,18 @@ namespace SORE_Graphics
     class SORE_EXPORT Renderable
     {
     public:
-        //Renderable();
-        Renderable(GeometryChunkPtr geometry_, MatrixPtr modelMatrix_, SORE_Resource::MaterialPtr material_);
+        Renderable(GeometryChunkPtr geometry_, MatrixPtr modelMatrix_, SORE_Resource::MaterialPtr material_);        
+        Renderable(const Renderable& r, SORE_Resource::MaterialPtr material_);
 
         void SetTexture(const std::string& samplerName, SORE_Resource::Texture2DPtr texture);
         template<typename T>
         void SetUniform(const std::string& name, const T& value)
         {
-            material.SetUniform(name, value);
+            material->SetUniform(name, value);
         }
 
         const GeometryChunkPtr GetGeometryChunk() const { return geometry; }
+        const SORE_Resource::MaterialPtr GetMaterial() const { return material; }
 
         MatrixPtr GetModelMatrix() { return modelMatrix; }
         const MatrixPtr GetModelMatrix() const { return modelMatrix; }

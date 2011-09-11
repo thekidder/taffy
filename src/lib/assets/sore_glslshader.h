@@ -64,12 +64,14 @@ namespace SORE_Resource
         struct glsl_variable_info
         {
             glsl_variable_info(GLuint index_, GLenum type_, GLint size_)
-                : index(index_), type(type_), size(size_)
+                : index(index_), type(type_), size(size_), bound(false)
             {}
 
             const GLint index;
             const GLenum type;
             const GLint size;
+
+            bool bound;
         };
 
         typedef std::map<std::string, glsl_variable_info> Uniform_map_t;
@@ -107,7 +109,7 @@ namespace SORE_Resource
         bool operator<(const GLSLShader& o) const;
         bool operator==(const GLSLShader& o) const;
     private:
-        const static glsl_variable_info none;
+        glsl_variable_info none;
 
         void Init();
         void Unload();
@@ -120,8 +122,8 @@ namespace SORE_Resource
         // check that name is of type, and return the uniform index, doing a lot of error checking
         int GetCheckedIndex(const std::string& name, GLenum type);
 
-        const glsl_variable_info& GetUniform(const std::string& name);
-        const glsl_variable_info& GetAttribute(const std::string& name);
+        glsl_variable_info& GetUniform(const std::string& name);
+        glsl_variable_info& GetAttribute(const std::string& name);
 
         void PrintInfo();
 
