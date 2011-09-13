@@ -93,7 +93,10 @@ int SORE_GUI::ProfilerStats::RenderSample(
     float y1 = static_cast<float>(height + 1);
     float y2 = y1 + 16.0f;
     imm_mode.SetMaterial(material);
-    imm_mode.SetColor(SORE_Graphics::White);
+    if(sample->children.size())
+        imm_mode.SetColor(SORE_Graphics::Red);
+    else
+        imm_mode.SetColor(SORE_Graphics::Green);
     imm_mode.SetTransform(SORE_Graphics::MatrixPtr(new SORE_Math::Matrix4<float>(content->GetPositionMatrix())));
     imm_mode.DrawQuad(
         x1, y1, 0.0f,
