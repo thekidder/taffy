@@ -1,9 +1,15 @@
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
 uniform float halfWidth;
-uniform mat4 transform;
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
 uniform float lightIntensity;
 uniform float shadowmap_size;
+
+uniform float energy;
+uniform float beat;
 
 uniform sampler2D shadowMap;
 uniform sampler2D colors;
@@ -20,9 +26,10 @@ void main()
     vec4 particlePosition = texture2D(positions, tex);
 
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * transform * vec4(particlePosition.xyz, 1.0);
-    float Cc = (gl_ProjectionMatrix[0] * halfWidth).x;
-	gl_PointSize = particlePosition.w / (sqrt(1.0 / (Cc * Cc)) * gl_Position.z);
+	gl_Position = projection * view * model * vec4(particlePosition.xyz, 1.0);
+    float Cc = (projection[0] * halfWidth).x;
+    float point_size = particlePosition.w + 0.02 * energy;
+	gl_PointSize = point_size / (sqrt(1.0 / (Cc * Cc)) * gl_Position.z);
     color = texture2D(colors, tex);
 
     alive = 1.0;
@@ -33,6 +40,7 @@ void main()
         return;
     }
 
+    color.g = max(color.g, min(0.001 * beat * energy, 0.1));
     float sat = color.g;
     // convert color from HSV to RGB
     vec3 rgb = vec3(0.0, 0.0, 0.0);
@@ -71,9 +79,9 @@ void main()
     vec2 pixel = vec2(1.0 / shadowmap_size, 1.0 / shadowmap_size);
 
     vec4 shadowCoordinateWdivide = shadowCoord / shadowCoord.w ;
-    //shadowCoordinateWdivide.s = 1.0 - shadowCoordinateWdivide.s;	
+    shadowCoordinateWdivide.s = 1.0 - shadowCoordinateWdivide.s;	
 	// Used to lower moiré pattern and self-shadowing
-	// shadowCoordinateWdivide.z += 0.0005;
+	shadowCoordinateWdivide.z += 0.0005;
 
     shadow = 1.0;
 

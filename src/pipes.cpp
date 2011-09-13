@@ -1,18 +1,30 @@
 #include "app_log.h"
 #include "pipes.h"
 
+#include <sore_material.h>
 #include <sore_sample.h>
 
 #include <boost/foreach.hpp>
 
-ParticleShadowPipe::ParticleShadowPipe(SORE_Resource::GLSLShaderPtr shader_, int shadowmap_size, SORE_Profiler::Profiler* profiler)
-    : Pipe(profiler), shader(shader_), shadowmap(shadowmap_size, shadowmap_size, true, 0)
+ParticleShadowPipe::ParticleShadowPipe(
+    SORE_Resource::MaterialPtr material_, int shadowmap_size,
+    SORE_Resource::Texture2DPtr current_, 
+    SORE_Resource::Texture2DPtr last_,
+    SORE_Profiler::Profiler* profiler)
+    : Pipe(profiler), material(material_), shadowmap(shadowmap_size, shadowmap_size, true, 0),
+    one(current_), two(last_), current(&one), last(&two)
 {
+}
+
+void ParticleShadowPipe::Swap()
+{
+    std::swap(current, last);
 }
 
 void ParticleShadowPipe::doSetup(SORE_Graphics::Renderbuffer_map_t& renderbuffers)
 {
-    renderbuffers["particle-shadowmap"] = &shadowmap;
+    renderbuffers["shadowMap"] = &shadowmap;
+    material->SetTexture("positions", *current);
 }
 
 SORE_Graphics::render_list& ParticleShadowPipe::beginRender(
@@ -27,12 +39,13 @@ SORE_Graphics::render_list& ParticleShadowPipe::beginRender(
     renderQueue.SetRenderbuffer(&shadowmap);
     renderQueue.AddCommand(SORE_Graphics::CLEAR_DEPTH_BUFFER);
 
-    BOOST_FOREACH(SORE_Graphics::Renderable& r, list)
+    myList.clear();
+    BOOST_FOREACH(const SORE_Graphics::Renderable& r, list)
     {
-        r.SetShader(shader);
+        myList.push_back(SORE_Graphics::Renderable(r, material));
     }
 
-    return list;
+    return myList;
 }
 
 void ParticleShadowPipe::finishRender(

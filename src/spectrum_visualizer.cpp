@@ -2,7 +2,7 @@
 #include "utility.h"
 
 #include <sore_font_loader.h>
-#include <sore_glslshader_loader.h>
+#include <sore_material_loader.h>
 #include <sore_texture2d_loader.h>
 
 #include <boost/format.hpp>
@@ -12,8 +12,8 @@ SpectrumVisualizer::SpectrumVisualizer(
         Spectrum* spectrum_)
         : Widget(size, position, parent), spectrum(spectrum_)
 {
-    shader = shaderCache.Get("untextured.shad");
-    font_shader = shaderCache.Get("default.shad");
+    material = materialCache.Get("untextured.json");
+    font_material = materialCache.Clone("default.shad");
     face = fontCache.Get("ix/LiberationSans-Regular.ttf");
 }
 
@@ -29,11 +29,9 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
     float width  = static_cast<float>(GetSize(SORE_GUI::HORIZONTAL));
     float height = static_cast<float>(GetSize(SORE_GUI::VERTICAL));
 
-    imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
-    imm_mode.SetShader(shader);
-    imm_mode.SetTexture(SORE_Resource::Texture2DPtr());
+    imm_mode.SetTransform(SORE_Graphics::MatrixPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
+    imm_mode.SetMaterial(material);
     imm_mode.SetColor(SORE_Graphics::Grey);
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
         0.0f,  0.0f,   0.0f,
         0.0f,  height, 0.0f,
@@ -68,7 +66,7 @@ void SpectrumVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateMo
     }
 
     imm_mode.SetColor(SORE_Graphics::White);
-    imm_mode.SetShader(font_shader);
+    imm_mode.SetMaterial(font_material);
     for(size_t i = 0; i < spectrum->NumBuckets(); ++i)
     {
         std::string str = (boost::format("%.0f-%.0fHz") % spectrum->HzRange(i).first % spectrum->HzRange(i).second).str();

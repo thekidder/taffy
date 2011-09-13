@@ -5,6 +5,9 @@ uniform float t;
 uniform float old_t;
 uniform vec3 pos; 
 
+uniform float energy;
+uniform float beat;
+
 varying vec2 tex;
 
 float pos_rand(vec2 co)
@@ -122,13 +125,15 @@ float cnoise(vec3 P)
 vec3 spawn_pos(float t, float seed)
 {
     return vec3(
-        16.0 * (cnoise(vec3(seed, t / 2.0, 246.123))),
-        16.0 * (cnoise(vec3(t / 2.0, seed, 51.12))),
-        16.0 * (cnoise(vec3(7.123, seed, t / 2.0)))) + vec3(0.0, 20.0, 0.0);
+        24.0 * (cnoise(vec3(seed, t / 2.0, 26.123))),
+        24.0 * (cnoise(vec3(t / 2.0, seed, 51.12))),
+        24.0 * (cnoise(vec3(7.123, seed, t / 2.0)))) + vec3(0.0, 20.0, 0.0);
 }
 
 void main()
 {
+    float elapsed = t - old_t;
+
     vec3 old = spawn_pos(old_t, seed);
     vec3 pos = spawn_pos(t, seed);
     /* vec3 pos = vec3(2.0 * rand(tex * seed), 0.0, 2.0 * rand(tex * seed * 7.3)); */
@@ -140,7 +145,7 @@ void main()
     /* pos.y = pos.y * 40.0 + 30.0; */
     /* pos.z *= 100.0; */
 
-    vec3 p_rand = rand_spherical(tex * vec2(t, 29871.56), 0.6);
+    vec3 p_rand = rand_spherical(tex * vec2(t, 271.56), 0.6);
     
     float x = pos.x + p_rand.x;
     float y = pos.y + p_rand.y;
@@ -149,11 +154,11 @@ void main()
     /* float y = pos.y; */
     /* float z = pos.z; */
 
-    gl_FragData[0] = vec4(x, y, z, 0.3 * pos_rand(tex * vec2(t, seed / 1.312)) + 0.1);
+    gl_FragData[0] = vec4(x, y, z, 0.3 * pos_rand(tex * vec2(t, seed / 1.312)) + 0.2);
 
-    float hue = pos_rand(tex * vec2(t, seed / 341.85));
-    hue *= 15.0;
-    hue += 35.0;
+    float hue = 360.0 - energy * 16.0;
+    hue = max(min(353.9, hue), 6.1);
+    hue += rand(tex * vec2(t, seed / 1.85)) * 6.0;
 
     float sat = pos_rand(tex * vec2(t, seed / 249.435));
     sat = clamp(sat * 2.0, 0.8, 1.0);
@@ -163,16 +168,19 @@ void main()
     
     gl_FragData[1] = vec4(hue, sat, val, sign(rand(tex * vec2(t, seed / 368.14)) - 0.8) );
 
-    vec3 vel = pos - old;
-    float elapsed = t - old_t;
+    vec3 vel = pos - vec3(0.0, 20.0, 0.0);// - old;
 
-    vec3 vel_rand = rand_spherical(tex * vec2(t, 98.51212341), 0.01);
+    float rad = 0.03;
+    //if(beat == 0.0)
+    //    rad = 5.0;
 
-    float xv = 0.02 * vel.x / elapsed + vel_rand.x;
-    float yv = 0.02 * vel.y / elapsed + vel_rand.y;
-    float zv = 0.02 * vel.z / elapsed + vel_rand.z;
+    vec3 vel_rand = rand_spherical(tex * vec2(t, 98.51212341), rad);
+
+    float xv = 0.02 * vel.x + vel_rand.x;
+    float yv = 0.02 * vel.y + vel_rand.y;
+    float zv = 0.02 * vel.z + vel_rand.z;
     gl_FragData[2] = vec4(
         xv, yv, zv,
-        0.05 * pos_rand(tex * vec2(t, seed / 938.8)) + 0.002);
+        0.06 * pos_rand(tex * vec2(t, seed / 938.8)) + 0.0025);
     //0.0, 0.0, 0.0, 0.03 * pos_rand(tex * vec2(t * seed / 23.9)) + 0.05);
 }

@@ -1,0 +1,4 @@
+{
+    "blend": "opaque",
+    "shader": "particles_emitter.shad"
+}

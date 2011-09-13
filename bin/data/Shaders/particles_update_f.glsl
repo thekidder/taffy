@@ -33,7 +33,7 @@ void main()
     if(color.a > 0.02)
     {
         vec3 new_color = color.rgb - vec3(0.0, elapsed * 0.05, elapsed * dataVec.w);
-        new_color = max(new_color, vec3(0.0, 0.0, 0.6));
+        new_color = max(new_color, vec3(0.0, 0.2, 0.6));
 
         vec3 vel = dataVec.xyz;
         vel.y += 1.0 * smoothstep(-2.9, -3.0, position.y);

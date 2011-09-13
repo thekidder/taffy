@@ -27,8 +27,8 @@ private:
     std::vector<data_container> data;
     size_t history_size;
 
-    SORE_Resource::GLSLShaderPtr shader;
-    SORE_Resource::GLSLShaderPtr font_shader;
+    SORE_Resource::MaterialPtr material;
+    SORE_Resource::MaterialPtr font_material;
     SORE_Resource::FontPtr face;
 
     std::string comment;

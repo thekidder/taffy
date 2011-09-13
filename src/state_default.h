@@ -117,7 +117,7 @@ private:
 
     int width, height;
 
-    float lightT;
+    float lightT, startup;
 };
 
 #endif

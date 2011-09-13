@@ -29,6 +29,8 @@ int main(int argc, char** argv)
     APP_LOG(SORE_Logging::LVL_INFO, GetVersionString());
 
     SORE_Game::GamestateStack stack(GetVersionDisplayName(), "data/app.bmp", settingsFile);
+    stack.PackageCache().AddPackage("ix_style.sdp");
+    stack.PackageCache().AddPackage("default_resources.sdp");
     stack.PushState(new DefaultState(stack));
     int toReturn = stack.Run();
 

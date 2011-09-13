@@ -1,6 +1,6 @@
 #include "pivot_camera.h"
 
-PivotCamera::PivotCamera() : x_rads(0.0f), y_rads(0.0f), dist(40.0f)
+PivotCamera::PivotCamera() : x_rads(0.0f), y_rads(0.0f), dist(120.0f)
 {
     Rotate(0.0f, static_cast<float>(M_PI / -6.0));
 }

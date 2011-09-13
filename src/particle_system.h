@@ -24,16 +24,17 @@ class ParticleSystem : public SORE_Graphics::GeometryProvider, public SORE_Graph
 {
 public:
     ParticleSystem(
-        Particle_spawn_func_t spawn_func,
         size_t texture_size_w, size_t texture_size_h,
-        SORE_Resource::Texture_cache_t& texture_cache,
-        SORE_Resource::Shader_cache_t& shader_cache);
+        SORE_Resource::MaterialPtr shadowMaterial_,
+        SORE_Resource::MaterialPtr updateMaterial_,
+        SORE_Resource::MaterialPtr drawMaterial_,
+        SORE_Resource::MaterialPtr emitterMaterial_);
 
+    ParticleShadowPipe* GetShadowPipe();
     ParticleUpdatePipe* GetUpdatePipe();
     ParticleEmitterPipe* GetEmitterPipe();
     SORE_Graphics::camera_info GetUpdateCamera();
 
-    void SetEmitter(SORE_Resource::GLSLShaderPtr shader);
     void Update(int elapsed, SORE_Graphics::ImmediateModeProvider& imm_mode);
 
     template<typename T>
@@ -41,7 +42,7 @@ public:
     {
         for(std::vector<SORE_Graphics::Renderable>::iterator it = geometry.begin(); it != geometry.end(); ++it)
         {
-            it->Uniforms().SetVariable(name, v);
+            it->SetUniform(name, v);
         }
     }
 
@@ -56,8 +57,6 @@ public:
 
     SORE_Graphics::BufferManager* GetBufferManager() { return this; }
 private:
-    SORE_Resource::GLSLShaderPtr update_shader, emitter_shader;
-
     std::vector<SORE_Graphics::Renderable> geometry;
     SORE_Graphics::SimpleBufferManager buffers;
 
@@ -67,14 +66,14 @@ private:
     ParticleState state1, state2, spawns;
     ParticleState* current, *last;
 
+    ParticleShadowPipe* shadow_pipe;
     ParticleUpdatePipe* update_pipe;
     ParticleEmitterPipe* emitter_pipe;
 
-    SORE_Resource::Texture_cache_t& texture_cache;
-    SORE_Resource::Shader_cache_t& shader_cache;
+    SORE_Resource::MaterialPtr updateMaterial, drawMaterial, emitterMaterial;
 
     int time_since_update, time_since_spawn_update;
-    float last_emit_time;
+    float last_emit_time, timer;
     float seed;
 
     bool spawned, updated;

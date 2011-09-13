@@ -1,0 +1,7 @@
+{
+    "blend": "subtractive",
+    "shader": "untextured_lit.shad",
+    "uniforms": 
+    {
+    }
+}

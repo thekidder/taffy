@@ -1,0 +1,8 @@
+{
+    "blend": "opaque",
+    "shader": "particles.shad",
+    "uniforms":
+    {
+	"texture": "particle.tga"
+    }
+}

@@ -2,7 +2,7 @@
 #include "utility.h"
 
 #include <sore_font_loader.h>
-#include <sore_glslshader_loader.h>
+#include <sore_material_loader.h>
 #include <sore_texture2d_loader.h>
 
 GraphVisualizer::GraphVisualizer(
@@ -11,8 +11,8 @@ GraphVisualizer::GraphVisualizer(
         : Widget(size, position, parent), input_range(input_range_),
         data(num_series), history_size(history_size_)
 {
-    shader = shaderCache.Get("untextured.shad");
-    font_shader = shaderCache.Get("default.shad");
+    material = materialCache.Get("untextured.json");
+    font_material = materialCache.Clone("default.shad");
     face = fontCache.Get("ix/LiberationSans-Regular.ttf");
 }
 
@@ -36,11 +36,9 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     float height = static_cast<float>(GetSize(SORE_GUI::VERTICAL));
 
     // draw background
-    imm_mode.SetTransform(SORE_Graphics::TransformationPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
-    imm_mode.SetShader(shader);
-    imm_mode.SetTexture(SORE_Resource::Texture2DPtr());
+    imm_mode.SetTransform(SORE_Graphics::MatrixPtr(new SORE_Math::Matrix4<float>(GetPositionMatrix())));
+    imm_mode.SetMaterial(material);
     imm_mode.SetColor(SORE_Graphics::Grey);
-    imm_mode.SetBlendMode(SORE_Graphics::BLEND_SUBTRACTIVE);
     imm_mode.DrawQuad(
         0.0f,  0.0f,   0.0f,
         0.0f,  height, 0.0f,
@@ -91,7 +89,7 @@ void GraphVisualizer::UpdateAndRender(int elapsed, SORE_Graphics::ImmediateModeP
     }
 
     imm_mode.SetColor(SORE_Graphics::White);
-    imm_mode.SetShader(font_shader);
+    imm_mode.SetMaterial(font_material);
     imm_mode.DrawString(
         static_cast<float>(GetSize(SORE_GUI::HORIZONTAL) - face->Width(24, comment)),
         static_cast<float>(GetSize(SORE_GUI::VERTICAL) - 24),

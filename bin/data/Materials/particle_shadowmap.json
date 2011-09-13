@@ -1,0 +1,7 @@
+{
+    "blend": "opaque",
+    "shader": "particles_shadowmap.shad",
+    "uniforms":
+    {
+    }
+}

@@ -19,8 +19,8 @@ private:
 
     Spectrum* spectrum;
 
-    SORE_Resource::GLSLShaderPtr shader;
-    SORE_Resource::GLSLShaderPtr font_shader;
+    SORE_Resource::MaterialPtr material;
+    SORE_Resource::MaterialPtr font_material;
     SORE_Resource::FontPtr face;
 };
 
