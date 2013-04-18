@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F247E173-FEFE-4C8B-A767-F306F8D044EA}</ProjectGuid>
+    <RootNamespace>sore</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\thirdparty\vs2012\x86\boost_1_53_0;../src/lib;../src/lib/3rdparty;../src/lib/assets;../src/lib/gui;../src/lib/kernel;../src/lib/math;../src/lib/network;../src/lib/renderer;../src/lib/resource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\boost\boost_1_47\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\thirdparty\vs2012\x86\boost_1_53_0;../src/lib;../src/lib/3rdparty;../src/lib/assets;../src/lib/gui;../src/lib/kernel;../src/lib/math;../src/lib/network;../src/lib/renderer;../src/lib/resource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\boost\boost_1_47\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\lib\3rdparty\json\json_reader.cpp" />
+    <ClCompile Include="..\src\lib\3rdparty\json\json_value.cpp" />
+    <ClCompile Include="..\src\lib\3rdparty\json\json_writer.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_font.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_font_loader.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_glslshader.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_glslshader_loader.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_material.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_material_loader.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_texture2d.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_texture2d_fboloader.cpp" />
+    <ClCompile Include="..\src\lib\assets\sore_texture2d_loader.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_button.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_checkbox.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_framewidget.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_framewindow.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_profilerstats.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_renderstats.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_sliderwidget.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_textwidget.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_topwidget.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_units.cpp" />
+    <ClCompile Include="..\src\lib\gui\sore_widget.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_event.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_gamekernel.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_gamestate.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_gamestate_stack.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_inputdistributor.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_inputtask.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_screen.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_task.cpp" />
+    <ClCompile Include="..\src\lib\kernel\sore_timing.cpp" />
+    <ClCompile Include="..\src\lib\math\sore_math.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_aggregatebuffermanager.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_batch.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_batchingbuffermanager.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_buffermanager.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_fbo.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_geometrychunk.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_geometryprovider.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_gl_command_list.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_graphicsarray.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_immediatemodeprovider.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_pipe.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_pipeline_renderer.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_renderable.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_renderstate.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_simplebuffermanager.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_texturestate.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_uniformstate.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_vbo.cpp" />
+    <ClCompile Include="..\src\lib\renderer\sore_vertexarray.cpp" />
+    <ClCompile Include="..\src\lib\resource\sore_fileloader.cpp" />
+    <ClCompile Include="..\src\lib\sore_camera.cpp" />
+    <ClCompile Include="..\src\lib\sore_color.cpp" />
+    <ClCompile Include="..\src\lib\sore_fileio.cpp" />
+    <ClCompile Include="..\src\lib\sore_fileio_windows.cpp" />
+    <ClCompile Include="..\src\lib\sore_font_windows.cpp" />
+    <ClCompile Include="..\src\lib\sore_interpolater.cpp" />
+    <ClCompile Include="..\src\lib\sore_logger.cpp" />
+    <ClCompile Include="..\src\lib\sore_logginginit.cpp" />
+    <ClCompile Include="..\src\lib\sore_profiler.cpp" />
+    <ClCompile Include="..\src\lib\sore_sample.cpp" />
+    <ClCompile Include="..\src\lib\sore_screeninfo.cpp" />
+    <ClCompile Include="..\src\lib\sore_settings.cpp" />
+    <ClCompile Include="..\src\lib\sore_timing_windows.cpp" />
+    <ClCompile Include="..\src\lib\sore_util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\lib\3rdparty\json\autolink.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\config.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\features.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\forwards.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\json.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\json_batchallocator.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\json_tool.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\reader.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\value.h" />
+    <ClInclude Include="..\src\lib\3rdparty\json\writer.h" />
+    <ClInclude Include="..\src\lib\assets\sore_assettypes.h" />
+    <ClInclude Include="..\src\lib\assets\sore_font.h" />
+    <ClInclude Include="..\src\lib\assets\sore_font_loader.h" />
+    <ClInclude Include="..\src\lib\assets\sore_glslshader.h" />
+    <ClInclude Include="..\src\lib\assets\sore_glslshader_loader.h" />
+    <ClInclude Include="..\src\lib\assets\sore_material.h" />
+    <ClInclude Include="..\src\lib\assets\sore_material_loader.h" />
+    <ClInclude Include="..\src\lib\assets\sore_texture2d.h" />
+    <ClInclude Include="..\src\lib\assets\sore_texture2d_fboloader.h" />
+    <ClInclude Include="..\src\lib\assets\sore_texture2d_loader.h" />
+    <ClInclude Include="..\src\lib\gui\sore_button.h" />
+    <ClInclude Include="..\src\lib\gui\sore_checkbox.h" />
+    <ClInclude Include="..\src\lib\gui\sore_dropdown.h" />
+    <ClInclude Include="..\src\lib\gui\sore_framewidget.h" />
+    <ClInclude Include="..\src\lib\gui\sore_framewindow.h" />
+    <ClInclude Include="..\src\lib\gui\sore_profilerstats.h" />
+    <ClInclude Include="..\src\lib\gui\sore_renderstats.h" />
+    <ClInclude Include="..\src\lib\gui\sore_sliderwidget.h" />
+    <ClInclude Include="..\src\lib\gui\sore_textfield.h" />
+    <ClInclude Include="..\src\lib\gui\sore_textwidget.h" />
+    <ClInclude Include="..\src\lib\gui\sore_topwidget.h" />
+    <ClInclude Include="..\src\lib\gui\sore_units.h" />
+    <ClInclude Include="..\src\lib\gui\sore_widget.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_event.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_event_keysym.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_gamekernel.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_gamestate.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_gamestate_stack.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_inputdistributor.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_inputtask.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_screen.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_task.h" />
+    <ClInclude Include="..\src\lib\kernel\sore_timing.h" />
+    <ClInclude Include="..\src\lib\math\sore_geometry.h" />
+    <ClInclude Include="..\src\lib\math\sore_math.h" />
+    <ClInclude Include="..\src\lib\math\sore_math_defines.h" />
+    <ClInclude Include="..\src\lib\math\sore_matrix4x4.h" />
+    <ClInclude Include="..\src\lib\math\sore_quaternion.h" />
+    <ClInclude Include="..\src\lib\math\sore_vector2.h" />
+    <ClInclude Include="..\src\lib\math\sore_vector3.h" />
+    <ClInclude Include="..\src\lib\math\sore_vector4.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_broadcaster.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_buffers.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_client.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_common.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_game.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_player.h" />
+    <ClInclude Include="..\src\lib\network\sore_network_server.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_aggregatebuffermanager.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_allgl.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_batch.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_batchingbuffermanager.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_blend_state.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_buffermanager.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_fbo.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_geometrychunk.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_geometryprovider.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_gl_command_list.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_graphicsarray.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_immediatemodeprovider.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_pipe.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_pipeline_renderer.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_renderable.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_renderer.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_renderstate.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_simplebuffermanager.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_texturestate.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_uniformstate.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_vbo.h" />
+    <ClInclude Include="..\src\lib\renderer\sore_vertexarray.h" />
+    <ClInclude Include="..\src\lib\resource\sore_fileloader.h" />
+    <ClInclude Include="..\src\lib\resource\sore_resourcecache.h" />
+    <ClInclude Include="..\src\lib\resource\sore_resourceproxy.h" />
+    <ClInclude Include="..\src\lib\sore_camera.h" />
+    <ClInclude Include="..\src\lib\sore_color.h" />
+    <ClInclude Include="..\src\lib\sore_defines.h" />
+    <ClInclude Include="..\src\lib\sore_dll.h" />
+    <ClInclude Include="..\src\lib\sore_exception.h" />
+    <ClInclude Include="..\src\lib\sore_fileio.h" />
+    <ClInclude Include="..\src\lib\sore_fileio_windows.h" />
+    <ClInclude Include="..\src\lib\sore_interpolater.h" />
+    <ClInclude Include="..\src\lib\sore_logger.h" />
+    <ClInclude Include="..\src\lib\sore_logginginit.h" />
+    <ClInclude Include="..\src\lib\sore_noncopyable.h" />
+    <ClInclude Include="..\src\lib\sore_profiler.h" />
+    <ClInclude Include="..\src\lib\sore_sample.h" />
+    <ClInclude Include="..\src\lib\sore_screeninfo.h" />
+    <ClInclude Include="..\src\lib\sore_settings.h" />
+    <ClInclude Include="..\src\lib\sore_util.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
