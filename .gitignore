@@ -1,0 +1,5 @@
+bin/*.mp3
+bin/*.ilk
+bin/*.pdb
+bin/*.exe
+bin/logs/*

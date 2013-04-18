@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{95E13DCC-3846-4F4C-96E5-E8A45E495B59}</ProjectGuid>
+    <RootNamespace>taffy</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)Debug</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\thirdparty\vs2012\x86\boost_1_53_0;../../sore/src/lib;../../sore/src/lib/3rdparty;../../sore/src/lib/assets;../../sore/src/lib/gui;../../sore/src/lib/kernel;../../sore/src/lib/math;../../sore/src/lib/network;../../sore/src/lib/renderer;../../sore/src/lib/resource;C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\thirdparty\vs2012\x86\boost_1_53_0\bin.v2\all;D:\Documents\Visual Studio 2010\Projects\sore\sore\Debug;%(AdditionalLibraryDirectories);C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;D:\Documents\DEVEL\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sore.lib;fmodex_vc.lib;sfml-graphics.lib;sfml-main.lib;sfml-system.lib;sfml-window.lib;zdll.lib;glew32.lib;freetype.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\thirdparty\vs2012\x86\boost_1_53_0;../../sore/src/lib;../../sore/src/lib/3rdparty;../../sore/src/lib/assets;../../sore/src/lib/gui;../../sore/src/lib/kernel;../../sore/src/lib/math;../../sore/src/lib/network;../../sore/src/lib/renderer;../../sore/src/lib/resource;C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\thirdparty\vs2012\x86\boost_1_53_0\bin.v2\all;D:\Documents\Visual Studio 2010\Projects\sore\sore\Release;%(AdditionalLibraryDirectories);C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;D:\Documents\DEVEL\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sore.lib;fmodex_vc.lib;sfml-graphics.lib;sfml-main.lib;sfml-system.lib;sfml-window.lib;zdll.lib;glew32.lib;freetype.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\3rdparty\kiss_fft.h" />
+    <ClInclude Include="..\src\3rdparty\kiss_fftr.h" />
+    <ClInclude Include="..\src\3rdparty\_kiss_fft_guts.h" />
+    <ClInclude Include="..\src\analyzer.h" />
+    <ClInclude Include="..\src\app_log.h" />
+    <ClInclude Include="..\src\averaging_spectrum.h" />
+    <ClInclude Include="..\src\beat_detector.h" />
+    <ClInclude Include="..\src\bounded_queue.h" />
+    <ClInclude Include="..\src\debug_gui.h" />
+    <ClInclude Include="..\src\energy_analyzer.h" />
+    <ClInclude Include="..\src\fft_spectrum.h" />
+    <ClInclude Include="..\src\fmod_pass_through_adapter.h" />
+    <ClInclude Include="..\src\fmod_spectrum.h" />
+    <ClInclude Include="..\src\geometric_spectrum.h" />
+    <ClInclude Include="..\src\graph_visualizer.h" />
+    <ClInclude Include="..\src\hsv_color.h" />
+    <ClInclude Include="..\src\kiss_spectrum.h" />
+    <ClInclude Include="..\src\partial_spectrum.h" />
+    <ClInclude Include="..\src\particle_system.h" />
+    <ClInclude Include="..\src\particle_texture_loader.h" />
+    <ClInclude Include="..\src\pipes.h" />
+    <ClInclude Include="..\src\pivot_camera.h" />
+    <ClInclude Include="..\src\sound_pass_through_buffer.h" />
+    <ClInclude Include="..\src\spectrum.h" />
+    <ClInclude Include="..\src\spectrum_snapshot.h" />
+    <ClInclude Include="..\src\spectrum_visualizer.h" />
+    <ClInclude Include="..\src\state_default.h" />
+    <ClInclude Include="..\src\utility.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\3rdparty\kiss_fft.c" />
+    <ClCompile Include="..\src\3rdparty\kiss_fftr.c" />
+    <ClCompile Include="..\src\averaging_spectrum.cpp" />
+    <ClCompile Include="..\src\beat_detector.cpp" />
+    <ClCompile Include="..\src\debug_gui.cpp" />
+    <ClCompile Include="..\src\energy_analyzer.cpp" />
+    <ClCompile Include="..\src\fft_spectrum.cpp" />
+    <ClCompile Include="..\src\fmod_pass_through_adapter.cpp" />
+    <ClCompile Include="..\src\fmod_spectrum.cpp" />
+    <ClCompile Include="..\src\geometric_spectrum.cpp" />
+    <ClCompile Include="..\src\graph_visualizer.cpp" />
+    <ClCompile Include="..\src\hsv_color.cpp" />
+    <ClCompile Include="..\src\kiss_spectrum.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\partial_spectrum.cpp" />
+    <ClCompile Include="..\src\particle_system.cpp" />
+    <ClCompile Include="..\src\particle_texture_loader.cpp" />
+    <ClCompile Include="..\src\pipes.cpp" />
+    <ClCompile Include="..\src\pivot_camera.cpp" />
+    <ClCompile Include="..\src\sound_pass_through_buffer.cpp" />
+    <ClCompile Include="..\src\spectrum.cpp" />
+    <ClCompile Include="..\src\spectrum_snapshot.cpp" />
+    <ClCompile Include="..\src\spectrum_visualizer.cpp" />
+    <ClCompile Include="..\src\state_default.cpp" />
+    <ClCompile Include="..\src\utility.cpp" />
+    <ClCompile Include="..\src\version_info.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
