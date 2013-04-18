@@ -1,0 +1,58 @@
+B0;115;0cRenderer design:
+GeometryChunk:
+  Contains geometry information (vertices [vertex data, colors, texcoords, etc], 
+  indices).
+Renderable:
+  Composed of a GeometryChunk, shader, textures, blending mode, and transformation.
+  Is sortable -  contains a key that implements sorting (see below)
+
+GeometryProvider:
+  Object that defines:
+    Projection for the geometry to be rendered
+    Callbacks for added, removed, changed objects
+
+Renderer:
+  On a GeometryProvider callback:
+    Rebuild or refresh affected VBOs
+    Two options: 
+     Do a complete rebuild each time, or:
+     Find the minimum that has to be changed, and change it
+  Per Frame:
+    For the current state: render all VBOs
+
+Rendering:
+  State changes that have to be accounted for:
+    -Bind/Draw from new VBO
+    -Change blending mode
+    -Bind new shader
+    -Bind new texture(s)
+    -Bind new uniforms
+
+  For simplicity we will impose the following limitations for the first iteration:
+    -Only one texture/renderable
+    -No shader uniforms
+
+  Goal is to get to same functionality in old renderer, then expand it
+
+Current issues:
+  where to store transformations?
+    use a shared_ptr
+
+Renderer sorting:
+
+key: 32-bits
+3 bits: layer (example: HUD, game, etc)
+2 bits: translucency
+  opaque
+  additive-translucency
+  subtractive-translucency
+12 bits: depth sorting
+6 bits: shader
+9 bits: texture
+
+alternate: 64-bit key
+3 bits: layer
+2 bits: translucency
+24 bits: depth sorting
+7 bits: shader
+28 bits:material/uniform

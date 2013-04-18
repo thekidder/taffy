@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sore", "sore.vcxproj", "{F247E173-FEFE-4C8B-A767-F306F8D044EA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "taffy", "..\..\taffy\vs2012\taffy.vcxproj", "{95E13DCC-3846-4F4C-96E5-E8A45E495B59}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F247E173-FEFE-4C8B-A767-F306F8D044EA} = {F247E173-FEFE-4C8B-A767-F306F8D044EA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F247E173-FEFE-4C8B-A767-F306F8D044EA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F247E173-FEFE-4C8B-A767-F306F8D044EA}.Debug|Win32.Build.0 = Debug|Win32
+		{F247E173-FEFE-4C8B-A767-F306F8D044EA}.Release|Win32.ActiveCfg = Release|Win32
+		{F247E173-FEFE-4C8B-A767-F306F8D044EA}.Release|Win32.Build.0 = Release|Win32
+		{95E13DCC-3846-4F4C-96E5-E8A45E495B59}.Debug|Win32.ActiveCfg = Debug|Win32
+		{95E13DCC-3846-4F4C-96E5-E8A45E495B59}.Debug|Win32.Build.0 = Debug|Win32
+		{95E13DCC-3846-4F4C-96E5-E8A45E495B59}.Release|Win32.ActiveCfg = Release|Win32
+		{95E13DCC-3846-4F4C-96E5-E8A45E495B59}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

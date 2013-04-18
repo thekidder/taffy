@@ -1,0 +1,24 @@
+set(SORE_KERNEL_SRCS
+  kernel/sore_event.cpp
+  kernel/sore_gamekernel.cpp
+  kernel/sore_gamestate.cpp
+  kernel/sore_gamestate_stack.cpp
+  kernel/sore_inputtask.cpp
+  kernel/sore_inputdistributor.cpp
+  kernel/sore_screen.cpp
+  kernel/sore_task.cpp
+  kernel/sore_timing.cpp
+  PARENT_SCOPE)
+
+set(SORE_KERNEL_HEADERS 
+  kernel/sore_event.h
+  kernel/sore_event_keysym.h
+  kernel/sore_gamekernel.h
+  kernel/sore_gamestate.h
+  kernel/sore_gamestate_stack.h
+  kernel/sore_inputtask.h
+  kernel/sore_inputdistributor.h
+  kernel/sore_screen.h
+  kernel/sore_task.h
+  kernel/sore_timing.h
+  PARENT_SCOPE)

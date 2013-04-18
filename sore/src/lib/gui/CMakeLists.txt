@@ -1,0 +1,23 @@
+set(SORE_GUI_SRCS 
+  gui/sore_checkbox.cpp
+  gui/sore_framewidget.cpp
+  gui/sore_framewindow.cpp
+  gui/sore_renderstats.cpp
+  gui/sore_profilerstats.cpp
+  gui/sore_textwidget.cpp
+  gui/sore_topwidget.cpp
+  gui/sore_widget.cpp
+  gui/sore_units.cpp
+  PARENT_SCOPE)
+
+set(SORE_GUI_HEADERS 
+  gui/sore_checkbox.h
+  gui/sore_framewidget.h 
+  gui/sore_framewindow.h
+  gui/sore_renderstats.h
+  gui/sore_profilerstats.h
+  gui/sore_textwidget.h
+  gui/sore_topwidget.h
+  gui/sore_widget.h
+  gui/sore_units.h 
+  PARENT_SCOPE)

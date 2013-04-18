@@ -1,0 +1,5 @@
+[Vertex]
+data/Shaders/point_sprite_vertex.glsl
+
+[Fragment]
+data/Shaders/point_sprite_fragment.glsl

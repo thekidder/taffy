@@ -6,7 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "taffy", "taffy.vcxproj", "{
 		{E50E4042-4219-43E4-BACD-5B647CC0766D} = {E50E4042-4219-43E4-BACD-5B647CC0766D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sore", "..\..\sore\vs2010\sore.vcxproj", "{E50E4042-4219-43E4-BACD-5B647CC0766D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sore", "..\sore\vs2010\sore.vcxproj", "{E50E4042-4219-43E4-BACD-5B647CC0766D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

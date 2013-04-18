@@ -1,0 +1,9 @@
+ix_style guidelines:
+  Border: 1px white (#ffffff)
+  Rounded on corners at a radius of 4px
+
+  Fill:
+  #1d1d1d. For translucent elements, opacity 80%
+
+  Special:
+  FrameWindow: Opacity of titlebar separator: 95%

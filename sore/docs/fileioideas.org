@@ -1,0 +1,20 @@
+* outfile support for SORE_FileIO
+** recognize when to write to straight file/package
+   needs support in PackageCache; determine if filename is in existing
+   package, write accordingly
+** packages:
+*** writing to a package is hard
+    files within a package have a maximum length, must rewrite
+    everything after that if we overflow that length -> not easy to
+    avoid lots of unneccesary writes
+*** writing to compressed file is hard
+    zlib has on-the-fly compression support? probably not...
+    lends support to writing to temporary file before writing whole
+    package out
+*** idea: write to temp file
+     on a flush calculate sizes/offsets and write whole package
+**** idea: transaction support
+     use transactions to recover from crash/failed temporary write ->
+     package write 
+     do this on sore package reading to provide support in any sore app
+     

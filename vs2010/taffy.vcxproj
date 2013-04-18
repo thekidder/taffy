@@ -47,11 +47,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\Program Files %28x86%29\boost\boost_1_47;../../sore/src/lib/;../../sore/src/lib/3rdparty;../../sore/src/lib/assets;../../sore/src/lib/gui;../../sore/src/lib/kernel;../../sore/src/lib/math;../../sore/src/lib/network;../../sore/src/lib/renderer;../../sore/src/lib/resource;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\Program Files %28x86%29\boost\boost_1_47;../sore/src/lib/;../sore/src/lib/3rdparty;../sore/src/lib/assets;../sore/src/lib/gui;../sore/src/lib/kernel;../sore/src/lib/math;../sore/src/lib/network;../sore/src/lib/renderer;../sore/src/lib/resource;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\boost\boost_1_47\lib;D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;../../sore/vs2010/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\boost\boost_1_47\lib;D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;../sore/vs2010/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sore.lib;fmodex_vc.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-system-d.lib;sfml-window-d.lib;zdll.lib;glew32.lib;freetype.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -62,13 +62,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\Program Files %28x86%29\boost\boost_1_47;../../sore/src/lib/;../../sore/src/lib/3rdparty;../../sore/src/lib/assets;../../sore/src/lib/gui;../../sore/src/lib/kernel;../../sore/src/lib/math;../../sore/src/lib/network;../../sore/src/lib/renderer;../../sore/src/lib/resource;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Documents\DEVEL\include;C:\Program Files %28x86%29\boost\boost_1_47;../sore/src/lib/;../sore/src/lib/3rdparty;../sore/src/lib/assets;../sore/src/lib/gui;../sore/src/lib/kernel;../sore/src/lib/math;../sore/src/lib/network;../sore/src/lib/renderer;../sore/src/lib/resource;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\inc;../src/3rdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\boost\boost_1_47\lib;D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;../../sore/vs2010/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\boost\boost_1_47\lib;D:\Documents\DEVEL\lib;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Programmers API Windows\api\lib;../sore/vs2010/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sore.lib;fmodex_vc.lib;sfml-graphics.lib;sfml-main.lib;sfml-system.lib;sfml-window.lib;zdll.lib;glew32.lib;freetype.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
