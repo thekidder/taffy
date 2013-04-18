@@ -26,8 +26,8 @@ using SORE_GUI::SUnit;
 const int k_fft_samples = 4096;
 const int k_num_channels = 2;
 const int k_num_particles_width  = 1024;
-const int k_num_particles_height = 512;
-const int k_shadowmap_size = 2048;
+const int k_num_particles_height = 2048;
+const int k_shadowmap_size = 4096;
 
 DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
     : Gamestate(stack), // run every 20 milliseconds
@@ -140,7 +140,7 @@ DefaultState::DefaultState(SORE_Game::GamestateStack& stack)
 
     visualizers_controls->SetChecked(false);
 
-    top.SetVisible(false);
+    top.SetVisible(true);
 
     renderer.AddGeometryProvider(&particles);
     renderer.AddGeometryProvider(top.GetGeometryProvider());

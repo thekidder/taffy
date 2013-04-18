@@ -23,3 +23,4 @@ std::string  GetVersionDisplayName();
 std::string  GetVersionComment();
 
 #endif //APP_LOG_H
+ 

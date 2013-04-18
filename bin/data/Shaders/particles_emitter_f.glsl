@@ -154,7 +154,7 @@ void main()
     /* float y = pos.y; */
     /* float z = pos.z; */
 
-    gl_FragData[0] = vec4(x, y, z, 0.3 * pos_rand(tex * vec2(t, seed / 1.312)) + 0.2);
+    gl_FragData[0] = vec4(x, y, z, 0.05 * pos_rand(tex * vec2(t, seed / 1.312)) + 0.05);
 
     float hue = 360.0 - energy * 16.0;
     hue = max(min(353.9, hue), 6.1);
