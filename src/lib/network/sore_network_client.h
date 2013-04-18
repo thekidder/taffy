@@ -24,10 +24,10 @@
 #include <boost/function.hpp>
 #include <enet/enet.h>
 
-#include "../sore_task.h"
-#include "../sore_settings.h"
-#include "sore_network_buffers.h"
-#include "sore_network_game.h"
+#include <sore_task.h>
+#include <sore_settings.h>
+#include <sore_network_buffers.h>
+#include <sore_network_game.h>
 
 namespace SORE_Network
 {

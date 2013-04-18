@@ -23,11 +23,11 @@
 
 #include <deque>
 
-#include "../sore_task.h"
-#include "../sore_settings.h"
-#include "sore_network_buffers.h"
-#include "sore_network_game.h"
-#include "sore_network_player.h"
+#include <sore_task.h>
+#include <sore_settings.h>
+#include <sore_network_buffers.h>
+#include <sore_network_game.h>
+#include <sore_network_player.h>
 
 namespace SORE_Network
 {

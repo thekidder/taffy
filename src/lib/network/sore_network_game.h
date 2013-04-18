@@ -21,7 +21,7 @@
 #ifndef SORE_NETWORK_GAME_H
 #define SORE_NETWORK_GAME_H
 
-#include "sore_network_player.h"
+#include <sore_network_player.h>
 
 namespace SORE_Network
 {

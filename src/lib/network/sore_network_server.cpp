@@ -21,8 +21,8 @@
 
 #include <cstdio>
 
-#include "../sore_logger.h"
-#include "../sore_timing.h"
+#include <sore_logger.h>
+#include <sore_timing.h>
 #include "sore_network_broadcaster.h"
 #include "sore_network_client.h"
 #include "sore_network_server.h"

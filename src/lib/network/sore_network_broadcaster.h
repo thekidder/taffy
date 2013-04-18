@@ -24,7 +24,7 @@
 #include <boost/function.hpp>
 #include <enet/enet.h>
 
-#include "../sore_task.h"
+#include <sore_task.h>
 
 namespace SORE_Network
 {
