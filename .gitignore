@@ -3,3 +3,6 @@ bin/*.ilk
 bin/*.pdb
 bin/*.exe
 bin/logs/*
+vs2010/*.sdf
+vs2010/*.suo
+vs2010/*.user
